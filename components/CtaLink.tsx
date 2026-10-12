@@ -8,15 +8,17 @@ export function CtaLink({
   className = "",
   onClick,
   size = "default",
+  variant = "default",
   withArrow = false,
 }: {
   className?: string;
   onClick?: () => void;
   size?: "default" | "lg";
+  variant?: "default" | "gold";
   withArrow?: boolean;
 }) {
   return (
-    <Link href="/#kayit" onClick={onClick} className={cn(buttonVariants({ size }), "group/cta", className)}>
+    <Link href="/#kayit" onClick={onClick} className={cn(buttonVariants({ size, variant }), "group/cta", className)}>
       {siteConfig.ctaLabel}
       {withArrow && (
         <ArrowRightIcon

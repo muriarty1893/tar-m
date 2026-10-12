@@ -33,9 +33,16 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
+// Arms the home hero's one-time intro before first paint (so nothing flashes), only when motion is
+// allowed. If the hero hasn't started within 4 s (slow or failed JS), the content simply shows.
+const cineScript = `(function(){var d=document.documentElement;if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("cine");setTimeout(function(){if(!d.dataset.cineRun)d.classList.remove("cine")},4000)})()`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="tr" className={`${dmSans.variable} ${spaceGrotesk.variable} h-full antialiased`}>
+    <html lang="tr" className={`${dmSans.variable} ${spaceGrotesk.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: cineScript }} />
+      </head>
       <body className="flex min-h-full flex-col font-sans">
         <a
           href="#icerik"

@@ -26,13 +26,17 @@ npx @gltf-transform/cli@4 optimize iphone_17_pro.glb public/models/phone.glb \
 
 The scene finds the display by its material name `OLED`, so keep that name if you swap the model.
 
+## The home hero
+
+`components/ui/cinematic-landing-hero.tsx` (adapted from a 21st.dev cinematic hero) plays a one-time GSAP intro on load and then rests; there is no scroll pinning. The headline reveals over a field running to the horizon (`public/hero/field-horizon.webp`). Then a forest-green card rises with the phone render (mouse tilt on desktop), two glass badges, the pitch and the CTAs. An inline `<head>` script in `app/layout.tsx` adds `html.cine` only when motion is allowed, so intro elements start hidden only then. Without JS, with reduced motion, or if the hero hasn't started within 4 s, everything shows in its final state. GSAP is loaded lazily after first paint.
+
 ## The hero image
 
-`public/hero-app-phone.webp` is a cinematic still of the bare phone (no meadow, transparent background) on the app's home screen. To re-render it after changing the app screens:
+`public/hero/phone.webp` is a cinematic still of the bare phone (no meadow, transparent background) on the app's home screen. To re-render it after changing the app screens:
 
 1. Add a temporary client page that renders `PhoneScene` with `scenery={false}`, `animate={false}`, `intro={false}`, `pose={[-0.12, -0.32, 0.035]}` and `view={{ fov: 24, position: [0, -0.3, 4.5], lookAt: [0, 0, 0] }}`, plus `AppScreen` in the overlay div (as `PhoneStage` does), in a 700×1000 box.
 2. Run `npm run dev`. In Playwright (Chromium with `--use-angle=gl`, 2× device scale), make the page background transparent and screenshot the canvas with `omitBackground: true`.
-3. Trim and convert: `magick render.png -trim +repage -bordercolor none -border 24 -resize 760x -quality 84 public/hero-app-phone.webp`
+3. Trim and convert: `magick render.png -trim +repage -bordercolor none -border 24 -resize 760x -quality 84 public/hero/phone.webp`
 4. Delete the temporary page.
 
 ## Photos

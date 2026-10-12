@@ -7,9 +7,9 @@ import { photoCredits } from "@/data/photo-credits";
 const publicFiles = (dir: string) => fs.readdirSync(path.join(process.cwd(), "public", dir)).map((f) => `/${dir}/${f}`);
 
 describe("photo credits", () => {
-  it("credits every photo shipped in public/demo and public/app", () => {
+  it("credits every photo shipped in public/demo, public/app and public/hero", () => {
     const credited = new Set(photoCredits.map((c) => c.src));
-    for (const f of [...publicFiles("demo"), ...publicFiles("app")]) expect(credited, f).toContain(f);
+    for (const f of [...publicFiles("demo"), ...publicFiles("app"), ...publicFiles("hero").filter((f) => f !== "/hero/phone.webp")]) expect(credited, f).toContain(f);
   });
 
   it("credits every demo scenario image", () => {
@@ -20,7 +20,7 @@ describe("photo credits", () => {
   it("names the author and links the license for every CC BY photo", () => {
     for (const c of photoCredits.filter((c) => c.license.startsWith("CC BY"))) {
       expect(c.author.trim(), c.src).not.toBe("");
-      expect(c.licenseUrl, c.src).toMatch(/^https:\/\/creativecommons\.org\/licenses\/by\//);
+      expect(c.licenseUrl, c.src).toMatch(/^https:\/\/creativecommons\.org\/licenses\/by(-sa)?\//);
     }
     for (const c of photoCredits) expect(c.sourceUrl).toMatch(/^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
   });

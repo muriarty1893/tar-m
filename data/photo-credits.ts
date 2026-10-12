@@ -4,16 +4,18 @@ export type PhotoCredit = {
   /** Short Turkish label shown in the credit line. */
   label: string;
   author: string;
-  license: "Kamu malı" | "CC0" | "CC BY 2.0" | "CC BY 4.0";
+  license: "Kamu malı" | "CC0" | "CC BY 2.0" | "CC BY 4.0" | "CC BY-SA 2.0";
   licenseUrl?: string;
   sourceUrl: string;
 };
 
 const BY2 = "https://creativecommons.org/licenses/by/2.0/";
 const BY4 = "https://creativecommons.org/licenses/by/4.0/";
+const BYSA2 = "https://creativecommons.org/licenses/by-sa/2.0/";
 const CC0 = "https://creativecommons.org/publicdomain/zero/1.0/";
 
 export const photoCredits: PhotoCredit[] = [
+  { src: "/hero/field-horizon.webp", label: "Ufka uzanan tarla", author: "John Sutton", license: "CC BY-SA 2.0", licenseUrl: BYSA2, sourceUrl: "https://commons.wikimedia.org/wiki/File:Waldringfield,_potato_rows_and_a_cloudless_sky_-_geograph.org.uk_-_7121840.jpg" },
   { src: "/demo/bugday-pas.webp", label: "Buğdayda sarı pas", author: "USDA", license: "Kamu malı", sourceUrl: "https://commons.wikimedia.org/wiki/File:Stripe_rust_on_wheat.jpg" },
   { src: "/app/scan-leaf.webp", label: "Buğdayda sarı pas (kırpılmış)", author: "USDA", license: "Kamu malı", sourceUrl: "https://commons.wikimedia.org/wiki/File:Stripe_rust_on_wheat.jpg" },
   { src: "/demo/kuru-misir.webp", label: "Kuraklıkta mısır", author: "CraneStation", license: "CC BY 2.0", licenseUrl: BY2, sourceUrl: "https://commons.wikimedia.org/wiki/File:Corn_in_drought,_Western_Kentucky,_August,_2012.jpg" },

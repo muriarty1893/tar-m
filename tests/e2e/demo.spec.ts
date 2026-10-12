@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
 
+// Logic tests: reduced motion keeps the phone still, so taps never race its intro spin.
+test.use({ reducedMotion: "reduce" });
+
 const DISCLAIMER = "Örnek gösterim — gerçek uygulamada kendi tarlanızın fotoğrafını yükleyeceksiniz.";
 
 test("tapping a scenario analyses, then shows diagnosis, gauge and disclaimer", async ({ page }) => {
@@ -36,4 +39,13 @@ test("demo CTA leads to the waitlist", async ({ page }) => {
   await page.goto("/#demo");
   const cta = page.locator("#demo").getByRole("link", { name: "Erken erişim için kaydol" });
   await expect(cta).toHaveAttribute("href", "/#kayit");
+});
+
+test("picking a field photo scrolls the phone into view", async ({ page }) => {
+  await page.goto("/#demo");
+  const picker = page.getByRole("button", { name: /Mısır tarlası/ });
+  await picker.scrollIntoViewIfNeeded();
+  await picker.click();
+  const stage = page.locator("#demo").getByTestId("uygulama-ekrani");
+  await expect(stage).toBeInViewport({ ratio: 0.5 });
 });

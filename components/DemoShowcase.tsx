@@ -42,6 +42,12 @@ export function DemoShowcase() {
   const pick = (s: DemoScenario) => {
     interacted.current = true;
     analyse(s);
+    // The picker sits below the phone: bring the phone into view (on phones it is usually off screen).
+    const el = stage.current;
+    if (el) {
+      const r = el.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > window.innerHeight) el.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
+    }
   };
 
   const scanNext = () => {
