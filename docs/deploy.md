@@ -46,6 +46,8 @@ Measured locally against `npm run build && npm start` with Lighthouse 12.8.2, mo
 | `/is-birligi` | 97 | 100 | 100 | 100 |
 | `/sss` | 93–94 | 100 | 100 | 100 |
 
+The 3D phone showcase (added later) loads three.js and the 1 MB model only when the demo nears the viewport, so the home page's first load is unchanged; measured against the build before it in alternating runs, both landed in the same 79–94 band on this laptop.
+
 What keeps the home page fast: the scroll-reveal is CSS (no animation library on load), Motion loads only when a demo answer appears, the mobile menu's Sheet code loads on first tap, form validation (zod) loads on first submit, and only the heading font is preloaded.
 
 ## Pre-launch checklist

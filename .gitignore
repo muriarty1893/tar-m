@@ -16,3 +16,7 @@ next-env.d.ts
 .DS_Store
 npm-debug.log*
 .playwright-mcp/
+
+# Source assets kept out of git (see docs/3d-model.md)
+/iphone_17_pro.glb
+/Ekran görüntüsü*.png

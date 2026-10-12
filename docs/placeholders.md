@@ -10,3 +10,5 @@
 | Hero phone mockup (built from demo data) | `components/Hero.tsx` | Real app screenshot once the app exists |
 | KVKK text: data controller, cross-border transfer basis, retention period (in [brackets]) | `app/gizlilik/page.tsx` | Lawyer-reviewed text; then remove the "Taslak" note |
 | Partner page "Pazar ve fırsat" (qualitative, no figures) | `app/is-birligi/page.tsx` | Sourced figures (e.g. TÜİK, Tarım ve Orman Bakanlığı) if you want numbers |
+| In-app illustrations on the 3D phone (weather hero, quick-action cards) | `public/app/*.svg` | Real photos or final app artwork (WebP, roughly 2× the shown size) |
+| Simulated app data on the 3D phone (user name, prices, weather) | `components/phone-app/AppScreen.tsx` | Final app screens; the prices there are illustrative, not live market data |

@@ -10,6 +10,8 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     locale: "tr-TR",
+    // Hardware WebGL: the site skips the 3D phone on software renderers (headless default).
+    launchOptions: { args: ["--use-angle=gl"] },
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },

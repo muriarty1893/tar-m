@@ -32,7 +32,7 @@ export default async function Home() {
         id="demo"
         eyebrow="Canlı demo"
         title="Uygulamayı deneyin"
-        intro="Örnek tarla fotoğraflarından birini seçin ve yapay zekânın nasıl yanıt verdiğini görün."
+        intro="Örnek tarla fotoğraflarından birini seçin; telefondaki uygulama fotoğrafı tarasın ve yapay zekânın yanıtını göstersin."
         className="bg-card"
       >
         <DemoShowcase />

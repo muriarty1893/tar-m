@@ -1,80 +1,83 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import {
-  CameraIcon,
-  CheckCircleIcon,
-  EyeIcon,
-  FirstAidKitIcon,
-  InfoIcon,
-  LightbulbIcon,
-} from "@phosphor-icons/react/dist/ssr";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { CameraIcon, CheckIcon, InfoIcon } from "@phosphor-icons/react/dist/ssr";
 import { demoScenarios, type DemoScenario } from "@/data/demo-scenarios";
-import { SuccessGauge } from "./SuccessGauge";
+import { AppScreen, type AppPhase } from "./phone-app/AppScreen";
+import { PhoneStage, usePrefersReducedMotion } from "./phone-app/PhoneStage";
 import { CtaLink } from "./CtaLink";
 
 const ANALYSIS_MS = 2000;
+const AUTOPLAY_MS = 2600;
 
-type Phase = "idle" | "analyzing" | "done";
-
-function AnswerBlock({ icon: Icon, label, children }: { icon: typeof EyeIcon; label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex gap-3">
-      <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary">
-        <Icon aria-hidden="true" weight="duotone" className="size-5" />
-      </span>
-      <div>
-        <p className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">{label}</p>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Answer({ s }: { s: DemoScenario }) {
-  return (
-    <div className="space-y-4" data-testid="demo-cevap">
-      <AnswerBlock icon={EyeIcon} label="Ne görüyorum">
-        <p className="text-[0.95rem]">{s.seen}</p>
-      </AnswerBlock>
-      <AnswerBlock icon={FirstAidKitIcon} label="Teşhis">
-        <p className="font-heading text-lg font-bold leading-snug">{s.diagnosis}</p>
-      </AnswerBlock>
-      <AnswerBlock icon={LightbulbIcon} label="Öneriler">
-        <ul className="mt-1 space-y-1.5 text-[0.95rem]">
-          {s.suggestions.map((t) => (
-            <li key={t} className="flex gap-2">
-              <CheckCircleIcon aria-hidden="true" weight="fill" className="mt-1 size-4 shrink-0 text-primary" />
-              {t}
-            </li>
-          ))}
-        </ul>
-      </AnswerBlock>
-      <SuccessGauge value={s.successRate} />
-    </div>
-  );
-}
+const STEPS: { label: string; reached: (p: AppPhase) => boolean }[] = [
+  { label: "Fotoğraf", reached: (p) => p !== "idle" },
+  { label: "Analiz", reached: (p) => p !== "idle" },
+  { label: "Sonuç", reached: (p) => p === "done" },
+];
 
 export function DemoShowcase() {
   const [selected, setSelected] = useState<DemoScenario | null>(null);
-  const [phase, setPhase] = useState<Phase>("idle");
+  const [phase, setPhase] = useState<AppPhase>("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  const interacted = useRef(false);
+  const reduced = usePrefersReducedMotion();
 
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current);
   }, []);
 
   // A new pick cancels any pending analysis so only the latest answer appears.
-  const analyse = (s: DemoScenario) => {
+  const analyse = useCallback((s: DemoScenario) => {
     if (timer.current) clearTimeout(timer.current);
     setSelected(s);
     setPhase("analyzing");
     timer.current = setTimeout(() => setPhase("done"), ANALYSIS_MS);
+  }, []);
+
+  const pick = (s: DemoScenario) => {
+    interacted.current = true;
+    analyse(s);
   };
 
+  const scanNext = () => {
+    const i = selected ? demoScenarios.indexOf(selected) : -1;
+    pick(demoScenarios[(i + 1) % demoScenarios.length]);
+  };
+
+  const reset = () => {
+    interacted.current = true;
+    if (timer.current) clearTimeout(timer.current);
+    setSelected(null);
+    setPhase("idle");
+  };
+
+  // Showcase: once the phone is in view, play one example scan unless the visitor acts first.
+  useEffect(() => {
+    const el = stage.current;
+    if (!el || reduced) return;
+    let pending: ReturnType<typeof setTimeout> | undefined;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting || interacted.current) return;
+        io.disconnect();
+        pending = setTimeout(() => {
+          if (!interacted.current) analyse(demoScenarios[0]);
+        }, AUTOPLAY_MS);
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      clearTimeout(pending);
+    };
+  }, [reduced, analyse]);
+
   return (
-    <div className="grid items-start gap-10 lg:grid-cols-[1fr_auto]">
+    <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-14">
       <div>
         <p className="flex items-center gap-2 text-lg font-semibold">
           <span className="flex size-7 items-center justify-center rounded-full bg-gold text-sm font-bold text-gold-foreground">1</span>
@@ -85,7 +88,7 @@ export function DemoShowcase() {
             <li key={s.id}>
               <button
                 type="button"
-                onClick={() => analyse(s)}
+                onClick={() => pick(s)}
                 aria-pressed={selected?.id === s.id}
                 className="group w-full cursor-pointer overflow-hidden rounded-3xl border-2 border-border bg-background text-left shadow-soft transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-lift aria-pressed:border-primary aria-pressed:ring-4 aria-pressed:ring-primary/20 motion-reduce:hover:translate-y-0"
               >
@@ -98,51 +101,36 @@ export function DemoShowcase() {
             </li>
           ))}
         </ul>
+
+        <p className="mt-8 flex items-center gap-2 text-lg font-semibold">
+          <span className="flex size-7 items-center justify-center rounded-full bg-gold text-sm font-bold text-gold-foreground">2</span>
+          Telefondaki yanıtı izleyin
+        </p>
+        <ol className="mt-4 flex items-center gap-2" aria-label="Tarama adımları">
+          {STEPS.map(({ label, reached }, i) => {
+            const on = reached(phase);
+            return (
+              <li key={label} className="flex flex-1 items-center gap-2">
+                <span
+                  className={`flex size-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-colors duration-300 ${on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-muted-foreground"}`}
+                >
+                  {on ? <CheckIcon aria-hidden="true" weight="bold" className="size-4" /> : i + 1}
+                </span>
+                <span className={`text-[0.95rem] font-semibold ${on ? "text-foreground" : "text-muted-foreground"}`}>
+                  {label}
+                  <span className="sr-only">{on ? " (tamamlandı)" : ""}</span>
+                </span>
+                {i < STEPS.length - 1 && <span aria-hidden="true" className={`h-0.5 flex-1 rounded-full ${on ? "bg-primary" : "bg-border"}`} />}
+              </li>
+            );
+          })}
+        </ol>
       </div>
 
-      <div className="mx-auto w-full max-w-sm">
-        <p className="mb-5 flex items-center gap-2 text-lg font-semibold">
-          <span className="flex size-7 items-center justify-center rounded-full bg-gold text-sm font-bold text-gold-foreground">2</span>
-          Yapay zekânın yanıtı
-        </p>
-        {/* Phone frame */}
-        <div className="relative">
-          <div aria-hidden="true" className="blob absolute -inset-6 bg-blob opacity-70" />
-          <div className="relative rounded-[2.6rem] border-[10px] border-foreground bg-foreground shadow-lift">
-            <div className="mx-auto mb-2 h-1.5 w-16 rounded-full bg-background/40" aria-hidden="true" />
-            <div className="min-h-[34rem] overflow-hidden rounded-[1.9rem] bg-background p-4 text-base" aria-live="polite">
-              {phase === "idle" && (
-                <div className="flex h-[32rem] flex-col items-center justify-center gap-4 px-4 text-center text-muted-foreground">
-                  <span className="blob flex size-20 items-center justify-center bg-secondary text-primary">
-                    <CameraIcon aria-hidden="true" weight="duotone" className="size-10" />
-                  </span>
-                  <p>Bir fotoğrafa dokunun; yapay zekâ tarlayı analiz etsin.</p>
-                </div>
-              )}
-
-              {selected && phase !== "idle" && (
-                <div className="space-y-4">
-                  <div className="relative overflow-hidden rounded-2xl">
-                    <Image src={selected.imageSrc} alt={selected.imageAlt} width={400} height={300} unoptimized className="w-full" />
-                    {phase === "analyzing" && (
-                      <div className="absolute inset-0 bg-primary/20" aria-hidden="true">
-                        <div className="h-1 w-full bg-gold shadow-[0_0_14px_var(--gold)] motion-safe:animate-[demo-scan_1.2s_ease-in-out_infinite]" />
-                      </div>
-                    )}
-                  </div>
-                  {phase === "analyzing" ? (
-                    <p className="flex items-center gap-2 font-semibold" role="status">
-                      <span className="size-4 rounded-full border-2 border-primary border-t-transparent motion-safe:animate-spin" aria-hidden="true" />
-                      Analiz ediliyor…
-                    </p>
-                  ) : (
-                    <Answer s={selected} />
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+      <div ref={stage}>
+        <PhoneStage>
+          <AppScreen phase={phase} scenario={selected} onScan={scanNext} onReset={reset} />
+        </PhoneStage>
       </div>
 
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between lg:col-span-2">
@@ -152,6 +140,21 @@ export function DemoShowcase() {
         </p>
         <CtaLink withArrow className="shrink-0" />
       </div>
+      <p className="text-sm text-muted-foreground lg:col-span-2">
+        3B telefon modeli:{" "}
+        <a
+          href="https://sketchfab.com/3d-models/iphone-17-pro-4541aa8a28324b33a2baaf81d263aaec"
+          className="underline underline-offset-2 hover:text-foreground"
+          rel="noopener"
+        >
+          “iPhone 17 Pro”, Ranguel
+        </a>{" "}
+        —{" "}
+        <a href="https://creativecommons.org/licenses/by/4.0/" className="underline underline-offset-2 hover:text-foreground" rel="noopener license">
+          CC BY 4.0
+        </a>
+        , web için sıkıştırıldı.
+      </p>
     </div>
   );
 }

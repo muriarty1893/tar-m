@@ -59,4 +59,5 @@ Commit and push; Vercel redeploys. If a file is invalid (missing title, wrong da
 - [docs/deploy.md](docs/deploy.md): Vercel setup, domain, and the pre-launch checklist
 - [docs/apps-script.md](docs/apps-script.md): connecting the forms to Google Sheets
 - [docs/placeholders.md](docs/placeholders.md): everything to replace before launch
+- [docs/3d-model.md](docs/3d-model.md): the 3D phone showcase and its model credit
 - [docs/superpowers/specs/](docs/superpowers/specs/): the design spec

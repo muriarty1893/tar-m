@@ -149,6 +149,15 @@
 }
 
 /* Demo "scanning" line over the field photo. */
+@keyframes app-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 @keyframes demo-scan {
   0%,
   100% {
@@ -187,4 +196,16 @@
   padding: 0.85rem 1.1rem;
   border-radius: 0.9rem;
   color: var(--foreground);
+}
+
+/* 3D phone showcase: sky behind the meadow scene. */
+@utility stage-sky {
+  background:
+    radial-gradient(circle at 80% 13%, rgb(255 240 186 / 0.95) 0, rgb(255 240 186 / 0) 24%),
+    linear-gradient(180deg, #bfe3f5 0%, #e2f3ef 46%, #f7efd8 70%, #f7efd8 100%);
+  @media (prefers-color-scheme: dark) {
+    background:
+      radial-gradient(circle at 80% 13%, rgb(253 230 138 / 0.28) 0, rgb(253 230 138 / 0) 20%),
+      linear-gradient(180deg, #0b1b2b 0%, #12293a 45%, #1d3a2c 75%, #1d3a2c 100%);
+  }
 }
