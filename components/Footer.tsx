@@ -15,7 +15,7 @@ const links = [
 
 export function Footer() {
   return (
-    <footer className="relative mt-auto overflow-hidden border-t border-border bg-card">
+    <footer className="relative mt-auto overflow-hidden border-t border-border bg-surface">
       <div aria-hidden="true" className="dot-texture pointer-events-none absolute inset-0 opacity-60" />
       <div aria-hidden="true" className="blob pointer-events-none absolute -bottom-24 -right-20 size-72 bg-blob opacity-60" />
       <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-[1.4fr_1fr_1fr]">

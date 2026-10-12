@@ -17,7 +17,7 @@ export function PartnerCta() {
       eyebrow="İş birliği"
       title="Birlikte büyüyelim"
       intro="Uygulamamızı sahaya birlikte taşıyacağımız kurum ve kişilerle tanışmak istiyoruz."
-      className="bg-card"
+      className="bg-surface"
     >
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {audiences.map(({ icon: Icon, title, text }) => (

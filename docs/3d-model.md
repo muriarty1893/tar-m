@@ -28,12 +28,12 @@ The scene finds the display by its material name `OLED`, so keep that name if yo
 
 ## The hero image
 
-`public/hero-phone.webp` is a render of this scene: the phone on the app's home screen above the meadow, on a transparent background. To re-render it after changing the app screens:
+`public/hero-app-phone.webp` is a cinematic still of the bare phone (no meadow, transparent background) on the app's home screen. To re-render it after changing the app screens:
 
-1. Run `npm run dev`.
-2. In Playwright (Chromium with `--use-angle=gl`, 2× device scale, reduced motion so the phone is still), open `/#demo`, make the page and `.stage-bg` backgrounds transparent, and screenshot a 520×820 area centred on the phone with `omitBackground: true`.
-3. Fade the meadow's edges and convert:
-   `magick render.png -resize 880x -channel A -fx "u*min(1,min((h-j)/190,min(i/140,(w-i)/140)))" +channel -quality 82 public/hero-phone.webp`
+1. Add a temporary client page that renders `PhoneScene` with `scenery={false}`, `animate={false}`, `intro={false}`, `pose={[-0.12, -0.32, 0.035]}` and `view={{ fov: 24, position: [0, -0.3, 4.5], lookAt: [0, 0, 0] }}`, plus `AppScreen` in the overlay div (as `PhoneStage` does), in a 700×1000 box.
+2. Run `npm run dev`. In Playwright (Chromium with `--use-angle=gl`, 2× device scale), make the page background transparent and screenshot the canvas with `omitBackground: true`.
+3. Trim and convert: `magick render.png -trim +repage -bordercolor none -border 24 -resize 760x -quality 84 public/hero-app-phone.webp`
+4. Delete the temporary page.
 
 ## Photos
 

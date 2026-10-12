@@ -25,17 +25,38 @@ type SceneProps = {
   /** DOM app screen that is warped onto the phone's display every frame. */
   overlay: RefObject<HTMLDivElement | null>;
   onReady: () => void;
+  /** The meadow under the phone; off for the bare-phone hero render. */
+  scenery?: boolean;
+  /** Resting rotation of the phone (x lean, y turn, z roll). */
+  pose?: [number, number, number];
+  view?: View;
 };
 
-export default function PhoneScene({ animate, intro, dark, active, overlay, onReady }: SceneProps) {
+type View = { fov: number; position: [number, number, number]; lookAt: [number, number, number] };
+
+/** Demo stage: facing the viewer straight on, leaning slightly back. */
+const DEMO_POSE: [number, number, number] = [-0.14, 0, 0];
+const DEMO_VIEW: View = { fov: 45, position: [0, 0.3, 2.45], lookAt: [0, -0.06, 0] };
+
+export default function PhoneScene({
+  animate,
+  intro,
+  dark,
+  active,
+  overlay,
+  onReady,
+  scenery = true,
+  pose = DEMO_POSE,
+  view = DEMO_VIEW,
+}: SceneProps) {
   return (
     <Canvas
       frameloop={active ? "always" : "demand"}
       dpr={[1, 1.75]}
-      camera={{ fov: 45, position: [0, 0.3, 2.45], near: 0.1, far: 20 }}
+      camera={{ fov: view.fov, position: view.position, near: 0.1, far: 20 }}
       gl={{ antialias: true, alpha: true }}
       onCreated={({ gl, camera }) => {
-        camera.lookAt(0, -0.06, 0);
+        camera.lookAt(...view.lookAt);
         gl.domElement.setAttribute("role", "img");
         gl.domElement.setAttribute("aria-label", LABEL);
       }}
@@ -51,11 +72,11 @@ export default function PhoneScene({ animate, intro, dark, active, overlay, onRe
 
       <PresentationControls global={false} cursor snap speed={1.3} polar={[-0.25, 0.25]} azimuth={[-0.7, 0.7]}>
         <Float enabled={animate} speed={1.4} rotationIntensity={0.1} floatIntensity={0.5} floatingRange={[-0.05, 0.05]}>
-          <Phone intro={intro} active={active} overlay={overlay} onReady={onReady} />
+          <Phone intro={intro} active={active} pose={pose} overlay={overlay} onReady={onReady} />
         </Float>
       </PresentationControls>
 
-      <GrassField y={-1.12} animate={animate} />
+      {scenery && <GrassField y={-1.12} animate={animate} />}
     </Canvas>
   );
 }
@@ -63,11 +84,13 @@ export default function PhoneScene({ animate, intro, dark, active, overlay, onRe
 function Phone({
   intro,
   active,
+  pose,
   overlay,
   onReady,
 }: {
   intro: boolean;
   active: boolean;
+  pose: [number, number, number];
   overlay: RefObject<HTMLDivElement | null>;
   onReady: () => void;
 }) {
@@ -132,8 +155,7 @@ function Phone({
 
   return (
     <group ref={turn}>
-      {/* Resting pose: facing the viewer straight on, leaning slightly back. */}
-      <group rotation={[-0.14, 0, 0]} scale={SCALE}>
+      <group rotation={pose} scale={SCALE}>
         <group rotation={[0, Math.PI, 0]}>
           <primitive object={model} />
           <group ref={screenAnchor} position={[screen.x, screen.y, screen.z]} rotation={[0, Math.PI, 0]} />

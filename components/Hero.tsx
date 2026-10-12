@@ -17,18 +17,17 @@ const trust = [
   { icon: ShieldCheckIcon, text: "KVKK'ya uygun" },
 ];
 
-/** Render of the 3D showcase phone running the app's home screen (see docs/3d-model.md to re-render). */
+/** Cinematic render of the showcase phone on the app's home screen, on plain white (see docs/3d-model.md to re-render). */
 function PhoneShot() {
   return (
-    <div className="relative mx-auto w-full max-w-[18rem] sm:max-w-[22rem]">
-      <div aria-hidden="true" className="blob absolute inset-x-0 inset-y-10 bg-blob" />
+    <div className="mx-auto w-full max-w-[16rem] sm:max-w-[20rem]">
       <Image
-        src="/hero-phone.webp"
+        src="/hero-app-phone.webp"
         alt={`${siteConfig.name} mobil uygulamasının ana ekranı: tarla hava durumu, ürün fiyatları ve hızlı işlemler`}
-        width={880}
-        height={1443}
-        sizes="(min-width: 640px) 352px, 288px"
-        className="relative h-auto w-full"
+        width={760}
+        height={1512}
+        sizes="(min-width: 640px) 320px, 256px"
+        className="h-auto w-full"
       />
     </div>
   );
@@ -37,7 +36,6 @@ function PhoneShot() {
 export function Hero() {
   return (
     <section className="relative overflow-hidden px-4 pb-20 pt-12 sm:pt-20">
-      <div aria-hidden="true" className="dot-texture pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
       <div className="relative mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.15fr_1fr]">
         <div className="min-w-0">
           <Badge variant="secondary" className="max-w-full shrink whitespace-normal text-left text-primary">

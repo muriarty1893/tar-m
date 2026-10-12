@@ -33,7 +33,7 @@ export default async function Home() {
         eyebrow="Canlı demo"
         title="Uygulamayı deneyin"
         intro="Örnek tarla fotoğraflarından birini seçin; telefondaki uygulama fotoğrafı tarasın ve yapay zekânın yanıtını göstersin."
-        className="bg-card"
+        className="bg-surface"
       >
         <DemoShowcase />
       </Section>
@@ -50,7 +50,7 @@ export default async function Home() {
         </div>
       </Section>
 
-      <Section id="haberler" eyebrow="Haberler" title="Son haberler" className="bg-card">
+      <Section id="haberler" eyebrow="Haberler" title="Son haberler" className="bg-surface">
         {latest.length === 0 ? (
           <p className="text-lg">Henüz haber yok.</p>
         ) : (
