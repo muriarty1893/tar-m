@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+/* Brand tokens: field green, wheat gold, warm off-white, soil brown. */
+:root {
+  --primary: #2f6b3a;
+  --primary-strong: #234f2b;
+  --on-primary: #ffffff;
+  --accent: #c8901a;
+  --accent-soft: #f6e7c1;
+  --surface: #faf6ee;
+  --card: #ffffff;
+  --ink: #3b2a1e;
+  --muted: #6b5a4c;
+  --line: #e7dfd0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #79c47d;
+    --primary-strong: #a3d9a5;
+    --on-primary: #10200f;
+    --accent: #e8b84a;
+    --accent-soft: #3a3020;
+    --surface: #131812;
+    --card: #1c231b;
+    --ink: #efe8dc;
+    --muted: #b8ac9b;
+    --line: #2f392e;
+  }
+}
+
+@theme inline {
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-on-primary: var(--on-primary);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* 18px base so every rem-based size scales with it. */
+html {
+  font-size: 112.5%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

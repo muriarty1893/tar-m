@@ -3,9 +3,15 @@ node_modules/
 out/
 .env*.local
 .env
+!.env.example
 .superpowers/
 test-results/
 playwright-report/
 *.tsbuildinfo
 next-env.d.ts
 .vercel
+# testing
+/coverage
+*.pem
+.DS_Store
+npm-debug.log*
