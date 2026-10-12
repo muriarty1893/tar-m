@@ -76,7 +76,7 @@ export function Hero() {
             {siteConfig.name}, tarlanızın fotoğrafından hastalık ve zararlı belirtilerini tanır, sade Türkçe öneriler
             sunar ve hasat başarı tahmini verir.
           </p>
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <CtaLink size="lg" withArrow />
             <Link href="/#demo" className={buttonVariants({ variant: "outline", size: "lg" })}>
               Demoyu deneyin

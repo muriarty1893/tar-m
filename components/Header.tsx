@@ -20,17 +20,17 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
       <div className="mx-auto flex h-18 max-w-6xl items-center justify-between gap-4 px-4">
-        <Link href="/" className="rounded-xl text-xl text-foreground">
+        <Link href="/" className="shrink-0 whitespace-nowrap rounded-xl text-xl text-foreground">
           <Logo />
         </Link>
 
-        <nav aria-label="Ana menü" className="hidden lg:block">
+        <nav aria-label="Ana menü" className="hidden xl:block">
           <ul className="flex items-center gap-1">
             {siteConfig.nav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="rounded-full px-3.5 py-2 text-[0.95rem] font-medium text-foreground transition-colors duration-200 hover:bg-secondary hover:text-primary"
+                  className="whitespace-nowrap rounded-full px-3.5 py-2 text-[0.95rem] font-medium text-foreground transition-colors duration-200 hover:bg-secondary hover:text-primary"
                 >
                   {item.label}
                 </Link>
@@ -40,7 +40,7 @@ export function Header() {
         </nav>
 
         {/* Visibility lives on the wrapper: CtaLink's own inline-flex would override `hidden`. */}
-        <div className="hidden lg:block">
+        <div className="hidden xl:block">
           <CtaLink />
         </div>
 
@@ -54,7 +54,7 @@ export function Header() {
             setMenuLoaded(true);
             setOpen(true);
           }}
-          className={buttonVariants({ variant: "outline", size: "icon", className: "lg:hidden" })}
+          className={buttonVariants({ variant: "outline", size: "icon", className: "xl:hidden" })}
         >
           <ListIcon aria-hidden="true" weight="bold" />
         </button>
