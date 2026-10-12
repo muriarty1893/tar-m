@@ -198,14 +198,16 @@
   color: var(--foreground);
 }
 
-/* 3D phone showcase: sky behind the meadow scene. */
-@utility stage-sky {
+/* 3D phone showcase: a light, on-palette backdrop with a soft sun glow behind the meadow. */
+@utility stage-bg {
   background:
-    radial-gradient(circle at 80% 13%, rgb(255 240 186 / 0.95) 0, rgb(255 240 186 / 0) 24%),
-    linear-gradient(180deg, #bfe3f5 0%, #e2f3ef 46%, #f7efd8 70%, #f7efd8 100%);
+    radial-gradient(ellipse 60% 50% at 50% 38%, rgb(255 255 255 / 0.95) 0, rgb(255 255 255 / 0) 70%),
+    radial-gradient(circle at 82% 12%, rgb(254 243 199 / 0.9) 0, rgb(254 243 199 / 0) 28%),
+    linear-gradient(180deg, #ffffff 0%, #f6fbf4 55%, #e9f6ec 100%);
   @media (prefers-color-scheme: dark) {
     background:
-      radial-gradient(circle at 80% 13%, rgb(253 230 138 / 0.28) 0, rgb(253 230 138 / 0) 20%),
-      linear-gradient(180deg, #0b1b2b 0%, #12293a 45%, #1d3a2c 75%, #1d3a2c 100%);
+      radial-gradient(ellipse 60% 50% at 50% 38%, rgb(74 222 128 / 0.08) 0, rgb(74 222 128 / 0) 70%),
+      radial-gradient(circle at 82% 12%, rgb(234 179 8 / 0.12) 0, rgb(234 179 8 / 0) 26%),
+      linear-gradient(180deg, #11261a 0%, #0c1a11 100%);
   }
 }

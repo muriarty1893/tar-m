@@ -1,5 +1,5 @@
-/** CSS pixel size of the simulated app screen (matches the 3D model's display aspect). */
-export const SCREEN = { width: 340, height: 738, radius: 46 } as const;
+/** CSS pixel size of the simulated app screen; aspect and corner radius measured from the model's display mesh. */
+export const SCREEN = { width: 340, height: 738, radius: 60 } as const;
 
 type Pt = [number, number];
 

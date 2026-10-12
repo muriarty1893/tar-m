@@ -32,10 +32,10 @@ export default function PhoneScene({ animate, intro, dark, active, overlay, onRe
     <Canvas
       frameloop={active ? "always" : "demand"}
       dpr={[1, 1.75]}
-      camera={{ fov: 45, position: [0, 0.38, 2.75], near: 0.1, far: 20 }}
+      camera={{ fov: 45, position: [0, 0.3, 2.45], near: 0.1, far: 20 }}
       gl={{ antialias: true, alpha: true }}
       onCreated={({ gl, camera }) => {
-        camera.lookAt(0, -0.2, 0);
+        camera.lookAt(0, -0.06, 0);
         gl.domElement.setAttribute("role", "img");
         gl.domElement.setAttribute("aria-label", LABEL);
       }}
@@ -50,7 +50,7 @@ export default function PhoneScene({ animate, intro, dark, active, overlay, onRe
       </Environment>
 
       <PresentationControls global={false} cursor snap speed={1.3} polar={[-0.25, 0.25]} azimuth={[-0.7, 0.7]}>
-        <Float enabled={animate} speed={1.4} rotationIntensity={0.25} floatIntensity={0.5} floatingRange={[-0.05, 0.05]}>
+        <Float enabled={animate} speed={1.4} rotationIntensity={0.1} floatIntensity={0.5} floatingRange={[-0.05, 0.05]}>
           <Phone intro={intro} active={active} overlay={overlay} onReady={onReady} />
         </Float>
       </PresentationControls>
@@ -132,7 +132,8 @@ function Phone({
 
   return (
     <group ref={turn}>
-      <group rotation={[0.06, -0.36, 0.03]} scale={SCALE}>
+      {/* Resting pose: facing the viewer straight on, leaning slightly back. */}
+      <group rotation={[-0.14, 0, 0]} scale={SCALE}>
         <group rotation={[0, Math.PI, 0]}>
           <primitive object={model} />
           <group ref={screenAnchor} position={[screen.x, screen.y, screen.z]} rotation={[0, Math.PI, 0]} />

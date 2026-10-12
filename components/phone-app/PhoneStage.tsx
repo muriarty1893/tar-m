@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
-import { HandGrabbingIcon, PauseIcon, PlayIcon } from "@phosphor-icons/react/dist/ssr";
+import { PauseIcon, PlayIcon } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
 import { SCREEN, shouldLoad3D } from "@/lib/phone-stage";
 
@@ -77,13 +77,13 @@ export function PhoneStage({ children }: { children: ReactNode }) {
 
   return (
     <div>
-      <div ref={ref} className="stage-sky relative mx-auto h-[600px] w-full max-w-[26rem] overflow-hidden rounded-[2rem] shadow-soft ring-1 ring-border sm:h-[680px]">
+      <div ref={ref} className="stage-bg relative mx-auto h-[640px] w-full overflow-hidden rounded-[2.5rem] ring-1 ring-border sm:h-[780px] lg:h-[860px]">
 
         {!ready && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="shrink-0 scale-[0.7] sm:scale-[0.79]">
+            <div className="shrink-0 scale-[0.74] sm:scale-[0.86] lg:scale-[0.95]">
               {/* Same size before and after: the app screen (~200 nodes) mounts only once the demo is near, keeping first paint light. */}
-              <div className="rounded-[56px] bg-[#1d211f] p-[10px] shadow-lift ring-2 ring-[#9ca3a0]">
+              <div className="rounded-[70px] bg-[#1d211f] p-[10px] shadow-lift ring-2 ring-[#9ca3a0]">
                 {near ? children : <div className="bg-background" style={{ width: SCREEN.width, height: SCREEN.height, borderRadius: SCREEN.radius }} />}
               </div>
             </div>
@@ -105,10 +105,6 @@ export function PhoneStage({ children }: { children: ReactNode }) {
 
       {ready && (
         <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-          <span className="hidden items-center gap-1.5 [@media(pointer:fine)]:flex">
-            <HandGrabbingIcon aria-hidden="true" weight="duotone" className="size-5" />
-            Telefonu sürükleyerek çevirin
-          </span>
           {!reduced && (
             <Button variant="ghost" size="sm" onClick={() => setPaused((p) => !p)}>
               {paused ? <PlayIcon aria-hidden="true" weight="fill" /> : <PauseIcon aria-hidden="true" weight="fill" />}

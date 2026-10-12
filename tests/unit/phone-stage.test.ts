@@ -5,6 +5,10 @@ describe("SCREEN", () => {
   it("keeps the phone's 19.5:9-ish screen aspect", () => {
     expect(SCREEN.height / SCREEN.width).toBeCloseTo(0.1449 / 0.0668, 1);
   });
+
+  it("rounds its corners like the model's display (radius ≈ 17.6% of the width), so nothing pokes out", () => {
+    expect(SCREEN.radius / SCREEN.width).toBeCloseTo(0.1758, 2);
+  });
 });
 
 describe("shouldLoad3D", () => {

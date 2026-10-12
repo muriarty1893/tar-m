@@ -21,8 +21,8 @@ export const demoScenarios: DemoScenario[] = [
   {
     id: "bugday-pas",
     title: "Buğday tarlası",
-    imageSrc: "/demo/bugday-pas.svg",
-    imageAlt: "Yapraklarında turuncu lekeler olan buğday tarlası",
+    imageSrc: "/demo/bugday-pas.webp",
+    imageAlt: "Yaprağında damarlar boyunca sarı-turuncu pas çizgileri olan buğday",
     seen: "Başaklanma dönemindeki buğday yapraklarında, damarlar boyunca uzanan sarı-turuncu çizgiler görülüyor.",
     diagnosis: "Sarı pas (Puccinia striiformis) belirtileri — erken evre",
     suggestions: [
@@ -35,8 +35,8 @@ export const demoScenarios: DemoScenario[] = [
   {
     id: "kuru-misir",
     title: "Mısır tarlası",
-    imageSrc: "/demo/kuru-misir.svg",
-    imageAlt: "Toprağı çatlamış, yaprakları kurumuş mısır tarlası",
+    imageSrc: "/demo/kuru-misir.webp",
+    imageAlt: "Kuraklıktan yaprakları kurumuş mısır tarlası",
     seen: "Toprak yüzeyinde çatlaklar var; mısır yaprakları kıvrılmış ve uçlarından kurumaya başlamış.",
     diagnosis: "Su stresi (kuraklık) — orta düzey",
     suggestions: [
@@ -48,7 +48,7 @@ export const demoScenarios: DemoScenario[] = [
   {
     id: "aycicegi",
     title: "Ayçiçeği tarlası",
-    imageSrc: "/demo/aycicegi.svg",
+    imageSrc: "/demo/aycicegi.webp",
     imageAlt: "Tablaları açmış, yaprakları yeşil ayçiçeği tarlası",
     seen: "Bitkiler eşit boyda, yapraklar koyu yeşil ve tablalar düzgün açılmış.",
     diagnosis: "Sağlıklı gelişim — belirgin bir sorun görülmedi",
@@ -60,10 +60,10 @@ export const demoScenarios: DemoScenario[] = [
   },
   {
     id: "zeytin",
-    title: "Zeytinlik",
-    imageSrc: "/demo/zeytin.svg",
-    imageAlt: "Yapraklarında ve dallarında koyu lekeler olan zeytin ağaçları",
-    seen: "Yaprak ve sürgünlerde koyu renkli lekeler ve yer yer yapışkan bir tabaka görülüyor.",
+    title: "Zeytin sürgünü",
+    imageSrc: "/demo/zeytin.webp",
+    imageAlt: "Sürgün üzerinde koyu kahverengi, kabuklu zeytin kara koşnilleri (yakın çekim)",
+    seen: "Sürgün üzerinde yarım küre biçiminde, koyu kahverengi kabuklu böcekler görülüyor; çevresinde yapışkan bir tabaka oluşabilir.",
     diagnosis: "Zeytin kara koşnili belirtisi ve buna bağlı fumajin (kurumcuk) olasılığı",
     suggestions: [
       "Sık dalları budayarak ağacın içine hava ve ışık girmesini sağlayın.",

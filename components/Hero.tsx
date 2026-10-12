@@ -2,14 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   CheckCircleIcon,
-  CloudSunIcon,
-  ScanIcon,
   ShieldCheckIcon,
   SparkleIcon,
   TranslateIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import { siteConfig } from "@/config/site";
-import { demoScenarios } from "@/data/demo-scenarios";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CtaLink } from "./CtaLink";
@@ -20,41 +17,19 @@ const trust = [
   { icon: ShieldCheckIcon, text: "KVKK'ya uygun" },
 ];
 
-/** Illustrative phone mockup of the app's answer screen; replace with a real screenshot later. */
-function PhoneMockup() {
-  const s = demoScenarios[0];
+/** Render of the 3D showcase phone running the app's home screen (see docs/3d-model.md to re-render). */
+function PhoneShot() {
   return (
-    <div aria-hidden="true" className="relative mx-auto w-full max-w-[20rem]">
-      <div className="blob absolute -inset-8 bg-blob" />
-      <div className="blob-alt absolute -bottom-6 -left-10 size-40 bg-gold-soft" />
-
-      <div className="relative rotate-[2.5deg] rounded-[2.6rem] border-[10px] border-foreground bg-foreground shadow-lift">
-        <div className="mx-auto mb-2 h-1.5 w-16 rounded-full bg-background/40" />
-        <div className="space-y-3 overflow-hidden rounded-[1.9rem] bg-background p-4 text-sm">
-          <p className="font-heading font-bold text-primary">{siteConfig.name}</p>
-          <Image src={s.imageSrc} alt="" width={400} height={300} unoptimized className="rounded-2xl" />
-          <p className="font-heading font-bold leading-snug">{s.diagnosis}</p>
-          <p className="text-muted-foreground">{s.suggestions[0]}</p>
-          <div>
-            <div className="flex justify-between text-xs font-semibold">
-              <span>Hasat başarı tahmini</span>
-              <span className="text-primary">%{s.successRate}</span>
-            </div>
-            <div className="mt-1.5 h-2.5 rounded-full bg-muted">
-              <div className="h-full rounded-full bg-primary" style={{ width: `${s.successRate}%` }} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="absolute -left-6 top-16 hidden rotate-[-4deg] items-center gap-2 rounded-2xl border border-border bg-card px-3.5 py-2.5 text-sm font-semibold shadow-soft sm:flex">
-        <ScanIcon weight="duotone" className="size-5 text-primary" />
-        Fotoğraf analiz edildi
-      </div>
-      <div className="absolute -right-4 bottom-20 hidden rotate-[3deg] items-center gap-2 rounded-2xl border border-border bg-card px-3.5 py-2.5 text-sm font-semibold shadow-soft sm:flex">
-        <CloudSunIcon weight="duotone" className="size-5 text-gold" />
-        İlaçlama için uygun gün
-      </div>
+    <div className="relative mx-auto w-full max-w-[18rem] sm:max-w-[22rem]">
+      <div aria-hidden="true" className="blob absolute inset-x-0 inset-y-10 bg-blob" />
+      <Image
+        src="/hero-phone.webp"
+        alt={`${siteConfig.name} mobil uygulamasının ana ekranı: tarla hava durumu, ürün fiyatları ve hızlı işlemler`}
+        width={880}
+        height={1443}
+        sizes="(min-width: 640px) 352px, 288px"
+        className="relative h-auto w-full"
+      />
     </div>
   );
 }
@@ -91,7 +66,7 @@ export function Hero() {
             ))}
           </ul>
         </div>
-        <PhoneMockup />
+        <PhoneShot />
       </div>
     </section>
   );

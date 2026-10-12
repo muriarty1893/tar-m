@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Image from "next/image";
 import {
   ArrowDownIcon,
@@ -23,6 +24,7 @@ import {
   MapPinIcon,
   MapTrifoldIcon,
   ScanIcon,
+  SnowflakeIcon,
   SunIcon,
   TractorIcon,
   UserIcon,
@@ -30,26 +32,36 @@ import {
   WindIcon,
   XIcon,
 } from "@phosphor-icons/react/dist/ssr";
-import type { DemoScenario } from "@/data/demo-scenarios";
+import { demoScenarios, type DemoScenario } from "@/data/demo-scenarios";
 import { SCREEN } from "@/lib/phone-stage";
 import { SuccessGauge } from "../SuccessGauge";
 
 export type AppPhase = "idle" | "analyzing" | "done";
+export type AppTab = "home" | "weather" | "history";
 
 type Props = {
   phase: AppPhase;
   scenario: DemoScenario | null;
+  /** Screen shown while no scan is running or open. */
+  tab: AppTab;
   onScan: () => void;
   onReset: () => void;
+  onTab: (tab: AppTab) => void;
+  /** Open a past scan's result straight away (history list). */
+  onOpen: (s: DemoScenario) => void;
 };
 
 /** Simulated mobile app (siteConfig.name), drawn at phone size (SCREEN px) for the 3D phone or the flat frame. */
-export function AppScreen({ phase, scenario, onScan, onReset }: Props) {
+export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen }: Props) {
   const camera = phase === "analyzing" && scenario;
+  const result = phase === "done" && scenario;
+  const clip = `inset(0 round ${SCREEN.radius}px)`;
   return (
     <div
-      className="relative overflow-hidden bg-background text-[15px] leading-snug text-foreground antialiased"
-      style={{ width: SCREEN.width, height: SCREEN.height, borderRadius: SCREEN.radius }}
+      data-testid="uygulama-ekrani"
+      className="relative cursor-default select-none overflow-hidden bg-background text-[15px] leading-snug text-foreground antialiased"
+      // clip-path (not just border-radius) so blurred layers can't bleed past the display's rounded corners.
+      style={{ width: SCREEN.width, height: SCREEN.height, borderRadius: SCREEN.radius, clipPath: clip }}
     >
       <StatusBar dark={!!camera || phase === "done"} />
       <div aria-hidden="true" className="absolute left-1/2 top-[13px] z-30 h-[30px] w-[100px] -translate-x-1/2 rounded-full bg-black" />
@@ -57,14 +69,18 @@ export function AppScreen({ phase, scenario, onScan, onReset }: Props) {
       <div aria-live="polite" className="h-full">
         {camera ? (
           <CameraScreen key="camera" s={scenario} />
-        ) : phase === "done" && scenario ? (
+        ) : result ? (
           <ResultScreen key={`done-${scenario.id}`} s={scenario} onReset={onReset} />
+        ) : tab === "weather" ? (
+          <WeatherScreen key="weather" />
+        ) : tab === "history" ? (
+          <HistoryScreen key="history" onOpen={onOpen} />
         ) : (
           <HomeScreen key="home" onScan={onScan} />
         )}
       </div>
 
-      {!camera && <TabBar active={phase === "done" ? "scan" : "home"} />}
+      {!camera && <TabBar active={result ? "scan" : tab} onHome={onReset} onScan={onScan} onTab={onTab} />}
       <div aria-hidden="true" className={`absolute bottom-2 left-1/2 z-30 h-[5px] w-32 -translate-x-1/2 rounded-full ${camera ? "bg-white/80" : "bg-foreground/80"}`} />
       {/* Cover-glass sheen so the flat DOM reads as lit glass on the 3D phone. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-40 bg-[linear-gradient(115deg,rgb(255_255_255/0.16)_0%,transparent_32%,transparent_70%,rgb(255_255_255/0.06)_100%)]" />
@@ -112,7 +128,7 @@ function HomeScreen({ onScan }: { onScan: () => void }) {
 function WeatherHero() {
   return (
     <div className="relative h-[238px] overflow-hidden rounded-[26px] text-white shadow-lift">
-      <Image src="/app/hero-field.svg" alt="" fill unoptimized sizes="320px" className="object-cover" />
+      <Image src="/app/hero-field.webp" alt="" fill sizes="320px" className="object-cover" />
       <div aria-hidden="true" className={`${scrim} bg-[linear-gradient(180deg,rgb(0_0_0/0.5)_0%,rgb(0_0_0/0.05)_42%,rgb(0_0_0/0.65)_100%)]`} />
       <div className="relative flex items-start justify-between gap-2 p-3.5">
         <span className="flex min-w-0 items-center gap-2">
@@ -203,7 +219,7 @@ function PriceStrip() {
 function ActionCard({ img, icon: Icon, title, sub, badge }: { img: string; icon: typeof EyeIcon; title: string; sub: string; badge?: string }) {
   return (
     <>
-      <Image src={img} alt="" fill unoptimized sizes="160px" className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none" />
+      <Image src={img} alt="" fill sizes="160px" className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none" />
       <span aria-hidden="true" className={`${scrim} bg-[linear-gradient(0deg,rgb(0_0_0/0.72)_0%,rgb(0_0_0/0.15)_55%,transparent_100%)]`} />
       <span aria-hidden="true" className="absolute left-2.5 top-2.5 flex size-9 items-center justify-center rounded-full bg-white/95 text-primary shadow-soft">
         <Icon weight="duotone" className="size-5" />
@@ -231,16 +247,16 @@ function QuickActions({ onScan }: { onScan: () => void }) {
           onClick={onScan}
           className={`${card} cursor-pointer ring-2 ring-gold ring-offset-2 ring-offset-background transition-transform duration-150 active:scale-[0.97] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-primary motion-reduce:active:scale-100`}
         >
-          <ActionCard img="/app/scan-leaf.svg" icon={CameraIcon} title="Hastalık Tara" sub="Kamerayla yaprak teşhisi" badge="Dene" />
+          <ActionCard img="/app/scan-leaf.webp" icon={CameraIcon} title="Hastalık Tara" sub="Kamerayla yaprak teşhisi" badge="Dene" />
         </button>
         <div className={card}>
-          <ActionCard img="/app/tractor-field.svg" icon={TractorIcon} title="Tarlalarım" sub="3 tarla ve harcamalar" />
+          <ActionCard img="/app/tractor-field.webp" icon={TractorIcon} title="Tarlalarım" sub="3 tarla ve harcamalar" />
         </div>
         <div className={card}>
-          <ActionCard img="/app/field-map.svg" icon={MapTrifoldIcon} title="Tarla Haritası" sub="Uydu ile izleme" />
+          <ActionCard img="/app/field-map.webp" icon={MapTrifoldIcon} title="Tarla Haritası" sub="Uydu ile izleme" />
         </div>
         <div className={card}>
-          <ActionCard img="/app/calendar.svg" icon={CalendarDotsIcon} title="Tarım Takvimi" sub="Ekim ve ilaçlama" />
+          <ActionCard img="/app/seedlings.webp" icon={CalendarDotsIcon} title="Tarım Takvimi" sub="Ekim ve ilaçlama" />
         </div>
       </div>
     </div>
@@ -250,9 +266,7 @@ function QuickActions({ onScan }: { onScan: () => void }) {
 function CameraScreen({ s }: { s: DemoScenario }) {
   return (
     <div className="relative h-full bg-black text-white">
-      <div className="absolute inset-x-0 -top-28 bottom-0">
-        <Image src={s.imageSrc} alt={s.imageAlt} fill unoptimized sizes="340px" className="object-cover opacity-90" />
-      </div>
+      <Image src={s.imageSrc} alt={s.imageAlt} fill sizes="340px" className="object-cover opacity-90" />
       <div aria-hidden="true" className="absolute inset-x-0 top-14 z-10 flex items-center justify-between px-5">
         <span className="flex size-10 items-center justify-center rounded-full bg-black/40 backdrop-blur">
           <XIcon weight="bold" className="size-5" />
@@ -313,10 +327,7 @@ function ResultScreen({ s, onReset }: { s: DemoScenario; onReset: () => void }) 
   return (
     <div className={`${scroll} pb-28 ${enter}`} data-testid="demo-cevap">
       <div className="relative h-[270px] overflow-hidden text-white">
-        {/* Shifted up so the sample image's corner tag sits off-screen, behind the status bar crop. */}
-        <div className="absolute inset-x-0 -top-12 bottom-0">
-          <Image src={s.imageSrc} alt={s.imageAlt} fill unoptimized sizes="340px" className="object-cover" />
-        </div>
+        <Image src={s.imageSrc} alt={s.imageAlt} fill sizes="340px" className="object-cover" />
         <div aria-hidden="true" className={`${scrim} bg-[linear-gradient(180deg,rgb(0_0_0/0.45)_0%,transparent_35%,rgb(0_0_0/0.78)_100%)]`} />
         <div className="absolute inset-x-3.5 top-[52px] flex items-center justify-between">
           <button
@@ -361,24 +372,114 @@ function ResultScreen({ s, onReset }: { s: DemoScenario; onReset: () => void }) 
   );
 }
 
-function TabBar({ active }: { active: "home" | "scan" }) {
+function TabBar({
+  active,
+  onHome,
+  onScan,
+  onTab,
+}: {
+  active: AppTab | "scan";
+  onHome: () => void;
+  onScan: () => void;
+  onTab: (tab: AppTab) => void;
+}) {
   const items = [
-    { id: "home", label: "Ana sayfa", Icon: HouseIcon },
-    { id: "scan", label: "Taramalar", Icon: ScanIcon },
-    { id: "weather", label: "Hava", Icon: CloudSunIcon },
-    { id: "history", label: "Geçmiş", Icon: ClockCounterClockwiseIcon },
+    { id: "home", label: "Ana sayfa", Icon: HouseIcon, go: onHome },
+    { id: "scan", label: "Taramalar", Icon: ScanIcon, go: onScan },
+    { id: "weather", label: "Hava", Icon: CloudSunIcon, go: () => onTab("weather") },
+    { id: "history", label: "Geçmiş", Icon: ClockCounterClockwiseIcon, go: () => onTab("history") },
   ] as const;
-  // Decorative: the simulated app's navigation is not interactive on the website.
   return (
-    <div aria-hidden="true" className="absolute inset-x-0 bottom-0 z-20 flex h-[84px] items-start justify-around border-t border-border bg-card/95 px-3 pt-2.5 backdrop-blur">
-      {items.map(({ id, label, Icon }) => (
-        <span key={id} className={`flex w-16 flex-col items-center gap-1 text-[11px] font-semibold ${active === id ? "text-primary" : "text-muted-foreground"}`}>
-          <span className={`flex h-7 w-12 items-center justify-center rounded-full ${active === id ? "bg-secondary" : ""}`}>
-            <Icon weight={active === id ? "fill" : "regular"} className="size-5" />
-          </span>
-          {label}
-        </span>
-      ))}
+    <nav aria-label="Uygulama menüsü" className="absolute inset-x-0 bottom-0 z-20 flex h-[86px] items-start justify-around border-t border-border bg-card px-5 pt-1.5">
+      {items.map(({ id, label, Icon, go }) => {
+        const on = active === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            onClick={go}
+            aria-current={on ? "page" : undefined}
+            className={`flex min-h-12 w-16 cursor-pointer flex-col items-center gap-1 rounded-2xl pt-1 text-[11px] font-semibold transition-colors duration-150 active:bg-secondary focus-visible:outline-2 focus-visible:outline-primary ${on ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            <span className={`flex h-7 w-12 items-center justify-center rounded-full transition-colors duration-150 ${on ? "bg-secondary" : ""}`}>
+              <Icon aria-hidden="true" weight={on ? "fill" : "regular"} className="size-5" />
+            </span>
+            {label}
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+const FORECAST = [
+  { day: "Bugün", Icon: SunIcon, max: 19, min: 7, rain: 5, tip: "İlaçlama için uygun" },
+  { day: "Salı", Icon: CloudSunIcon, max: 17, min: 6, rain: 20, tip: "Sulama yapılabilir" },
+  { day: "Çarşamba", Icon: CloudRainIcon, max: 13, min: 5, rain: 85, tip: "İlaçlamayı erteleyin" },
+  { day: "Perşembe", Icon: CloudSunIcon, max: 15, min: 3, rain: 30, tip: "Toprak işlemeye uygun" },
+  { day: "Cuma", Icon: SnowflakeIcon, max: 9, min: -1, rain: 10, tip: "Don riski: fideleri örtün" },
+];
+
+function ScreenTitle({ children }: { children: ReactNode }) {
+  return <p className="mb-3 font-heading text-[22px] font-bold">{children}</p>;
+}
+
+function WeatherScreen() {
+  return (
+    <div className={`${scroll} px-3.5 pb-28 pt-[56px] ${enter}`}>
+      <ScreenTitle>Hava durumu</ScreenTitle>
+      <WeatherHero />
+      <p className="mb-2 mt-4 font-heading text-[16px] font-bold">5 günlük tarım tahmini</p>
+      <ul className="space-y-2">
+        {FORECAST.map(({ day, Icon, max, min, rain, tip }) => (
+          <li key={day} className="flex items-center gap-3 rounded-[18px] border border-border bg-card px-3 py-2.5">
+            <Icon aria-hidden="true" weight="duotone" className={`size-7 shrink-0 ${rain > 60 ? "text-sky-600" : min < 0 ? "text-sky-500" : "text-gold"}`} />
+            <span className="min-w-0 flex-1">
+              <span className="block text-[14px] font-bold">{day}</span>
+              <span className="block truncate text-[12px] text-muted-foreground">{tip}</span>
+            </span>
+            <span className="text-right text-[12px] text-muted-foreground">
+              <span className="block font-heading text-[15px] font-bold text-foreground">
+                {max}° / {min}°
+              </span>
+              Yağış %{rain}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+const HISTORY_DATES = ["Bugün, 08:12", "Dün, 17:40", "3 gün önce", "1 hafta önce"];
+
+function HistoryScreen({ onOpen }: { onOpen: (s: DemoScenario) => void }) {
+  return (
+    <div className={`${scroll} px-3.5 pb-28 pt-[56px] ${enter}`}>
+      <ScreenTitle>Geçmiş taramalar</ScreenTitle>
+      <ul className="space-y-2.5">
+        {demoScenarios.map((s, i) => (
+          <li key={s.id}>
+            <button
+              type="button"
+              onClick={() => onOpen(s)}
+              className="flex w-full cursor-pointer items-center gap-3 rounded-[20px] border border-border bg-card p-2.5 text-left transition-colors duration-150 hover:bg-secondary/60 active:bg-secondary focus-visible:outline-2 focus-visible:outline-primary"
+            >
+              <span className="relative size-16 shrink-0 overflow-hidden rounded-[14px]">
+                <Image src={s.imageSrc} alt="" fill sizes="64px" className="object-cover" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[14.5px] font-bold">{s.title}</span>
+                <span className="block truncate text-[12px] text-muted-foreground">{s.diagnosis}</span>
+                <span className="block text-[11px] text-muted-foreground">{HISTORY_DATES[i]}</span>
+              </span>
+              <span className={`rounded-full px-2.5 py-1 text-[12.5px] font-bold ${s.successRate >= 75 ? "bg-secondary text-primary" : s.successRate >= 60 ? "bg-gold-soft text-gold-foreground" : "bg-destructive/10 text-destructive"}`}>
+                %{s.successRate}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

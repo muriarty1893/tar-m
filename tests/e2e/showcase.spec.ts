@@ -64,5 +64,27 @@ test("credits the 3D model under CC BY 4.0", async ({ page }) => {
   await page.goto("/#demo");
   const credit = page.locator("#demo").getByRole("link", { name: /iPhone 17 Pro/ });
   await expect(credit).toHaveAttribute("href", /sketchfab\.com/);
-  await expect(page.locator("#demo").getByRole("link", { name: "CC BY 4.0" })).toHaveAttribute("href", /creativecommons\.org\/licenses\/by\/4\.0/);
+  const modelCredit = page.locator("#demo p", { hasText: "3B telefon modeli" });
+  await expect(modelCredit.getByRole("link", { name: "CC BY 4.0" })).toHaveAttribute("href", /creativecommons\.org\/licenses\/by\/4\.0/);
+});
+
+test("the phone's bottom bar switches screens and opens past scans", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/#demo");
+  const demo = page.locator("#demo");
+  await expect(demo.locator(CANVAS)).toBeVisible({ timeout: 20_000 });
+  const app = demo.getByTestId("uygulama-ekrani");
+  const nav = app.getByRole("navigation", { name: "Uygulama menüsü" });
+
+  await nav.getByRole("button", { name: "Hava" }).click();
+  await expect(app.getByText("5 günlük tarım tahmini")).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Hava" })).toHaveAttribute("aria-current", "page");
+
+  await nav.getByRole("button", { name: "Geçmiş" }).click();
+  await app.getByRole("button", { name: /Zeytin sürgünü/ }).click();
+  await expect(app.getByTestId("demo-cevap")).toBeVisible();
+  await expect(app.getByRole("meter")).toHaveAttribute("aria-valuenow", "63");
+
+  await nav.getByRole("button", { name: "Ana sayfa" }).click();
+  await expect(app.getByText("Hızlı İşlemler")).toBeVisible();
 });
