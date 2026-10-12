@@ -6,26 +6,6 @@ Built with Next.js 16 (App Router, Cache Components) and Tailwind CSS 4. Deploye
 
 **Design:** "Organik Doğa" — palette and style from the UI UX Pro Max design database (Agriculture/Farm Tech, Organic Biophilic), Space Grotesk + DM Sans, light and dark mode. Components: [shadcn/ui](https://ui.shadcn.com) (in `components/ui/`), adapted [Magic UI](https://magicui.design) pieces (in `components/magicui/`), and [Phosphor](https://phosphoricons.com) icons. All free and MIT/OFL licensed. Design spec: `docs/superpowers/specs/2026-10-12-bereket-ai-redesign-design.md`.
 
-## Run locally
-
-```bash
-npm install
-cp .env.example .env.local   # fill in values, see docs/apps-script.md
-npm run dev                  # http://localhost:3000
-```
-
-The site works without the env vars; only form submissions fail (visitors see an error with the contact e-mail).
-
-## Tests
-
-```bash
-npm test          # unit tests (Vitest)
-npm run e2e       # end-to-end tests (Playwright; builds and starts the site on port 3100)
-npm run lint
-```
-
-First run of the e2e tests: `npx playwright install chromium`.
-
 ## Everyday edits
 
 | To change… | Edit |
