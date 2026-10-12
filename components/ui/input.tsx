@@ -1,11 +1,10 @@
 import * as React from "react"
-import { Input as InputPrimitive } from "@base-ui/react/input"
 import { cn } from "cn"
 
-// shadcn/ui Input (Base UI), 48px tall with 18px text for outdoor readability.
+// shadcn/ui Input (classic, native <input>), 48px tall with 18px text for outdoor readability.
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
-    <InputPrimitive
+    <input
       type={type}
       data-slot="input"
       className={cn(

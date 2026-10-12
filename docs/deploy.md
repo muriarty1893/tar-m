@@ -36,17 +36,17 @@ Vercel's Hobby plan is for **non-commercial, personal use**. A pre-launch site t
 
 ## Lighthouse (mobile) results at handoff
 
-Measured locally against `npm run build && npm start` with Lighthouse 12.8.2, mobile preset (scores vary ±5 between runs on the same machine):
+Measured locally against `npm run build && npm start` with Lighthouse 12.8.2, mobile preset, after the Organik Doğa redesign. Scores vary ±5 between runs on the same laptop, so the table shows the range of 3 runs:
 
 | Page | Performance | Accessibility | Best Practices | SEO |
 |---|---|---|---|---|
-| `/` | 91–94 | 100 | 100 | 100 |
-| `/hava` | 90–92 | 100 | 100 | 100 |
-| `/haberler` | 93–97 | 100 | 100 | 100 |
-| `/is-birligi` | 96 | 100 | 100 | 100 |
-| `/sss` | 89–94 | 100 | 100 | 100 |
+| `/` | 90–91 | 100 | 100 | 100 |
+| `/hava` | 90–94 | 100 | 100 | 100 |
+| `/haberler` | 94–99 | 100 | 100 | 100 |
+| `/is-birligi` | 97 | 100 | 100 | 100 |
+| `/sss` | 93–94 | 100 | 100 | 100 |
 
-The remaining performance cost is Total Blocking Time from React hydration (≈250–330 ms on a throttled mid-range phone profile).
+What keeps the home page fast: the scroll-reveal is CSS (no animation library on load), Motion loads only when a demo answer appears, the mobile menu's Sheet code loads on first tap, form validation (zod) loads on first submit, and only the heading font is preloaded.
 
 ## Pre-launch checklist
 

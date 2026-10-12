@@ -4,6 +4,8 @@ The official website for Bereket AI, a Turkish AI farming assistant app (in deve
 
 Built with Next.js 16 (App Router, Cache Components) and Tailwind CSS 4. Deployed on Vercel.
 
+**Design:** "Organik Doğa" — palette and style from the UI UX Pro Max design database (Agriculture/Farm Tech, Organic Biophilic), Space Grotesk + DM Sans, light and dark mode. Components: [shadcn/ui](https://ui.shadcn.com) (in `components/ui/`), adapted [Magic UI](https://magicui.design) pieces (in `components/magicui/`), and [Phosphor](https://phosphoricons.com) icons. All free and MIT/OFL licensed. Design spec: `docs/superpowers/specs/2026-10-12-bereket-ai-redesign-design.md`.
+
 ## Run locally
 
 ```bash
@@ -29,7 +31,7 @@ First run of the e2e tests: `npx playwright install chromium`.
 | To change… | Edit |
 |---|---|
 | Name, tagline, contact e-mail, menu | `config/site.ts` |
-| Colors | `app/globals.css` (`:root` tokens, light and dark) |
+| Colors, radius, shadows | `app/globals.css` (`:root` tokens, light and dark) |
 | News | add a Markdown file to `content/haberler/` (see below) |
 | Demo examples | `data/demo-scenarios.ts` and images in `public/demo/` |
 | FAQ / About / Privacy | `app/sss/page.tsx`, `app/hakkimizda/page.tsx`, `app/gizlilik/page.tsx` |

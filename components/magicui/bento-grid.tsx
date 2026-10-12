@@ -7,7 +7,7 @@ import { cn } from "cn"
 
 export function BentoGrid({ children, className, ...props }: ComponentPropsWithoutRef<"ul">) {
   return (
-    <ul className={cn("grid w-full auto-rows-[minmax(15rem,auto)] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3", className)} {...props}>
+    <ul className={cn("grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3", className)} {...props}>
       {children}
     </ul>
   )
@@ -27,7 +27,7 @@ export function BentoCard({ name, description, icon, background, className, head
   return (
     <li
       className={cn(
-        "group relative flex flex-col justify-end overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-soft transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-lift motion-reduce:hover:translate-y-0",
+        "group relative flex min-h-60 flex-col justify-end overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-soft transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-lift motion-reduce:hover:translate-y-0",
         className,
       )}
     >

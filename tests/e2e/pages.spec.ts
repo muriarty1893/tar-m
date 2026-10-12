@@ -20,6 +20,27 @@ test("landing page has every section in spec order", async ({ page }) => {
   expect([...found].sort((a, b) => a - b)).toEqual(found);
 });
 
+test("landing sections are visible without JavaScript (reveal animation is an enhancement)", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto("/");
+  for (const name of ["Nasıl çalışır?", "Neler yapabilir?", "Birlikte büyüyelim"]) {
+    const heading = page.getByRole("heading", { level: 2, name });
+    await heading.scrollIntoViewIfNeeded();
+    const opacity = await heading.evaluate((el) => {
+      let node: Element | null = el;
+      let o = 1;
+      while (node) {
+        o *= Number(getComputedStyle(node).opacity);
+        node = node.parentElement;
+      }
+      return o;
+    });
+    expect(opacity, name).toBe(1);
+  }
+  await context.close();
+});
+
 test("landing CTA appears in hero, mid-page and footer", async ({ page }) => {
   await page.goto("/");
   const ctas = page.getByRole("link", { name: "Erken erişim için kaydol" });

@@ -32,7 +32,7 @@ function PhoneMockup() {
         <div className="mx-auto mb-2 h-1.5 w-16 rounded-full bg-background/40" />
         <div className="space-y-3 overflow-hidden rounded-[1.9rem] bg-background p-4 text-sm">
           <p className="font-heading font-bold text-primary">{siteConfig.name}</p>
-          <Image src={s.imageSrc} alt="" width={400} height={300} unoptimized priority className="rounded-2xl" />
+          <Image src={s.imageSrc} alt="" width={400} height={300} unoptimized className="rounded-2xl" />
           <p className="font-heading font-bold leading-snug">{s.diagnosis}</p>
           <p className="text-muted-foreground">{s.suggestions[0]}</p>
           <div>

@@ -1,17 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import dynamic from "next/dynamic";
+import { useRef, useState } from "react";
 import { ListIcon } from "@phosphor-icons/react/dist/ssr";
 import { siteConfig } from "@/config/site";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { buttonVariants } from "@/components/ui/button";
 import { Logo } from "./Logo";
 import { CtaLink } from "./CtaLink";
 
+// The Sheet (Base UI Dialog) is only needed once someone opens the menu.
+const MobileMenu = dynamic(() => import("./MobileMenu"), { ssr: false });
+
 export function Header() {
   const [open, setOpen] = useState(false);
-  const close = () => setOpen(false);
+  const [menuLoaded, setMenuLoaded] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
@@ -40,33 +44,21 @@ export function Header() {
           <CtaLink />
         </div>
 
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger
-            className={buttonVariants({ variant: "outline", size: "icon", className: "lg:hidden" })}
-            aria-label="Menüyü aç"
-          >
-            <ListIcon aria-hidden="true" weight="bold" />
-          </SheetTrigger>
-          <SheetContent id="mobil-menu" side="right" className="w-[86%] max-w-sm gap-0 bg-background p-6">
-            <SheetTitle className="font-heading text-lg font-bold">Menü</SheetTitle>
-            <nav aria-label="Mobil menü" className="mt-6">
-              <ul className="flex flex-col gap-1">
-                {siteConfig.nav.map((item) => (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      onClick={close}
-                      className="flex min-h-12 items-center rounded-2xl px-4 text-lg font-medium text-foreground hover:bg-secondary hover:text-primary"
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-            <CtaLink className="mt-6 w-full" onClick={close} />
-          </SheetContent>
-        </Sheet>
+        <button
+          ref={triggerRef}
+          type="button"
+          aria-label="Menüyü aç"
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          onClick={() => {
+            setMenuLoaded(true);
+            setOpen(true);
+          }}
+          className={buttonVariants({ variant: "outline", size: "icon", className: "lg:hidden" })}
+        >
+          <ListIcon aria-hidden="true" weight="bold" />
+        </button>
+        {menuLoaded && <MobileMenu open={open} onOpenChange={setOpen} returnFocusTo={triggerRef} />}
       </div>
     </header>
   );

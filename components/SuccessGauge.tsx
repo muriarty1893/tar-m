@@ -1,4 +1,13 @@
-import { NumberTicker } from "@/components/magicui/number-ticker";
+"use client";
+
+import dynamic from "next/dynamic";
+
+// The Magic UI NumberTicker (and the Motion library behind it) loads only when a
+// gauge is actually shown, i.e. after a demo answer appears — not on page load.
+const NumberTicker = dynamic(() => import("@/components/magicui/number-ticker").then((m) => m.NumberTicker), {
+  ssr: false,
+  loading: () => null,
+});
 
 const R = 80;
 const HALF = Math.PI * R;
@@ -36,7 +45,7 @@ export function SuccessGauge({ value, label = "Hasat başarı tahmini" }: { valu
       </svg>
       <p className="-mt-3 text-center text-sm font-semibold">
         {label}:{" "}
-        <span className={`font-heading text-2xl font-bold ${tone(v)}`}>
+        <span className={`inline-flex min-w-[3ch] justify-center font-heading text-2xl font-bold ${tone(v)}`}>
           %<NumberTicker value={v} />
         </span>
       </p>

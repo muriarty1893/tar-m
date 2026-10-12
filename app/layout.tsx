@@ -7,7 +7,7 @@ import { Footer } from "@/components/Footer";
 import "./globals.css";
 
 // latin-ext carries the Turkish letters (ç ğ ı İ ö ş ü).
-const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin", "latin-ext"] });
+const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin", "latin-ext"], preload: false });
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin", "latin-ext"],
