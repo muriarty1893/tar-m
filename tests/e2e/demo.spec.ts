@@ -10,8 +10,8 @@ test("tapping a scenario analyses, then shows diagnosis, gauge and disclaimer", 
   await expect(page.getByText("Analiz ediliyor…")).toBeVisible();
   await expect(page.getByTestId("demo-cevap")).toHaveCount(0);
 
-  await expect(page.getByText("Sarı pas (Puccinia striiformis) belirtileri — erken evre")).toBeVisible({ timeout: 4000 });
-  const meter = page.getByRole("meter", { name: "Hasat başarı tahmini" });
+  await expect(page.locator("#demo").getByText("Sarı pas (Puccinia striiformis) belirtileri — erken evre")).toBeVisible({ timeout: 4000 });
+  const meter = page.locator("#demo").getByRole("meter", { name: "Hasat başarı tahmini" });
   await expect(meter).toHaveAttribute("aria-valuenow", "72");
   await expect(page.getByText("Analiz ediliyor…")).toHaveCount(0);
 });
@@ -25,11 +25,11 @@ test("switching scenarios mid-analysis shows only the second answer", async ({ p
   // The first timer (due ~0.8 s from now) must not reveal the wheat answer.
   await page.waitForTimeout(1100);
   await expect(page.getByTestId("demo-cevap")).toHaveCount(0);
-  await expect(page.getByText(/Puccinia/)).toHaveCount(0);
+  await expect(page.locator("#demo").getByText(/Puccinia/)).toHaveCount(0);
 
   await expect(page.getByText("Sağlıklı gelişim — belirgin bir sorun görülmedi")).toBeVisible({ timeout: 4000 });
-  await expect(page.getByRole("meter")).toHaveAttribute("aria-valuenow", "91");
-  await expect(page.getByText(/Puccinia/)).toHaveCount(0);
+  await expect(page.locator("#demo").getByRole("meter")).toHaveAttribute("aria-valuenow", "91");
+  await expect(page.locator("#demo").getByText(/Puccinia/)).toHaveCount(0);
 });
 
 test("demo CTA leads to the waitlist", async ({ page }) => {

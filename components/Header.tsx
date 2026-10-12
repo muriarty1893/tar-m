@@ -29,7 +29,10 @@ export function Header() {
           </ul>
         </nav>
 
-        <CtaLink className="hidden text-base lg:inline-flex" />
+        {/* Visibility lives on the wrapper: CtaLink's own inline-flex would override `hidden`. */}
+        <div className="hidden lg:block">
+          <CtaLink className="text-base" />
+        </div>
 
         <button
           type="button"
