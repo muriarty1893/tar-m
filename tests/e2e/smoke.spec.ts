@@ -9,6 +9,16 @@ test("header CTA is hidden on phones and the menu holds it instead", async ({ pa
   await expect(headerCta).toBeVisible();
 });
 
+test("CTA inside the mobile menu closes the menu so the form is visible", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 750 });
+  await page.goto("/haberler");
+  await page.getByRole("button", { name: "Menüyü aç" }).click();
+  await page.locator("#mobil-menu").getByRole("link", { name: "Erken erişim için kaydol" }).click();
+  await expect(page).toHaveURL(/#kayit$/);
+  await expect(page.locator("#mobil-menu")).toHaveCount(0);
+  await expect(page.getByLabel("Ad soyad")).toBeInViewport();
+});
+
 test("home page has Turkish lang, brand name and CTA", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("lang", "tr");

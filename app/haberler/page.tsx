@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/config/site";
 import { getAllArticles } from "@/lib/news";
 import { NewsCard } from "@/components/NewsCard";
 
 export const metadata: Metadata = {
   title: "Haberler",
-  description: "Tarım dünyasından haberler, öneriler ve Bereket AI duyuruları.",
+  description: `Tarım dünyasından haberler, öneriler ve ${siteConfig.name} duyuruları.`,
 };
 
 export default async function NewsPage() {
@@ -14,7 +15,7 @@ export default async function NewsPage() {
     <section className="mx-auto max-w-6xl px-4 py-12">
       <h1 className="text-4xl font-extrabold">Haberler</h1>
       <p className="mt-3 text-lg text-muted">
-        Tarım dünyasından haberler, mevsimlik öneriler ve Bereket AI duyuruları.
+        Tarım dünyasından haberler, mevsimlik öneriler ve {siteConfig.name} duyuruları.
       </p>
 
       {articles.length === 0 ? (

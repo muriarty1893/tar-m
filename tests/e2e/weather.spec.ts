@@ -76,6 +76,15 @@ test("re-picking the current province does not get stuck loading", async ({ page
   await expect(page.getByTestId("sicaklik")).toHaveText("17°C");
 });
 
+test("a stalled weather API ends in the retry message instead of loading forever", async ({ page }) => {
+  await page.route("https://api.open-meteo.com/**", () => {
+    /* never respond */
+  });
+  await page.goto("/hava");
+  await expect(page.getByText("Hava durumu şu an alınamadı")).toBeVisible({ timeout: 12_000 });
+  await expect(page.getByRole("button", { name: "Tekrar dene" })).toBeVisible();
+});
+
 test("weather failure shows a retry button that recovers", async ({ page }) => {
   let fail = true;
   await page.route("https://api.open-meteo.com/**", (route) =>

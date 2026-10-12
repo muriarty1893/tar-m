@@ -1,4 +1,5 @@
 import { Section } from "./Section";
+import { siteConfig } from "@/config/site";
 import { CtaLink } from "./CtaLink";
 
 const features = [
@@ -40,7 +41,7 @@ export function Features() {
       id="ozellikler"
       eyebrow="Özellikler"
       title="Neler yapabilir?"
-      intro="Bereket AI, tarlanızdaki sorunları erkenden fark etmenize ve doğru kararı vermenize yardım eder."
+      intro={`${siteConfig.name}, tarlanızdaki sorunları erkenden fark etmenize ve doğru kararı vermenize yardım eder.`}
       className="bg-card/60"
     >
       <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

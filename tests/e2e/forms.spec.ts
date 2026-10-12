@@ -45,6 +45,19 @@ test("waitlist upstream failure shows the error and keeps typed values", async (
   await expect(page.getByRole("checkbox")).toBeChecked();
 });
 
+test("rate-limited submission explains to wait instead of a generic error", async ({ page }) => {
+  await page.route("**/api/waitlist", (route) =>
+    route.fulfill({ status: 429, contentType: "application/json", body: '{"ok":false,"error":"rate"}' }),
+  );
+  await page.goto("/#kayit");
+  await fillWaitlist(page);
+  await page.getByRole("button", { name: "Kaydol" }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "Çok fazla deneme" })).toContainText(
+    "Çok fazla deneme yapıldı, lütfen birkaç dakika sonra tekrar deneyin.",
+  );
+  await expect(page.getByLabel("E-posta")).toHaveValue("sukru@example.com");
+});
+
 test("real API route with an unreachable Apps Script shows the error (no mocks)", async ({ page }) => {
   // playwright.config points APPS_SCRIPT_URL at a closed port.
   await page.goto("/#kayit");

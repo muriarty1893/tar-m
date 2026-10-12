@@ -4,12 +4,12 @@ import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Sıkça Sorulan Sorular",
-  description: "Bereket AI hakkında merak edilenler: ne zaman çıkacak, ücretli mi, hangi ürünleri tanıyor, verilerim güvende mi?",
+  description: `${siteConfig.name} hakkında merak edilenler: ne zaman çıkacak, ücretli mi, hangi ürünleri tanıyor, verilerim güvende mi?`,
 };
 
 const faqs: { q: string; a: React.ReactNode }[] = [
   {
-    q: "Bereket AI nedir?",
+    q: `${siteConfig.name} nedir?`,
     a: "Tarlanızın ya da bitkinizin fotoğrafını gönderdiğinizde, yapay zekâ ile hastalık ve zararlı belirtilerini tanıyan, öneriler sunan ve hasat başarı tahmini veren Türkçe bir mobil uygulamadır.",
   },
   {
@@ -31,7 +31,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Yapay zekânın önerileri ziraat mühendisinin yerini tutar mı?",
-    a: "Hayır. Bereket AI size hızlı bir ön değerlendirme sunar ve neye dikkat etmeniz gerektiğini gösterir. İlaçlama gibi önemli kararlarda mutlaka bir ziraat mühendisine ya da il/ilçe tarım müdürlüğüne danışmanızı öneririz.",
+    a: `Hayır. ${siteConfig.name} size hızlı bir ön değerlendirme sunar ve neye dikkat etmeniz gerektiğini gösterir. İlaçlama gibi önemli kararlarda mutlaka bir ziraat mühendisine ya da il/ilçe tarım müdürlüğüne danışmanızı öneririz.`,
   },
   {
     q: "Hasat başarı tahmini nasıl hesaplanıyor?",

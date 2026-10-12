@@ -14,7 +14,7 @@ export function PartnerCta() {
       id="is-birligi"
       eyebrow="İş birliği"
       title="Birlikte büyüyelim"
-      intro="Bereket AI'yi sahaya birlikte taşıyacağımız kurum ve kişilerle tanışmak istiyoruz."
+      intro="Uygulamamızı sahaya birlikte taşıyacağımız kurum ve kişilerle tanışmak istiyoruz."
       className="bg-primary/5"
     >
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

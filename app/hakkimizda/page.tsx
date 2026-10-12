@@ -4,7 +4,7 @@ import { CtaLink } from "@/components/CtaLink";
 
 export const metadata: Metadata = {
   title: "Hakkımızda",
-  description: "Bereket AI'nin hikâyesi, misyonu ve değerleri.",
+  description: `${siteConfig.name}: hikâyemiz, misyonumuz ve değerlerimiz.`,
 };
 
 const values = [

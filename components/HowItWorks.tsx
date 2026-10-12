@@ -9,7 +9,7 @@ const steps = [
   {
     icon: "🤖",
     title: "Yapay zekâ incelesin",
-    text: "Bereket AI yaprak, renk ve gelişim belirtilerini saniyeler içinde analiz eder.",
+    text: "Yapay zekâ yaprak, renk ve gelişim belirtilerini saniyeler içinde analiz eder.",
   },
   {
     icon: "🌾",

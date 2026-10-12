@@ -23,7 +23,7 @@ export default async function Home() {
         id="demo"
         eyebrow="Canlı demo"
         title="Uygulamayı deneyin"
-        intro="Örnek tarla fotoğraflarından birini seçin ve Bereket AI'nin nasıl yanıt verdiğini görün."
+        intro="Örnek tarla fotoğraflarından birini seçin ve yapay zekânın nasıl yanıt verdiğini görün."
       >
         <DemoShowcase />
       </Section>

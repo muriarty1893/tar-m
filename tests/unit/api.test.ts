@@ -91,9 +91,9 @@ describe("POST /api/waitlist", () => {
     expect(res.status).toBe(400);
   });
 
-  it("returns 429 on the sixth request from the same IP", async () => {
+  it("allows 20 requests per IP (a shared cooperative Wi-Fi) and returns 429 on the 21st", async () => {
     const ip = freshIp();
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 20; i++) {
       expect((await waitlistPOST(req(validWaitlist(), ip))).status).toBe(200);
     }
     const res = await waitlistPOST(req(validWaitlist(), ip));
@@ -144,7 +144,7 @@ describe("POST /api/partner", () => {
 
   it("rate-limits separately from the waitlist", async () => {
     const ip = freshIp();
-    for (let i = 0; i < 5; i++) await waitlistPOST(req(validWaitlist(), ip));
+    for (let i = 0; i < 20; i++) await waitlistPOST(req(validWaitlist(), ip));
     expect((await partnerPOST(req(validPartner, ip))).status).toBe(200);
   });
 });

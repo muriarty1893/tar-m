@@ -16,6 +16,7 @@ export type FarmingHint = { kind: "frost" | "rain" | "spray" | "normal"; text: s
 
 const API = "https://api.open-meteo.com/v1/forecast";
 const CACHE_MS = 10 * 60_000;
+const TIMEOUT_MS = 8_000;
 const cache = new Map<string, { at: number; data: Forecast }>();
 
 /**
@@ -81,7 +82,8 @@ export async function fetchForecast(lat: number, lon: number, fetchImpl: typeof 
     forecast_days: "7",
     timezone: "auto",
   });
-  const res = await fetchImpl(`${API}?${params}`);
+  // A stalled connection must end in the retry message, not an endless spinner.
+  const res = await fetchImpl(`${API}?${params}`, { signal: AbortSignal.timeout(TIMEOUT_MS) });
   if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
   const data = parse((await res.json()) as ApiResponse);
   cache.set(key, { at: Date.now(), data });

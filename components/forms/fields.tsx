@@ -51,10 +51,14 @@ export function Honeypot({ value, onChange }: { value: string; onChange: (v: str
   );
 }
 
-export function FormError() {
+export function FormError({ rateLimited = false }: { rateLimited?: boolean }) {
   return (
     <div role="alert" className="rounded-xl border-l-4 border-red-600 bg-red-600/10 p-4">
-      <p className="font-semibold">Bir sorun oluştu, lütfen tekrar deneyin.</p>
+      <p className="font-semibold">
+        {rateLimited
+          ? "Çok fazla deneme yapıldı, lütfen birkaç dakika sonra tekrar deneyin."
+          : "Bir sorun oluştu, lütfen tekrar deneyin."}
+      </p>
       <p className="mt-1">
         Sorun devam ederse bize{" "}
         <a href={`mailto:${siteConfig.contactEmail}`} className="font-semibold text-primary underline">

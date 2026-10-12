@@ -4,7 +4,7 @@ import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "İş Birliği",
-  description: "Yatırımcılar, kooperatifler, ziraat odaları ve pilot çiftlikler için Bereket AI iş birliği.",
+  description: `Yatırımcılar, kooperatifler, ziraat odaları ve pilot çiftlikler için ${siteConfig.name} iş birliği.`,
 };
 
 const blocks = [

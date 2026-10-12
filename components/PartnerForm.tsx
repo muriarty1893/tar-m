@@ -55,7 +55,7 @@ export function PartnerForm() {
         <textarea id="p-message" rows={5} maxLength={2000} value={values.message} onChange={(e) => set("message", e.target.value)} className={inputClass} {...describedBy("p-message", errors.message)} />
       </Field>
       <Honeypot value={values.website} onChange={(v) => set("website", v)} />
-      {status === "error" && <FormError />}
+      {(status === "error" || status === "rate") && <FormError rateLimited={status === "rate"} />}
       <SubmitButton busy={status === "submitting"}>Mesajı gönder</SubmitButton>
     </form>
   );

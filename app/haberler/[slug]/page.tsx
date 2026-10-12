@@ -4,6 +4,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getAllArticles, getArticle } from "@/lib/news";
 import { formatTrDate } from "@/lib/format";
+import { siteConfig } from "@/config/site";
 
 // Cache Components rejects an empty list, so a site with no articles yet
 // still builds; the placeholder slug simply resolves to notFound().
@@ -17,15 +18,20 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/haberler/[slug]">): Promise<Metadata> {
   const article = await getArticle((await params).slug);
   if (!article) return { title: "Haber bulunamadı" };
+  // A page-level openGraph object replaces the root one entirely, so repeat the shared fields
+  // and fall back to the site share image when the article has no cover (WhatsApp previews).
   return {
     title: article.title,
     description: article.summary,
     openGraph: {
       type: "article",
+      siteName: siteConfig.name,
+      locale: "tr_TR",
+      url: `/haberler/${article.slug}`,
       title: article.title,
       description: article.summary,
       publishedTime: article.date,
-      ...(article.cover ? { images: [article.cover] } : {}),
+      images: [article.cover ?? { url: "/opengraph-image", width: 1200, height: 630 }],
     },
   };
 }

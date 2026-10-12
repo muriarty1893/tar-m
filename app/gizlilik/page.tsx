@@ -3,7 +3,7 @@ import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Gizlilik ve KVKK Aydınlatma Metni",
-  description: "Bereket AI web sitesinde toplanan kişisel verilerin işlenmesine ilişkin KVKK aydınlatma metni.",
+  description: `${siteConfig.name} web sitesinde toplanan kişisel verilerin işlenmesine ilişkin KVKK aydınlatma metni.`,
 };
 
 // DRAFT: written as a starting point only. A lawyer must review it before launch,

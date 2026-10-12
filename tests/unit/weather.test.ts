@@ -81,6 +81,13 @@ describe("fetchForecast", () => {
     expect(url).toContain("timezone=auto");
   });
 
+  it("gives the request a timeout signal so a stalled API cannot hang the widget", async () => {
+    const f = fakeFetch(fixture());
+    await fetchForecast(38.1, 27.1, f);
+    const init = (f as unknown as { mock: { calls: [string, RequestInit?][] } }).mock.calls[0][1];
+    expect(init?.signal).toBeInstanceOf(AbortSignal);
+  });
+
   it("throws on HTTP 500", async () => {
     await expect(fetchForecast(40.1, 30.1, fakeFetch({}, 500))).rejects.toThrow();
   });

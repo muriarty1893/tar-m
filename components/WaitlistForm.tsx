@@ -111,7 +111,7 @@ export function WaitlistForm() {
           </div>
 
           <Honeypot value={values.website} onChange={(v) => set("website", v)} />
-          {status === "error" && <FormError />}
+          {(status === "error" || status === "rate") && <FormError rateLimited={status === "rate"} />}
           <SubmitButton busy={status === "submitting"}>Kaydol</SubmitButton>
         </form>
       )}

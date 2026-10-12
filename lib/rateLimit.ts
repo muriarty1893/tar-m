@@ -3,9 +3,11 @@ const hits = new Map<string, number[]>();
 /**
  * Sliding-window limiter kept in memory. On serverless each instance has its
  * own map, so this is best-effort protection, not a hard guarantee.
+ * The limit is generous because a cooperative meeting or a mobile carrier (CGNAT)
+ * can put many real farmers behind one IP; bots are stopped by the honeypot.
  * Returns true when the request is allowed.
  */
-export function checkRateLimit(key: string, limit = 5, windowMs = 10 * 60_000): boolean {
+export function checkRateLimit(key: string, limit = 20, windowMs = 10 * 60_000): boolean {
   const now = Date.now();
   const recent = (hits.get(key) ?? []).filter((t) => now - t < windowMs);
   if (recent.length >= limit) {

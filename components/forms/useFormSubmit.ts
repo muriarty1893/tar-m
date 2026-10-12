@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { SubmitResponse } from "@/lib/submit";
 
-export type FormStatus = "idle" | "submitting" | "success" | "error";
+export type FormStatus = "idle" | "submitting" | "success" | "error" | "rate";
 export type FormKind = "waitlist" | "partner";
 
 /**
@@ -37,7 +37,7 @@ export function useFormSubmit<T extends Record<string, unknown>>(kind: FormKind)
         return;
       }
       if (body && body.error === "validation" && body.fields) setErrors(body.fields);
-      setStatus("error");
+      setStatus(body?.error === "rate" ? "rate" : "error");
     } catch {
       setStatus("error");
     }

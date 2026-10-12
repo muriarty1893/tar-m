@@ -63,7 +63,7 @@ export function Header() {
               </li>
             ))}
           </ul>
-          <CtaLink className="w-full" />
+          <CtaLink className="w-full" onClick={close} />
         </nav>
       )}
     </header>
