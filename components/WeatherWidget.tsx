@@ -5,30 +5,64 @@ import Link from "next/link";
 import { DEFAULT_PROVINCE, findProvinces, nearestProvince, type Province } from "@/data/provinces";
 import { describeWeather, farmingHint, fetchForecast, type FarmingHint, type Forecast } from "@/lib/weather";
 import { formatTrDate } from "@/lib/format";
+import {
+  ArrowClockwiseIcon,
+  ArrowRightIcon,
+  CloudFogIcon,
+  CloudIcon,
+  CloudLightningIcon,
+  CloudRainIcon,
+  CloudSunIcon,
+  DropIcon,
+  MagnifyingGlassIcon,
+  MapPinIcon,
+  NavigationArrowIcon,
+  PlantIcon,
+  SnowflakeIcon,
+  SprayBottleIcon,
+  SunIcon,
+  ThermometerIcon,
+  WindIcon,
+} from "@phosphor-icons/react/dist/ssr";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type Status = "loading" | "ok" | "error";
 
 const hintStyle: Record<FarmingHint["kind"], string> = {
   frost: "border-sky-500 bg-sky-500/10",
-  rain: "border-blue-600 bg-blue-600/10",
-  spray: "border-primary bg-primary/10",
-  normal: "border-accent bg-accent-soft",
+  rain: "border-blue-600 bg-blue-600/10 dark:border-blue-400",
+  spray: "border-primary bg-secondary",
+  normal: "border-gold bg-gold-soft",
 };
 
-const hintIcon: Record<FarmingHint["kind"], string> = {
-  frost: "❄️",
-  rain: "🌧️",
-  spray: "✅",
-  normal: "🌾",
+const hintIcon: Record<FarmingHint["kind"], typeof SunIcon> = {
+  frost: SnowflakeIcon,
+  rain: CloudRainIcon,
+  spray: SprayBottleIcon,
+  normal: PlantIcon,
 };
+
+function ConditionIcon({ code, className }: { code: number; className: string }) {
+  const p = { "aria-hidden": true, weight: "duotone" as const, className };
+  if (code === 0) return <SunIcon {...p} />;
+  if (code <= 2) return <CloudSunIcon {...p} />;
+  if (code === 3) return <CloudIcon {...p} />;
+  if (code === 45 || code === 48) return <CloudFogIcon {...p} />;
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return <SnowflakeIcon {...p} />;
+  if (code >= 95) return <CloudLightningIcon {...p} />;
+  return <CloudRainIcon {...p} />;
+}
 
 const round = (n: number) => Math.round(n);
 const noopSubscribe = () => () => {};
 
 function HintBox({ hint }: { hint: FarmingHint }) {
+  const Icon = hintIcon[hint.kind];
   return (
-    <p className={`rounded-xl border-l-4 p-3 font-semibold ${hintStyle[hint.kind]}`}>
-      <span aria-hidden="true">{hintIcon[hint.kind]} </span>
+    <p className={`flex items-start gap-3 rounded-2xl border-l-4 p-4 font-semibold ${hintStyle[hint.kind]}`}>
+      <Icon aria-hidden="true" weight="duotone" className="mt-0.5 size-6 shrink-0" />
       {hint.text}
     </p>
   );
@@ -59,25 +93,34 @@ function ForecastView({
   const today = forecast.daily[0];
   const n = (v: number) => (placeholder ? "–" : String(round(v)));
   return (
-    <div className="mt-5 space-y-4">
-      <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
-        <p className="text-5xl font-extrabold" data-testid={placeholder ? undefined : "sicaklik"}>
+    <div className="mt-6 space-y-5">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <span className="blob flex size-16 items-center justify-center bg-gold-soft text-gold">
+          <ConditionIcon code={forecast.current.code} className="size-9" />
+        </span>
+        <p className="font-heading text-5xl font-bold tracking-tight" data-testid={placeholder ? undefined : "sicaklik"}>
           {n(forecast.current.temp)}°C
         </p>
-        <p className="text-lg text-muted">{placeholder ? "…" : describeWeather(forecast.current.code)}</p>
+        <p className="text-lg text-muted-foreground">{placeholder ? "…" : describeWeather(forecast.current.code)}</p>
       </div>
       <dl className="grid grid-cols-2 gap-3 text-base sm:grid-cols-3">
-        <div>
-          <dt className="text-muted">Yağış ihtimali</dt>
-          <dd className="font-bold">%{n(today.rainProb)}</dd>
+        <div className="rounded-2xl bg-secondary/60 p-3">
+          <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <DropIcon aria-hidden="true" weight="duotone" className="size-4" /> Yağış ihtimali
+          </dt>
+          <dd className="font-heading text-lg font-bold">%{n(today.rainProb)}</dd>
         </div>
-        <div>
-          <dt className="text-muted">Rüzgâr</dt>
-          <dd className="font-bold">{n(forecast.current.wind)} km/s</dd>
+        <div className="rounded-2xl bg-secondary/60 p-3">
+          <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <WindIcon aria-hidden="true" weight="duotone" className="size-4" /> Rüzgâr
+          </dt>
+          <dd className="font-heading text-lg font-bold">{n(forecast.current.wind)} km/s</dd>
         </div>
-        <div>
-          <dt className="text-muted">En düşük / en yüksek</dt>
-          <dd className="font-bold">
+        <div className="col-span-2 rounded-2xl bg-secondary/60 p-3 sm:col-span-1">
+          <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <ThermometerIcon aria-hidden="true" weight="duotone" className="size-4" /> En düşük / en yüksek
+          </dt>
+          <dd className="font-heading text-lg font-bold">
             {n(today.min)}° / {n(today.max)}°
           </dd>
         </div>
@@ -85,21 +128,27 @@ function ForecastView({
       <HintBox hint={farmingHint(today)} />
 
       {compact ? (
-        <Link href="/hava" className="inline-block font-bold text-primary underline" tabIndex={placeholder ? -1 : undefined}>
-          7 günlük tahmin ve il seçimi →
+        <Link
+          href="/hava"
+          className="group inline-flex min-h-11 items-center gap-2 font-semibold text-primary underline-offset-4 hover:underline"
+          tabIndex={placeholder ? -1 : undefined}
+        >
+          7 günlük tahmin ve il seçimi
+          <ArrowRightIcon aria-hidden="true" weight="bold" className="transition-transform group-hover:translate-x-0.5" />
         </Link>
       ) : (
-        <ol className="divide-y divide-line" aria-label="7 günlük tahmin">
+        <ol className="divide-y divide-border rounded-2xl border border-border" aria-label="7 günlük tahmin">
           {forecast.daily.map((d) => {
             const hint = farmingHint(d);
+            const HintIcon = hintIcon[hint.kind];
             return (
-              <li key={d.date} className="grid gap-1 py-3 sm:grid-cols-[10rem_8rem_1fr] sm:items-center">
+              <li key={d.date} className="grid gap-1 px-4 py-3.5 sm:grid-cols-[10rem_8rem_1fr] sm:items-center">
                 <span className="font-semibold">{placeholder ? "–" : formatTrDate(d.date)}</span>
-                <span>
+                <span className="tabular-nums">
                   {n(d.min)}° / {n(d.max)}° · %{n(d.rainProb)}
                 </span>
-                <span className="text-muted">
-                  <span aria-hidden="true">{hintIcon[hint.kind]} </span>
+                <span className="flex items-start gap-2 text-muted-foreground">
+                  <HintIcon aria-hidden="true" weight="duotone" className="mt-1 size-4 shrink-0" />
                   {hint.text}
                 </span>
               </li>
@@ -116,21 +165,24 @@ function ProvinceSearch({ onPick }: { onPick: (p: Province) => void }) {
   const results = query.trim() ? findProvinces(query).slice(0, 8) : [];
   return (
     <div className="relative">
-      <label htmlFor="il-ara" className="mb-1 block font-semibold">
+      <Label htmlFor="il-ara" className="mb-2">
         İl ara
-      </label>
-      <input
-        id="il-ara"
-        type="search"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Örn. Konya, Şanlıurfa…"
-        autoComplete="off"
-        className="min-h-12 w-full rounded-xl border border-line bg-card px-4 text-lg"
-      />
+      </Label>
+      <div className="relative">
+        <MagnifyingGlassIcon aria-hidden="true" weight="bold" className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          id="il-ara"
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Örn. Konya, Şanlıurfa…"
+          autoComplete="off"
+          className="pl-11"
+        />
+      </div>
       {query.trim() && (
-        <ul className="mt-2 flex flex-wrap gap-2" aria-label="Arama sonuçları">
-          {results.length === 0 && <li className="text-muted">Eşleşen il bulunamadı.</li>}
+        <ul className="mt-3 flex flex-wrap gap-2" aria-label="Arama sonuçları">
+          {results.length === 0 && <li className="text-muted-foreground">Eşleşen il bulunamadı.</li>}
           {results.map((p) => (
             <li key={p.name}>
               <button
@@ -139,7 +191,7 @@ function ProvinceSearch({ onPick }: { onPick: (p: Province) => void }) {
                   onPick(p);
                   setQuery("");
                 }}
-                className="min-h-11 rounded-full border border-line bg-card px-4 hover:border-primary"
+                className={buttonVariants({ variant: "secondary", size: "sm" })}
               >
                 {p.name}
               </button>
@@ -204,13 +256,17 @@ export function WeatherWidget({ compact = false, headingLevel = 3 }: { compact?:
 
 
   return (
-    <div className="rounded-3xl border border-line bg-card p-5 shadow-sm sm:p-6" aria-live="polite">
+    <div className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-7" aria-live="polite">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Heading className="text-2xl font-extrabold">{province.name}</Heading>
+        <Heading className="flex items-center gap-2 text-2xl font-bold">
+          <MapPinIcon aria-hidden="true" weight="duotone" className="size-6 text-primary" />
+          {province.name}
+        </Heading>
         {geoAvailable && (
-          <button type="button" onClick={locateMe} className="min-h-11 rounded-full border border-line px-4 text-base hover:border-primary">
-            📍 Konumumu kullan
-          </button>
+          <Button variant="outline" size="sm" onClick={locateMe}>
+            <NavigationArrowIcon aria-hidden="true" weight="duotone" />
+            Konumumu kullan
+          </Button>
         )}
       </div>
 
@@ -226,7 +282,7 @@ export function WeatherWidget({ compact = false, headingLevel = 3 }: { compact?:
           <div aria-hidden="true" className="invisible">
             <ForecastView forecast={SKELETON} compact={compact} placeholder />
           </div>
-          <p role="status" className="absolute inset-x-0 top-6 flex items-center gap-2 text-muted">
+          <p role="status" className="absolute inset-x-0 top-6 flex items-center gap-2 text-muted-foreground">
             <span className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent motion-safe:animate-spin" aria-hidden="true" />
             Hava durumu yükleniyor…
           </p>
@@ -236,18 +292,15 @@ export function WeatherWidget({ compact = false, headingLevel = 3 }: { compact?:
       {status === "error" && (
         <div className="mt-6 space-y-3">
           <p className="font-semibold">Hava durumu şu an alınamadı</p>
-          <button
-            type="button"
-            onClick={retry}
-            className="min-h-11 rounded-full bg-primary px-5 font-bold text-on-primary"
-          >
+          <Button onClick={retry}>
+            <ArrowClockwiseIcon aria-hidden="true" weight="bold" />
             Tekrar dene
-          </button>
+          </Button>
         </div>
       )}
 
       {status === "ok" && forecast && <ForecastView forecast={forecast} compact={compact} />}
-      <p className="mt-4 text-sm text-muted">
+      <p className="mt-5 text-sm text-muted-foreground">
         Veri:{" "}
         <a href="https://open-meteo.com/" className="underline" rel="noopener noreferrer" target="_blank">
           Open-Meteo

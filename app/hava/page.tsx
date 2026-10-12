@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { WeatherWidget } from "@/components/WeatherWidget";
+import { PageHero } from "@/components/PageHero";
 
 export const metadata: Metadata = {
   title: "Hava Durumu",
@@ -8,14 +9,15 @@ export const metadata: Metadata = {
 
 export default function WeatherPage() {
   return (
-    <section className="mx-auto max-w-4xl px-4 py-12">
-      <h1 className="text-4xl font-extrabold">Hava Durumu</h1>
-      <p className="mt-3 text-lg text-muted">
-        İlinizi seçin; 7 günlük tahminle birlikte don, yoğun yağış ve ilaçlama için uygun günleri görün.
-      </p>
-      <div className="mt-8">
+    <>
+      <PageHero
+        eyebrow="Hava durumu"
+        title="Hava Durumu"
+        intro="İlinizi seçin; 7 günlük tahminle birlikte don, yoğun yağış ve ilaçlama için uygun günleri görün."
+      />
+      <section className="mx-auto max-w-4xl px-4 py-12">
         <WeatherWidget headingLevel={2} />
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

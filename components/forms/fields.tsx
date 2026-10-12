@@ -1,9 +1,24 @@
 import type { ReactNode } from "react";
+import { CaretDownIcon, WarningCircleIcon } from "@phosphor-icons/react/dist/ssr";
 import { siteConfig } from "@/config/site";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
-export const inputClass =
-  "min-h-12 w-full rounded-xl border border-line bg-card px-4 py-2 text-lg aria-[invalid=true]:border-red-600";
+/** Native select styled like the shadcn Input: native keeps the phone's own picker (best on mobile). */
+export const selectClass =
+  "min-h-12 w-full cursor-pointer appearance-none rounded-2xl border-2 border-input bg-card py-2 pl-4 pr-11 text-base text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-4 focus-visible:ring-ring/20 aria-invalid:border-destructive";
 
+export function SelectChevron() {
+  return (
+    <CaretDownIcon
+      aria-hidden="true"
+      weight="bold"
+      className="pointer-events-none absolute right-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
+    />
+  );
+}
+
+// UI UX Pro Max (shadcn stack): visible label tied to the control, error right below the field.
 export function Field({
   id,
   label,
@@ -18,18 +33,23 @@ export function Field({
   children: ReactNode;
 }) {
   return (
-    <div className="space-y-1">
-      <label htmlFor={id} className="block font-semibold">
+    <div className="space-y-2">
+      <Label htmlFor={id}>
         {label}
-        {optional && <span className="font-normal text-muted"> (isteğe bağlı)</span>}
-      </label>
+        {optional && <span className="font-normal text-muted-foreground"> (isteğe bağlı)</span>}
+      </Label>
       {children}
-      {error && (
-        <p id={`${id}-hata`} className="text-base font-semibold text-red-700 dark:text-red-400">
-          {error}
-        </p>
-      )}
+      {error && <FieldError id={`${id}-hata`}>{error}</FieldError>}
     </div>
+  );
+}
+
+export function FieldError({ id, children }: { id: string; children: ReactNode }) {
+  return (
+    <p id={id} className="flex items-center gap-1.5 text-base font-semibold text-destructive">
+      <WarningCircleIcon aria-hidden="true" weight="fill" className="size-5 shrink-0" />
+      {children}
+    </p>
   );
 }
 
@@ -53,32 +73,34 @@ export function Honeypot({ value, onChange }: { value: string; onChange: (v: str
 
 export function FormError({ rateLimited = false }: { rateLimited?: boolean }) {
   return (
-    <div role="alert" className="rounded-xl border-l-4 border-red-600 bg-red-600/10 p-4">
-      <p className="font-semibold">
-        {rateLimited
-          ? "Çok fazla deneme yapıldı, lütfen birkaç dakika sonra tekrar deneyin."
-          : "Bir sorun oluştu, lütfen tekrar deneyin."}
-      </p>
-      <p className="mt-1">
-        Sorun devam ederse bize{" "}
-        <a href={`mailto:${siteConfig.contactEmail}`} className="font-semibold text-primary underline">
-          {siteConfig.contactEmail}
-        </a>{" "}
-        adresinden yazabilirsiniz.
-      </p>
+    <div role="alert" className="flex gap-3 rounded-2xl border-l-4 border-destructive bg-destructive/10 p-4">
+      <WarningCircleIcon aria-hidden="true" weight="duotone" className="mt-0.5 size-6 shrink-0 text-destructive" />
+      <div>
+        <p className="font-semibold">
+          {rateLimited
+            ? "Çok fazla deneme yapıldı, lütfen birkaç dakika sonra tekrar deneyin."
+            : "Bir sorun oluştu, lütfen tekrar deneyin."}
+        </p>
+        <p className="mt-1">
+          Sorun devam ederse bize{" "}
+          <a href={`mailto:${siteConfig.contactEmail}`} className="font-semibold text-primary underline underline-offset-4">
+            {siteConfig.contactEmail}
+          </a>{" "}
+          adresinden yazabilirsiniz.
+        </p>
+      </div>
     </div>
   );
 }
 
 export function SubmitButton({ busy, children }: { busy: boolean; children: ReactNode }) {
   return (
-    <button
-      type="submit"
-      disabled={busy}
-      className="min-h-12 w-full rounded-full bg-primary px-6 py-3 text-lg font-bold text-on-primary transition hover:bg-primary-strong disabled:opacity-60 sm:w-auto"
-    >
+    <Button type="submit" size="lg" disabled={busy} className="w-full sm:w-auto">
+      {busy && (
+        <span aria-hidden="true" className="size-5 rounded-full border-2 border-current border-t-transparent motion-safe:animate-spin" />
+      )}
       {busy ? "Gönderiliyor…" : children}
-    </button>
+    </Button>
   );
 }
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { getAllArticles } from "@/lib/news";
 import { Hero } from "@/components/Hero";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -9,21 +10,30 @@ import { WeatherWidget } from "@/components/WeatherWidget";
 import { NewsCard } from "@/components/NewsCard";
 import { PartnerCta } from "@/components/PartnerCta";
 import { WaitlistForm } from "@/components/WaitlistForm";
+import { BlurFade } from "@/components/magicui/blur-fade";
 
 export default async function Home() {
   const latest = (await getAllArticles()).slice(0, 3);
 
   return (
     <>
+      {/* Above the fold renders without animation so it paints immediately. */}
       <Hero />
-      <HowItWorks />
-      <Features />
+
+      <BlurFade>
+        <HowItWorks />
+      </BlurFade>
+
+      <BlurFade>
+        <Features />
+      </BlurFade>
 
       <Section
         id="demo"
         eyebrow="Canlı demo"
         title="Uygulamayı deneyin"
         intro="Örnek tarla fotoğraflarından birini seçin ve yapay zekânın nasıl yanıt verdiğini görün."
+        className="bg-card"
       >
         <DemoShowcase />
       </Section>
@@ -33,14 +43,14 @@ export default async function Home() {
         eyebrow="Hava durumu"
         title="Bugün tarlanızda hava nasıl?"
         intro="İlinizin hava durumunu ve çiftçiye özel uyarıları görün."
-        className="bg-card/60"
       >
-        <div className="max-w-2xl">
+        <div aria-hidden="true" className="blob pointer-events-none absolute right-[-8rem] top-24 hidden size-96 bg-blob opacity-60 lg:block" />
+        <div className="relative max-w-2xl">
           <WeatherWidget compact />
         </div>
       </Section>
 
-      <Section id="haberler" eyebrow="Haberler" title="Son haberler">
+      <Section id="haberler" eyebrow="Haberler" title="Son haberler" className="bg-card">
         {latest.length === 0 ? (
           <p className="text-lg">Henüz haber yok.</p>
         ) : (
@@ -50,15 +60,23 @@ export default async function Home() {
             ))}
           </div>
         )}
-        <Link href="/haberler" className="mt-8 inline-block font-bold text-primary underline">
-          Tüm haberler →
+        <Link
+          href="/haberler"
+          className="group mt-10 inline-flex min-h-11 items-center gap-2 font-semibold text-primary underline-offset-4 hover:underline"
+        >
+          Tüm haberler
+          <ArrowRightIcon aria-hidden="true" weight="bold" className="transition-transform group-hover:translate-x-0.5" />
         </Link>
       </Section>
 
-      <PartnerCta />
+      <BlurFade>
+        <PartnerCta />
+      </BlurFade>
 
-      <section className="px-4 py-16 sm:py-20">
-        <div className="mx-auto max-w-4xl">
+      <section className="relative overflow-hidden px-4 py-20 sm:py-24">
+        <div aria-hidden="true" className="dot-texture pointer-events-none absolute inset-0 opacity-70" />
+        <div aria-hidden="true" className="blob pointer-events-none absolute -left-24 top-10 size-80 bg-blob opacity-70" />
+        <div className="relative mx-auto max-w-4xl">
           <WaitlistForm />
         </div>
       </section>

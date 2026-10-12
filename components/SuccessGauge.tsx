@@ -1,13 +1,15 @@
+import { NumberTicker } from "@/components/magicui/number-ticker";
+
 const R = 80;
 const HALF = Math.PI * R;
 
 function tone(value: number) {
-  if (value < 50) return "text-red-600 dark:text-red-400";
-  if (value < 75) return "text-accent-ink";
+  if (value < 50) return "text-destructive";
+  if (value < 75) return "text-gold";
   return "text-primary";
 }
 
-/** Half-circle gauge for the harvest success estimate (0-100). */
+/** Half-circle gauge for the harvest success estimate (0-100); the number counts up (Magic UI NumberTicker). */
 export function SuccessGauge({ value, label = "Hasat başarı tahmini" }: { value: number; label?: string }) {
   const v = Math.max(0, Math.min(100, Math.round(value)));
   return (
@@ -18,10 +20,10 @@ export function SuccessGauge({ value, label = "Hasat başarı tahmini" }: { valu
       aria-valuemax={100}
       aria-valuenow={v}
       aria-valuetext={`%${v}`}
-      className="flex flex-col items-center"
+      className="flex flex-col items-center rounded-2xl bg-secondary/60 px-4 pb-3 pt-4"
     >
-      <svg viewBox="0 0 200 110" className="w-44" aria-hidden="true">
-        <path d="M20 100a80 80 0 0 1 160 0" fill="none" stroke="var(--line)" strokeWidth="16" strokeLinecap="round" />
+      <svg viewBox="0 0 200 110" className="w-40" aria-hidden="true">
+        <path d="M20 100a80 80 0 0 1 160 0" fill="none" stroke="var(--muted)" strokeWidth="16" strokeLinecap="round" />
         <path
           d="M20 100a80 80 0 0 1 160 0"
           fill="none"
@@ -32,8 +34,11 @@ export function SuccessGauge({ value, label = "Hasat başarı tahmini" }: { valu
           className={`${tone(v)} motion-safe:transition-[stroke-dasharray] motion-safe:duration-700`}
         />
       </svg>
-      <p className="-mt-2 text-center font-bold">
-        {label}: <span className={`text-2xl ${tone(v)}`}>%{v}</span>
+      <p className="-mt-3 text-center text-sm font-semibold">
+        {label}:{" "}
+        <span className={`font-heading text-2xl font-bold ${tone(v)}`}>
+          %<NumberTicker value={v} />
+        </span>
       </p>
     </div>
   );

@@ -10,13 +10,13 @@ export const metadata: Metadata = {
 // in particular the data-controller details and the cross-border transfer section.
 export default function PrivacyPage() {
   return (
-    <article className="mx-auto max-w-3xl px-4 py-12">
-      <p role="note" className="rounded-xl border-l-4 border-accent bg-accent-soft p-4 font-bold">
+    <article className="mx-auto max-w-3xl px-4 py-14">
+      <p role="note" className="rounded-2xl border-l-4 border-gold bg-gold-soft p-4 font-bold">
         Taslak — hukuki inceleme gereklidir.
       </p>
-      <h1 className="mt-8 text-3xl font-extrabold sm:text-4xl">Gizlilik ve KVKK Aydınlatma Metni</h1>
+      <h1 className="mt-8 text-3xl font-bold tracking-tight sm:text-5xl">Gizlilik ve KVKK Aydınlatma Metni</h1>
 
-      <div className="prose-article mt-8 space-y-4 text-lg leading-relaxed">
+      <div className="prose-article mt-10 space-y-4 rounded-3xl border border-border bg-card p-7 text-lg leading-relaxed shadow-soft sm:p-10">
         <p>
           Bu metin, 6698 sayılı Kişisel Verilerin Korunması Kanunu (&quot;KVKK&quot;) uyarınca, {siteConfig.name} web sitesi
           üzerinden toplanan kişisel verilerin işlenmesi hakkında sizi bilgilendirmek amacıyla hazırlanmıştır.
@@ -82,7 +82,7 @@ export default function PrivacyPage() {
           adresine iletebilirsiniz. Başvurunuz en geç 30 gün içinde ücretsiz olarak sonuçlandırılır.
         </p>
 
-        <p className="text-base text-muted">Son güncelleme: 12 Ekim 2026</p>
+        <p className="text-base text-muted-foreground">Son güncelleme: 12 Ekim 2026</p>
       </div>
     </article>
   );

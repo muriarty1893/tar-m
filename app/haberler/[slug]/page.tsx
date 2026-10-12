@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getAllArticles, getArticle } from "@/lib/news";
 import { formatTrDate } from "@/lib/format";
 import { siteConfig } from "@/config/site";
+import { ArrowLeftIcon, CalendarBlankIcon } from "@phosphor-icons/react/dist/ssr";
 
 // Cache Components rejects an empty list, so a site with no articles yet
 // still builds; the placeholder slug simply resolves to notFound().
@@ -41,23 +42,33 @@ export default async function ArticlePage({ params }: PageProps<"/haberler/[slug
   if (!article) notFound();
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-12">
-      <Link href="/haberler" className="text-primary underline">
-        ← Tüm haberler
-      </Link>
-      <h1 className="mt-6 text-3xl font-extrabold leading-tight sm:text-4xl">{article.title}</h1>
-      <time dateTime={article.date} className="mt-3 block text-muted">
-        {formatTrDate(article.date)}
-      </time>
-      {article.cover?.startsWith("/") && (
-        <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl">
-          <Image src={article.cover} alt="" fill priority sizes="(min-width: 768px) 768px, 100vw" className="object-cover" />
+    <article>
+      <header className="relative overflow-hidden border-b border-border px-4 pb-12 pt-10 sm:pt-14">
+        <div aria-hidden="true" className="dot-texture pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top_left,black,transparent_70%)]" />
+        <div aria-hidden="true" className="blob pointer-events-none absolute -right-24 -top-24 size-72 bg-blob opacity-70" />
+        <div className="relative mx-auto max-w-3xl">
+          <Link
+            href="/haberler"
+            className="inline-flex min-h-11 items-center gap-2 font-semibold text-primary underline-offset-4 hover:underline"
+          >
+            <ArrowLeftIcon aria-hidden="true" weight="bold" />
+            Tüm haberler
+          </Link>
+          <h1 className="mt-5 text-3xl font-bold leading-tight tracking-tight sm:text-5xl">{article.title}</h1>
+          <time dateTime={article.date} className="mt-5 flex items-center gap-1.5 text-muted-foreground">
+            <CalendarBlankIcon aria-hidden="true" weight="duotone" className="size-5" />
+            {formatTrDate(article.date)}
+          </time>
         </div>
-      )}
-      <div
-        className="prose-article mt-8 space-y-4 text-lg leading-relaxed"
-        dangerouslySetInnerHTML={{ __html: article.html }}
-      />
+      </header>
+      <div className="mx-auto max-w-3xl px-4 py-12">
+        {article.cover?.startsWith("/") && (
+          <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-3xl shadow-soft">
+            <Image src={article.cover} alt="" fill priority sizes="(min-width: 768px) 768px, 100vw" className="object-cover" />
+          </div>
+        )}
+        <div className="prose-article space-y-5 text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: article.html }} />
+      </div>
     </article>
   );
 }

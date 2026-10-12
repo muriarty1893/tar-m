@@ -6,7 +6,8 @@ test("header CTA is hidden on phones and the menu holds it instead", async ({ pa
   const headerCta = page.locator("header").getByRole("link", { name: "Erken erişim için kaydol" });
   await expect(headerCta).toBeHidden();
   await page.getByRole("button", { name: "Menüyü aç" }).click();
-  await expect(headerCta).toBeVisible();
+  // The menu (shadcn Sheet) is portaled outside <header>; it holds the CTA instead.
+  await expect(page.locator("#mobil-menu").getByRole("link", { name: "Erken erişim için kaydol" })).toBeVisible();
 });
 
 test("CTA inside the mobile menu closes the menu so the form is visible", async ({ page }) => {

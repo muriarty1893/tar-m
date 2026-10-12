@@ -57,10 +57,13 @@ test("no horizontal scroll at 375 px on any route", async ({ page }) => {
 
 test("FAQ has at least 6 questions that expand", async ({ page }) => {
   await page.goto("/sss");
-  const items = page.locator("main details");
-  expect(await items.count()).toBeGreaterThanOrEqual(6);
-  await items.first().locator("summary").click();
-  await expect(items.first()).toHaveAttribute("open", "");
+  const triggers = page.locator('main [data-slot="accordion-trigger"]');
+  expect(await triggers.count()).toBeGreaterThanOrEqual(6);
+  const first = triggers.first();
+  await expect(first).toHaveAttribute("aria-expanded", "false");
+  await first.click();
+  await expect(first).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByText("Türkçe bir mobil uygulamadır.", { exact: false })).toBeVisible();
 });
 
 test("privacy page is a KVKK draft with the legal-review note", async ({ page }) => {

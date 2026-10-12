@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { SealCheckIcon } from "@phosphor-icons/react/dist/ssr";
 import { PARTNER_TYPES } from "@/lib/partner-types";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useFormSubmit } from "./forms/useFormSubmit";
-import { Field, FormError, Honeypot, SubmitButton, describedBy, inputClass } from "./forms/fields";
+import { Field, FormError, Honeypot, SelectChevron, SubmitButton, describedBy, selectClass } from "./forms/fields";
 
 const initial = { name: "", organization: "", email: "", phone: "", type: "", message: "", website: "" };
 
@@ -19,40 +22,46 @@ export function PartnerForm() {
 
   if (status === "success") {
     return (
-      <p role="status" className="rounded-xl border-l-4 border-primary bg-primary/10 p-4 text-lg font-semibold">
-        Teşekkürler! Mesajınızı aldık, en kısa sürede size dönüş yapacağız.
-      </p>
+      <div role="status" className="flex flex-col items-start gap-4 py-6">
+        <span className="blob flex size-16 items-center justify-center bg-secondary text-primary">
+          <SealCheckIcon aria-hidden="true" weight="duotone" className="size-9" />
+        </span>
+        <p className="font-heading text-2xl font-bold">Teşekkürler! Mesajınızı aldık, en kısa sürede size dönüş yapacağız.</p>
+      </div>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="relative space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+    <form onSubmit={onSubmit} noValidate className="relative space-y-5">
+      <div className="grid gap-5 sm:grid-cols-2">
         <Field id="p-name" label="Ad soyad" error={errors.name}>
-          <input id="p-name" autoComplete="name" value={values.name} onChange={(e) => set("name", e.target.value)} className={inputClass} {...describedBy("p-name", errors.name)} />
+          <Input id="p-name" autoComplete="name" value={values.name} onChange={(e) => set("name", e.target.value)} {...describedBy("p-name", errors.name)} />
         </Field>
         <Field id="p-org" label="Kurum adı" error={errors.organization}>
-          <input id="p-org" autoComplete="organization" value={values.organization} onChange={(e) => set("organization", e.target.value)} className={inputClass} {...describedBy("p-org", errors.organization)} />
+          <Input id="p-org" autoComplete="organization" value={values.organization} onChange={(e) => set("organization", e.target.value)} {...describedBy("p-org", errors.organization)} />
         </Field>
         <Field id="p-email" label="E-posta" error={errors.email}>
-          <input id="p-email" type="email" inputMode="email" autoComplete="email" value={values.email} onChange={(e) => set("email", e.target.value)} className={inputClass} {...describedBy("p-email", errors.email)} />
+          <Input id="p-email" type="email" inputMode="email" autoComplete="email" value={values.email} onChange={(e) => set("email", e.target.value)} {...describedBy("p-email", errors.email)} />
         </Field>
         <Field id="p-phone" label="Telefon" optional error={errors.phone}>
-          <input id="p-phone" type="tel" autoComplete="tel" value={values.phone} onChange={(e) => set("phone", e.target.value)} className={inputClass} {...describedBy("p-phone", errors.phone)} />
+          <Input id="p-phone" type="tel" inputMode="tel" autoComplete="tel" value={values.phone} onChange={(e) => set("phone", e.target.value)} {...describedBy("p-phone", errors.phone)} />
         </Field>
       </div>
       <Field id="p-type" label="Kurum türü" error={errors.type}>
-        <select id="p-type" value={values.type} onChange={(e) => set("type", e.target.value)} className={inputClass} {...describedBy("p-type", errors.type)}>
-          <option value="">Seçiniz</option>
-          {Object.entries(PARTNER_TYPES).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select id="p-type" value={values.type} onChange={(e) => set("type", e.target.value)} className={selectClass} {...describedBy("p-type", errors.type)}>
+            <option value="">Seçiniz</option>
+            {Object.entries(PARTNER_TYPES).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <SelectChevron />
+        </div>
       </Field>
       <Field id="p-message" label="Mesajınız" error={errors.message}>
-        <textarea id="p-message" rows={5} maxLength={2000} value={values.message} onChange={(e) => set("message", e.target.value)} className={inputClass} {...describedBy("p-message", errors.message)} />
+        <Textarea id="p-message" rows={5} maxLength={2000} value={values.message} onChange={(e) => set("message", e.target.value)} {...describedBy("p-message", errors.message)} />
       </Field>
       <Honeypot value={values.website} onChange={(v) => set("website", v)} />
       {(status === "error" || status === "rate") && <FormError rateLimited={status === "rate"} />}

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { cn } from "cn";
 
 export function Section({
   id,
@@ -7,6 +8,7 @@ export function Section({
   intro,
   children,
   className = "",
+  align = "left",
 }: {
   id?: string;
   eyebrow?: string;
@@ -14,16 +16,19 @@ export function Section({
   intro?: ReactNode;
   children: ReactNode;
   className?: string;
+  align?: "left" | "center";
 }) {
   return (
-    <section id={id} className={`scroll-mt-20 px-4 py-16 sm:py-20 ${className}`}>
+    <section id={id} className={cn("relative scroll-mt-20 px-4 py-20 sm:py-24", className)}>
       <div className="mx-auto max-w-6xl">
-        <div className="max-w-3xl">
-          {eyebrow && <p className="font-bold uppercase tracking-wider text-accent-ink">{eyebrow}</p>}
-          <h2 className="mt-1 text-3xl font-extrabold sm:text-4xl">{title}</h2>
-          {intro && <p className="mt-3 text-lg text-muted">{intro}</p>}
+        <div className={cn("max-w-2xl", align === "center" && "mx-auto text-center")}>
+          {eyebrow && (
+            <p className="text-sm font-bold uppercase tracking-[0.14em] text-gold">{eyebrow}</p>
+          )}
+          <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{title}</h2>
+          {intro && <p className="mt-4 text-lg text-muted-foreground">{intro}</p>}
         </div>
-        <div className="mt-10">{children}</div>
+        <div className="mt-12">{children}</div>
       </div>
     </section>
   );

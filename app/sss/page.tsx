@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
+import { PageHero } from "@/components/PageHero";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export const metadata: Metadata = {
   title: "Sıkça Sorulan Sorular",
@@ -16,7 +18,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
     q: "Uygulama ne zaman çıkacak?",
     a: (
       <>
-        Uygulama şu anda geliştirme aşamasında. <Link href="/#kayit" className="text-primary underline">Erken erişim listesine</Link>{" "}
+        Uygulama şu anda geliştirme aşamasında. <Link href="/#kayit" className="font-semibold text-primary underline underline-offset-4">Erken erişim listesine</Link>{" "}
         kaydolanlar, uygulama hazır olduğunda ilk haberdar olacak.
       </>
     ),
@@ -46,7 +48,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
     a: (
       <>
         Verileriniz yalnızca size hizmet vermek ve uygulamayı geliştirmek için, 6698 sayılı KVKK&apos;ya uygun şekilde işlenir.
-        Ayrıntılar için <Link href="/gizlilik" className="text-primary underline">Gizlilik ve KVKK</Link> sayfasına bakabilirsiniz.
+        Ayrıntılar için <Link href="/gizlilik" className="font-semibold text-primary underline underline-offset-4">Gizlilik ve KVKK</Link> sayfasına bakabilirsiniz.
       </>
     ),
   },
@@ -54,28 +56,31 @@ const faqs: { q: string; a: React.ReactNode }[] = [
 
 export default function FaqPage() {
   return (
-    <section className="mx-auto max-w-3xl px-4 py-12">
-      <h1 className="text-4xl font-extrabold">Sıkça Sorulan Sorular</h1>
-      <p className="mt-3 text-lg text-muted">
-        Aradığınız cevabı bulamadıysanız bize{" "}
-        <a href={`mailto:${siteConfig.contactEmail}`} className="text-primary underline">
-          {siteConfig.contactEmail}
-        </a>{" "}
-        adresinden yazın.
-      </p>
-      <div className="mt-8 space-y-3">
-        {faqs.map((f) => (
-          <details key={f.q} className="group rounded-2xl border border-line bg-card p-5 open:shadow-sm">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-bold">
-              {f.q}
-              <span className="text-2xl text-primary transition group-open:rotate-45" aria-hidden="true">
-                +
-              </span>
-            </summary>
-            <div className="mt-3 text-lg text-muted">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </section>
+    <>
+      <PageHero
+        eyebrow="SSS"
+        title="Sıkça Sorulan Sorular"
+        intro={
+          <>
+            Aradığınız cevabı bulamadıysanız bize{" "}
+            <a href={`mailto:${siteConfig.contactEmail}`} className="font-semibold text-primary underline underline-offset-4">
+              {siteConfig.contactEmail}
+            </a>{" "}
+            adresinden yazın.
+          </>
+        }
+      />
+      <section className="mx-auto max-w-3xl px-4 py-14">
+        {/* shadcn/ui Accordion (Base UI): answers stay in the HTML for search engines. */}
+        <Accordion className="gap-3">
+          {faqs.map((f) => (
+            <AccordionItem key={f.q} value={f.q} className="rounded-3xl border border-border bg-card px-6 shadow-soft not-last:border-b">
+              <AccordionTrigger headingLevel={2}>{f.q}</AccordionTrigger>
+              <AccordionContent className="text-lg">{f.a}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </section>
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EnvelopeIcon } from "@phosphor-icons/react/dist/ssr";
 import { siteConfig } from "@/config/site";
 import { Logo } from "./Logo";
 import { CtaLink } from "./CtaLink";
@@ -14,32 +15,39 @@ const links = [
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-line bg-card">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-3">
-        <div className="space-y-3">
+    <footer className="relative mt-auto overflow-hidden border-t border-border bg-card">
+      <div aria-hidden="true" className="dot-texture pointer-events-none absolute inset-0 opacity-60" />
+      <div aria-hidden="true" className="blob pointer-events-none absolute -bottom-24 -right-20 size-72 bg-blob opacity-60" />
+      <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
+        <div className="space-y-4">
           <Logo className="text-xl" />
-          <p className="text-muted">{siteConfig.tagline}</p>
-          <CtaLink />
+          <p className="max-w-sm text-muted-foreground">{siteConfig.tagline}</p>
+          <CtaLink withArrow />
         </div>
         <nav aria-label="Alt menü">
-          <ul className="space-y-2">
+          <p className="font-heading text-base font-bold">Sayfalar</p>
+          <ul className="mt-3 space-y-1">
             {links.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="hover:text-primary">
+                <Link href={l.href} className="inline-flex min-h-11 items-center text-muted-foreground transition-colors hover:text-primary">
                   {l.label}
                 </Link>
               </li>
             ))}
           </ul>
         </nav>
-        <div className="space-y-2">
-          <p className="font-bold">İletişim</p>
-          <a href={`mailto:${siteConfig.contactEmail}`} className="break-all text-primary underline">
+        <div>
+          <p className="font-heading text-base font-bold">İletişim</p>
+          <a
+            href={`mailto:${siteConfig.contactEmail}`}
+            className="mt-3 inline-flex min-h-11 items-center gap-2 break-all font-medium text-primary underline-offset-4 hover:underline"
+          >
+            <EnvelopeIcon aria-hidden="true" weight="duotone" className="size-5 shrink-0" />
             {siteConfig.contactEmail}
           </a>
         </div>
       </div>
-      <p className="border-t border-line px-4 py-4 text-center text-sm text-muted">
+      <p className="relative border-t border-border px-4 py-5 text-center text-sm text-muted-foreground">
         © 2026 {siteConfig.name}. Tüm hakları saklıdır.
       </p>
     </footer>
