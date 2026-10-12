@@ -81,10 +81,27 @@ test("the phone's bottom bar switches screens and opens past scans", async ({ pa
   await expect(nav.getByRole("button", { name: "Hava" })).toHaveAttribute("aria-current", "page");
 
   await nav.getByRole("button", { name: "Geçmiş" }).click();
-  await app.getByRole("button", { name: /Zeytin sürgünü/ }).click();
+  await app.getByRole("button", { name: /Domates bahçesi/ }).click();
   await expect(app.getByTestId("demo-cevap")).toBeVisible();
-  await expect(app.getByRole("meter")).toHaveAttribute("aria-valuenow", "63");
+  await expect(app.getByRole("meter")).toHaveAttribute("aria-valuenow", "48");
 
   await nav.getByRole("button", { name: "Ana sayfa" }).click();
   await expect(app.getByText("Hızlı İşlemler")).toBeVisible();
+});
+
+test("the picked field becomes the scene behind the phone, live in its camera", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/#demo");
+  const demo = page.locator("#demo");
+  await expect(demo.locator(CANVAS)).toBeVisible({ timeout: 20_000 });
+  const stage = demo.locator(".stage-bg");
+  await expect(stage).not.toHaveAttribute("data-scene");
+
+  await demo.getByRole("button", { name: /Ayçiçeği tarlası/ }).click();
+  await expect(stage).toHaveAttribute("data-scene", "/demo/aycicegi-tarlasi.webp");
+  await expect(demo.getByTestId("uygulama-ekrani").getByText("CANLI · Tarama")).toBeVisible();
+
+  await expect(demo.getByTestId("demo-cevap")).toBeVisible({ timeout: 4000 });
+  await demo.getByRole("button", { name: "Yeni tarama" }).click();
+  await expect(stage).not.toHaveAttribute("data-scene");
 });

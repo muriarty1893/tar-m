@@ -9,6 +9,8 @@ The demo section (`#demo`) shows the app running on a 3D phone that floats above
 - `components/phone-app/PhoneScene.tsx`: three.js scene (React Three Fiber + drei). Each frame it projects the display's four corners and warps the DOM screen onto them with a CSS `matrix3d` (`quadMatrix3d` in `lib/phone-stage.ts`), so the screen stays real, accessible, clickable HTML.
 - `components/phone-app/GrassField.tsx`: procedural meadow (instanced grass, wheat and flowers with a wind shader). No download needed.
 
+When a field photo is picked, that photo fills the stage behind the phone (blurred, with a vignette) and the meadow hides, so the phone looks like it is standing in the field; its camera screen shows the same scene zoomed in, with a slight handheld drift and a CANLI label. Resetting brings the meadow back.
+
 The phone's bottom bar works: Ana sayfa, Taramalar (starts a scan), Hava (5-day farm forecast) and Geçmiş (past scans; tap one to open its result).
 
 Motion: the phone turns in once, then floats. "Hareketi durdur" pauses it. With `prefers-reduced-motion` there is no intro, no float and no automatic example scan.

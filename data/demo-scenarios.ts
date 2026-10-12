@@ -21,8 +21,8 @@ export const demoScenarios: DemoScenario[] = [
   {
     id: "bugday-pas",
     title: "Buğday tarlası",
-    imageSrc: "/demo/bugday-pas.webp",
-    imageAlt: "Yaprağında damarlar boyunca sarı-turuncu pas çizgileri olan buğday",
+    imageSrc: "/demo/bugday-sari-pas.webp",
+    imageAlt: "Tarlada yakın çekim: damarları boyunca sarı-turuncu pas püstülleri dizilmiş tahıl yaprağı",
     seen: "Başaklanma dönemindeki buğday yapraklarında, damarlar boyunca uzanan sarı-turuncu çizgiler görülüyor.",
     diagnosis: "Sarı pas (Puccinia striiformis) belirtileri — erken evre",
     suggestions: [
@@ -35,7 +35,7 @@ export const demoScenarios: DemoScenario[] = [
   {
     id: "kuru-misir",
     title: "Mısır tarlası",
-    imageSrc: "/demo/kuru-misir.webp",
+    imageSrc: "/demo/misir-kuraklik.webp",
     imageAlt: "Kuraklıktan yaprakları kurumuş mısır tarlası",
     seen: "Toprak yüzeyinde çatlaklar var; mısır yaprakları kıvrılmış ve uçlarından kurumaya başlamış.",
     diagnosis: "Su stresi (kuraklık) — orta düzey",
@@ -48,7 +48,7 @@ export const demoScenarios: DemoScenario[] = [
   {
     id: "aycicegi",
     title: "Ayçiçeği tarlası",
-    imageSrc: "/demo/aycicegi.webp",
+    imageSrc: "/demo/aycicegi-tarlasi.webp",
     imageAlt: "Tablaları açmış, yaprakları yeşil ayçiçeği tarlası",
     seen: "Bitkiler eşit boyda, yapraklar koyu yeşil ve tablalar düzgün açılmış.",
     diagnosis: "Sağlıklı gelişim — belirgin bir sorun görülmedi",
@@ -59,17 +59,17 @@ export const demoScenarios: DemoScenario[] = [
     successRate: 91,
   },
   {
-    id: "zeytin",
-    title: "Zeytin sürgünü",
-    imageSrc: "/demo/zeytin.webp",
-    imageAlt: "Sürgün üzerinde koyu kahverengi, kabuklu zeytin kara koşnilleri (yakın çekim)",
-    seen: "Sürgün üzerinde yarım küre biçiminde, koyu kahverengi kabuklu böcekler görülüyor; çevresinde yapışkan bir tabaka oluşabilir.",
-    diagnosis: "Zeytin kara koşnili belirtisi ve buna bağlı fumajin (kurumcuk) olasılığı",
+    id: "domates-mildiyo",
+    title: "Domates bahçesi",
+    imageSrc: "/demo/domates-mildiyo.webp",
+    imageAlt: "Dalda yeşil domatesler: birinde kahverengi lekeler, biri tamamen kararıp buruşmuş",
+    seen: "Yeşil domates meyvelerinde kahverengi, yağlı görünümlü lekeler var; bir meyve tamamen kararmış ve buruşmuş.",
+    diagnosis: "Domates mildiyösü (Phytophthora infestans) — meyvede ilerlemiş belirti",
     suggestions: [
-      "Sık dalları budayarak ağacın içine hava ve ışık girmesini sağlayın.",
-      "Mücadele zamanlaması için bölgenizdeki tahmin-uyarı duyurularını takip edin.",
-      "Uygulama öncesi bir ziraat mühendisinden reçete alın.",
+      "Lekeli meyve ve yaprakları toplayıp bahçeden uzaklaştırın; kompost yığınına atmayın.",
+      "Yaprakları ıslatmayan damla sulamaya geçin ve sıra aralarında hava akışını artırın.",
+      "Serin ve nemli günlerde koruyucu uygulama için bir ziraat mühendisinden reçete alın.",
     ],
-    successRate: 63,
+    successRate: 48,
   },
 ];

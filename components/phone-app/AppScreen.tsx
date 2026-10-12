@@ -266,12 +266,20 @@ function QuickActions({ onScan }: { onScan: () => void }) {
 function CameraScreen({ s }: { s: DemoScenario }) {
   return (
     <div className="relative h-full bg-black text-white">
-      <Image src={s.imageSrc} alt={s.imageAlt} fill sizes="340px" className="object-cover opacity-90" />
+      {/* Live viewfinder: the same field as the stage behind the phone, zoomed in, with a slight handheld drift. */}
+      <div className="absolute inset-0 motion-safe:animate-[handheld_7s_ease-in-out_infinite_alternate]">
+        <div className="absolute inset-0 scale-[1.35]">
+          <Image src={s.imageSrc} alt={s.imageAlt} fill sizes="480px" className="object-cover" />
+        </div>
+      </div>
       <div aria-hidden="true" className="absolute inset-x-0 top-14 z-10 flex items-center justify-between px-5">
         <span className="flex size-10 items-center justify-center rounded-full bg-black/40 backdrop-blur">
           <XIcon weight="bold" className="size-5" />
         </span>
-        <span className="rounded-full bg-black/40 px-3 py-1.5 text-[13px] font-semibold backdrop-blur">Tarama</span>
+        <span className="flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 text-[13px] font-semibold backdrop-blur">
+          <span className="size-2 rounded-full bg-red-500 motion-safe:animate-pulse" />
+          CANLI · Tarama
+        </span>
         <span className="flex size-10 items-center justify-center rounded-full bg-black/40 backdrop-blur">
           <LightningIcon weight="fill" className="size-5" />
         </span>

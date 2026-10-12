@@ -162,6 +162,19 @@
   }
 }
 
+/* Camera viewfinder in the demo: a slow handheld drift. */
+@keyframes handheld {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-1.6%, 1.1%) rotate(-0.5deg);
+  }
+  100% {
+    transform: translate(1.2%, -0.9%) rotate(0.4deg);
+  }
+}
+
 @keyframes demo-scan {
   0%,
   100% {

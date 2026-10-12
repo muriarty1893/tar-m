@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { PauseIcon, PlayIcon } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,9 @@ function webglRenderer(): string | null {
  * Shows the simulated app on the 3D phone model. Until the model is ready — or for
  * good when WebGL is missing or Save-Data is on — the same screen sits in a flat frame.
  */
-export function PhoneStage({ children }: { children: ReactNode }) {
+export type StageScene = { src: string; alt: string };
+
+export function PhoneStage({ children, scene = null }: { children: ReactNode; scene?: StageScene | null }) {
   const ref = useRef<HTMLDivElement>(null);
   const overlay = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
@@ -52,6 +55,9 @@ export function PhoneStage({ children }: { children: ReactNode }) {
   const reduced = usePrefersReducedMotion();
   const dark = useMediaQuery("(prefers-color-scheme: dark)");
   const markReady = useCallback(() => setReady(true), []);
+  // Keep the last scene mounted so clearing it fades out instead of popping.
+  const [lastScene, setLastScene] = useState<StageScene | null>(scene);
+  if (scene && scene.src !== lastScene?.src) setLastScene(scene);
 
   useEffect(() => {
     const el = ref.current;
@@ -77,7 +83,25 @@ export function PhoneStage({ children }: { children: ReactNode }) {
 
   return (
     <div>
-      <div ref={ref} className="stage-bg relative mx-auto h-[640px] w-full overflow-hidden rounded-[2.5rem] ring-1 ring-border sm:h-[780px] lg:h-[860px]">
+      <div
+        ref={ref}
+        data-scene={scene?.src}
+        className="stage-bg relative mx-auto h-[640px] w-full overflow-hidden rounded-[2.5rem] ring-1 ring-border sm:h-[780px] lg:h-[860px]"
+      >
+        {/* The chosen field fills the stage, as if the phone were standing in it and filming it live. */}
+        {lastScene && (
+          <div aria-hidden="true" className={`absolute inset-0 transition-opacity duration-700 ${scene ? "opacity-100" : "opacity-0"}`}>
+            <Image
+              key={lastScene.src}
+              src={lastScene.src}
+              alt=""
+              fill
+              sizes="(min-width: 1280px) 1200px, 100vw"
+              className="scale-105 object-cover blur-[3px] motion-safe:animate-in motion-safe:fade-in motion-safe:duration-700"
+            />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_45%,rgb(0_0_0/0)_25%,rgb(0_0_0/0.5)_100%)]" />
+          </div>
+        )}
 
         {!ready && (
           <div className="absolute inset-0 flex items-center justify-center">
@@ -92,7 +116,7 @@ export function PhoneStage({ children }: { children: ReactNode }) {
 
         {load && (
           <div className="absolute inset-0">
-            <PhoneScene animate={!reduced && !paused} intro={!reduced} dark={dark} active={onScreen} overlay={overlay} onReady={markReady} />
+            <PhoneScene animate={!reduced && !paused} intro={!reduced} dark={dark} active={onScreen} overlay={overlay} onReady={markReady} scenery={!scene} />
           </div>
         )}
         {ready && (

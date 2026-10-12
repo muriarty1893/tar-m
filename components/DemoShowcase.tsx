@@ -96,7 +96,7 @@ export function DemoShowcase() {
   return (
     <div className="space-y-10">
       <div ref={stage}>
-        <PhoneStage>
+        <PhoneStage scene={selected ? { src: selected.imageSrc, alt: selected.imageAlt } : null}>
           <AppScreen
             phase={phase}
             scenario={selected}
