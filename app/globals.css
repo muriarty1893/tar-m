@@ -54,6 +54,17 @@ body {
   color: var(--ink);
 }
 
+/* Demo "scanning" line over the field photo. */
+@keyframes demo-scan {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(16rem);
+  }
+}
+
 /* Markdown article body (news). */
 .prose-article h2 {
   margin-top: 2rem;
