@@ -14,7 +14,7 @@ export default function WeatherPage() {
         İlinizi seçin; 7 günlük tahminle birlikte don, yoğun yağış ve ilaçlama için uygun günleri görün.
       </p>
       <div className="mt-8">
-        <WeatherWidget />
+        <WeatherWidget headingLevel={2} />
       </div>
     </section>
   );

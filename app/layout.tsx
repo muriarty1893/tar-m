@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import { siteConfig } from "@/config/site";
+import { siteUrl } from "@/lib/site-url";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import "./globals.css";
@@ -10,12 +11,23 @@ const nunito = Nunito({
   subsets: ["latin", "latin-ext"],
 });
 
+const defaultTitle = `${siteConfig.name} — Çiftçinin yapay zekâ destekli tarla asistanı`;
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
-    default: `${siteConfig.name} — Çiftçinin yapay zekâ destekli tarla asistanı`,
+    default: defaultTitle,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  openGraph: {
+    type: "website",
+    locale: "tr_TR",
+    siteName: siteConfig.name,
+    title: defaultTitle,
+    description: siteConfig.description,
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PARTNER_TYPES, type PartnerType } from "./partner-types";
 
 const requiredText = (label: string, min: number, max: number) =>
   z
@@ -28,15 +29,6 @@ export const waitlistSchema = z.object({
   website: honeypot,
 });
 
-export const PARTNER_TYPES = {
-  yatirimci: "Yatırımcı",
-  kooperatif: "Kooperatif",
-  oda: "Ziraat odası / kamu kurumu",
-  ciftlik: "Çiftlik / üretici",
-  diger: "Diğer",
-} as const;
-
-export type PartnerType = keyof typeof PARTNER_TYPES;
 
 export const partnerSchema = z.object({
   name: requiredText("Ad soyad", 2, 100),

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { waitlistSchema } from "@/lib/forms";
 import { provinces } from "@/data/provinces";
 import { useFormSubmit } from "./forms/useFormSubmit";
 import { Field, FormError, Honeypot, SubmitButton, describedBy, inputClass } from "./forms/fields";
@@ -11,7 +10,7 @@ const initial = { name: "", email: "", city: "", crop: "", consent: false, websi
 
 export function WaitlistForm() {
   const [values, setValues] = useState(initial);
-  const { status, errors, submit } = useFormSubmit<typeof initial>("/api/waitlist", waitlistSchema);
+  const { status, errors, submit } = useFormSubmit<typeof initial>("waitlist");
   const set = <K extends keyof typeof initial>(k: K, v: (typeof initial)[K]) => setValues((s) => ({ ...s, [k]: v }));
 
   const onSubmit = (e: FormEvent) => {

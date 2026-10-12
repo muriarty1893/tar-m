@@ -6,6 +6,7 @@
   --primary-strong: #234f2b;
   --on-primary: #ffffff;
   --accent: #c8901a;
+  --accent-ink: #8a5a00;
   --accent-soft: #f6e7c1;
   --surface: #faf6ee;
   --card: #ffffff;
@@ -20,6 +21,7 @@
     --primary-strong: #a3d9a5;
     --on-primary: #10200f;
     --accent: #e8b84a;
+    --accent-ink: #e8b84a;
     --accent-soft: #3a3020;
     --surface: #131812;
     --card: #1c231b;
@@ -34,6 +36,7 @@
   --color-primary-strong: var(--primary-strong);
   --color-on-primary: var(--on-primary);
   --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
   --color-accent-soft: var(--accent-soft);
   --color-surface: var(--surface);
   --color-card: var(--card);

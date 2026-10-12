@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <section className="mx-auto max-w-3xl px-4 py-20 text-center">
-      <p className="text-6xl font-extrabold text-accent">404</p>
+      <p className="text-6xl font-extrabold text-accent-ink">404</p>
       <h1 className="mt-4 text-3xl font-extrabold">Sayfa bulunamadı</h1>
       <p className="mt-3 text-lg text-muted">
         Aradığınız sayfa taşınmış ya da hiç var olmamış olabilir.

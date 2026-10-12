@@ -3,7 +3,7 @@ const HALF = Math.PI * R;
 
 function tone(value: number) {
   if (value < 50) return "text-red-600 dark:text-red-400";
-  if (value < 75) return "text-accent";
+  if (value < 75) return "text-accent-ink";
   return "text-primary";
 }
 

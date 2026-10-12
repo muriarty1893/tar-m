@@ -1,0 +1,38 @@
+import { test, expect } from "@playwright/test";
+
+const SLUGS = ["bereket-ai-erken-erisim", "bugdayda-pas-hastaligi", "kis-oncesi-toprak-hazirligi"];
+
+test("sitemap lists static routes and every article", async ({ request }) => {
+  const res = await request.get("/sitemap.xml");
+  expect(res.status()).toBe(200);
+  const xml = await res.text();
+  for (const path of ["/haberler", "/hava", "/is-birligi", "/sss", "/hakkimizda", "/gizlilik"]) {
+    expect(xml).toContain(`${path}</loc>`);
+  }
+  for (const slug of SLUGS) expect(xml).toContain(`/haberler/${slug}</loc>`);
+  expect(xml).toMatch(/<loc>http:\/\/localhost:3100\/?<\/loc>/);
+});
+
+test("robots.txt allows crawling and points at the sitemap", async ({ request }) => {
+  const txt = await (await request.get("/robots.txt")).text();
+  expect(txt).toMatch(/Allow: \//);
+  expect(txt).toContain("Sitemap: http://localhost:3100/sitemap.xml");
+});
+
+test("home page has description and Open Graph tags with an absolute image", async ({ page, request }) => {
+  await page.goto("/");
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /Bereket AI/);
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", /Bereket AI/);
+  await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute("content", "tr_TR");
+  const image = await page.locator('meta[property="og:image"]').first().getAttribute("content");
+  expect(image).toMatch(/^http:\/\/localhost:3100\//);
+  const img = await request.get(image!);
+  expect(img.status()).toBe(200);
+  expect(img.headers()["content-type"]).toBe("image/png");
+});
+
+test("article page has its own title and og:type article", async ({ page }) => {
+  await page.goto(`/haberler/${SLUGS[1]}`);
+  await expect(page).toHaveTitle(/^Buğdayda sarı pas/);
+  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute("content", "article");
+});

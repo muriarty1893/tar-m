@@ -1,28 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import type { z } from "zod";
-import { fieldErrors } from "@/lib/forms";
 import type { SubmitResponse } from "@/lib/submit";
 
 export type FormStatus = "idle" | "submitting" | "success" | "error";
+export type FormKind = "waitlist" | "partner";
 
-/** Validates on the client with the same schema as the server, then POSTs JSON. */
-export function useFormSubmit<T extends Record<string, unknown>>(endpoint: string, schema: z.ZodType) {
+/**
+ * Validates on the client with the same schema as the server, then POSTs JSON.
+ * The schemas (and zod) are imported on first submit so they stay out of the initial page load.
+ */
+export function useFormSubmit<T extends Record<string, unknown>>(kind: FormKind) {
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   async function submit(values: T) {
-    const parsed = schema.safeParse(values);
-    if (!parsed.success) {
-      setErrors(fieldErrors(parsed.error));
-      setStatus("idle");
-      return;
-    }
-    setErrors({});
     setStatus("submitting");
     try {
-      const res = await fetch(endpoint, {
+      const forms = await import("@/lib/forms");
+      const schema = kind === "waitlist" ? forms.waitlistSchema : forms.partnerSchema;
+      const parsed = schema.safeParse(values);
+      if (!parsed.success) {
+        setErrors(forms.fieldErrors(parsed.error));
+        setStatus("idle");
+        return;
+      }
+      setErrors({});
+      const res = await fetch(`/api/${kind}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(values),

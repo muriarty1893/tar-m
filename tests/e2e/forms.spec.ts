@@ -7,6 +7,17 @@ async function fillWaitlist(page: Page) {
   await page.getByRole("checkbox").check();
 }
 
+test("validation library is not part of the initial page load", async ({ page }) => {
+  const bodies: Promise<string>[] = [];
+  page.on("response", (res) => {
+    if (res.url().endsWith(".js")) bodies.push(res.text().catch(() => ""));
+  });
+  await page.goto("/", { waitUntil: "networkidle" });
+  const scripts = await Promise.all(bodies);
+  expect(scripts.length).toBeGreaterThan(0);
+  expect(scripts.some((s) => s.includes("ZodError"))).toBe(false);
+});
+
 test("waitlist submits and shows the thank-you message", async ({ page }) => {
   let sent: Record<string, unknown> | null = null;
   await page.route("**/api/waitlist", async (route) => {

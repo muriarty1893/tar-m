@@ -22,7 +22,7 @@ export default async function NewsPage() {
       ) : (
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {articles.map((a) => (
-            <NewsCard key={a.slug} article={a} />
+            <NewsCard key={a.slug} article={a} headingLevel={2} />
           ))}
         </div>
       )}

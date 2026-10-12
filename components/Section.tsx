@@ -19,7 +19,7 @@ export function Section({
     <section id={id} className={`scroll-mt-20 px-4 py-16 sm:py-20 ${className}`}>
       <div className="mx-auto max-w-6xl">
         <div className="max-w-3xl">
-          {eyebrow && <p className="font-bold uppercase tracking-wider text-accent">{eyebrow}</p>}
+          {eyebrow && <p className="font-bold uppercase tracking-wider text-accent-ink">{eyebrow}</p>}
           <h2 className="mt-1 text-3xl font-extrabold sm:text-4xl">{title}</h2>
           {intro && <p className="mt-3 text-lg text-muted">{intro}</p>}
         </div>

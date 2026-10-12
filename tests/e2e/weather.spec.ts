@@ -31,6 +31,32 @@ test("weather page shows mocked conditions and farming hints for Ankara", async 
   expect(calls[0]).toContain("latitude=39.93");
 });
 
+test("loading the forecast does not shift the page layout", async ({ page }) => {
+  const sevenDays = {
+    ...body,
+    daily: Object.fromEntries(
+      Object.entries(body.daily).map(([k, v]) => [k, k === "time" ? [...Array(7)].map((_, i) => `2026-10-1${i}`) : [...Array(7)].map(() => v[1])]),
+    ),
+  };
+  await page.route("https://api.open-meteo.com/**", async (route) => {
+    await new Promise((r) => setTimeout(r, 800));
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(sevenDays) });
+  });
+  await page.addInitScript(() => {
+    (window as unknown as { __cls: number }).__cls = 0;
+    new PerformanceObserver((list) => {
+      for (const e of list.getEntries() as unknown as { value: number; hadRecentInput: boolean }[]) {
+        if (!e.hadRecentInput) (window as unknown as { __cls: number }).__cls += e.value;
+      }
+    }).observe({ type: "layout-shift", buffered: true });
+  });
+  await page.goto("/hava");
+  await expect(page.getByTestId("sicaklik")).toHaveText("17°C");
+  await page.waitForTimeout(300);
+  const cls = await page.evaluate(() => (window as unknown as { __cls: number }).__cls);
+  expect(cls).toBeLessThan(0.1);
+});
+
 test("province search picks a province and refetches", async ({ page }) => {
   const calls = await mockWeather(page);
   await page.goto("/hava");

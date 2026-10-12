@@ -34,6 +34,83 @@ function HintBox({ hint }: { hint: FarmingHint }) {
   );
 }
 
+// Same shape as a real forecast so the loading skeleton occupies the same space (no layout shift).
+const SKELETON: Forecast = {
+  current: { temp: 0, wind: 0, code: 0 },
+  daily: Array.from({ length: 7 }, (_, i) => ({
+    date: `2026-01-${String(10 + i).padStart(2, "0")}`,
+    min: 0,
+    max: 0,
+    rainProb: 50,
+    rainMm: 0,
+    windMax: 20,
+  })),
+};
+
+function ForecastView({
+  forecast,
+  compact,
+  placeholder = false,
+}: {
+  forecast: Forecast;
+  compact: boolean;
+  placeholder?: boolean;
+}) {
+  const today = forecast.daily[0];
+  const n = (v: number) => (placeholder ? "–" : String(round(v)));
+  return (
+    <div className="mt-5 space-y-4">
+      <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
+        <p className="text-5xl font-extrabold" data-testid={placeholder ? undefined : "sicaklik"}>
+          {n(forecast.current.temp)}°C
+        </p>
+        <p className="text-lg text-muted">{placeholder ? "…" : describeWeather(forecast.current.code)}</p>
+      </div>
+      <dl className="grid grid-cols-2 gap-3 text-base sm:grid-cols-3">
+        <div>
+          <dt className="text-muted">Yağış ihtimali</dt>
+          <dd className="font-bold">%{n(today.rainProb)}</dd>
+        </div>
+        <div>
+          <dt className="text-muted">Rüzgâr</dt>
+          <dd className="font-bold">{n(forecast.current.wind)} km/s</dd>
+        </div>
+        <div>
+          <dt className="text-muted">En düşük / en yüksek</dt>
+          <dd className="font-bold">
+            {n(today.min)}° / {n(today.max)}°
+          </dd>
+        </div>
+      </dl>
+      <HintBox hint={farmingHint(today)} />
+
+      {compact ? (
+        <Link href="/hava" className="inline-block font-bold text-primary underline" tabIndex={placeholder ? -1 : undefined}>
+          7 günlük tahmin ve il seçimi →
+        </Link>
+      ) : (
+        <ol className="divide-y divide-line" aria-label="7 günlük tahmin">
+          {forecast.daily.map((d) => {
+            const hint = farmingHint(d);
+            return (
+              <li key={d.date} className="grid gap-1 py-3 sm:grid-cols-[10rem_8rem_1fr] sm:items-center">
+                <span className="font-semibold">{placeholder ? "–" : formatTrDate(d.date)}</span>
+                <span>
+                  {n(d.min)}° / {n(d.max)}° · %{n(d.rainProb)}
+                </span>
+                <span className="text-muted">
+                  <span aria-hidden="true">{hintIcon[hint.kind]} </span>
+                  {hint.text}
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+    </div>
+  );
+}
+
 function ProvinceSearch({ onPick }: { onPick: (p: Province) => void }) {
   const [query, setQuery] = useState("");
   const results = query.trim() ? findProvinces(query).slice(0, 8) : [];
@@ -74,7 +151,8 @@ function ProvinceSearch({ onPick }: { onPick: (p: Province) => void }) {
   );
 }
 
-export function WeatherWidget({ compact = false }: { compact?: boolean }) {
+export function WeatherWidget({ compact = false, headingLevel = 3 }: { compact?: boolean; headingLevel?: 2 | 3 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const [province, setProvince] = useState<Province>(DEFAULT_PROVINCE);
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<{ key: string; forecast?: Forecast } | null>(null);
@@ -124,12 +202,11 @@ export function WeatherWidget({ compact = false }: { compact?: boolean }) {
     };
   }, [province, requestKey]);
 
-  const today = forecast?.daily[0];
 
   return (
     <div className="rounded-3xl border border-line bg-card p-5 shadow-sm sm:p-6" aria-live="polite">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-2xl font-extrabold">{province.name}</h3>
+        <Heading className="text-2xl font-extrabold">{province.name}</Heading>
         {geoAvailable && (
           <button type="button" onClick={locateMe} className="min-h-11 rounded-full border border-line px-4 text-base hover:border-primary">
             📍 Konumumu kullan
@@ -143,7 +220,18 @@ export function WeatherWidget({ compact = false }: { compact?: boolean }) {
         </div>
       )}
 
-      {status === "loading" && <p className="mt-6 text-muted">Hava durumu yükleniyor…</p>}
+      {status === "loading" && (
+        <div className="relative">
+          {/* Invisible copy of the real layout reserves its space, so the page does not jump when data arrives. */}
+          <div aria-hidden="true" className="invisible">
+            <ForecastView forecast={SKELETON} compact={compact} placeholder />
+          </div>
+          <p role="status" className="absolute inset-x-0 top-6 flex items-center gap-2 text-muted">
+            <span className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent motion-safe:animate-spin" aria-hidden="true" />
+            Hava durumu yükleniyor…
+          </p>
+        </div>
+      )}
 
       {status === "error" && (
         <div className="mt-6 space-y-3">
@@ -158,57 +246,7 @@ export function WeatherWidget({ compact = false }: { compact?: boolean }) {
         </div>
       )}
 
-      {status === "ok" && forecast && today && (
-        <div className="mt-5 space-y-4">
-          <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
-            <p className="text-5xl font-extrabold" data-testid="sicaklik">
-              {round(forecast.current.temp)}°C
-            </p>
-            <p className="text-lg text-muted">{describeWeather(forecast.current.code)}</p>
-          </div>
-          <dl className="grid grid-cols-2 gap-3 text-base sm:grid-cols-3">
-            <div>
-              <dt className="text-muted">Yağış ihtimali</dt>
-              <dd className="font-bold">%{round(today.rainProb)}</dd>
-            </div>
-            <div>
-              <dt className="text-muted">Rüzgâr</dt>
-              <dd className="font-bold">{round(forecast.current.wind)} km/s</dd>
-            </div>
-            <div>
-              <dt className="text-muted">En düşük / en yüksek</dt>
-              <dd className="font-bold">
-                {round(today.min)}° / {round(today.max)}°
-              </dd>
-            </div>
-          </dl>
-          <HintBox hint={farmingHint(today)} />
-
-          {compact ? (
-            <Link href="/hava" className="inline-block font-bold text-primary underline">
-              7 günlük tahmin ve il seçimi →
-            </Link>
-          ) : (
-            <ol className="divide-y divide-line" aria-label="7 günlük tahmin">
-              {forecast.daily.map((d) => {
-                const hint = farmingHint(d);
-                return (
-                  <li key={d.date} className="grid gap-1 py-3 sm:grid-cols-[10rem_8rem_1fr] sm:items-center">
-                    <span className="font-semibold">{formatTrDate(d.date)}</span>
-                    <span>
-                      {round(d.min)}° / {round(d.max)}° · %{round(d.rainProb)}
-                    </span>
-                    <span className="text-muted">
-                      <span aria-hidden="true">{hintIcon[hint.kind]} </span>
-                      {hint.text}
-                    </span>
-                  </li>
-                );
-              })}
-            </ol>
-          )}
-        </div>
-      )}
+      {status === "ok" && forecast && <ForecastView forecast={forecast} compact={compact} />}
       <p className="mt-4 text-sm text-muted">
         Veri:{" "}
         <a href="https://open-meteo.com/" className="underline" rel="noopener noreferrer" target="_blank">

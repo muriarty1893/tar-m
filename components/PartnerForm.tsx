@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { PARTNER_TYPES, partnerSchema } from "@/lib/forms";
+import { PARTNER_TYPES } from "@/lib/partner-types";
 import { useFormSubmit } from "./forms/useFormSubmit";
 import { Field, FormError, Honeypot, SubmitButton, describedBy, inputClass } from "./forms/fields";
 
@@ -9,7 +9,7 @@ const initial = { name: "", organization: "", email: "", phone: "", type: "", me
 
 export function PartnerForm() {
   const [values, setValues] = useState(initial);
-  const { status, errors, submit } = useFormSubmit<typeof initial>("/api/partner", partnerSchema);
+  const { status, errors, submit } = useFormSubmit<typeof initial>("partner");
   const set = (k: keyof typeof initial, v: string) => setValues((s) => ({ ...s, [k]: v }));
 
   const onSubmit = (e: FormEvent) => {

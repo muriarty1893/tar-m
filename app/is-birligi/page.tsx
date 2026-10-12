@@ -38,7 +38,7 @@ export default function PartnerPage() {
   return (
     <div className="px-4 py-12">
       <div className="mx-auto max-w-4xl">
-        <p className="font-bold uppercase tracking-wider text-accent">İş birliği</p>
+        <p className="font-bold uppercase tracking-wider text-accent-ink">İş birliği</p>
         <h1 className="mt-1 text-4xl font-extrabold">{siteConfig.name} ile birlikte çalışalım</h1>
         <p className="mt-4 text-xl text-muted">
           Yatırımcılar, kooperatifler, ziraat odaları, kamu kurumları ve pilot çiftliklerle sahaya birlikte çıkmak
