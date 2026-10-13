@@ -6,11 +6,11 @@ import { demoScenarios, type DemoScenario } from "@/data/demo-scenarios";
 import { photoCredits } from "@/data/photo-credits";
 import { AppScreen, type AppPhase, type AppTab } from "./phone-app/AppScreen";
 import { PhoneStage, usePrefersReducedMotion } from "./phone-app/PhoneStage";
+import { ANALYSIS_MS } from "@/lib/phone-stage";
 import { CtaLink } from "./CtaLink";
 import { Button } from "./ui/button";
 import { FocusCards } from "./ui/focus-cards";
 
-const ANALYSIS_MS = 2000;
 const AUTOPLAY_MS = 2600;
 /** In the auto tour, how long the live camera shows before the shutter "is pressed". */
 const AUTOPLAY_SHUTTER_MS = 1800;

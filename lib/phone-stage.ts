@@ -37,3 +37,9 @@ export function introProgress(elapsed: number, duration: number): number {
   const t = Math.min(1, Math.max(0, elapsed / duration));
   return 1 - (1 - t) ** 3;
 }
+
+/**
+ * How long the demo's scan "analysis" takes. The real app waits on an AI response that
+ * will take 3 s or more, so the scan screen's loader loops and its progress bar follows this value.
+ */
+export const ANALYSIS_MS = 2000;

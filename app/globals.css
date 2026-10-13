@@ -340,3 +340,41 @@ html.cine [data-cine] {
   mask-composite: intersect;
   mask-image: linear-gradient(#0000, #0000), conic-gradient(from calc((var(--start) - var(--spread)) * 1deg), #0000 0deg, #fff, #0000 calc(var(--spread) * 2deg));
 }
+
+/* Analyzing-image loader (components/ui/analyzing-image.tsx): the original motion timing as CSS —
+   2.5 s per sweep, ease (0.175, 0.885, 0.32, 1), keyframes at 0 / 60 % / 100 %, mirrored, forever. */
+@keyframes analyzing-wipe {
+  0% {
+    clip-path: inset(0% 0% 0% 0%);
+  }
+  60% {
+    clip-path: inset(0% 105% 0% 0%);
+  }
+  100% {
+    clip-path: inset(0% 0% 0% 0%);
+  }
+}
+@keyframes analyzing-bar {
+  0% {
+    transform: translateX(1400%);
+  }
+  60% {
+    transform: translateX(-80%);
+  }
+  100% {
+    transform: translateX(1400%);
+  }
+}
+.analyzing-wipe,
+.analyzing-bar {
+  animation-duration: 2.5s;
+  animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+.analyzing-wipe {
+  animation-name: analyzing-wipe;
+}
+.analyzing-bar {
+  animation-name: analyzing-bar;
+}

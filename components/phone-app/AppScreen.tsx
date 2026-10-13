@@ -37,7 +37,8 @@ import {
   XIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import { demoScenarios, type DemoScenario } from "@/data/demo-scenarios";
-import { SCREEN } from "@/lib/phone-stage";
+import { ANALYSIS_MS, SCREEN } from "@/lib/phone-stage";
+import { AnalyzingImage } from "@/components/ui/analyzing-image";
 import { SuccessGauge } from "../SuccessGauge";
 
 export type AppPhase = "idle" | "camera" | "analyzing" | "done";
@@ -332,12 +333,19 @@ function CameraScreen({ s, live, onShutter }: { s: DemoScenario; live: boolean; 
           {/* Shutter flash. */}
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 bg-white opacity-0 motion-safe:animate-[shutter-flash_0.45s_ease-out]" />
           <div className="absolute inset-x-0 bottom-0 z-10 rounded-t-[30px] bg-card px-5 pb-9 pt-5 text-card-foreground">
-            <p className="flex items-center gap-2 font-heading text-[18px] font-bold" role="status">
-              <span className="size-5 rounded-full border-[3px] border-primary border-t-transparent motion-safe:animate-spin" aria-hidden="true" />
-              Analiz ediliyor…
-            </p>
-            <div aria-hidden="true" className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
-              <div className="h-full origin-left rounded-full bg-primary motion-safe:animate-[app-progress_2s_ease-out_forwards]" />
+            {/* Waiting for the AI: the image-analysis loader loops for as long as the answer takes. */}
+            <div className="flex items-center gap-3.5">
+              <AnalyzingImage className="size-14 text-primary [--loading-ui-analyzing-image-background:var(--card)]" />
+              <div>
+                <p className="font-heading text-[18px] font-bold">Analiz ediliyor…</p>
+                <p className="text-[13px] text-muted-foreground">Yapay zekâ fotoğrafı inceliyor</p>
+              </div>
+            </div>
+            <div aria-hidden="true" className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full origin-left rounded-full bg-primary motion-safe:animate-[app-progress_ease-out_forwards]"
+                style={{ animationDuration: `${ANALYSIS_MS}ms` }}
+              />
             </div>
             <ul aria-hidden="true" className="mt-3 space-y-1.5 text-[14px] text-muted-foreground">
               <li className="flex items-center gap-2">

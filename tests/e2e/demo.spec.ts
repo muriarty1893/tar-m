@@ -90,3 +90,16 @@ test("after a scan, the in-app chat answers a suggested question and a typed one
   await app.getByRole("button", { name: "Sonuca dön" }).click();
   await expect(app.getByTestId("demo-cevap")).toBeVisible();
 });
+
+test("while analysing, the scan screen shows the animated image-analysis indicator", async ({ page }) => {
+  await page.goto("/#demo");
+  const app = page.locator("#demo").getByTestId("uygulama-ekrani");
+  await page.getByRole("button", { name: /Ayçiçeği tarlası/ }).click();
+  await app.getByRole("button", SHUTTER).click();
+  const indicator = app.getByRole("status", { name: "Fotoğraf analiz ediliyor" });
+  await expect(indicator).toBeVisible();
+  await expect(indicator.locator("svg")).toHaveCount(2);
+  // It goes away with the result.
+  await expect(app.getByTestId("demo-cevap")).toBeVisible({ timeout: 4000 });
+  await expect(indicator).toHaveCount(0);
+});
