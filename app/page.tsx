@@ -45,10 +45,7 @@ export default async function Home() {
         title="Bugün tarlanızda hava nasıl?"
         intro="İlinizin hava durumunu ve çiftçiye özel uyarıları görün."
       >
-        <div aria-hidden="true" className="blob pointer-events-none absolute right-[-8rem] top-24 hidden size-96 bg-blob opacity-60 lg:block" />
-        <div className="relative max-w-2xl">
-          <WeatherWidget compact />
-        </div>
+        <WeatherWidget compact />
       </Section>
 
       <Section id="haberler" eyebrow="Haberler" title="Son haberler" className="bg-surface">

@@ -1,18 +1,24 @@
 "use client";
 
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import Link from "next/link";
 import { DEFAULT_PROVINCE, findProvinces, nearestProvince, type Province } from "@/data/provinces";
-import { describeWeather, farmingHint, fetchForecast, type FarmingHint, type Forecast } from "@/lib/weather";
-import { formatTrDate } from "@/lib/format";
+import {
+  describeWeather,
+  farmingHint,
+  fetchForecast,
+  rangeBar,
+  weatherKind,
+  type DailyForecast,
+  type FarmingHint,
+  type Forecast,
+  type WeatherKind,
+} from "@/lib/weather";
+import { formatTrDay, formatTrShortDate } from "@/lib/format";
 import {
   ArrowClockwiseIcon,
   ArrowRightIcon,
-  CloudFogIcon,
-  CloudIcon,
-  CloudLightningIcon,
   CloudRainIcon,
-  CloudSunIcon,
   DropIcon,
   MagnifyingGlassIcon,
   MapPinIcon,
@@ -20,57 +26,63 @@ import {
   PlantIcon,
   SnowflakeIcon,
   SprayBottleIcon,
-  SunIcon,
-  ThermometerIcon,
+  SunHorizonIcon,
   WindIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  CloudIcon,
+  FogIcon,
+  HeavyRainIcon,
+  MoonIcon,
+  PartlyCloudyIcon,
+  RainIcon,
+  SnowIcon,
+  SunIcon,
+  ThunderIcon,
+  WindIcon as WindyIcon,
+  type WeatherIconProps,
+} from "@/components/ui/animated-weather-icons";
 
 type Status = "loading" | "ok" | "error";
 
-const hintStyle: Record<FarmingHint["kind"], string> = {
-  frost: "border-sky-500 bg-sky-500/10",
-  rain: "border-blue-600 bg-blue-600/10 dark:border-blue-400",
-  spray: "border-primary bg-secondary",
-  normal: "border-gold bg-gold-soft",
+const KIND_ICON: Record<WeatherKind, (p: WeatherIconProps) => ReactNode> = {
+  sun: SunIcon,
+  moon: MoonIcon,
+  partly: PartlyCloudyIcon,
+  cloud: CloudIcon,
+  fog: FogIcon,
+  rain: RainIcon,
+  "heavy-rain": HeavyRainIcon,
+  snow: SnowIcon,
+  thunder: ThunderIcon,
+  wind: WindyIcon,
 };
 
-const hintIcon: Record<FarmingHint["kind"], typeof SunIcon> = {
-  frost: SnowflakeIcon,
-  rain: CloudRainIcon,
-  spray: SprayBottleIcon,
-  normal: PlantIcon,
-};
-
-function ConditionIcon({ code, className }: { code: number; className: string }) {
-  const p = { "aria-hidden": true, weight: "duotone" as const, className };
-  if (code === 0) return <SunIcon {...p} />;
-  if (code <= 2) return <CloudSunIcon {...p} />;
-  if (code === 3) return <CloudIcon {...p} />;
-  if (code === 45 || code === 48) return <CloudFogIcon {...p} />;
-  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return <SnowflakeIcon {...p} />;
-  if (code >= 95) return <CloudLightningIcon {...p} />;
-  return <CloudRainIcon {...p} />;
+function ConditionIcon({ kind, ...props }: WeatherIconProps & { kind: WeatherKind }) {
+  const Icon = KIND_ICON[kind];
+  return <Icon {...props} />;
 }
+
+/** Without a daily code (older cached responses), guess from the rain chance. */
+const dayKind = (d: DailyForecast): WeatherKind => (d.code !== undefined ? weatherKind(d.code) : d.rainProb >= 60 ? "rain" : "partly");
+
+// Text tones are ≥ 4.5:1 on their own tinted backgrounds, light and dark.
+const HINT: Record<FarmingHint["kind"], { Icon: typeof PlantIcon; tone: string; tint: string; plan: string }> = {
+  frost: { Icon: SnowflakeIcon, tone: "text-sky-800 dark:text-sky-300", tint: "bg-sky-500/10 ring-sky-500/30", plan: "Don riski" },
+  rain: { Icon: CloudRainIcon, tone: "text-blue-800 dark:text-blue-300", tint: "bg-blue-500/10 ring-blue-500/30", plan: "Yoğun yağış" },
+  spray: { Icon: SprayBottleIcon, tone: "text-primary", tint: "bg-secondary/70 ring-primary/25", plan: "İlaçlamaya uygun" },
+  normal: { Icon: PlantIcon, tone: "text-amber-800 dark:text-gold", tint: "bg-gold-soft ring-gold/25", plan: "Normal koşullar" },
+};
 
 const round = (n: number) => Math.round(n);
 const noopSubscribe = () => () => {};
 
-function HintBox({ hint }: { hint: FarmingHint }) {
-  const Icon = hintIcon[hint.kind];
-  return (
-    <p className={`flex items-start gap-3 rounded-2xl border-l-4 p-4 font-semibold ${hintStyle[hint.kind]}`}>
-      <Icon aria-hidden="true" weight="duotone" className="mt-0.5 size-6 shrink-0" />
-      {hint.text}
-    </p>
-  );
-}
-
 // Same shape as a real forecast so the loading skeleton occupies the same space (no layout shift).
 const SKELETON: Forecast = {
-  current: { temp: 0, wind: 0, code: 0 },
+  current: { temp: 0, wind: 0, code: 3, isDay: true },
   daily: Array.from({ length: 7 }, (_, i) => ({
     date: `2026-01-${String(10 + i).padStart(2, "0")}`,
     min: 0,
@@ -78,84 +90,207 @@ const SKELETON: Forecast = {
     rainProb: 50,
     rainMm: 0,
     windMax: 20,
+    code: 3,
   })),
 };
 
-function ForecastView({
-  forecast,
-  compact,
-  placeholder = false,
-}: {
-  forecast: Forecast;
-  compact: boolean;
-  placeholder?: boolean;
-}) {
-  const today = forecast.daily[0];
-  const n = (v: number) => (placeholder ? "–" : String(round(v)));
-  return (
-    <div className="mt-6 space-y-5">
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-        <span className="blob flex size-16 items-center justify-center bg-gold-soft text-gold">
-          <ConditionIcon code={forecast.current.code} className="size-9" />
-        </span>
-        <p className="font-heading text-5xl font-bold tracking-tight" data-testid={placeholder ? undefined : "sicaklik"}>
-          {n(forecast.current.temp)}°C
-        </p>
-        <p className="text-lg text-muted-foreground">{placeholder ? "…" : describeWeather(forecast.current.code)}</p>
-      </div>
-      <dl className="grid grid-cols-2 gap-3 text-base sm:grid-cols-3">
-        <div className="rounded-2xl bg-secondary/60 p-3">
-          <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <DropIcon aria-hidden="true" weight="duotone" className="size-4" /> Yağış ihtimali
-          </dt>
-          <dd className="font-heading text-lg font-bold">%{n(today.rainProb)}</dd>
-        </div>
-        <div className="rounded-2xl bg-secondary/60 p-3">
-          <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <WindIcon aria-hidden="true" weight="duotone" className="size-4" /> Rüzgâr
-          </dt>
-          <dd className="font-heading text-lg font-bold">{n(forecast.current.wind)} km/s</dd>
-        </div>
-        <div className="col-span-2 rounded-2xl bg-secondary/60 p-3 sm:col-span-1">
-          <dt className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <ThermometerIcon aria-hidden="true" weight="duotone" className="size-4" /> En düşük / en yüksek
-          </dt>
-          <dd className="font-heading text-lg font-bold">
-            {n(today.min)}° / {n(today.max)}°
-          </dd>
-        </div>
-      </dl>
-      <HintBox hint={farmingHint(today)} />
+// The bar colour follows the absolute temperature (blue when cold, orange when hot), from -10 to 40 °C.
+const SCALE = { lo: -10, span: 50 };
+const TEMP_GRADIENT = "linear-gradient(90deg,#60a5fa 0%,#38bdf8 20%,#4ade80 45%,#facc15 65%,#fb923c 82%,#ef4444 100%)";
 
-      {compact ? (
-        <Link
-          href="/hava"
-          className="group inline-flex min-h-11 items-center gap-2 font-semibold text-primary underline-offset-4 hover:underline"
-          tabIndex={placeholder ? -1 : undefined}
-        >
-          7 günlük tahmin ve il seçimi
-          <ArrowRightIcon aria-hidden="true" weight="bold" className="transition-transform group-hover:translate-x-0.5" />
-        </Link>
-      ) : (
-        <ol className="divide-y divide-border rounded-2xl border border-border" aria-label="7 günlük tahmin">
-          {forecast.daily.map((d) => {
-            const hint = farmingHint(d);
-            const HintIcon = hintIcon[hint.kind];
-            return (
-              <li key={d.date} className="grid gap-1 px-4 py-3.5 sm:grid-cols-[10rem_8rem_1fr] sm:items-center">
-                <span className="font-semibold">{placeholder ? "–" : formatTrDate(d.date)}</span>
-                <span className="tabular-nums">
-                  {n(d.min)}° / {n(d.max)}° · %{n(d.rainProb)}
+function paint(min: number, max: number) {
+  const span = Math.max(max - min, 0.5);
+  const size = (SCALE.span / span) * 100;
+  const pos = SCALE.span === span ? 0 : ((min - SCALE.lo) / (SCALE.span - span)) * 100;
+  return { backgroundImage: TEMP_GRADIENT, backgroundSize: `${size}% 100%`, backgroundPosition: `${pos}% 0` };
+}
+
+type ViewProps = { forecast: Forecast; placeholder: boolean };
+
+function numberText(placeholder: boolean) {
+  return (v: number) => (placeholder ? "–" : String(round(v)));
+}
+
+function NowPanel({ forecast, placeholder }: ViewProps) {
+  const n = numberText(placeholder);
+  const today = forecast.daily[0];
+  const { current } = forecast;
+  const kind = weatherKind(current.code, { isDay: current.isDay, wind: current.wind });
+  const stats = [
+    { Icon: DropIcon, label: "Yağış", value: `%${n(today.rainProb)}` },
+    { Icon: WindIcon, label: "Rüzgâr", value: `${n(current.wind)} km/s` },
+    { Icon: SunHorizonIcon, label: "Gün doğumu", value: placeholder ? "–" : (today.sunrise ?? "–") },
+  ];
+  return (
+    <div data-sky={kind} className="wx-sky relative isolate flex flex-col overflow-hidden rounded-[1.75rem] p-5 ring-1 ring-inset ring-foreground/5 sm:p-6">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">Şu an</p>
+          <p className="mt-1 font-heading text-7xl font-bold leading-none tracking-tighter tabular-nums sm:text-8xl" data-testid={placeholder ? undefined : "sicaklik"}>
+            {n(current.temp)}
+            <span className="align-super text-3xl font-semibold tracking-normal text-muted-foreground sm:text-4xl">°C</span>
+          </p>
+          <p className="mt-3 text-xl font-semibold">{placeholder ? "…" : describeWeather(current.code)}</p>
+          <p className="flex flex-wrap gap-x-3 text-base text-muted-foreground tabular-nums">
+            <span>En düşük {n(today.min)}°</span>
+            <span>En yüksek {n(today.max)}°</span>
+          </p>
+        </div>
+        <ConditionIcon kind={kind} size="auto" animate={!placeholder} className="-mr-2 -mt-1 size-20 drop-shadow-[0_10px_24px_rgb(0_0_0/0.08)] sm:size-26" />
+      </div>
+      <dl className="mt-auto grid grid-cols-3 gap-2 pt-6">
+        {stats.map(({ Icon, label, value }) => (
+          <div key={label} className="rounded-2xl bg-card/70 px-3 py-2.5 ring-1 ring-inset ring-foreground/5 backdrop-blur-sm">
+            <dt className="flex flex-col gap-1 text-[0.8rem] font-medium leading-tight text-muted-foreground sm:flex-row sm:items-center sm:gap-1.5">
+              <Icon aria-hidden="true" weight="duotone" className="size-4 shrink-0" />
+              {label}
+            </dt>
+            <dd className="mt-0.5 font-heading text-lg font-bold tabular-nums">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+function TodayAdvice({ hint }: { hint: FarmingHint }) {
+  const { Icon, tone, tint } = HINT[hint.kind];
+  return (
+    <div className={`rounded-[1.75rem] p-5 ring-1 ring-inset sm:p-6 ${tint}`}>
+      <p className={`flex items-center gap-2 text-sm font-bold uppercase tracking-[0.14em] ${tone}`}>
+        <Icon aria-hidden="true" weight="duotone" className="size-5" />
+        Bugün tarlada
+      </p>
+      <p className="mt-2 font-heading text-xl font-bold leading-snug sm:text-2xl">{hint.text}</p>
+    </div>
+  );
+}
+
+function NextDays({ forecast, placeholder }: ViewProps) {
+  const n = numberText(placeholder);
+  return (
+    <ul className="grid grid-cols-3 gap-2.5" aria-label="Önümüzdeki günler">
+      {forecast.daily.slice(1, 4).map((d, i) => (
+        <li key={d.date} className="wx-hover flex flex-col items-center rounded-[1.4rem] border border-border bg-background px-2 py-3.5 text-center">
+          <span className="font-semibold">{placeholder ? "–" : formatTrDay(d.date, i + 1)}</span>
+          <ConditionIcon kind={dayKind(d)} size={48} animate={false} className="my-1.5" />
+          <span className="font-heading text-lg font-bold tabular-nums">
+            {n(d.max)}° <span className="font-semibold text-muted-foreground">{n(d.min)}°</span>
+          </span>
+          <span className="mt-0.5 flex items-center gap-1 text-sm text-muted-foreground tabular-nums">
+            <DropIcon aria-hidden="true" weight="duotone" className="size-3.5" />%{n(d.rainProb)}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Which days of the week suit spraying, and which bring frost or heavy rain. */
+function WeekPlan({ forecast, placeholder }: ViewProps) {
+  const days = forecast.daily.map((d, i) => ({ label: placeholder ? "–" : formatTrDay(d.date, i), kind: farmingHint(d).kind }));
+  return (
+    <div className="flex-1 rounded-[1.75rem] border border-border p-5 sm:p-6">
+      <p className="font-heading text-lg font-bold">Bu hafta tarlada</p>
+      <ul className="mt-3 space-y-3">
+        {(["spray", "frost", "rain"] as const).map((kind) => {
+          const { Icon, tone, tint, plan } = HINT[kind];
+          const list = days.filter((d) => d.kind === kind).map((d) => d.label);
+          return (
+            <li key={kind} className="flex items-start gap-3">
+              <span className={`flex size-9 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ${tint} ${tone}`}>
+                <Icon aria-hidden="true" weight="duotone" className="size-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block font-semibold">{plan}</span>
+                <span className="block text-muted-foreground">{list.length ? list.join(", ") : "Bu hafta beklenmiyor"}</span>
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function WeekList({ forecast, placeholder }: ViewProps) {
+  const n = numberText(placeholder);
+  const lo = Math.min(...forecast.daily.map((d) => d.min));
+  const hi = Math.max(...forecast.daily.map((d) => d.max));
+  const nowAt = rangeBar(forecast.current.temp, forecast.current.temp, lo, hi).left;
+  return (
+    <div className="mt-6">
+      <p className="mb-3 px-1 font-heading text-lg font-bold">7 günlük tahmin</p>
+      <ol className="divide-y divide-border overflow-hidden rounded-[1.75rem] border border-border" aria-label="7 günlük tahmin">
+        {forecast.daily.map((d, i) => {
+          const hint = farmingHint(d);
+          const { Icon: HintIcon, tone } = HINT[hint.kind];
+          const bar = rangeBar(d.min, d.max, lo, hi);
+          const rain = (
+            <span className="flex items-center gap-1 font-semibold text-blue-800 tabular-nums dark:text-blue-300">
+              <DropIcon aria-hidden="true" weight="duotone" className="size-4" />%{n(d.rainProb)}
+            </span>
+          );
+          return (
+            <li
+              key={d.date}
+              className="wx-hover grid grid-cols-[5.6rem_2.25rem_minmax(0,1fr)] items-center gap-x-2.5 gap-y-1.5 px-4 sm:gap-x-3 py-3.5 transition-colors duration-200 hover:bg-surface sm:grid-cols-[6rem_2.75rem_3.75rem_minmax(0,1fr)_minmax(0,16rem)] sm:px-5"
+            >
+              <span className="min-w-0">
+                <span className="block truncate font-semibold">{placeholder ? "–" : formatTrDay(d.date, i)}</span>
+                <span className="block text-sm text-muted-foreground">{placeholder ? "–" : formatTrShortDate(d.date)}</span>
+              </span>
+              <ConditionIcon kind={dayKind(d)} size="auto" animate={false} className="size-9 sm:size-10" />
+              <span className="hidden text-sm sm:block">{rain}</span>
+              <span className="flex items-center gap-2.5 tabular-nums">
+                <span className="w-8 shrink-0 text-right text-muted-foreground">{n(d.min)}°</span>
+                <span className="relative h-2 flex-1 rounded-full bg-muted">
+                  <span className="absolute inset-y-0 rounded-full" style={{ left: `${bar.left}%`, width: `${bar.width}%`, ...paint(d.min, d.max) }} />
+                  {i === 0 && !placeholder && (
+                    <span aria-hidden="true" className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-card ring-2 ring-foreground/70" style={{ left: `${nowAt}%` }} />
+                  )}
                 </span>
-                <span className="flex items-start gap-2 text-muted-foreground">
-                  <HintIcon aria-hidden="true" weight="duotone" className="mt-1 size-4 shrink-0" />
+                <span className="w-8 shrink-0 font-semibold">{n(d.max)}°</span>
+              </span>
+              <span className={`col-span-full flex flex-wrap items-start gap-x-3 gap-y-1 text-sm sm:col-span-1 ${tone}`}>
+                <span className="sm:hidden">{rain}</span>
+                <span className="flex min-w-0 items-start gap-1.5 font-medium">
+                  <HintIcon aria-hidden="true" weight="duotone" className="mt-0.5 size-4 shrink-0" />
                   {hint.text}
                 </span>
-              </li>
-            );
-          })}
-        </ol>
-      )}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
+
+function ForecastView({ forecast, compact, placeholder = false }: { forecast: Forecast; compact: boolean; placeholder?: boolean }) {
+  return (
+    <div>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+        <NowPanel forecast={forecast} placeholder={placeholder} />
+        <div className="flex flex-col gap-4">
+          <TodayAdvice hint={farmingHint(forecast.daily[0])} />
+          {compact ? (
+            <>
+              <NextDays forecast={forecast} placeholder={placeholder} />
+              <Link
+                href="/hava"
+                className="group inline-flex min-h-11 items-center gap-2 self-start font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                7 günlük tahmin ve il seçimi
+                <ArrowRightIcon aria-hidden="true" weight="bold" className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </>
+          ) : (
+            <WeekPlan forecast={forecast} placeholder={placeholder} />
+          )}
+        </div>
+      </div>
+      {!compact && <WeekList forecast={forecast} placeholder={placeholder} />}
     </div>
   );
 }
@@ -256,8 +391,8 @@ export function WeatherWidget({ compact = false, headingLevel = 3 }: { compact?:
 
 
   return (
-    <div className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-7" aria-live="polite">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="overflow-hidden rounded-[2rem] border border-border bg-card shadow-soft" aria-live="polite">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 pb-1 pt-5 sm:px-7 sm:pt-6">
         <Heading className="flex items-center gap-2 text-2xl font-bold">
           <MapPinIcon aria-hidden="true" weight="duotone" className="size-6 text-primary" />
           {province.name}
@@ -271,36 +406,40 @@ export function WeatherWidget({ compact = false, headingLevel = 3 }: { compact?:
       </div>
 
       {!compact && (
-        <div className="mt-4">
+        <div className="px-5 pt-3 sm:px-7">
           <ProvinceSearch onPick={pick} />
         </div>
       )}
 
-      {status === "loading" && (
-        <div className="relative">
-          {/* Invisible copy of the real layout reserves its space, so the page does not jump when data arrives. */}
-          <div aria-hidden="true" className="invisible">
-            <ForecastView forecast={SKELETON} compact={compact} placeholder />
+      <div className="p-3 sm:p-5">
+        {status === "loading" && (
+          <div className="relative">
+            {/* The real layout, greyed and inert, reserves the space so nothing jumps when data arrives. */}
+            <div aria-hidden="true" inert className="opacity-55 motion-safe:animate-pulse">
+              <ForecastView forecast={SKELETON} compact={compact} placeholder />
+            </div>
+            <p role="status" className="absolute left-1/2 top-10 flex -translate-x-1/2 items-center gap-2.5 whitespace-nowrap rounded-full bg-card px-4 py-2 font-semibold shadow-soft ring-1 ring-border">
+              <span className="size-4 rounded-full border-2 border-primary border-t-transparent motion-safe:animate-spin" aria-hidden="true" />
+              Hava durumu yükleniyor…
+            </p>
           </div>
-          <p role="status" className="absolute inset-x-0 top-6 flex items-center gap-2 text-muted-foreground">
-            <span className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent motion-safe:animate-spin" aria-hidden="true" />
-            Hava durumu yükleniyor…
-          </p>
-        </div>
-      )}
+        )}
 
-      {status === "error" && (
-        <div className="mt-6 space-y-3">
-          <p className="font-semibold">Hava durumu şu an alınamadı</p>
-          <Button onClick={retry}>
-            <ArrowClockwiseIcon aria-hidden="true" weight="bold" />
-            Tekrar dene
-          </Button>
-        </div>
-      )}
+        {status === "error" && (
+          <div className="flex flex-col items-center gap-3 rounded-[1.75rem] bg-surface px-5 py-10 text-center">
+            <CloudIcon size={72} animate={false} />
+            <p className="font-heading text-xl font-bold">Hava durumu şu an alınamadı</p>
+            <p className="max-w-sm text-muted-foreground">Bağlantınızı kontrol edip yeniden deneyin.</p>
+            <Button onClick={retry} className="mt-1">
+              <ArrowClockwiseIcon aria-hidden="true" weight="bold" />
+              Tekrar dene
+            </Button>
+          </div>
+        )}
 
-      {status === "ok" && forecast && <ForecastView forecast={forecast} compact={compact} />}
-      <p className="mt-5 text-sm text-muted-foreground">
+        {status === "ok" && forecast && <ForecastView forecast={forecast} compact={compact} />}
+      </div>
+      <p className="px-5 pb-5 text-sm text-muted-foreground sm:px-7">
         Veri:{" "}
         <a href="https://open-meteo.com/" className="underline" rel="noopener noreferrer" target="_blank">
           Open-Meteo

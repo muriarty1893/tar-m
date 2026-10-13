@@ -378,3 +378,228 @@ html.cine [data-cine] {
 .analyzing-bar {
   animation-name: analyzing-bar;
 }
+
+/*
+ * Animated weather icons (components/ui/animated-weather-icons.tsx).
+ * They loop on `.wx-live` icons, or on any icon inside a hovered/focused `.wx-hover`;
+ * otherwise, and always under reduced motion, they rest on their static drawing.
+ */
+.wx-icon * {
+  transform-box: view-box;
+}
+.wx-spin {
+  transform-origin: 24px 24px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-spin {
+    animation: wx-spin var(--wx-t, 12s) linear infinite;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-twinkle {
+    animation: wx-twinkle 2s ease-in-out infinite;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-pulse {
+    animation: wx-pulse 3s ease-in-out infinite;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-star {
+    animation: wx-star 2s ease-in-out infinite;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-drift {
+    animation: wx-drift var(--wx-t, 6s) ease-in-out infinite;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-fall {
+    animation: wx-fall var(--wx-t, 0.8s) ease-in infinite;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-flake-r {
+    animation: wx-flake-r 2s ease-in infinite;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-flake-l {
+    animation: wx-flake-l 2s ease-in infinite;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-flash {
+    animation: wx-flash 3s linear infinite;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-flash-glow {
+    animation: wx-flash-glow 3s linear infinite;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-draw {
+    stroke-dasharray: 1;
+    animation: wx-draw 1.5s ease-in-out infinite;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-haze {
+    animation: wx-haze 3s ease-in-out infinite;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-rise {
+    animation: wx-rise 3s ease-in-out infinite alternate;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-bob {
+    animation: wx-bob 2s ease-in-out infinite;
+  }
+  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-arc {
+    stroke-dasharray: 1;
+    animation: wx-arc 2.5s ease-in-out infinite alternate;
+  }
+}
+@keyframes wx-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes wx-twinkle {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes wx-pulse {
+  50% {
+    transform: scale(1.15);
+  }
+}
+@keyframes wx-star {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.2);
+  }
+}
+@keyframes wx-drift {
+  25% {
+    transform: translateX(var(--wx-x, 2px));
+  }
+  75% {
+    transform: translateX(calc(var(--wx-x, 2px) * -1));
+  }
+}
+@keyframes wx-fall {
+  from {
+    transform: translateY(0);
+    opacity: var(--wx-o, 0.8);
+  }
+  to {
+    transform: translateY(var(--wx-y, 12px));
+    opacity: 0;
+  }
+}
+@keyframes wx-flake-r {
+  from {
+    transform: translate(0, -2px);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(3px, 5px);
+  }
+  to {
+    transform: translate(0, 12px);
+    opacity: 0;
+  }
+}
+@keyframes wx-flake-l {
+  from {
+    transform: translate(0, -2px);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-3px, 5px);
+  }
+  to {
+    transform: translate(0, 12px);
+    opacity: 0;
+  }
+}
+@keyframes wx-flash {
+  0%,
+  33%,
+  67%,
+  100% {
+    opacity: 0;
+  }
+  11%,
+  22%,
+  56% {
+    opacity: 1;
+  }
+}
+@keyframes wx-flash-glow {
+  0%,
+  22%,
+  67%,
+  100% {
+    opacity: 0;
+  }
+  11% {
+    opacity: 0.3;
+  }
+  56% {
+    opacity: 0.2;
+  }
+}
+@keyframes wx-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes wx-haze {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateX(3px);
+  }
+}
+@keyframes wx-rise {
+  from {
+    transform: translateY(4px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes wx-bob {
+  0%,
+  100% {
+    transform: translateY(2px);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+@keyframes wx-arc {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  60%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.7;
+  }
+}
+
+/* Weather "now" panel: a soft sky tint that follows the condition (data-sky = WeatherKind). */
+.wx-sky {
+  --sky: #94a3b8;
+  background:
+    radial-gradient(110% 80% at 100% 0%, color-mix(in oklab, var(--sky) 30%, transparent) 0%, transparent 60%),
+    linear-gradient(165deg, color-mix(in oklab, var(--sky) 20%, var(--card)) 0%, color-mix(in oklab, var(--sky) 5%, var(--card)) 75%);
+}
+.wx-sky[data-sky="sun"] { --sky: #f59e0b; }
+.wx-sky[data-sky="partly"] { --sky: #60a5fa; }
+.wx-sky[data-sky="rain"] { --sky: #3b82f6; }
+.wx-sky[data-sky="heavy-rain"] { --sky: #2563eb; }
+.wx-sky[data-sky="snow"] { --sky: #38bdf8; }
+.wx-sky[data-sky="thunder"] { --sky: #6366f1; }
+.wx-sky[data-sky="wind"] { --sky: #14b8a6; }
+.wx-sky[data-sky="moon"] { --sky: #8b5cf6; }

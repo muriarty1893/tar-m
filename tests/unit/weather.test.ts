@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { farmingHint, fetchForecast, describeWeather, type DailyForecast } from "@/lib/weather";
+import { farmingHint, fetchForecast, describeWeather, rangeBar, weatherKind, type DailyForecast } from "@/lib/weather";
 
 const day = (over: Partial<DailyForecast> = {}): DailyForecast => ({
   date: "2026-10-12",
@@ -66,7 +66,7 @@ describe("fetchForecast", () => {
   it("parses the Open-Meteo response", async () => {
     const f = fakeFetch(fixture());
     const forecast = await fetchForecast(39.93, 32.86, f);
-    expect(forecast.current).toEqual({ temp: 17.4, wind: 9.2, code: 3 });
+    expect(forecast.current).toEqual({ temp: 17.4, wind: 9.2, code: 3, isDay: true });
     expect(forecast.daily[1]).toEqual({
       date: "2026-10-13",
       min: 4.2,
@@ -135,5 +135,70 @@ describe("describeWeather", () => {
     expect(describeWeather(63)).toBe("Yağmurlu");
     expect(describeWeather(95)).toBe("Gök gürültülü fırtına");
     expect(describeWeather(12345)).toBe("Bilinmiyor");
+  });
+});
+
+describe("fetchForecast extras", () => {
+  it("reads day/night, per-day weather codes and sunrise/sunset times", async () => {
+    const body = {
+      ...fixture({ weather_code: [61, 0], sunrise: ["2026-10-12T07:04", "2026-10-13T07:05"], sunset: ["2026-10-12T18:31", "2026-10-13T18:29"] }),
+      current: { temperature_2m: 9, wind_speed_10m: 3, weather_code: 0, is_day: 0 },
+    };
+    const f = fakeFetch(body);
+    const forecast = await fetchForecast(42.1, 33.1, f);
+    expect(forecast.current.isDay).toBe(false);
+    expect(forecast.daily[0]).toMatchObject({ code: 61, sunrise: "07:04", sunset: "18:31" });
+    const url = decodeURIComponent(String((f as unknown as { mock: { calls: unknown[][] } }).mock.calls[0][0]));
+    expect(url).toContain("is_day");
+    expect(url).toContain("weather_code,sunrise,sunset");
+  });
+
+  it("keeps a day whose optional code or sun times are missing", async () => {
+    const forecast = await fetchForecast(42.2, 33.2, fakeFetch(fixture({ weather_code: [null, 3] })));
+    expect(forecast.daily).toHaveLength(2);
+    expect(forecast.daily[0].code).toBeUndefined();
+    expect(forecast.daily[0].sunrise).toBeUndefined();
+    expect(forecast.daily[1].code).toBe(3);
+  });
+});
+
+describe("weatherKind", () => {
+  it("clear sky is the sun by day and the moon by night", () => {
+    expect(weatherKind(0)).toBe("sun");
+    expect(weatherKind(0, { isDay: false })).toBe("moon");
+    expect(weatherKind(1, { isDay: false })).toBe("moon");
+  });
+
+  it("maps cloud, fog, rain, heavy rain, snow and thunder codes", () => {
+    expect(weatherKind(2)).toBe("partly");
+    expect(weatherKind(3)).toBe("cloud");
+    expect(weatherKind(48)).toBe("fog");
+    expect(weatherKind(53)).toBe("rain");
+    expect(weatherKind(63)).toBe("rain");
+    expect(weatherKind(81)).toBe("rain");
+    expect(weatherKind(65)).toBe("heavy-rain");
+    expect(weatherKind(82)).toBe("heavy-rain");
+    expect(weatherKind(73)).toBe("snow");
+    expect(weatherKind(86)).toBe("snow");
+    expect(weatherKind(95)).toBe("thunder");
+    expect(weatherKind(12345)).toBe("cloud");
+  });
+
+  it("a dry but windy sky (30 km/h or more) shows the wind", () => {
+    expect(weatherKind(1, { wind: 30 })).toBe("wind");
+    expect(weatherKind(2, { wind: 29.9 })).toBe("partly");
+    expect(weatherKind(61, { wind: 45 })).toBe("rain");
+  });
+});
+
+describe("rangeBar", () => {
+  it("places a day's min-max span on the week's scale, in percent", () => {
+    expect(rangeBar(5, 15, 0, 20)).toEqual({ left: 25, width: 50 });
+    expect(rangeBar(0, 20, 0, 20)).toEqual({ left: 0, width: 100 });
+  });
+
+  it("keeps a sliver visible for a flat day and a full bar for a flat week", () => {
+    expect(rangeBar(10, 10, 0, 20).width).toBeGreaterThan(0);
+    expect(rangeBar(7, 7, 7, 7)).toEqual({ left: 0, width: 100 });
   });
 });

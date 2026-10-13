@@ -98,3 +98,46 @@ test("weather failure shows a retry button that recovers", async ({ page }) => {
   await page.getByRole("button", { name: "Tekrar dene" }).click();
   await expect(page.getByTestId("sicaklik")).toHaveText("17°C");
 });
+
+test("the sky panel and animated icon follow the conditions; the week plan names the right days", async ({ page }) => {
+  await mockWeather(page);
+  await page.goto("/hava");
+  await expect(page.getByTestId("sicaklik")).toHaveText("17°C");
+  // weather_code 3 → overcast: grey sky, cloud icon, looping.
+  await expect(page.locator('[data-sky="cloud"]')).toBeVisible();
+  await expect(page.locator('[data-sky="cloud"] svg.wx-icon.wx-live')).toHaveCount(1);
+
+  const week = page.getByRole("list", { name: "7 günlük tahmin" });
+  await expect(week.getByRole("listitem")).toHaveCount(3);
+  await expect(week.getByRole("listitem").first()).toContainText("Bugün");
+  await expect(week.getByRole("listitem").nth(2)).toContainText("Çarşamba");
+
+  // 12 Oct frost (Bugün), 13 Oct heavy rain (Yarın), 14 Oct calm and dry (Çarşamba).
+  const plan = page.getByText("Bu hafta tarlada").locator("..");
+  await expect(plan.getByRole("listitem").filter({ hasText: "İlaçlamaya uygun" })).toContainText("Çarşamba");
+  await expect(plan.getByRole("listitem").filter({ hasText: "Don riski" })).toContainText("Bugün");
+  await expect(plan.getByRole("listitem").filter({ hasText: "Yoğun yağış" })).toContainText("Yarın");
+});
+
+test("a clear night shows the moon", async ({ page }) => {
+  await page.route("https://api.open-meteo.com/**", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ ...body, current: { ...body.current, weather_code: 0, is_day: 0 } }),
+    }),
+  );
+  await page.goto("/hava");
+  await expect(page.locator('[data-sky="moon"]')).toBeVisible();
+  await expect(page.getByText("Açık", { exact: true })).toBeVisible();
+});
+
+test("the home page weather card shows today and the next days", async ({ page }) => {
+  await mockWeather(page);
+  await page.goto("/#hava");
+  const section = page.locator("#hava");
+  await expect(section.getByTestId("sicaklik")).toHaveText("17°C");
+  const next = section.getByRole("list", { name: "Önümüzdeki günler" });
+  await expect(next.getByRole("listitem").first()).toContainText("Yarın");
+  await expect(section.getByRole("link", { name: /7 günlük tahmin/ })).toHaveAttribute("href", "/hava");
+});

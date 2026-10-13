@@ -15,7 +15,7 @@ export default function WeatherPage() {
         title="Hava Durumu"
         intro="İlinizi seçin; 7 günlük tahminle birlikte don, yoğun yağış ve ilaçlama için uygun günleri görün."
       />
-      <section className="mx-auto max-w-4xl px-4 py-12">
+      <section className="mx-auto max-w-5xl px-4 py-12">
         <WeatherWidget headingLevel={2} />
       </section>
     </>
