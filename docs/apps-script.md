@@ -1,6 +1,6 @@
 # Connecting the forms to Google Sheets
 
-The waitlist and partner forms post to the site's own API routes, which forward
+The waitlist, partner and question forms post to the site's own API routes, which forward
 each submission to a small Google Apps Script. The script writes it into a
 Google Sheet. This takes about 10 minutes, once.
 
@@ -8,7 +8,7 @@ Google Sheet. This takes about 10 minutes, once.
 
 1. Go to <https://sheets.google.com> and create a blank spreadsheet, e.g. "Bereket AI Kayıtlar".
 2. Rename the first tab to `waitlist` (exactly, lowercase).
-3. Add a second tab named `partner`.
+3. Add a second tab named `partner`, and a third named `question` (the home page's "Sorunuz mu var?" form).
 
 Leave both tabs empty. The script writes the header row on the first submission.
 

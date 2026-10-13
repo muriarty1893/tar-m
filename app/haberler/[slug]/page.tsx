@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getAllArticles, getArticle } from "@/lib/news";
+import { getAllArticles, getArticle, shareImage } from "@/lib/news";
 import { formatTrDate } from "@/lib/format";
 import { siteConfig } from "@/config/site";
 import { ArrowLeftIcon, CalendarBlankIcon } from "@phosphor-icons/react/dist/ssr";
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageProps<"/haberler/[slug]">
       title: article.title,
       description: article.summary,
       publishedTime: article.date,
-      images: [article.cover ?? { url: "/opengraph-image", width: 1200, height: 630 }],
+      images: [shareImage(article.cover)],
     },
   };
 }

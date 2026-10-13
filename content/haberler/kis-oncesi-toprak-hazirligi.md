@@ -2,6 +2,7 @@
 title: Kış öncesi toprak hazırlığında 5 öneri
 date: 2026-09-24
 summary: "(Örnek haber) Hasat sonrası yapılan doğru toprak hazırlığı, gelecek sezonun verimini doğrudan etkiler."
+cover: /hero/field-horizon.webp
 ---
 
 Hasat bittikten sonra toprağı kışa hazırlamak, bir sonraki ekim döneminin temelini oluşturur.

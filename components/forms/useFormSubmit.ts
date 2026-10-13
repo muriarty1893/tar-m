@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { SubmitResponse } from "@/lib/submit";
 
 export type FormStatus = "idle" | "submitting" | "success" | "error" | "rate";
-export type FormKind = "waitlist" | "partner";
+export type FormKind = "waitlist" | "partner" | "question";
 
 /**
  * Validates on the client with the same schema as the server, then POSTs JSON.
@@ -18,7 +18,7 @@ export function useFormSubmit<T extends Record<string, unknown>>(kind: FormKind)
     setStatus("submitting");
     try {
       const forms = await import("@/lib/forms");
-      const schema = kind === "waitlist" ? forms.waitlistSchema : forms.partnerSchema;
+      const schema = { waitlist: forms.waitlistSchema, partner: forms.partnerSchema, question: forms.questionSchema }[kind];
       const parsed = schema.safeParse(values);
       if (!parsed.success) {
         setErrors(forms.fieldErrors(parsed.error));

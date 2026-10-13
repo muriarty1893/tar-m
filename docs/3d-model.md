@@ -9,6 +9,8 @@ The demo section (`#demo`) shows the app running on a 3D phone that floats above
 - `components/phone-app/PhoneScene.tsx`: three.js scene (React Three Fiber + drei). Each frame it projects the display's four corners and warps the DOM screen onto them with a CSS `matrix3d` (`quadMatrix3d` in `lib/phone-stage.ts`), so the screen stays real, accessible, clickable HTML.
 - `components/phone-app/GrassField.tsx`: procedural meadow (instanced grass, wheat and flowers with a wind shader). No download needed.
 
+Flow: picking a field photo (or "Hastalık Tara" on the phone) opens the live camera; the shutter on the phone, or the large "Fotoğrafı çek ve analiz et" button beside it, takes the photo and starts the 2 s analysis. On the result, "Soru sor" opens a scripted chat: each scenario's suggested questions (`questions` in `data/demo-scenarios.ts`, to be reviewed by an agronomist like the rest of the demo text) and a free-text box that explains it is a demo.
+
 When a field photo is picked, that photo fills the stage behind the phone (blurred, with a vignette) and the meadow hides, so the phone looks like it is standing in the field; its camera screen shows the same scene zoomed in, with a slight handheld drift and a CANLI label. Resetting brings the meadow back.
 
 The phone's bottom bar works: Ana sayfa, Taramalar (starts a scan), Hava (5-day farm forecast) and Geçmiş (past scans; tap one to open its result).

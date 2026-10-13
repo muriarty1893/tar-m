@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CameraIcon, CheckIcon, InfoIcon } from "@phosphor-icons/react/dist/ssr";
 import { demoScenarios, type DemoScenario } from "@/data/demo-scenarios";
@@ -8,20 +7,26 @@ import { photoCredits } from "@/data/photo-credits";
 import { AppScreen, type AppPhase, type AppTab } from "./phone-app/AppScreen";
 import { PhoneStage, usePrefersReducedMotion } from "./phone-app/PhoneStage";
 import { CtaLink } from "./CtaLink";
+import { Button } from "./ui/button";
+import { FocusCards } from "./ui/focus-cards";
 
 const ANALYSIS_MS = 2000;
 const AUTOPLAY_MS = 2600;
+/** In the auto tour, how long the live camera shows before the shutter "is pressed". */
+const AUTOPLAY_SHUTTER_MS = 1800;
 
-const STEPS: { label: string; reached: (p: AppPhase) => boolean }[] = [
-  { label: "Fotoğraf", reached: (p) => p !== "idle" },
-  { label: "Analiz", reached: (p) => p !== "idle" },
-  { label: "Sonuç", reached: (p) => p === "done" },
+const taken = (p: AppPhase) => p === "analyzing" || p === "done";
+const STEPS: { label: string; reached: (p: AppPhase) => boolean; current: (p: AppPhase) => boolean }[] = [
+  { label: "Fotoğraf", reached: taken, current: (p) => p === "camera" },
+  { label: "Analiz", reached: taken, current: (p) => p === "analyzing" },
+  { label: "Sonuç", reached: (p) => p === "done", current: () => false },
 ];
 
 export function DemoShowcase() {
   const [selected, setSelected] = useState<DemoScenario | null>(null);
   const [phase, setPhase] = useState<AppPhase>("idle");
   const [tab, setTab] = useState<AppTab>("home");
+  const [asking, setAsking] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stage = useRef<HTMLDivElement>(null);
   const interacted = useRef(false);
@@ -31,17 +36,29 @@ export function DemoShowcase() {
     if (timer.current) clearTimeout(timer.current);
   }, []);
 
-  // A new pick cancels any pending analysis so only the latest answer appears.
-  const analyse = useCallback((s: DemoScenario) => {
+  // Picking a field opens the live camera on it; a new pick cancels any pending analysis.
+  const aim = useCallback((s: DemoScenario) => {
     if (timer.current) clearTimeout(timer.current);
     setSelected(s);
+    setAsking(false);
+    setPhase("camera");
+  }, []);
+
+  // The shutter takes the photo and starts the analysis.
+  const shoot = useCallback(() => {
+    if (timer.current) clearTimeout(timer.current);
     setPhase("analyzing");
     timer.current = setTimeout(() => setPhase("done"), ANALYSIS_MS);
   }, []);
 
+  const press = () => {
+    interacted.current = true;
+    shoot();
+  };
+
   const pick = (s: DemoScenario) => {
     interacted.current = true;
-    analyse(s);
+    aim(s);
     // The picker sits below the phone: bring the phone into view (on phones it is usually off screen).
     const el = stage.current;
     if (el) {
@@ -59,6 +76,7 @@ export function DemoShowcase() {
     interacted.current = true;
     if (timer.current) clearTimeout(timer.current);
     setSelected(null);
+    setAsking(false);
     setPhase("idle");
     setTab(to);
   };
@@ -68,6 +86,7 @@ export function DemoShowcase() {
     interacted.current = true;
     if (timer.current) clearTimeout(timer.current);
     setSelected(s);
+    setAsking(false);
     setPhase("done");
   };
 
@@ -81,7 +100,11 @@ export function DemoShowcase() {
         if (!e.isIntersecting || interacted.current) return;
         io.disconnect();
         pending = setTimeout(() => {
-          if (!interacted.current) analyse(demoScenarios[0]);
+          if (interacted.current) return;
+          aim(demoScenarios[0]);
+          pending = setTimeout(() => {
+            if (!interacted.current) shoot();
+          }, AUTOPLAY_SHUTTER_MS);
         }, AUTOPLAY_MS);
       },
       { threshold: 0.35 },
@@ -91,7 +114,7 @@ export function DemoShowcase() {
       io.disconnect();
       clearTimeout(pending);
     };
-  }, [reduced, analyse]);
+  }, [reduced, aim, shoot]);
 
   return (
     <div className="space-y-10">
@@ -105,6 +128,12 @@ export function DemoShowcase() {
             onReset={() => reset()}
             onTab={(t) => reset(t)}
             onOpen={open}
+            onShutter={press}
+            asking={asking}
+            onAsk={(v) => {
+              interacted.current = true;
+              setAsking(v);
+            }}
           />
         </PhoneStage>
       </div>
@@ -115,50 +144,55 @@ export function DemoShowcase() {
             <span className="flex size-7 items-center justify-center rounded-full bg-gold text-sm font-bold text-gold-foreground">1</span>
             Bir tarla fotoğrafı seçin
           </p>
-          <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {demoScenarios.map((s) => (
-              <li key={s.id}>
-                <button
-                  type="button"
-                  onClick={() => pick(s)}
-                  aria-pressed={selected?.id === s.id}
-                  className="group w-full cursor-pointer overflow-hidden rounded-3xl border-2 border-border bg-background text-left shadow-soft transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-lift aria-pressed:border-primary aria-pressed:ring-4 aria-pressed:ring-primary/20 motion-reduce:hover:translate-y-0"
-                >
-                  <Image src={s.imageSrc} alt={s.imageAlt} width={400} height={300} sizes="(min-width: 640px) 25vw, 50vw" className="aspect-[4/3] w-full object-cover" />
-                  <span className="flex min-h-12 items-center justify-between gap-2 px-3.5 py-2.5 font-semibold">
-                    {s.title}
-                    <CameraIcon aria-hidden="true" weight="duotone" className="size-5 shrink-0 text-primary opacity-70 group-aria-pressed:opacity-100" />
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
+          <FocusCards
+            className="mt-4"
+            cards={demoScenarios.map((s) => ({ id: s.id, title: s.title, src: s.imageSrc, alt: s.imageAlt }))}
+            selectedId={selected?.id}
+            onSelect={(id) => pick(demoScenarios.find((s) => s.id === id)!)}
+            icon={<CameraIcon weight="duotone" />}
+          />
         </div>
 
         <div>
           <p className="flex items-center gap-2 text-lg font-semibold">
             <span className="flex size-7 items-center justify-center rounded-full bg-gold text-sm font-bold text-gold-foreground">2</span>
-            Telefondaki yanıtı izleyin
+            Fotoğrafı çekin, yanıtı izleyin
           </p>
           <ol className="mt-4 flex items-center gap-2 lg:min-w-[22rem]" aria-label="Tarama adımları">
-            {STEPS.map(({ label, reached }, i) => {
+            {STEPS.map(({ label, reached, current }, i) => {
               const on = reached(phase);
+              const now = current(phase);
               return (
-                <li key={label} className="flex flex-1 items-center gap-2">
+                <li key={label} className="flex flex-1 items-center gap-2" aria-current={now ? "step" : undefined}>
                   <span
-                    className={`flex size-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-colors duration-300 ${on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-muted-foreground"}`}
+                    className={`flex size-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition-colors duration-300 ${
+                      on ? "border-primary bg-primary text-primary-foreground" : now ? "border-gold bg-gold-soft text-gold ring-4 ring-gold/25" : "border-border bg-background text-muted-foreground"
+                    }`}
                   >
                     {on ? <CheckIcon aria-hidden="true" weight="bold" className="size-4" /> : i + 1}
                   </span>
-                  <span className={`text-[0.95rem] font-semibold ${on ? "text-foreground" : "text-muted-foreground"}`}>
+                  <span className={`text-[0.95rem] font-semibold ${on || now ? "text-foreground" : "text-muted-foreground"}`}>
                     {label}
-                    <span className="sr-only">{on ? " (tamamlandı)" : ""}</span>
+                    <span className="sr-only">{on ? " (tamamlandı)" : now ? " (şu an)" : ""}</span>
                   </span>
                   {i < STEPS.length - 1 && <span aria-hidden="true" className={`h-0.5 flex-1 rounded-full ${on ? "bg-primary" : "bg-border"}`} />}
                 </li>
               );
             })}
           </ol>
+          {/* Large shutter next to the phone: easier to hit than the one on the small screen. */}
+          <div className="mt-5 min-h-14">
+            {phase === "camera" ? (
+              <Button size="lg" onClick={press} className="w-full sm:w-auto">
+                <CameraIcon aria-hidden="true" weight="fill" />
+                Fotoğrafı çek ve analiz et
+              </Button>
+            ) : (
+              <p className="text-muted-foreground">
+                {phase === "idle" ? "Bir fotoğraf seçin; telefonun kamerası açılsın." : phase === "analyzing" ? "Yapay zekâ fotoğrafı inceliyor…" : "Sonucu telefonda görün, \u201cSoru sor\u201d ile ayrıntı isteyin."}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 

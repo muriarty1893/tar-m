@@ -1,11 +1,13 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
   ArrowUpIcon,
+  ArrowsClockwiseIcon,
+  ChatCircleDotsIcon,
   BatteryFullIcon,
   CalendarDotsIcon,
   CameraIcon,
@@ -23,6 +25,8 @@ import {
   LightningIcon,
   MapPinIcon,
   MapTrifoldIcon,
+  PaperPlaneRightIcon,
+  PlantIcon,
   ScanIcon,
   SnowflakeIcon,
   SunIcon,
@@ -36,7 +40,7 @@ import { demoScenarios, type DemoScenario } from "@/data/demo-scenarios";
 import { SCREEN } from "@/lib/phone-stage";
 import { SuccessGauge } from "../SuccessGauge";
 
-export type AppPhase = "idle" | "analyzing" | "done";
+export type AppPhase = "idle" | "camera" | "analyzing" | "done";
 export type AppTab = "home" | "weather" | "history";
 
 type Props = {
@@ -49,12 +53,18 @@ type Props = {
   onTab: (tab: AppTab) => void;
   /** Open a past scan's result straight away (history list). */
   onOpen: (s: DemoScenario) => void;
+  /** Shutter on the live camera: take the photo and start the analysis. */
+  onShutter: () => void;
+  /** The "Soru sor" chat about the current result. */
+  asking: boolean;
+  onAsk: (open: boolean) => void;
 };
 
 /** Simulated mobile app (siteConfig.name), drawn at phone size (SCREEN px) for the 3D phone or the flat frame. */
-export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen }: Props) {
-  const camera = phase === "analyzing" && scenario;
+export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen, onShutter, asking, onAsk }: Props) {
+  const camera = (phase === "camera" || phase === "analyzing") && scenario;
   const result = phase === "done" && scenario;
+  const chat = result && asking;
   const clip = `inset(0 round ${SCREEN.radius}px)`;
   return (
     <div
@@ -63,14 +73,16 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
       // clip-path (not just border-radius) so blurred layers can't bleed past the display's rounded corners.
       style={{ width: SCREEN.width, height: SCREEN.height, borderRadius: SCREEN.radius, clipPath: clip }}
     >
-      <StatusBar dark={!!camera || phase === "done"} />
+      <StatusBar dark={!!camera || (!!result && !chat)} />
       <div aria-hidden="true" className="absolute left-1/2 top-[13px] z-30 h-[30px] w-[100px] -translate-x-1/2 rounded-full bg-black" />
 
       <div aria-live="polite" className="h-full">
         {camera ? (
-          <CameraScreen key="camera" s={scenario} />
+          <CameraScreen key="camera" s={scenario} live={phase === "camera"} onShutter={onShutter} />
+        ) : chat ? (
+          <AskScreen key={`ask-${scenario.id}`} s={scenario} onBack={() => onAsk(false)} />
         ) : result ? (
-          <ResultScreen key={`done-${scenario.id}`} s={scenario} onReset={onReset} />
+          <ResultScreen key={`done-${scenario.id}`} s={scenario} onReset={onReset} onAsk={() => onAsk(true)} />
         ) : tab === "weather" ? (
           <WeatherScreen key="weather" />
         ) : tab === "history" ? (
@@ -80,7 +92,7 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
         )}
       </div>
 
-      {!camera && <TabBar active={result ? "scan" : tab} onHome={onReset} onScan={onScan} onTab={onTab} />}
+      {!camera && !chat && <TabBar active={result ? "scan" : tab} onHome={onReset} onScan={onScan} onTab={onTab} />}
       <div aria-hidden="true" className={`absolute bottom-2 left-1/2 z-30 h-[5px] w-32 -translate-x-1/2 rounded-full ${camera ? "bg-white/80" : "bg-foreground/80"}`} />
       {/* Cover-glass sheen so the flat DOM reads as lit glass on the 3D phone. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-40 bg-[linear-gradient(115deg,rgb(255_255_255/0.16)_0%,transparent_32%,transparent_70%,rgb(255_255_255/0.06)_100%)]" />
@@ -263,11 +275,12 @@ function QuickActions({ onScan }: { onScan: () => void }) {
   );
 }
 
-function CameraScreen({ s }: { s: DemoScenario }) {
+function CameraScreen({ s, live, onShutter }: { s: DemoScenario; live: boolean; onShutter: () => void }) {
   return (
     <div className="relative h-full bg-black text-white">
-      {/* Live viewfinder: the same field as the stage behind the phone, zoomed in, with a slight handheld drift. */}
-      <div className="absolute inset-0 motion-safe:animate-[handheld_7s_ease-in-out_infinite_alternate]">
+      {/* Viewfinder: the same field as the stage behind the phone, zoomed in. Live it drifts like a
+          handheld camera; once the shutter is pressed the frame freezes. */}
+      <div className={`absolute inset-0 ${live ? "motion-safe:animate-[handheld_7s_ease-in-out_infinite_alternate]" : ""}`}>
         <div className="absolute inset-0 scale-[1.35]">
           <Image src={s.imageSrc} alt={s.imageAlt} fill sizes="480px" className="object-cover" />
         </div>
@@ -278,40 +291,195 @@ function CameraScreen({ s }: { s: DemoScenario }) {
         </span>
         <span className="flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 text-[13px] font-semibold backdrop-blur">
           <span className="size-2 rounded-full bg-red-500 motion-safe:animate-pulse" />
-          CANLI · Tarama
+          {live ? "CANLI · Kamera" : "CANLI · Tarama"}
         </span>
         <span className="flex size-10 items-center justify-center rounded-full bg-black/40 backdrop-blur">
           <LightningIcon weight="fill" className="size-5" />
         </span>
       </div>
 
-      {/* Viewfinder with corner brackets and a sweeping scan line. */}
+      {/* Framing brackets; the scan line sweeps only while analysing. */}
       <div aria-hidden="true" className="absolute inset-x-8 top-32 h-[17rem]">
         {["left-0 top-0 border-l-4 border-t-4 rounded-tl-3xl", "right-0 top-0 border-r-4 border-t-4 rounded-tr-3xl", "left-0 bottom-0 border-l-4 border-b-4 rounded-bl-3xl", "right-0 bottom-0 border-r-4 border-b-4 rounded-br-3xl"].map((c) => (
-          <span key={c} className={`absolute size-12 border-gold ${c}`} />
+          <span key={c} className={`absolute size-12 ${live ? "border-white/90" : "border-gold"} ${c}`} />
         ))}
-        <div className="absolute inset-x-3 top-1 h-1 rounded-full bg-gold shadow-[0_0_18px_4px_var(--gold)] motion-safe:animate-[demo-scan_1.4s_ease-in-out_infinite]" />
+        {!live && <div className="absolute inset-x-3 top-1 h-1 rounded-full bg-gold shadow-[0_0_18px_4px_var(--gold)] motion-safe:animate-[demo-scan_1.4s_ease-in-out_infinite]" />}
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 z-10 rounded-t-[30px] bg-card px-5 pb-9 pt-5 text-card-foreground">
-        <p className="flex items-center gap-2 font-heading text-[18px] font-bold" role="status">
-          <span className="size-5 rounded-full border-[3px] border-primary border-t-transparent motion-safe:animate-spin" aria-hidden="true" />
-          Analiz ediliyor…
-        </p>
-        <div aria-hidden="true" className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
-          <div className="h-full origin-left rounded-full bg-primary motion-safe:animate-[app-progress_2s_ease-out_forwards]" />
+      {live ? (
+        <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-4 bg-gradient-to-t from-black/80 via-black/50 to-transparent px-6 pb-10 pt-12">
+          <p className="rounded-full bg-black/50 px-3.5 py-1.5 text-[13px] font-semibold backdrop-blur">Hastalıklı bölgeyi çerçeveye alın</p>
+          <div className="flex w-full items-center justify-between">
+            <span aria-hidden="true" className="relative size-12 overflow-hidden rounded-xl ring-2 ring-white/70">
+              <Image src={s.imageSrc} alt="" fill sizes="48px" className="object-cover" />
+            </span>
+            <button
+              type="button"
+              onClick={onShutter}
+              aria-label="Fotoğraf çek"
+              className="flex size-[78px] cursor-pointer items-center justify-center rounded-full border-4 border-white transition-transform duration-150 active:scale-90 focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-gold motion-reduce:active:scale-100"
+            >
+              <span className="size-[60px] rounded-full bg-white shadow-[0_0_0_2px_rgb(0_0_0/0.15)]" />
+            </button>
+            <span aria-hidden="true" className="flex size-12 items-center justify-center rounded-full bg-black/40 backdrop-blur">
+              <ArrowsClockwiseIcon weight="bold" className="size-6" />
+            </span>
+          </div>
+          <p aria-hidden="true" className="text-[12px] font-bold tracking-[0.2em] text-gold">FOTOĞRAF</p>
         </div>
-        <ul aria-hidden="true" className="mt-3 space-y-1.5 text-[14px] text-muted-foreground">
-          <li className="flex items-center gap-2">
-            <CheckCircleIcon weight="fill" className="size-4 text-primary" /> Yaprak ve toprak dokusu
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircleIcon weight="fill" className="size-4 text-primary" /> Renk ve leke örüntüleri
-          </li>
-          <li className="flex items-center gap-2">
-            <span className="size-4 rounded-full border-2 border-border" /> Öneriler hazırlanıyor
-          </li>
-        </ul>
+      ) : (
+        <>
+          {/* Shutter flash. */}
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 bg-white opacity-0 motion-safe:animate-[shutter-flash_0.45s_ease-out]" />
+          <div className="absolute inset-x-0 bottom-0 z-10 rounded-t-[30px] bg-card px-5 pb-9 pt-5 text-card-foreground">
+            <p className="flex items-center gap-2 font-heading text-[18px] font-bold" role="status">
+              <span className="size-5 rounded-full border-[3px] border-primary border-t-transparent motion-safe:animate-spin" aria-hidden="true" />
+              Analiz ediliyor…
+            </p>
+            <div aria-hidden="true" className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
+              <div className="h-full origin-left rounded-full bg-primary motion-safe:animate-[app-progress_2s_ease-out_forwards]" />
+            </div>
+            <ul aria-hidden="true" className="mt-3 space-y-1.5 text-[14px] text-muted-foreground">
+              <li className="flex items-center gap-2">
+                <CheckCircleIcon weight="fill" className="size-4 text-primary" /> Yaprak ve toprak dokusu
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircleIcon weight="fill" className="size-4 text-primary" /> Renk ve leke örüntüleri
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="size-4 rounded-full border-2 border-border" /> Öneriler hazırlanıyor
+              </li>
+            </ul>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+type Message = { from: "me" | "ai"; text: string };
+const GENERIC_ANSWER =
+  "Bu bir demo: gerçek uygulamada yapay zekâ sorunuzu fotoğrafınıza, ürününüze ve bölgenizin hava durumuna göre yanıtlayacak. Şimdilik önerilen sorulardan birini deneyebilirsiniz.";
+
+/** "Soru sor": a scripted chat about the scan, with suggested questions and a free-text box. */
+function AskScreen({ s, onBack }: { s: DemoScenario; onBack: () => void }) {
+  const [messages, setMessages] = useState<Message[]>([
+    { from: "ai", text: `Merhaba! "${s.diagnosis}" sonucu hakkında merak ettiklerinizi sorabilirsiniz.` },
+  ]);
+  const [typing, setTyping] = useState(false);
+  const [draft, setDraft] = useState("");
+  const list = useRef<HTMLDivElement>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
+  useEffect(() => {
+    list.current?.scrollTo({ top: list.current.scrollHeight });
+  }, [messages, typing]);
+
+  const asked = new Set(messages.filter((m) => m.from === "me").map((m) => m.text));
+  const suggestions = s.questions.filter((q) => !asked.has(q.q));
+
+  const ask = (text: string) => {
+    const q = text.trim();
+    if (!q || typing) return;
+    setMessages((m) => [...m, { from: "me", text: q }]);
+    setDraft("");
+    setTyping(true);
+    const answer = s.questions.find((x) => x.q === q)?.a ?? GENERIC_ANSWER;
+    timer.current = setTimeout(() => {
+      setMessages((m) => [...m, { from: "ai", text: answer }]);
+      setTyping(false);
+    }, 900);
+  };
+
+  return (
+    <div className={`flex h-full flex-col bg-background ${enter}`}>
+      <div className="flex items-center gap-3 border-b border-border px-4 pb-3 pt-14">
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="Sonuca dön"
+          className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-card shadow-soft transition-colors duration-150 hover:bg-secondary focus-visible:outline-3 focus-visible:outline-primary"
+        >
+          <ArrowLeftIcon aria-hidden="true" weight="bold" className="size-5" />
+        </button>
+        <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+          <PlantIcon weight="duotone" className="size-6" />
+        </span>
+        <span className="min-w-0">
+          <span className="block font-heading text-[16px] font-bold">Ziraat asistanı</span>
+          <span className="flex items-center gap-1 text-[12px] text-muted-foreground">
+            <span aria-hidden="true" className="size-1.5 rounded-full bg-primary" />
+            Çevrimiçi · {s.title}
+          </span>
+        </span>
+      </div>
+
+      <div ref={list} role="log" aria-label="Sohbet" className={`${scroll} flex-1 space-y-2.5 px-4 py-4`}>
+        {messages.map((m, i) => (
+          <p
+            key={i}
+            className={`max-w-[82%] rounded-[20px] px-3.5 py-2.5 text-[14px] leading-snug ${
+              m.from === "me" ? "ml-auto rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md border border-border bg-card"
+            }`}
+          >
+            <span className="sr-only">{m.from === "me" ? "Siz: " : "Asistan: "}</span>
+            {m.text}
+          </p>
+        ))}
+        {typing && (
+          <p className="flex w-fit items-center gap-1 rounded-[20px] rounded-bl-md border border-border bg-card px-3.5 py-3" aria-label="Asistan yazıyor">
+            {[0, 1, 2].map((d) => (
+              <span key={d} className="size-2 rounded-full bg-muted-foreground/60 motion-safe:animate-bounce" style={{ animationDelay: `${d * 120}ms` }} />
+            ))}
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-2.5 border-t border-border bg-card px-3 pb-7 pt-3">
+        {suggestions.length > 0 && (
+          <div className="-mx-3 flex gap-2 overflow-x-auto px-3 [scrollbar-width:none]">
+            {suggestions.map((q) => (
+              <button
+                key={q.q}
+                type="button"
+                onClick={() => ask(q.q)}
+                className="shrink-0 cursor-pointer rounded-full border border-primary/40 bg-secondary px-3 py-2 text-[13px] font-semibold text-primary transition-colors duration-150 hover:bg-primary hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-primary"
+              >
+                {q.q}
+              </button>
+            ))}
+          </div>
+        )}
+        <form
+          className="flex items-center gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            ask(draft);
+          }}
+        >
+          <label htmlFor="soru-yaz" className="sr-only">
+            Sorunuzu yazın
+          </label>
+          <input
+            id="soru-yaz"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="Sorunuzu yazın…"
+            autoComplete="off"
+            className="min-h-11 min-w-0 flex-1 rounded-full border border-input bg-background px-4 text-[14px] outline-none focus-visible:border-primary"
+          />
+          <button
+            type="submit"
+            aria-label="Gönder"
+            disabled={!draft.trim() || typing}
+            className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            <PaperPlaneRightIcon aria-hidden="true" weight="fill" className="size-5" />
+          </button>
+        </form>
       </div>
     </div>
   );
@@ -331,8 +499,9 @@ function Block({ icon: Icon, label, children }: { icon: typeof EyeIcon; label: s
   );
 }
 
-function ResultScreen({ s, onReset }: { s: DemoScenario; onReset: () => void }) {
+function ResultScreen({ s, onReset, onAsk }: { s: DemoScenario; onReset: () => void; onAsk: () => void }) {
   return (
+    <div className="relative h-full">
     <div className={`${scroll} pb-28 ${enter}`} data-testid="demo-cevap">
       <div className="relative h-[270px] overflow-hidden text-white">
         <Image src={s.imageSrc} alt={s.imageAlt} fill sizes="340px" className="object-cover" />
@@ -375,7 +544,32 @@ function ResultScreen({ s, onReset }: { s: DemoScenario; onReset: () => void }) 
             ))}
           </ul>
         </Block>
+        <button
+          type="button"
+          onClick={onAsk}
+          className="flex w-full cursor-pointer items-center gap-3 rounded-[20px] border-2 border-primary/30 bg-secondary p-3.5 text-left transition-colors duration-150 hover:bg-primary/15 focus-visible:outline-3 focus-visible:outline-primary"
+        >
+          <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+            <ChatCircleDotsIcon weight="fill" className="size-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-heading text-[15px] font-bold text-primary">Bu teşhis hakkında soru sorun</span>
+            <span className="block text-[12.5px] text-muted-foreground">Ziraat asistanı yanıtlasın</span>
+          </span>
+          <CaretRightIcon aria-hidden="true" weight="bold" className="size-4 text-primary" />
+        </button>
       </div>
+    </div>
+      {/* Always-visible shortcut to the chat, above the tab bar. */}
+      <button
+        type="button"
+        onClick={onAsk}
+        aria-label="Soru sor"
+        className="absolute bottom-[100px] right-4 z-10 flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full bg-primary px-4 font-semibold text-primary-foreground shadow-lift transition-transform duration-150 active:scale-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:active:scale-100"
+      >
+        <ChatCircleDotsIcon aria-hidden="true" weight="fill" className="size-5" />
+        Soru sor
+      </button>
     </div>
   );
 }

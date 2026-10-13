@@ -65,7 +65,7 @@ const features = [
     icon: <TranslateIcon weight="duotone" />,
     name: "Tamamen Türkçe",
     description: "Sade ve anlaşılır bir dille, büyük yazılar ve kolay kullanım ile her yaştan çiftçiye uygun.",
-    className: "sm:col-span-2 lg:col-span-3 min-h-0 bg-gold-soft",
+    className: "sm:col-span-2 lg:col-span-3 min-h-0",
   },
 ];
 

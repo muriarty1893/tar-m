@@ -81,3 +81,8 @@ export async function getArticle(slug: string, dir: string = DEFAULT_DIR): Promi
   const file = path.join(dir, `${slug}.md`);
   return fs.existsSync(file) ? readArticle(file) : null;
 }
+
+/** The article's share (Open Graph) image: its cover, or the site share image for WhatsApp previews. */
+export function shareImage(cover: string | undefined): string | { url: string; width: number; height: number } {
+  return cover ?? { url: "/opengraph-image", width: 1200, height: 630 };
+}

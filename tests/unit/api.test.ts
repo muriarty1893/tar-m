@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { POST as waitlistPOST } from "@/app/api/waitlist/route";
 import { POST as partnerPOST } from "@/app/api/partner/route";
+import { POST as questionPOST } from "@/app/api/question/route";
 
 let ipCounter = 0;
 const freshIp = () => `10.0.0.${++ipCounter}`;
@@ -146,5 +147,23 @@ describe("POST /api/partner", () => {
     const ip = freshIp();
     for (let i = 0; i < 20; i++) await waitlistPOST(req(validWaitlist(), ip));
     expect((await partnerPOST(req(validPartner, ip))).status).toBe(200);
+  });
+});
+
+describe("POST /api/question", () => {
+  const validQuestion = { email: "hasan@example.com", question: "Uygulama hangi ürünleri tanıyacak?", consent: true, website: "" };
+
+  it("forwards to the question sheet", async () => {
+    const res = await questionPOST(req(validQuestion));
+    expect(res.status).toBe(200);
+    expect(sentBody().sheet).toBe("question");
+    expect(sentBody().question).toBe(validQuestion.question);
+  });
+
+  it("returns 400 with a field error for a too-short question", async () => {
+    const res = await questionPOST(req({ ...validQuestion, question: "Neden?" }));
+    expect(res.status).toBe(400);
+    expect((await res.json()).fields.question).toBe("Sorunuz en az 10 karakter olmalı.");
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

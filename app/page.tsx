@@ -10,6 +10,7 @@ import { WeatherWidget } from "@/components/WeatherWidget";
 import { NewsCard } from "@/components/NewsCard";
 import { PartnerCta } from "@/components/PartnerCta";
 import { WaitlistForm } from "@/components/WaitlistForm";
+import { QuestionSection } from "@/components/QuestionSection";
 import { BlurFade } from "@/components/magicui/blur-fade";
 
 export default async function Home() {
@@ -72,6 +73,8 @@ export default async function Home() {
       <BlurFade>
         <PartnerCta />
       </BlurFade>
+
+      <QuestionSection />
 
       <section className="relative overflow-hidden px-4 py-20 sm:py-24">
         <div aria-hidden="true" className="dot-texture pointer-events-none absolute inset-0 opacity-70" />

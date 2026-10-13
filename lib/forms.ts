@@ -47,8 +47,21 @@ export const partnerSchema = z.object({
   website: honeypot,
 });
 
+export const questionSchema = z.object({
+  name: optionalText("Ad", 100),
+  email,
+  question: z
+    .string({ error: "Sorunuz gerekli." })
+    .trim()
+    .min(10, { error: "Sorunuz en az 10 karakter olmalı." })
+    .max(1000, { error: "Sorunuz en fazla 1000 karakter olabilir." }),
+  consent: z.literal(true, { error: "Devam etmek için KVKK onayı gerekli." }),
+  website: honeypot,
+});
+
 export type WaitlistInput = z.input<typeof waitlistSchema>;
 export type PartnerInput = z.input<typeof partnerSchema>;
+export type QuestionInput = z.input<typeof questionSchema>;
 
 /** Google Sheets runs cells starting with = + - @ as formulas; a leading ' stores them as text. */
 export function neutraliseFormula(value: string): string {

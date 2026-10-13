@@ -27,6 +27,17 @@ describe("demoScenarios", () => {
     }
   });
 
+  it("offers 2-3 follow-up questions with answers for the in-app chat", () => {
+    for (const s of demoScenarios) {
+      expect(s.questions.length, s.id).toBeGreaterThanOrEqual(2);
+      expect(s.questions.length, s.id).toBeLessThanOrEqual(3);
+      for (const { q, a } of s.questions) {
+        expect(q.trim().endsWith("?"), q).toBe(true);
+        expect(a.trim().length, q).toBeGreaterThan(20);
+      }
+    }
+  });
+
   it("points every image at a file that exists under public/", () => {
     for (const s of demoScenarios) {
       expect(s.imageSrc.startsWith("/")).toBe(true);

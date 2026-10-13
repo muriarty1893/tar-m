@@ -1,7 +1,7 @@
 /**
  * Bereket AI — form receiver.
  * Appends each website submission as a row to the tab named by `sheet`
- * ("waitlist" or "partner"). See docs/apps-script.md for setup.
+ * ("waitlist", "partner" or "question"). See docs/apps-script.md for setup.
  *
  * Set the script property SECRET (Project Settings → Script properties)
  * to the same value as APPS_SCRIPT_SECRET in Vercel.
@@ -10,6 +10,7 @@
 var COLUMNS = {
   waitlist: ["submittedAt", "name", "email", "city", "crop", "consent"],
   partner: ["submittedAt", "name", "organization", "email", "phone", "type", "message"],
+  question: ["submittedAt", "name", "email", "question", "consent"],
 };
 
 function doPost(e) {

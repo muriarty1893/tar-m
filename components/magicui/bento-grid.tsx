@@ -1,9 +1,11 @@
-// Adapted from Magic UI "BentoGrid" (MIT, magicui.design, listed on 21st.dev).
+// Adapted from Magic UI "BentoGrid" (MIT, magicui.design, listed on 21st.dev), with
+// Aceternity UI's "Glowing Effect" border on each card.
 // Changes: server component (no hover-only CTA — UI UX Pro Max forbids
 // hover-only affordances), Phosphor icon slot, Organik Doğa surfaces, and a
 // responsive 1 → 2 → 3 column grid instead of fixed 3 columns.
 import type { ComponentPropsWithoutRef, ReactNode } from "react"
 import { cn } from "cn"
+import { GlowingEffect } from "@/components/ui/glowing-effect"
 
 export function BentoGrid({ children, className, ...props }: ComponentPropsWithoutRef<"ul">) {
   return (
@@ -24,24 +26,23 @@ interface BentoCardProps {
 
 export function BentoCard({ name, description, icon, background, className, headingLevel = "h3" }: BentoCardProps) {
   const Heading = headingLevel
+  // Outer frame carries the Aceternity-style glowing border; the inner panel holds the content.
   return (
-    <li
-      className={cn(
-        "group relative flex min-h-60 flex-col justify-end overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-soft transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-lift motion-reduce:hover:translate-y-0",
-        className,
-      )}
-    >
-      {background && (
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          {background}
-        </div>
-      )}
-      <div className="relative">
-        <span className="flex size-12 items-center justify-center rounded-2xl bg-secondary text-primary [&_svg]:size-7">
+    <li className={cn("relative min-h-60 rounded-[1.75rem] border border-border p-2", className)}>
+      <GlowingEffect />
+      <div className="relative flex h-full flex-col justify-end gap-5 overflow-hidden rounded-[1.25rem] border border-border/70 bg-card p-6 shadow-soft">
+        {background && (
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+            {background}
+          </div>
+        )}
+        <span className="relative flex size-12 w-fit items-center justify-center rounded-xl border border-border bg-background p-2.5 text-primary [&_svg]:size-7">
           {icon}
         </span>
-        <Heading className="mt-4 text-xl font-bold">{name}</Heading>
-        <p className="mt-1.5 text-muted-foreground">{description}</p>
+        <div className="relative">
+          <Heading className="text-xl font-bold">{name}</Heading>
+          <p className="mt-2 text-muted-foreground">{description}</p>
+        </div>
       </div>
     </li>
   )

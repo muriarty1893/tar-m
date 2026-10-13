@@ -13,6 +13,7 @@ test("the 3D phone loads near the demo and runs the app on its screen", async ({
   await expect(demo.getByText("Hızlı İşlemler")).toBeVisible();
 
   await demo.getByRole("button", { name: /Hastalık Tara/ }).click();
+  await demo.getByRole("button", { name: "Fotoğraf çek", exact: true }).click();
   await expect(demo.getByText("Analiz ediliyor…")).toBeVisible();
   await expect(demo.getByTestId("demo-cevap")).toBeVisible({ timeout: 4000 });
 
@@ -99,6 +100,8 @@ test("the picked field becomes the scene behind the phone, live in its camera", 
 
   await demo.getByRole("button", { name: /Ayçiçeği tarlası/ }).click();
   await expect(stage).toHaveAttribute("data-scene", "/demo/aycicegi-tarlasi.webp");
+  await expect(demo.getByTestId("uygulama-ekrani").getByText("CANLI · Kamera")).toBeVisible();
+  await demo.getByRole("button", { name: "Fotoğraf çek", exact: true }).click();
   await expect(demo.getByTestId("uygulama-ekrani").getByText("CANLI · Tarama")).toBeVisible();
 
   await expect(demo.getByTestId("demo-cevap")).toBeVisible({ timeout: 4000 });

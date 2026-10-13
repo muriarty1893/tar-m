@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { waitlistSchema, partnerSchema, neutraliseFormula } from "@/lib/forms";
+import { waitlistSchema, partnerSchema, questionSchema, neutraliseFormula } from "@/lib/forms";
 
 const waitlist = (over: Record<string, unknown> = {}) => ({
   name: "Ayşe Yılmaz",
@@ -86,5 +86,42 @@ describe("neutraliseFormula", () => {
 
   it("leaves normal text alone", () => {
     expect(neutraliseFormula("Konya")).toBe("Konya");
+  });
+});
+
+const question = (over: Record<string, unknown> = {}) => ({
+  name: "Hasan Kaya",
+  email: "hasan@example.com",
+  question: "Uygulama hangi ürünleri tanıyacak?",
+  consent: true,
+  website: "",
+  ...over,
+});
+
+describe("questionSchema", () => {
+  it("accepts a question with an email and consent", () => {
+    expect(questionSchema.safeParse(question()).success).toBe(true);
+  });
+
+  it("allows the name to be left out", () => {
+    expect(questionSchema.safeParse(question({ name: undefined })).success).toBe(true);
+  });
+
+  it("needs an email so the team can answer", () => {
+    expect(questionSchema.safeParse(question({ email: "" })).success).toBe(false);
+  });
+
+  it("rejects a question shorter than 10 characters, with a Turkish message", () => {
+    const r = questionSchema.safeParse(question({ question: "Neden?" }));
+    expect(r.success).toBe(false);
+    expect(!r.success && r.error.issues[0].message).toBe("Sorunuz en az 10 karakter olmalı.");
+  });
+
+  it("caps the question at 1000 characters", () => {
+    expect(questionSchema.safeParse(question({ question: "a".repeat(1001) })).success).toBe(false);
+  });
+
+  it("requires KVKK consent", () => {
+    expect(questionSchema.safeParse(question({ consent: false })).success).toBe(false);
   });
 });

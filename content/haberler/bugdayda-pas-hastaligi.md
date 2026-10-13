@@ -2,6 +2,7 @@
 title: Buğdayda sarı pas hastalığına karşı erken uyarı işaretleri
 date: 2026-10-03
 summary: "(Örnek haber) Yapraklarda sarı çizgiler mi gördünüz? Sarı pas hastalığını erken fark etmek verim kaybını azaltabilir."
+cover: /demo/bugday-sari-pas.webp
 ---
 
 Sarı pas, serin ve nemli havalarda buğdayda hızla yayılabilen bir mantar hastalığıdır. Erken fark edildiğinde zararı sınırlamak mümkündür.

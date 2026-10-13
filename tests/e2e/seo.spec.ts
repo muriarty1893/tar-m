@@ -37,11 +37,12 @@ test("article page has its own title and og:type article", async ({ page }) => {
   await expect(page.locator('meta[property="og:type"]')).toHaveAttribute("content", "article");
 });
 
-test("article without a cover still has a share image and site name", async ({ page, request }) => {
+// (The no-cover fallback to the site share image is unit-tested via shareImage in lib/news.)
+test("article shares its cover image and the site name", async ({ page, request }) => {
   await page.goto(`/haberler/${SLUGS[1]}`);
   await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute("content", "Bereket AI");
   await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", `http://localhost:3100/haberler/${SLUGS[1]}`);
   const image = await page.locator('meta[property="og:image"]').first().getAttribute("content");
-  expect(image).toMatch(/^http:\/\/localhost:3100\//);
-  expect((await request.get(image!)).headers()["content-type"]).toBe("image/png");
+  expect(image).toBe("http://localhost:3100/demo/bugday-sari-pas.webp");
+  expect((await request.get(image!)).headers()["content-type"]).toBe("image/webp");
 });

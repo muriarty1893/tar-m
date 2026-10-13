@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import path from "node:path";
-import { getAllArticles, getArticle } from "@/lib/news";
+import { getAllArticles, getArticle, shareImage } from "@/lib/news";
 
 const fx = (name: string) => path.join(__dirname, "..", "fixtures", name);
 
@@ -57,5 +57,15 @@ describe("getArticle", () => {
 
   it("returns null for a path-traversal slug", async () => {
     expect(await getArticle("../news-bad-date/bozuk-tarih", fx("news-valid"))).toBeNull();
+  });
+});
+
+describe("shareImage", () => {
+  it("uses the article's cover when it has one", () => {
+    expect(shareImage("/demo/bugday-sari-pas.webp")).toBe("/demo/bugday-sari-pas.webp");
+  });
+
+  it("falls back to the site share image (1200×630) without a cover", () => {
+    expect(shareImage(undefined)).toEqual({ url: "/opengraph-image", width: 1200, height: 630 });
   });
 });

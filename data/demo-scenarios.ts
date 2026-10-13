@@ -15,6 +15,8 @@ export type DemoScenario = {
   suggestions: string[];
   /** Estimated harvest success, 0-100. */
   successRate: number;
+  /** Suggested follow-up questions for the in-app "Soru sor" chat, with scripted answers. */
+  questions: { q: string; a: string }[];
 };
 
 export const demoScenarios: DemoScenario[] = [
@@ -31,6 +33,11 @@ export const demoScenarios: DemoScenario[] = [
       "Gelecek sezon için pasa dayanıklı tohum çeşitlerini değerlendirin.",
     ],
     successRate: 72,
+    questions: [
+      { q: "İlaçlama yapmam gerekiyor mu?", a: "Erken evrede belirtiler sınırlıysa önce yayılmayı izlemek yeterli olabilir. Lekeler bayrak yaprağına çıkıyorsa ilaçlama kararını bir ziraat mühendisiyle birlikte verin." },
+      { q: "Hastalık komşu tarlalara bulaşır mı?", a: "Evet, sarı pas sporları rüzgârla uzaklara taşınır. Komşu çiftçileri haberdar etmek ve bölgenizdeki tahmin-uyarı duyurularını takip etmek yayılmayı yavaşlatır." },
+      { q: "Verim ne kadar düşer?", a: "Erken yakalanıp kontrol altına alınırsa kayıp sınırlı kalır. Hastalık başakta da ilerlerse kayıp ciddi boyutlara ulaşabilir; tahmini %72 başarı bu nedenle takibe bağlıdır." },
+    ],
   },
   {
     id: "kuru-misir",
@@ -44,6 +51,10 @@ export const demoScenarios: DemoScenario[] = [
       "Damla sulamaya geçiş, aynı su ile daha geniş alanı sulamanızı sağlar.",
     ],
     successRate: 54,
+    questions: [
+      { q: "Ne kadar sık sulamalıyım?", a: "Toprağın 20-30 cm derinliği kurumaya başladığında sulayın. Püskül ve koçan döneminde susuzluk verimi en çok düşüren dönemdir, bu dönemi kaçırmayın." },
+      { q: "Yaprakların kıvrılması geçer mi?", a: "Su stresi giderilirse yapraklar genellikle serin saatlerde açılır. Uçlardan kuruyan kısımlar ise geri dönmez; yeni yaprakların sağlıklı olup olmadığına bakın." },
+    ],
   },
   {
     id: "aycicegi",
@@ -57,6 +68,10 @@ export const demoScenarios: DemoScenario[] = [
       "Hasat zamanını tablaların arkası sarı-kahverengiye döndüğünde planlayın.",
     ],
     successRate: 91,
+    questions: [
+      { q: "Kuş zararını nasıl azaltırım?", a: "Tabla döneminde tarlayı sık gezmek, ses ya da görsel kovucuları dönüşümlü kullanmak ve hasadı geciktirmemek kuş zararını belirgin biçimde azaltır." },
+      { q: "Hasat zamanını nasıl anlarım?", a: "Tablaların arkası sarı-kahverengiye döndüğünde ve dış yapraklar kuruduğunda hasat yaklaşmıştır. Tohum nemi yaklaşık %9-10'a indiğinde hasat edin." },
+    ],
   },
   {
     id: "domates-mildiyo",
@@ -71,5 +86,10 @@ export const demoScenarios: DemoScenario[] = [
       "Serin ve nemli günlerde koruyucu uygulama için bir ziraat mühendisinden reçete alın.",
     ],
     successRate: 48,
+    questions: [
+      { q: "Sağlam meyveleri yiyebilir miyim?", a: "Lekesiz, sert ve sağlıklı görünen meyveler tüketilebilir. Lekeli ya da yumuşamış meyveleri ayırın; hastalık depoda da ilerleyebilir." },
+      { q: "Hastalık diğer bitkilere geçer mi?", a: "Evet. Mildiyö serin ve nemli havada hızla yayılır, patates gibi akraba bitkilere de geçebilir. Hastalıklı bitki artıklarını bahçeden uzaklaştırın." },
+      { q: "Gelecek yıl tekrar olmaması için ne yapmalıyım?", a: "Ekim nöbeti uygulayın, dayanıklı çeşit seçin, sıra aralarını geniş tutun ve yaprakları ıslatmayan damla sulama kullanın." },
+    ],
   },
 ];

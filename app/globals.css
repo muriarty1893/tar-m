@@ -292,3 +292,51 @@ html.cine [data-cine] {
     0 25px 50px -12px rgb(0 0 0 / 0.6),
     inset 0 1px 1px rgb(255 255 255 / 0.2);
 }
+
+/* Demo camera: the shutter flash when a photo is taken. */
+@keyframes shutter-flash {
+  0% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Spotlight card (components/ui/spotlight-card.tsx). */
+.spotlight-card__light {
+  background: radial-gradient(260px circle at var(--spot-x, 50%) var(--spot-y, 0%), color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%);
+}
+.spotlight-card__edge {
+  padding: 1.5px;
+  background: radial-gradient(220px circle at var(--spot-x, 50%) var(--spot-y, 0%), color-mix(in srgb, var(--primary) 70%, transparent), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-card__light,
+  .spotlight-card__edge {
+    transition: none;
+  }
+}
+
+/* Glowing effect (components/ui/glowing-effect.tsx): a conic arc on the border towards the pointer. */
+.glowing-effect::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--glow-border));
+  border-radius: inherit;
+  border: var(--glow-border) solid transparent;
+  background:
+    radial-gradient(circle, #16a34a 10%, transparent 20%),
+    radial-gradient(circle at 40% 40%, #ca8a04 5%, transparent 15%),
+    radial-gradient(circle at 60% 60%, #4ade80 10%, transparent 20%),
+    repeating-conic-gradient(from 236.84deg at 50% 50%, #16a34a 0%, #ca8a04 5%, #4ade80 10%, #15803d 15%, #16a34a 20%);
+  background-attachment: fixed;
+  opacity: var(--active);
+  transition: opacity 300ms;
+  mask-clip: padding-box, border-box;
+  mask-composite: intersect;
+  mask-image: linear-gradient(#0000, #0000), conic-gradient(from calc((var(--start) - var(--spread)) * 1deg), #0000 0deg, #fff, #0000 calc(var(--spread) * 2deg));
+}
