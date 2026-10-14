@@ -3,6 +3,7 @@ import { EnvelopeIcon } from "@phosphor-icons/react/dist/ssr";
 import { siteConfig } from "@/config/site";
 import { Logo } from "./Logo";
 import { CtaLink } from "./CtaLink";
+import { WheatFooterBand } from "./WheatField";
 
 const links = [
   { label: "Hakkımızda", href: "/hakkimizda" },
@@ -15,10 +16,9 @@ const links = [
 
 export function Footer() {
   return (
-    <footer className="relative mt-auto overflow-hidden border-t border-border bg-surface">
+    <footer className="footer-field relative mt-auto overflow-hidden border-t border-border">
       <div aria-hidden="true" className="dot-texture pointer-events-none absolute inset-0 opacity-60" />
-      <div aria-hidden="true" className="blob pointer-events-none absolute -bottom-24 -right-20 size-72 bg-blob opacity-60" />
-      <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div className="relative z-10 mx-auto grid max-w-6xl gap-10 px-4 pb-4 pt-14 md:grid-cols-[1.4fr_1fr_1fr]">
         <div className="space-y-4">
           <Logo className="text-xl" />
           <p className="max-w-sm text-muted-foreground">{siteConfig.tagline}</p>
@@ -47,9 +47,9 @@ export function Footer() {
           </a>
         </div>
       </div>
-      <p className="relative border-t border-border px-4 py-5 text-center text-sm text-muted-foreground">
-        © 2026 {siteConfig.name}. Tüm hakları saklıdır.
-      </p>
+      <WheatFooterBand>
+        <p>© 2026 {siteConfig.name}. Tüm hakları saklıdır.</p>
+      </WheatFooterBand>
     </footer>
   );
 }

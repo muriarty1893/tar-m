@@ -3,7 +3,8 @@
 // Adapted from a 21st.dev "cinematic landing hero". Changes: plays once on load
 // instead of a 7000px pinned scroll and then rests; uses our real phone render
 // instead of a CSS mockup; our copy, colours and CTAs; one <h1>; Phosphor
-// icons instead of emoji; content stays visible without JS or with reduced motion.
+// icons instead of emoji; content stays visible without JS or with reduced motion; no
+// pointer effects (the phone doesn't tilt and no light follows the mouse).
 
 import { useEffect, useRef, type ReactNode } from "react";
 import Image from "next/image";
@@ -51,8 +52,6 @@ export function CinematicHero({
   className,
 }: CinematicHeroProps) {
   const root = useRef<HTMLElement>(null);
-  const card = useRef<HTMLDivElement>(null);
-  const tilt = useRef<HTMLDivElement>(null);
 
   // One-time intro, then rest. Runs only if the <head> script armed it (motion allowed, not timed out).
   useEffect(() => {
@@ -120,31 +119,6 @@ export function CinematicHero({
     };
   }, []);
 
-  // Mouse tilt on the phone and a moving sheen on the card (fine pointers only, motion allowed).
-  useEffect(() => {
-    if (!window.matchMedia("(pointer: fine) and (prefers-reduced-motion: no-preference)").matches) return;
-    let frame = 0;
-    const onMove = (e: MouseEvent) => {
-      if (window.scrollY > window.innerHeight) return;
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        if (!card.current || !tilt.current) return;
-        const r = card.current.getBoundingClientRect();
-        card.current.style.setProperty("--mouse-x", `${e.clientX - r.left}px`);
-        card.current.style.setProperty("--mouse-y", `${e.clientY - r.top}px`);
-        const x = (e.clientX / window.innerWidth - 0.5) * 2;
-        const y = (e.clientY / window.innerHeight - 0.5) * 2;
-        const el = tilt.current;
-        loadGsap().then((gsap) => gsap.to(el, { rotationY: x * 10, rotationX: -y * 10, duration: 1.2, ease: "power3.out" }));
-      });
-    };
-    window.addEventListener("mousemove", onMove);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      cancelAnimationFrame(frame);
-    };
-  }, []);
-
   return (
     <section
       ref={root}
@@ -173,12 +147,9 @@ export function CinematicHero({
       {/* Foreground: the forest-green card with the phone. */}
       <div className="pointer-events-none absolute inset-0 z-20 flex items-end justify-center pb-[3svh]" style={{ perspective: "1500px" }}>
         <div
-          ref={card}
           data-cine="card"
           className="cine-card pointer-events-auto relative h-[66%] w-[94vw] max-w-[88rem] overflow-hidden rounded-[2rem] md:w-[90vw] md:rounded-[2.5rem] lg:h-[66%]"
         >
-          <div aria-hidden="true" className="cine-sheen pointer-events-none absolute inset-0" />
-
           <div className="relative mx-auto flex h-full max-w-7xl flex-col items-center justify-evenly gap-4 px-5 py-6 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,0.8fr)] lg:gap-10 lg:px-12 lg:py-0">
             {/* Left (desktop) / bottom (mobile): the pitch and actions. */}
             <div data-cine="left" className="order-3 w-full text-center lg:order-1 lg:text-left">
@@ -190,7 +161,7 @@ export function CinematicHero({
 
             {/* Centre: the phone render with floating glass badges. */}
             <div data-cine="phone" className="relative order-2 flex min-h-0 w-full flex-1 items-center justify-center lg:h-full lg:w-auto lg:flex-none" style={{ perspective: "1000px" }}>
-              <div ref={tilt} className="relative h-full max-h-[34rem] py-1 [transform-style:preserve-3d] lg:h-[88%]">
+              <div className="relative h-full max-h-[34rem] py-1 [transform-style:preserve-3d] lg:h-[88%]">
                 <Image
                   src={phone.src}
                   alt={phone.alt}

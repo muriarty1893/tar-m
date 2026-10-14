@@ -2,27 +2,16 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { PauseIcon, PlayIcon } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
 import { SCREEN, shouldLoad3D } from "@/lib/phone-stage";
+import { useMediaQuery, usePrefersReducedMotion } from "@/lib/use-media-query";
 
 // three.js, R3F and the 1 MB model load only when the demo nears the viewport.
 const PhoneScene = dynamic(() => import("./PhoneScene"), { ssr: false, loading: () => null });
 
-export function useMediaQuery(query: string) {
-  return useSyncExternalStore(
-    (cb) => {
-      const mq = window.matchMedia(query);
-      mq.addEventListener("change", cb);
-      return () => mq.removeEventListener("change", cb);
-    },
-    () => window.matchMedia(query).matches,
-    () => false,
-  );
-}
-
-export const usePrefersReducedMotion = () => useMediaQuery("(prefers-reduced-motion: reduce)");
+export { useMediaQuery, usePrefersReducedMotion } from "@/lib/use-media-query";
 
 /** The WebGL renderer's name (to spot software rendering), or null without WebGL. */
 function webglRenderer(): string | null {

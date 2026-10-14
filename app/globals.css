@@ -279,10 +279,6 @@ html.cine [data-cine] {
     inset 0 -2px 4px rgb(0 0 0 / 0.6);
   border: 1px solid rgb(255 255 255 / 0.05);
 }
-.cine-sheen {
-  background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 40%), rgb(255 255 255 / 0.07) 0%, transparent 40%);
-  mix-blend-mode: screen;
-}
 .cine-badge {
   background: linear-gradient(135deg, rgb(255 255 255 / 0.12) 0%, rgb(255 255 255 / 0.03) 100%);
   backdrop-filter: blur(20px);
@@ -633,5 +629,93 @@ html.cine [data-cine] {
   100% {
     opacity: 0;
     transform: scale(1.45);
+  }
+}
+
+/*
+ * Footer wheat field (components/WheatField.tsx). Rows fade with distance (aerial perspective):
+ * pale and small at the back, rich gold in front. Golden-hour sky behind, dark soil below.
+ */
+.footer-field {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface) 45%, color-mix(in oklab, #f5c66b 30%, var(--surface)) 100%);
+}
+.wheat-row--back {
+  --wheat-head: #ecd593;
+  --wheat-stem: #cdb878;
+  --sway: 2deg;
+  bottom: 22px;
+  opacity: 0.85;
+}
+.wheat-row--mid {
+  --wheat-head: #dfb24e;
+  --wheat-stem: #b9973f;
+  --sway: 3deg;
+  bottom: 10px;
+}
+.wheat-row--front {
+  --wheat-head: #c98f22;
+  --wheat-stem: #94701f;
+  --sway: 4.5deg;
+  bottom: -4px;
+}
+.wheat-soil {
+  background: linear-gradient(180deg, #1d5a31 0%, #14532d 40%, #0f3f22 100%);
+  color: rgb(255 255 255 / 0.85);
+}
+@media (prefers-color-scheme: dark) {
+  .footer-field {
+    background: linear-gradient(180deg, var(--surface) 0%, var(--surface) 45%, color-mix(in oklab, #b7791f 22%, var(--surface)) 100%);
+  }
+  .wheat-row--back {
+    --wheat-head: #6f6131;
+    --wheat-stem: #5b5029;
+  }
+  .wheat-row--mid {
+    --wheat-head: #937532;
+    --wheat-stem: #74602a;
+  }
+  .wheat-row--front {
+    --wheat-head: #b58a2e;
+    --wheat-stem: #866824;
+  }
+  .wheat-soil {
+    background: linear-gradient(180deg, #0f2c19 0%, #0a2413 100%);
+  }
+}
+.wheat-clump {
+  transform-origin: 50% 100%;
+  translate: -50% 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .wheat-clump {
+    animation: wheat-sway var(--dur, 5s) ease-in-out var(--delay, 0s) infinite;
+  }
+  .wheat-field[data-run="true"] .wheat-clump {
+    will-change: transform;
+  }
+  .wheat-field[data-run="false"] .wheat-clump {
+    animation-play-state: paused;
+  }
+}
+@keyframes wheat-sway {
+  0%,
+  100% {
+    transform: rotate(calc(var(--sway, 3deg) * -0.45));
+  }
+  50% {
+    transform: rotate(var(--sway, 3deg));
+  }
+}
+/* Low haze where the stalks meet the soil, so gaps between clumps read as field, not sky. */
+.wheat-field::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 38%;
+  background: linear-gradient(180deg, transparent, color-mix(in oklab, #c9952e 38%, transparent));
+}
+@media (prefers-color-scheme: dark) {
+  .wheat-field::after {
+    background: linear-gradient(180deg, transparent, color-mix(in oklab, #7a5c1e 45%, transparent));
   }
 }

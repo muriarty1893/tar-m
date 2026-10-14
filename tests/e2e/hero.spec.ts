@@ -32,3 +32,18 @@ test.describe("without JavaScript", () => {
     await expect(page.getByRole("heading", { level: 2, name: "Ziraat uzmanınız cebinizde." })).toBeVisible();
   });
 });
+
+test("the hero stays still under the mouse: no phone tilt, no light following the pointer", async ({ page, isMobile }) => {
+  test.skip(isMobile, "mouse interaction");
+  await page.goto("/");
+  const card = page.getByRole("heading", { level: 2, name: "Ziraat uzmanınız cebinizde." });
+  await expect(card).toBeVisible({ timeout: 8000 });
+  await page.waitForTimeout(3500); // let the intro finish
+  const phone = page.locator("main section").first().getByRole("img", { name: /mobil uygulamasının ana ekranı/ }).locator("..");
+  const before = await phone.evaluate((el) => getComputedStyle(el).transform);
+  await page.mouse.move(80, 120);
+  await page.mouse.move(1200, 700, { steps: 8 });
+  await page.waitForTimeout(1500);
+  expect(await phone.evaluate((el) => getComputedStyle(el).transform)).toBe(before);
+  await expect(page.locator(".cine-sheen")).toHaveCount(0);
+});
