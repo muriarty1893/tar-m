@@ -4,16 +4,20 @@ import { demoScenarios } from "../../data/demo-scenarios";
 test.describe("PillNav (desktop navigation)", () => {
   test.skip(({ isMobile }) => isMobile, "the pill nav is the desktop bar; phones use the menu");
 
-  test("marks the current page and fills a pill on hover", async ({ page }) => {
+  test("marks the current page and rolls the label on hover, without a colour fill", async ({ page }) => {
     await page.goto("/haberler");
     const nav = page.getByRole("navigation", { name: "Ana menü" });
     await expect(nav.getByRole("link", { name: "Haberler", exact: true })).toHaveAttribute("aria-current", "page");
+    await expect(nav.locator(".pill-nav__circle")).toHaveCount(0);
     const pill = nav.getByRole("link", { name: "Demo", exact: true });
-    const circle = pill.locator(".pill-nav__circle");
-    const rest = await circle.evaluate((el) => getComputedStyle(el).transform);
+    const label = pill.locator(".pill-nav__label").first();
+    const look = () => Promise.all([label.evaluate((el) => getComputedStyle(el).transform), pill.evaluate((el) => getComputedStyle(el).backgroundColor)]);
+    const [restLabel, restBg] = await look();
     await pill.hover();
-    await page.waitForTimeout(450);
-    expect(await circle.evaluate((el) => getComputedStyle(el).transform)).not.toBe(rest);
+    await page.waitForTimeout(350);
+    const [hoverLabel, hoverBg] = await look();
+    expect(hoverLabel).not.toBe(restLabel);
+    expect(hoverBg).toBe(restBg);
   });
 });
 

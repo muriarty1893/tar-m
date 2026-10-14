@@ -11,6 +11,7 @@ const links = [
   { label: "Hava Durumu", href: "/hava" },
   { label: "Sıkça Sorulan Sorular", href: "/sss" },
   { label: "Gizlilik ve KVKK", href: "/gizlilik" },
+  { label: "Görsel kaynakları", href: "/kaynaklar" },
 ];
 
 export function Footer() {

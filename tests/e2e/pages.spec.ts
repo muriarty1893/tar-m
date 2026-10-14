@@ -53,7 +53,7 @@ test("landing shows the 3 latest news items", async ({ page }) => {
   await expect(page.locator("#haberler article")).toHaveCount(3);
 });
 
-const ROUTES = ["/", "/haberler", "/hava", "/is-birligi", "/sss", "/hakkimizda", "/gizlilik"];
+const ROUTES = ["/", "/haberler", "/hava", "/is-birligi", "/sss", "/hakkimizda", "/gizlilik", "/kaynaklar"];
 
 test("every route returns 200 with a unique title", async ({ page }) => {
   const titles = new Set<string>();

@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CameraIcon, CheckIcon, InfoIcon } from "@phosphor-icons/react/dist/ssr";
 import { demoScenarios, type DemoScenario } from "@/data/demo-scenarios";
-import { photoCredits } from "@/data/photo-credits";
 import { AppScreen, type AppPhase, type AppTab, type GuideStep } from "./phone-app/AppScreen";
 import { PhoneStage, usePrefersReducedMotion } from "./phone-app/PhoneStage";
 import { ANALYSIS_MS } from "@/lib/phone-stage";
@@ -95,36 +94,16 @@ export function DemoShowcase() {
 
   return (
     <div className="space-y-10">
-      <div ref={stage}>
-        <PhoneStage scene={selected ? { src: selected.imageSrc, alt: selected.imageAlt } : null}>
-          <AppScreen
-            phase={phase}
-            scenario={selected}
-            tab={tab}
-            onScan={scanNext}
-            onReset={() => reset()}
-            onTab={(t) => reset(t)}
-            onOpen={open}
-            onShutter={press}
-            asking={asking}
-            onAsk={(v) => {
-              if (v) mark("ask");
-              setAsking(v);
-            }}
-            hint={hint}
-            onQuestion={() => mark("question")}
-          />
-        </PhoneStage>
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-        <div>
+      {/* Desktop: the field picker and the steps beside the phone. Phones: picker, phone, steps. */}
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-10">
+        <div className="lg:col-start-1 lg:row-start-1">
           <p className="flex items-center gap-2 text-lg font-semibold">
             <span className="flex size-7 items-center justify-center rounded-full bg-gold text-sm font-bold text-gold-foreground">1</span>
             Bir tarla fotoğrafı seçin
           </p>
           <FocusCards
-            className="mt-4"
+            className="mt-4 lg:grid-cols-2"
+            cardClassName="lg:aspect-[5/4]"
             cards={demoScenarios.map((s) => ({ id: s.id, title: s.title, src: s.imageSrc, alt: s.imageAlt }))}
             selectedId={selected?.id}
             onSelect={(id) => pick(demoScenarios.find((s) => s.id === id)!)}
@@ -132,7 +111,29 @@ export function DemoShowcase() {
           />
         </div>
 
-        <div>
+        <div ref={stage} className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <PhoneStage scene={selected ? { src: selected.imageSrc, alt: selected.imageAlt } : null}>
+            <AppScreen
+              phase={phase}
+              scenario={selected}
+              tab={tab}
+              onScan={scanNext}
+              onReset={() => reset()}
+              onTab={(t) => reset(t)}
+              onOpen={open}
+              onShutter={press}
+              asking={asking}
+              onAsk={(v) => {
+                if (v) mark("ask");
+                setAsking(v);
+              }}
+              hint={hint}
+              onQuestion={() => mark("question")}
+            />
+          </PhoneStage>
+        </div>
+
+        <div className="lg:col-start-1 lg:row-start-2">
           <p className="flex items-center gap-2 text-lg font-semibold">
             <span className="flex size-7 items-center justify-center rounded-full bg-gold text-sm font-bold text-gold-foreground">2</span>
             Fotoğrafı çekin, yanıtı izleyin
@@ -182,50 +183,6 @@ export function DemoShowcase() {
         </p>
         <CtaLink withArrow className="shrink-0" />
       </div>
-      <Credits />
-    </div>
-  );
-}
-
-const linkCls = "underline underline-offset-2 hover:text-foreground";
-
-/** Attribution required by the CC BY licences of the 3D model and photos. */
-function Credits() {
-  return (
-    <div className="space-y-1 text-sm text-muted-foreground">
-      <p>
-        3B telefon modeli:{" "}
-        <a href="https://sketchfab.com/3d-models/iphone-17-pro-4541aa8a28324b33a2baaf81d263aaec" className={linkCls} rel="noopener">
-          “iPhone 17 Pro”, Ranguel
-        </a>{" "}
-        —{" "}
-        <a href="https://creativecommons.org/licenses/by/4.0/" className={linkCls} rel="noopener license">
-          CC BY 4.0
-        </a>
-        , web için sıkıştırıldı.
-      </p>
-      <p>
-        Fotoğraflar (Wikimedia Commons, kırpıldı):{" "}
-        {photoCredits
-          .filter((c, i, all) => all.findIndex((o) => o.sourceUrl === c.sourceUrl) === i)
-          .map((c, i) => (
-            <span key={c.src}>
-              {i > 0 && "; "}
-              <a href={c.sourceUrl} className={linkCls} rel="noopener">
-                {c.label}
-              </a>
-              {", "}
-              {c.author} —{" "}
-              {c.licenseUrl ? (
-                <a href={c.licenseUrl} className={linkCls} rel="noopener license">
-                  {c.license}
-                </a>
-              ) : (
-                c.license
-              )}
-            </span>
-          ))}
-      </p>
     </div>
   );
 }

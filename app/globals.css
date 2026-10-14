@@ -858,14 +858,15 @@ html.cine [data-cine] {
   -webkit-user-drag: none;
 }
 
-/* PillNav (components/ui/pill-nav.tsx), from React Bits: a green bar of light pills; hovering or
-   focusing one fills it with green from below while the label slides up and a white copy rises. */
+/* PillNav (components/ui/pill-nav.tsx), from React Bits: a green bar of light pills. On hover or
+   keyboard focus each label rolls: the letters flip up one after another and a green copy rolls
+   in from below. No colour fill. */
 .pill-nav {
   --pill-base: var(--primary);
   --pill-bg: var(--background);
   --pill-text: var(--foreground);
-  --pill-hover-text: var(--primary-foreground);
-  --pill-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --pill-roll-text: var(--primary);
+  --pill-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 .pill-nav__list {
   display: flex;
@@ -893,6 +894,7 @@ html.cine [data-cine] {
   }
 }
 .pill-nav__list > li {
+  position: relative;
   display: flex;
 }
 .pill-nav__pill {
@@ -902,13 +904,11 @@ html.cine [data-cine] {
   justify-content: center;
   height: 100%;
   padding: 0 18px;
-  overflow: hidden;
   border-radius: 9999px;
   background: var(--pill-bg);
   color: var(--pill-text);
   font-size: 0.95rem;
   font-weight: 600;
-  line-height: 1;
   white-space: nowrap;
   text-decoration: none;
   outline: none;
@@ -916,52 +916,27 @@ html.cine [data-cine] {
 .pill-nav__pill:focus-visible {
   box-shadow: 0 0 0 3px var(--pill-bg), 0 0 0 6px var(--ring);
 }
-.pill-nav__circle {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  z-index: 1;
-  display: block;
-  border-radius: 50%;
-  background: var(--pill-base);
-  pointer-events: none;
-  transform: translateX(-50%) scale(0);
-  transition: transform 0.2s var(--pill-ease);
+.pill-nav__roll {
+  display: inline-flex;
 }
-.pill-nav__stack {
-  position: relative;
-  z-index: 2;
-  display: inline-block;
-  line-height: 1;
+/* One letter: a window one line tall over a column of two copies. */
+.pill-nav__char {
+  display: inline-flex;
+  flex-direction: column;
+  height: 1.2em;
+  line-height: 1.2em;
+  overflow: hidden;
 }
 .pill-nav__label {
-  position: relative;
-  display: inline-block;
-  transition: transform 0.2s var(--pill-ease);
+  display: block;
+  transition: transform 0.22s var(--pill-ease);
+  transition-delay: calc(var(--i, 0) * 14ms);
 }
-.pill-nav__label-hover {
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: var(--pill-hover-text);
-  opacity: 0;
-  transform: translateY(calc(var(--pill-h, 40px) + 12px));
-  transition:
-    transform 0.2s var(--pill-ease),
-    opacity 0.2s var(--pill-ease);
-}
-.pill-nav__pill:is(:hover, :focus-visible) .pill-nav__circle {
-  transform: translateX(-50%) scale(1.2);
-  transition-duration: 0.3s;
+.pill-nav__label--next {
+  color: var(--pill-roll-text);
 }
 .pill-nav__pill:is(:hover, :focus-visible) .pill-nav__label {
-  transform: translateY(calc(-1 * (var(--pill-h, 40px) + 8px)));
-  transition-duration: 0.3s;
-}
-.pill-nav__pill:is(:hover, :focus-visible) .pill-nav__label-hover {
-  opacity: 1;
-  transform: translateY(0);
-  transition-duration: 0.3s;
+  transform: translateY(-100%);
 }
 /* Current page: a dot under the pill. */
 .pill-nav__list > li:has([aria-current="page"])::after {
@@ -976,13 +951,9 @@ html.cine [data-cine] {
   background: var(--pill-base);
   transform: translateX(-50%);
 }
-.pill-nav__list > li:has([aria-current="page"]) {
-  position: relative;
-}
 @media (prefers-reduced-motion: reduce) {
-  .pill-nav__circle,
-  .pill-nav__label,
-  .pill-nav__label-hover {
+  .pill-nav__label {
     transition: none;
   }
 }
+

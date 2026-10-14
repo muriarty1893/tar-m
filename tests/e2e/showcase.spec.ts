@@ -93,12 +93,36 @@ test("without WebGL the app screen shows in a flat phone frame", async ({ page }
   await expect(demo.locator("canvas")).toHaveCount(0);
 });
 
-test("credits the 3D model under CC BY 4.0", async ({ page }) => {
+test("the field picker sits beside the phone on desktop and above it on phones", async ({ page, isMobile }) => {
   await page.goto("/#demo");
-  const credit = page.locator("#demo").getByRole("link", { name: /iPhone 17 Pro/ });
-  await expect(credit).toHaveAttribute("href", /sketchfab\.com/);
-  const modelCredit = page.locator("#demo p", { hasText: "3B telefon modeli" });
-  await expect(modelCredit.getByRole("link", { name: "CC BY 4.0" })).toHaveAttribute("href", /creativecommons\.org\/licenses\/by\/4\.0/);
+  const demo = page.locator("#demo");
+  // Measure both in one go: opening /#demo smooth-scrolls, so separate reads would straddle the scroll.
+  await expect(demo.getByRole("button", { name: /Buğday tarlası/ })).toBeVisible();
+  const [picker, stage] = await demo.evaluate((root) =>
+    [root.querySelector("button[aria-pressed]")!, root.querySelector(".stage-bg")!].map((el) => {
+      const r = el.getBoundingClientRect();
+      return { x: r.x, y: r.y, width: r.width, height: r.height };
+    }),
+  );
+  if (isMobile) {
+    expect(picker.y + picker.height).toBeLessThan(stage.y);
+  } else {
+    // Side by side: the picker overlaps the stage vertically and sits to its left.
+    expect(picker.x + picker.width).toBeLessThanOrEqual(stage.x);
+    expect(picker.y).toBeLessThan(stage.y + stage.height);
+  }
+});
+
+test("no credit lines under the demo; they live on the image sources page, linked from the footer", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("#demo")).not.toContainText("3B telefon modeli");
+  await expect(page.locator("#demo")).not.toContainText("Wikimedia Commons");
+  await page.locator("footer").getByRole("link", { name: "Görsel kaynakları" }).click();
+  await expect(page).toHaveURL(/\/kaynaklar$/);
+  const model = page.getByRole("listitem").filter({ hasText: "iPhone 17 Pro" });
+  await expect(model.getByRole("link", { name: /iPhone 17 Pro/ })).toHaveAttribute("href", /sketchfab\.com/);
+  await expect(model.getByRole("link", { name: "CC BY 4.0" })).toHaveAttribute("href", /creativecommons\.org\/licenses\/by\/4\.0/);
+  for (const author of ["Rasbak", "CraneStation", "Maurice Flesier", "John Sutton"]) await expect(page.getByText(author, { exact: false }).first()).toBeVisible();
 });
 
 test("the phone's bottom bar switches screens and opens past scans", async ({ page }) => {

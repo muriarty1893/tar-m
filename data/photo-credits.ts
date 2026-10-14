@@ -1,4 +1,4 @@
-/** Photos from Wikimedia Commons used on the site. CC BY photos must stay credited (shown under the demo). */
+/** Photos from Wikimedia Commons used on the site. CC BY photos must stay credited (listed on /kaynaklar). */
 export type PhotoCredit = {
   src: string;
   /** Short Turkish label shown in the credit line. */
@@ -39,3 +39,13 @@ export const photoCredits: PhotoCredit[] = [
   { src: "/app/seedlings.webp", label: "Çimlenen tohumlar", author: "Aerospectra", license: "CC BY 4.0", licenseUrl: BY4, sourceUrl: "https://commons.wikimedia.org/wiki/File:Sprouting_seeds.jpg" },
   pageHeroPhoto,
 ];
+
+/** The 3D phone in the demo (CC BY 4.0, credit required; listed on /kaynaklar). */
+export const modelCredit = {
+  title: "iPhone 17 Pro",
+  author: "Ranguel",
+  sourceUrl: "https://sketchfab.com/3d-models/iphone-17-pro-4541aa8a28324b33a2baaf81d263aaec",
+  license: "CC BY 4.0",
+  licenseUrl: BY4,
+  note: "web için sıkıştırıldı",
+};

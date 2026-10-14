@@ -16,12 +16,15 @@ export function FocusCards({
   onSelect,
   icon,
   className,
+  cardClassName,
 }: {
   cards: FocusCard[];
   selectedId?: string | null;
   onSelect: (id: string) => void;
   icon?: ReactNode;
   className?: string;
+  /** Extra classes for each card (e.g. a different aspect ratio in a narrow column). */
+  cardClassName?: string;
 }) {
   return (
     <ul className={cn("grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4", className)}>
@@ -36,6 +39,7 @@ export function FocusCards({
               className={cn(
                 "relative block aspect-[4/5] w-full cursor-pointer overflow-hidden rounded-3xl bg-muted text-left shadow-soft outline-none ring-offset-2 ring-offset-background focus-visible:ring-4 focus-visible:ring-ring/40 sm:aspect-[3/4]",
                 selected && "ring-4 ring-primary",
+                cardClassName,
               )}
             >
               <Image

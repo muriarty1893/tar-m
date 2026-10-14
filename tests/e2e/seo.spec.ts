@@ -6,7 +6,7 @@ test("sitemap lists static routes and every article", async ({ request }) => {
   const res = await request.get("/sitemap.xml");
   expect(res.status()).toBe(200);
   const xml = await res.text();
-  for (const path of ["/haberler", "/hava", "/is-birligi", "/sss", "/hakkimizda", "/gizlilik"]) {
+  for (const path of ["/haberler", "/hava", "/is-birligi", "/sss", "/hakkimizda", "/gizlilik", "/kaynaklar"]) {
     expect(xml).toContain(`${path}</loc>`);
   }
   for (const slug of SLUGS) expect(xml).toContain(`/haberler/${slug}</loc>`);
