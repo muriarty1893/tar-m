@@ -631,13 +631,3 @@ html.cine [data-cine] {
     transform: scale(1.45);
   }
 }
-
-/* Footer sky behind the wheat scene (components/WheatScene.tsx): clear above the content, warming to the horizon. */
-.wheat-sky {
-  background: linear-gradient(180deg, var(--surface) 0%, #f8f4e2 42%, #fde6b0 72%, #f3cf86 100%);
-}
-@media (prefers-color-scheme: dark) {
-  .wheat-sky {
-    background: linear-gradient(180deg, var(--surface) 0%, #10291f 45%, #17393a 72%, #1d4744 100%);
-  }
-}

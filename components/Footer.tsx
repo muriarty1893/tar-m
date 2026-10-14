@@ -3,7 +3,6 @@ import { EnvelopeIcon } from "@phosphor-icons/react/dist/ssr";
 import { siteConfig } from "@/config/site";
 import { Logo } from "./Logo";
 import { CtaLink } from "./CtaLink";
-import { WheatScene } from "./WheatScene";
 
 const links = [
   { label: "Hakkımızda", href: "/hakkimizda" },
@@ -16,10 +15,10 @@ const links = [
 
 export function Footer() {
   return (
-    <footer className="wheat-sky relative isolate mt-auto overflow-hidden border-t border-border [touch-action:pan-y]">
-      {/* The whole footer is a wheat field scene; the content sits on the sky above it. */}
-      <WheatScene />
-      <div className="relative z-10 mx-auto grid max-w-6xl gap-10 px-4 pb-12 pt-14 md:grid-cols-[1.4fr_1fr_1fr]">
+    <footer className="relative mt-auto overflow-hidden border-t border-border bg-surface">
+      <div aria-hidden="true" className="dot-texture pointer-events-none absolute inset-0 opacity-60" />
+      <div aria-hidden="true" className="blob pointer-events-none absolute -bottom-24 -right-20 size-72 bg-blob opacity-60" />
+      <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
         <div className="space-y-4">
           <Logo className="text-xl" />
           <p className="max-w-sm text-muted-foreground">{siteConfig.tagline}</p>
@@ -48,13 +47,9 @@ export function Footer() {
           </a>
         </div>
       </div>
-      {/* Room for the field: the scene's horizon starts here. Move the pointer through it. */}
-      <div data-field-start aria-hidden="true" className="h-[19rem] sm:h-[24rem]" />
-      <div className="relative z-10 flex justify-center px-4 pb-6">
-        <p className="rounded-full bg-[#10301b]/75 px-4 py-2 text-center text-sm text-white/90 backdrop-blur-sm">
-          © 2026 {siteConfig.name}. Tüm hakları saklıdır.
-        </p>
-      </div>
+      <p className="relative border-t border-border px-4 py-5 text-center text-sm text-muted-foreground">
+        © 2026 {siteConfig.name}. Tüm hakları saklıdır.
+      </p>
     </footer>
   );
 }
