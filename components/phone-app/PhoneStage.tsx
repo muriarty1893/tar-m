@@ -4,7 +4,8 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { SCREEN, shouldLoad3D } from "@/lib/phone-stage";
-import { useMediaQuery, usePrefersReducedMotion } from "@/lib/use-media-query";
+import { usePrefersReducedMotion } from "@/lib/use-media-query";
+import { StageBackdrop, type Backdrop } from "./StageBackdrop";
 
 // three.js, R3F and the 1 MB model load only when the demo nears the viewport.
 const PhoneScene = dynamic(() => import("./PhoneScene"), { ssr: false, loading: () => null });
@@ -31,7 +32,16 @@ function webglRenderer(): string | null {
  */
 export type StageScene = { src: string; alt: string };
 
-export function PhoneStage({ children, scene = null }: { children: ReactNode; scene?: StageScene | null }) {
+export function PhoneStage({
+  children,
+  scene = null,
+  backdrop = "meadow",
+}: {
+  children: ReactNode;
+  scene?: StageScene | null;
+  /** The scene behind the phone, following the app's tab (StageBackdrop). */
+  backdrop?: Backdrop;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const overlay = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
@@ -39,7 +49,6 @@ export function PhoneStage({ children, scene = null }: { children: ReactNode; sc
   const [onScreen, setOnScreen] = useState(false);
   const [ready, setReady] = useState(false);
   const reduced = usePrefersReducedMotion();
-  const dark = useMediaQuery("(prefers-color-scheme: dark)");
   const markReady = useCallback(() => setReady(true), []);
   // Keep the last scene mounted so clearing it fades out instead of popping.
   const [lastScene, setLastScene] = useState<StageScene | null>(scene);
@@ -72,8 +81,11 @@ export function PhoneStage({ children, scene = null }: { children: ReactNode; sc
       <div
         ref={ref}
         data-scene={scene?.src}
+        data-backdrop={backdrop}
         className="stage-bg relative mx-auto h-[640px] w-full overflow-hidden rounded-[2.5rem] ring-1 ring-border sm:h-[780px] lg:h-[860px]"
       >
+        <StageBackdrop backdrop={backdrop} />
+
         {/* The chosen field fills the stage, as if the phone were standing in it and filming it live. */}
         {lastScene && (
           <div aria-hidden="true" className={`absolute inset-0 transition-opacity duration-700 ${scene ? "opacity-100" : "opacity-0"}`}>
@@ -102,7 +114,7 @@ export function PhoneStage({ children, scene = null }: { children: ReactNode; sc
 
         {load && (
           <div className="absolute inset-0">
-            <PhoneScene animate={!reduced} intro={!reduced} dark={dark} active={onScreen} overlay={overlay} onReady={markReady} scenery={!scene} />
+            <PhoneScene animate={!reduced} intro={!reduced} dark={false} active={onScreen} overlay={overlay} onReady={markReady} scenery={!scene && backdrop === "meadow"} />
           </div>
         )}
         {ready && (

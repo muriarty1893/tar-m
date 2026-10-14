@@ -4,6 +4,7 @@ import { siteConfig } from "@/config/site";
 import { siteUrl } from "@/lib/site-url";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { WelcomeGate } from "@/components/WelcomeGate";
 import "./globals.css";
 
 // latin-ext carries the Turkish letters (ç ğ ı İ ö ş ü).
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <Footer />
+        <WelcomeGate />
       </body>
     </html>
   );

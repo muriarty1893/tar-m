@@ -45,3 +45,16 @@ describe("demoScenarios", () => {
     }
   });
 });
+
+describe("demo farm calendar", async () => {
+  const cal = await import("@/data/farm-calendar");
+  it("lays October 2026 out Monday-first", () => {
+    expect(cal.daysInMonth()).toBe(31);
+    expect(cal.weekdayName(1)).toBe("Perşembe");
+    expect(cal.weekdayName(14)).toBe("Çarşamba");
+  });
+  it("has tasks on today and none on the 2nd", () => {
+    expect(cal.tasksOn(cal.CALENDAR_MONTH.today).map((t) => t.title)).toContain("Taban gübresi (DAP) at");
+    expect(cal.tasksOn(2)).toEqual([]);
+  });
+});

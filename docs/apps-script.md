@@ -1,6 +1,6 @@
 # Connecting the forms to Google Sheets
 
-The waitlist, partner and question forms post to the site's own API routes, which forward
+The waitlist, partner and question forms, and the first-visit "Bizi nereden duydunuz?" question, post to the site's own API routes, which forward
 each submission to a small Google Apps Script. The script writes it into a
 Google Sheet. This takes about 10 minutes, once.
 
@@ -8,9 +8,10 @@ Google Sheet. This takes about 10 minutes, once.
 
 1. Go to <https://sheets.google.com> and create a blank spreadsheet, e.g. "Bereket AI Kayıtlar".
 2. Rename the first tab to `waitlist` (exactly, lowercase).
-3. Add a second tab named `partner`, and a third named `question` (the home page's "Sorunuz mu var?" form).
+3. Add a second tab named `partner`, a third named `question` (the home page's "Sorunuz mu var?" form)
+   and a fourth named `source` (answers to the welcome question shown on a visitor's first visit).
 
-Leave both tabs empty. The script writes the header row on the first submission.
+Leave the tabs empty. The script writes the header row on the first submission.
 
 ## 2. Add the script
 
@@ -53,3 +54,10 @@ Run `npm run dev`, open <http://localhost:3000/#kayit>, submit the form, and che
 - Values starting with `=`, `+`, `-` or `@` are stored with a leading `'` so the sheet never runs them as formulas. A phone like `+90…` displays normally.
 - Duplicate e-mails are stored as separate rows; remove duplicates in Sheets when needed (**Data → Data cleanup → Remove duplicates**).
 - If the script or sheet is unreachable, visitors see an error with your contact e-mail, and what they typed stays in the form.
+
+## Adding the `source` tab to an existing sheet
+
+If the sheet was set up before the welcome question existed: add a tab named `source`, paste the
+updated [`apps-script/Code.gs`](apps-script/Code.gs) over the old code, and **Deploy → Manage
+deployments → Edit → Version: New version → Deploy** (the web app URL stays the same). Until then the
+answers are only kept in each visitor's browser; the welcome screen works either way.

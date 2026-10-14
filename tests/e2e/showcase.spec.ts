@@ -189,3 +189,44 @@ test("the picked field becomes the scene behind the phone, live in its camera", 
   await demo.getByRole("button", { name: "Yeni tarama" }).click();
   await expect(stage).not.toHaveAttribute("data-scene");
 });
+
+test("each app tab sets its own scene behind the phone: grass, sky, ploughed rows, harvest", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/#demo");
+  const demo = page.locator("#demo");
+  await expect(demo.locator(CANVAS)).toBeVisible({ timeout: 20_000 });
+  const stage = demo.locator(".stage-bg");
+  const nav = demo.getByTestId("uygulama-ekrani").getByRole("navigation", { name: "Uygulama menüsü" });
+  await expect(stage).toHaveAttribute("data-backdrop", "meadow");
+  for (const [tab, backdrop] of [["Hava", "sky"], ["Takvim", "furrows"], ["Geçmiş", "harvest"], ["Ana sayfa", "meadow"]] as const) {
+    await nav.getByRole("button", { name: tab }).click();
+    await expect(stage).toHaveAttribute("data-backdrop", backdrop);
+    await expect(stage.locator(`[data-scene-layer="${backdrop}"]`)).toHaveCSS("opacity", "1");
+  }
+});
+
+test("the calendar tab lists the month's farm tasks by day, and tasks can be ticked off", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/#demo");
+  const demo = page.locator("#demo");
+  await expect(demo.locator(CANVAS)).toBeVisible({ timeout: 20_000 });
+  const app = demo.getByTestId("uygulama-ekrani");
+  await app.getByRole("navigation", { name: "Uygulama menüsü" }).getByRole("button", { name: "Takvim" }).click();
+  await expect(app.getByText("Tarım takvimi")).toBeVisible();
+  const month = app.getByRole("group", { name: "Ekim 2026" });
+  // Today is picked to start with, and its tasks are listed.
+  await expect(month.getByRole("button", { name: /^14 Ekim/ })).toHaveAttribute("aria-pressed", "true");
+  const tasks = app.getByRole("list", { name: /görevler/ });
+  await expect(tasks).toContainText("Taban gübresi");
+
+  await month.getByRole("button", { name: /^16 Ekim/ }).click();
+  await expect(tasks).toContainText("Buğday ekimi");
+  const check = tasks.getByRole("checkbox", { name: /Buğday ekimi/ });
+  await expect(check).toHaveAttribute("aria-checked", "false");
+  await check.click();
+  await expect(check).toHaveAttribute("aria-checked", "true");
+
+  // A day without tasks says so.
+  await month.getByRole("button", { name: /^2 Ekim/ }).click();
+  await expect(app.getByText("Bu gün için görev yok")).toBeVisible();
+});

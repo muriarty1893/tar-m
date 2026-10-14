@@ -42,6 +42,7 @@ import { ANALYSIS_MS, SCREEN } from "@/lib/phone-stage";
 import { AnalyzingImage } from "@/components/ui/analyzing-image";
 import { SuccessGauge } from "../SuccessGauge";
 import { TapHint } from "./TapHint";
+import { CalendarScreen } from "./CalendarScreen";
 
 // React Bits SpringCheck (motion) loads with the first result, alongside the gauge's number ticker.
 const SpringCheck = dynamic(() => import("@/components/ui/spring-check").then((m) => m.SpringCheck), {
@@ -50,7 +51,7 @@ const SpringCheck = dynamic(() => import("@/components/ui/spring-check").then((m
 });
 
 export type AppPhase = "idle" | "camera" | "analyzing" | "done";
-export type AppTab = "home" | "weather" | "history";
+export type AppTab = "home" | "weather" | "calendar" | "history";
 /** Demo coach marks, in order: start a scan, take the photo, open the chat, pick a question. */
 export type GuideStep = "scan" | "shoot" | "ask" | "question";
 
@@ -100,6 +101,8 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
           <ResultScreen key={`done-${scenario.id}`} s={scenario} onReset={onReset} onAsk={() => onAsk(true)} hint={hint === "ask"} />
         ) : tab === "weather" ? (
           <WeatherScreen key="weather" />
+        ) : tab === "calendar" ? (
+          <CalendarScreen key="calendar" className={`${scroll} px-3.5 pb-28 pt-[56px] ${enter}`} />
         ) : tab === "history" ? (
           <HistoryScreen key="history" onOpen={onOpen} />
         ) : (
@@ -641,10 +644,11 @@ function TabBar({
     { id: "home", label: "Ana sayfa", Icon: HouseIcon, go: onHome },
     { id: "scan", label: "Taramalar", Icon: ScanIcon, go: onScan },
     { id: "weather", label: "Hava", Icon: CloudSunIcon, go: () => onTab("weather") },
+    { id: "calendar", label: "Takvim", Icon: CalendarDotsIcon, go: () => onTab("calendar") },
     { id: "history", label: "Geçmiş", Icon: ClockCounterClockwiseIcon, go: () => onTab("history") },
   ] as const;
   return (
-    <nav aria-label="Uygulama menüsü" className="absolute inset-x-0 bottom-0 z-20 flex h-[86px] items-start justify-around border-t border-border bg-card px-5 pt-1.5">
+    <nav aria-label="Uygulama menüsü" className="absolute inset-x-0 bottom-0 z-20 flex h-[86px] items-start justify-around border-t border-border bg-card px-2 pt-1.5">
       {items.map(({ id, label, Icon, go }) => {
         const on = active === id;
         return (
@@ -653,7 +657,7 @@ function TabBar({
             type="button"
             onClick={go}
             aria-current={on ? "page" : undefined}
-            className={`flex min-h-12 w-16 cursor-pointer flex-col items-center gap-1 rounded-2xl pt-1 text-[11px] font-semibold transition-colors duration-150 active:bg-secondary focus-visible:outline-2 focus-visible:outline-primary ${on ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+            className={`flex min-h-12 w-[60px] cursor-pointer flex-col items-center gap-1 rounded-2xl pt-1 text-[11px] font-semibold transition-colors duration-150 active:bg-secondary focus-visible:outline-2 focus-visible:outline-primary ${on ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
           >
             <span className={`flex h-7 w-12 items-center justify-center rounded-full transition-colors duration-150 ${on ? "bg-secondary" : ""}`}>
               <Icon aria-hidden="true" weight={on ? "fill" : "regular"} className="size-5" />

@@ -5,6 +5,10 @@ import { CameraIcon, CheckIcon, InfoIcon } from "@phosphor-icons/react/dist/ssr"
 import { demoScenarios, type DemoScenario } from "@/data/demo-scenarios";
 import { AppScreen, type AppPhase, type AppTab, type GuideStep } from "./phone-app/AppScreen";
 import { PhoneStage, usePrefersReducedMotion } from "./phone-app/PhoneStage";
+import type { Backdrop } from "./phone-app/StageBackdrop";
+
+/** The scene behind the phone for each app tab: grass at home, sky for the weather, and so on. */
+const BACKDROPS: Record<AppTab, Backdrop> = { home: "meadow", weather: "sky", calendar: "furrows", history: "harvest" };
 import { ANALYSIS_MS } from "@/lib/phone-stage";
 import { CtaLink } from "./CtaLink";
 import { Button } from "./ui/button";
@@ -112,7 +116,7 @@ export function DemoShowcase() {
         </div>
 
         <div ref={stage} className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
-          <PhoneStage scene={selected ? { src: selected.imageSrc, alt: selected.imageAlt } : null}>
+          <PhoneStage scene={selected ? { src: selected.imageSrc, alt: selected.imageAlt } : null} backdrop={BACKDROPS[tab]}>
             <AppScreen
               phase={phase}
               scenario={selected}

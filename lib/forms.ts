@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { PARTNER_TYPES, type PartnerType } from "./partner-types";
+import { WELCOME_SOURCES, type WelcomeSource } from "./welcome";
 
 const requiredText = (label: string, min: number, max: number) =>
   z
@@ -29,6 +30,14 @@ export const waitlistSchema = z.object({
   website: honeypot,
 });
 
+
+/** The first-visit "Bizi nereden duydunuz?" answer. */
+export const sourceSchema = z.object({
+  source: z.enum(WELCOME_SOURCES.map((s) => s.id) as [WelcomeSource, ...WelcomeSource[]], {
+    error: "Lütfen bir seçenek işaretleyin.",
+  }),
+  website: honeypot,
+});
 
 export const partnerSchema = z.object({
   name: requiredText("Ad soyad", 2, 100),

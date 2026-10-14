@@ -45,7 +45,7 @@ async function forward(sheet: string, fields: Record<string, unknown>): Promise<
 }
 
 /** Shared POST handler: rate limit → parse → honeypot → validate → forward to Google Sheets. */
-export async function handleSubmission(req: Request, sheet: "waitlist" | "partner" | "question", schema: z.ZodType) {
+export async function handleSubmission(req: Request, sheet: "waitlist" | "partner" | "question" | "source", schema: z.ZodType) {
   if (!checkRateLimit(`${sheet}:${clientIp(req)}`)) return reply({ ok: false, error: "rate" }, 429);
 
   const text = await req.text();
