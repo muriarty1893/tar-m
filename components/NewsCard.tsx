@@ -8,8 +8,8 @@ import { formatTrDate } from "@/lib/format";
 export function NewsCard({ article, headingLevel = 3 }: { article: Article; headingLevel?: 2 | 3 }) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
-      <article className="relative flex h-full flex-col rounded-[1.75rem] border border-border bg-card p-3 shadow-soft">
-        <div className="relative aspect-[16/10] overflow-hidden rounded-[1.25rem] bg-secondary">
+      <article className="relative flex h-full flex-col rounded-2xl border border-border bg-card p-3 shadow-soft">
+        <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-secondary">
           {article.cover?.startsWith("/") ? (
             <Image src={article.cover} alt="" fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" />
           ) : (

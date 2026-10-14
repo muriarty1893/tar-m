@@ -2,12 +2,25 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* White only: no dark mode. `dark:` utilities (from shadcn and older markup) apply only under a
+   .dark class, which the site never sets, so a dark-mode device still gets the white site. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
- * Organik Doğa design system — UI UX Pro Max "Agriculture/Farm Tech" palette
- * with the Organic Biophilic style. Dark mode follows the device setting.
- * Every text pair is ≥ 4.5:1 (see docs/superpowers/specs/2026-10-12-bereket-ai-redesign-design.md).
+ * Base tokens (the original Organik Doğa palette). The four white design candidates in
+ * app/tasarim.css override them per `html[data-tasarim]`; the demo phone's app pins these originals
+ * (.demo-app below). Every text pair is ≥ 4.5:1.
  */
 :root {
+  color-scheme: light;
+  --site-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --site-heading: var(--font-space-grotesk), var(--font-dm-sans), ui-sans-serif, sans-serif;
+  --elev-1: 0 10px 30px -14px rgb(21 128 61 / 0.35);
+  --elev-2: 0 24px 48px -20px rgb(21 128 61 / 0.45);
+  --btn-radius: 9999px;
+  /* Strong panels (the waitlist's side, the features call-out). */
+  --panel: #15803d;
+  --panel-foreground: #ffffff;
   --background: #ffffff;
   /* Alternating sections: a faint mint tint so white cards still stand out (UI UX Pro Max: light theme, card on tinted surface). */
   --surface: #f4faf5;
@@ -33,7 +46,6 @@
   --border: #bbf7d0;
   --input: #86efac;
   --ring: #15803d;
-  --shadow-tint: 21 128 61;
   --radius: 1.25rem;
   /* shadcn chart series (components/ui/chart.tsx), in the brand palette. */
   --chart-1: #15803d;
@@ -41,41 +53,6 @@
   --chart-3: #22c55e;
   --chart-4: #c2410c;
   --chart-5: #b91c1c;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0c1a11;
-    --surface: #10211a;
-    --foreground: #e3f4e7;
-    --card: #13261a;
-    --card-foreground: #e3f4e7;
-    --popover: #13261a;
-    --popover-foreground: #e3f4e7;
-    --primary: #4ade80;
-    --primary-foreground: #052e16;
-    --secondary: #1f3d29;
-    --secondary-foreground: #e3f4e7;
-    --muted: #18301f;
-    --muted-foreground: #a7c4af;
-    --accent: #1f3d29;
-    --accent-foreground: #e3f4e7;
-    --gold: #eab308;
-    --gold-foreground: #1a1405;
-    --gold-soft: #2d2610;
-    --leaf: #22c55e;
-    --blob: #14351f;
-    --destructive: #f87171;
-    --border: #1f3d29;
-    --input: #2e5a3c;
-    --ring: #4ade80;
-    --shadow-tint: 0 0 0;
-    --chart-1: #4ade80;
-    --chart-2: #eab308;
-    --chart-3: #86efac;
-    --chart-4: #fb923c;
-    --chart-5: #f87171;
-  }
 }
 
 @theme inline {
@@ -108,16 +85,18 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-space-grotesk), var(--font-dm-sans), ui-sans-serif, sans-serif;
+  --color-panel: var(--panel);
+  --color-panel-foreground: var(--panel-foreground);
+  --font-sans: var(--site-sans);
+  --font-heading: var(--site-heading);
   --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: calc(var(--radius) * 0.7);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.2);
   --radius-2xl: calc(var(--radius) * 1.4);
   --radius-3xl: calc(var(--radius) * 1.8);
-  --shadow-soft: 0 10px 30px -14px rgb(var(--shadow-tint) / 0.35);
-  --shadow-lift: 0 24px 48px -20px rgb(var(--shadow-tint) / 0.45);
+  --shadow-soft: var(--elev-1);
+  --shadow-lift: var(--elev-2);
 }
 
 @layer base {
@@ -134,7 +113,7 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-heading);
+    font-family: var(--site-heading);
     text-wrap: balance;
   }
   :focus-visible {
@@ -237,12 +216,6 @@
     radial-gradient(ellipse 60% 50% at 50% 38%, rgb(255 255 255 / 0.95) 0, rgb(255 255 255 / 0) 70%),
     radial-gradient(circle at 82% 12%, rgb(254 243 199 / 0.9) 0, rgb(254 243 199 / 0) 28%),
     linear-gradient(180deg, #ffffff 0%, #f6fbf4 55%, #e9f6ec 100%);
-  @media (prefers-color-scheme: dark) {
-    background:
-      radial-gradient(ellipse 60% 50% at 50% 38%, rgb(74 222 128 / 0.08) 0, rgb(74 222 128 / 0) 70%),
-      radial-gradient(circle at 82% 12%, rgb(234 179 8 / 0.12) 0, rgb(234 179 8 / 0) 26%),
-      linear-gradient(180deg, #11261a 0%, #0c1a11 100%);
-  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -260,51 +233,103 @@ html.cine [data-cine] {
   mix-blend-mode: overlay;
 }
 
-/* Outside the card: theme-aware depth on the headline. */
+/* Headline over the field, and the card with the phone. Every colour comes from the --hero-* tokens,
+   which each design candidate sets (app/tasarim.css). */
 .text-3d-matte {
   color: var(--foreground);
-  text-shadow:
-    0 10px 30px color-mix(in srgb, var(--foreground) 18%, transparent),
-    0 2px 4px color-mix(in srgb, var(--foreground) 10%, transparent);
+  text-shadow: var(--hero-line-shadow, none);
 }
 .text-silver-matte {
-  background: linear-gradient(180deg, var(--primary) 0%, color-mix(in srgb, var(--foreground) 70%, transparent) 100%);
+  background: var(--hero-line2);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   transform: translateZ(0);
-  filter: drop-shadow(0 10px 20px color-mix(in srgb, var(--foreground) 14%, transparent));
 }
-
-/* Inside the forest-green card: white-to-mint metal lettering. */
 .text-card-silver {
-  background: linear-gradient(180deg, #ffffff 0%, #a7f3c0 100%);
+  background: var(--hero-wordmark);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   transform: translateZ(0);
-  filter: drop-shadow(0 12px 24px rgb(0 0 0 / 0.55)) drop-shadow(0 4px 8px rgb(0 0 0 / 0.4));
 }
-
 .cine-card {
-  background: linear-gradient(145deg, #166534 0%, #0b2e1a 55%, #06190e 100%);
-  box-shadow:
-    0 40px 100px -20px rgb(6 25 14 / 0.55),
-    0 20px 40px -20px rgb(6 25 14 / 0.5),
-    inset 0 1px 2px rgb(255 255 255 / 0.18),
-    inset 0 -2px 4px rgb(0 0 0 / 0.6);
-  border: 1px solid rgb(255 255 255 / 0.05);
+  background: var(--hero-card-bg);
+  color: var(--hero-fg);
+  box-shadow: var(--hero-card-shadow);
+  border: var(--hero-card-border);
 }
 .cine-badge {
-  background: linear-gradient(135deg, rgb(255 255 255 / 0.12) 0%, rgb(255 255 255 / 0.03) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow:
-    0 0 0 1px rgb(255 255 255 / 0.12),
-    0 25px 50px -12px rgb(0 0 0 / 0.6),
-    inset 0 1px 1px rgb(255 255 255 / 0.2);
+  background: var(--hero-badge-bg);
+  color: var(--hero-fg);
+  box-shadow: var(--hero-badge-shadow);
+  border: var(--hero-badge-border, 0);
+}
+.hero-fg {
+  color: var(--hero-fg);
+}
+.hero-muted {
+  color: var(--hero-muted);
+}
+.hero-chip {
+  background: var(--hero-chip-bg);
+  color: var(--hero-chip-fg);
+}
+.hero-outline {
+  border-color: var(--hero-fg);
+  color: var(--hero-fg);
+  &:hover {
+    background: color-mix(in srgb, var(--hero-fg) 10%, transparent);
+  }
 }
 
+/* Section eyebrow (the small line above a section title); each design sets its own look. */
+.eyebrow {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+/* The demo phone's app is not part of the redesign: it keeps the original palette, type and shapes
+   whatever design the site around it uses. */
+.demo-app {
+  --background: #ffffff;
+  --surface: #f4faf5;
+  --foreground: #14532d;
+  --card: #ffffff;
+  --card-foreground: #14532d;
+  --popover: #ffffff;
+  --popover-foreground: #14532d;
+  --primary: #15803d;
+  --primary-foreground: #ffffff;
+  --secondary: #dcfce7;
+  --secondary-foreground: #14532d;
+  --muted: #e8f0f1;
+  --muted-foreground: #475569;
+  --accent: #dcfce7;
+  --accent-foreground: #14532d;
+  --gold: #a16207;
+  --gold-foreground: #ffffff;
+  --gold-soft: #fef3c7;
+  --leaf: #22c55e;
+  --destructive: #b91c1c;
+  --border: #bbf7d0;
+  --input: #86efac;
+  --ring: #15803d;
+  --radius: 1.25rem;
+  --btn-radius: 9999px;
+  --elev-1: 0 10px 30px -14px rgb(21 128 61 / 0.35);
+  --elev-2: 0 24px 48px -20px rgb(21 128 61 / 0.45);
+  --chart-1: #15803d;
+  --chart-2: #a16207;
+  --chart-3: #22c55e;
+  --chart-4: #c2410c;
+  --chart-5: #b91c1c;
+  --site-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --site-heading: var(--font-space-grotesk), var(--font-dm-sans), ui-sans-serif, sans-serif;
+  font-family: var(--site-sans);
+  color: var(--foreground);
+}
 /* Demo camera: the shutter flash when a photo is taken. */
 @keyframes shutter-flash {
   0% {

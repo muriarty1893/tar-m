@@ -84,7 +84,7 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
   return (
     <div
       data-testid="uygulama-ekrani"
-      className="relative cursor-default select-none overflow-hidden bg-background text-[15px] leading-snug text-foreground antialiased"
+      className="demo-app relative cursor-default select-none overflow-hidden bg-background text-[15px] leading-snug text-foreground antialiased"
       // clip-path (not just border-radius) so blurred layers can't bleed past the display's rounded corners.
       style={{ width: SCREEN.width, height: SCREEN.height, borderRadius: SCREEN.radius, clipPath: clip }}
     >

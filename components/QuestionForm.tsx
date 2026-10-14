@@ -25,7 +25,7 @@ export function QuestionForm() {
 
   if (status === "success") {
     return (
-      <div role="status" className="flex h-full flex-col items-start justify-center gap-4 rounded-[2rem] border border-border bg-card p-8 shadow-lift">
+      <div role="status" className="flex h-full flex-col items-start justify-center gap-4 rounded-3xl border border-border bg-card p-8 shadow-lift">
         <span className="blob flex size-16 items-center justify-center bg-secondary text-primary">
           <SealCheckIcon aria-hidden="true" weight="duotone" className="size-9" />
         </span>
@@ -36,7 +36,7 @@ export function QuestionForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="relative space-y-5 rounded-[2rem] border border-border bg-card p-6 shadow-lift sm:p-8">
+    <form onSubmit={onSubmit} noValidate className="relative space-y-5 rounded-3xl border border-border bg-card p-6 shadow-lift sm:p-8">
       <p className="flex items-center gap-2 font-heading text-xl font-bold">
         <ChatCircleDotsIcon aria-hidden="true" weight="duotone" className="size-7 text-primary" />
         Ekibimize sorun

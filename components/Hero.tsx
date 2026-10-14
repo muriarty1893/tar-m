@@ -8,7 +8,7 @@ import { CtaLink } from "./CtaLink";
 
 const [line1, line2] = siteConfig.tagline.split(/(?<=,)\s/);
 
-/** Home hero: field-to-horizon backdrop, headline, then the forest-green card with the app on our phone. */
+/** Home hero: field-to-horizon backdrop, headline, then the card with the app on our phone. */
 export function Hero() {
   return (
     <CinematicHero
@@ -25,7 +25,7 @@ export function Hero() {
       cardHeading="Ziraat uzmanınız cebinizde."
       cardDescription={
         <>
-          <span className="font-semibold text-white">{siteConfig.name}</span>, tarlanızın fotoğrafından hastalık ve
+          <span className="hero-fg font-semibold">{siteConfig.name}</span>, tarlanızın fotoğrafından hastalık ve
           zararlı belirtilerini tanır, sade Türkçe öneriler sunar ve hasat başarı tahmini verir.
         </>
       }
@@ -36,7 +36,7 @@ export function Hero() {
             href="/#demo"
             className={buttonVariants({
               variant: "outline",
-              className: "border-white/70 text-white hover:bg-white/10 focus-visible:ring-white/40",
+              className: "hero-outline",
             })}
           >
             Demoyu deneyin

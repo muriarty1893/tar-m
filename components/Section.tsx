@@ -19,13 +19,11 @@ export function Section({
   align?: "left" | "center";
 }) {
   return (
-    <section id={id} className={cn("relative scroll-mt-20 px-4 py-20 sm:py-24", className)}>
+    <section id={id} className={cn("site-section relative scroll-mt-20 px-4 py-20 sm:py-24", className)}>
       <div className="mx-auto max-w-6xl">
-        <div className={cn("max-w-2xl", align === "center" && "mx-auto text-center")}>
-          {eyebrow && (
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-gold">{eyebrow}</p>
-          )}
-          <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{title}</h2>
+        <div className={cn("section-head max-w-2xl", align === "center" && "mx-auto text-center")}>
+          {eyebrow && <p className="eyebrow">{eyebrow}</p>}
+          <h2 className="section-title mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{title}</h2>
           {intro && <p className="mt-4 text-lg text-muted-foreground">{intro}</p>}
         </div>
         <div className="mt-12">{children}</div>

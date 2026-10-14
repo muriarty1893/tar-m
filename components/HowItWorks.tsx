@@ -31,7 +31,7 @@ export function HowItWorks() {
       <ol className="grid gap-5 md:grid-cols-3">
         {steps.map(({ icon: Icon, title, text }, i) => (
           <li key={title} className="h-full">
-            <div className="flex h-full flex-col rounded-[1.75rem] border border-border bg-card p-7 shadow-soft">
+            <div className="flex h-full flex-col rounded-2xl border border-border bg-card p-7 shadow-soft">
               <div className="flex items-start justify-between">
                 <span className="flex size-14 items-center justify-center rounded-2xl bg-secondary text-primary">
                   <Icon aria-hidden="true" weight="duotone" className="size-8" />
@@ -43,7 +43,7 @@ export function HowItWorks() {
                   className="font-heading text-6xl font-bold leading-none text-primary/10 before:content-[attr(data-num)]"
                 />
               </div>
-              <p className="mt-6 text-sm font-bold uppercase tracking-[0.14em] text-gold">Adım {i + 1}</p>
+              <p className="eyebrow mt-6 self-start">Adım {i + 1}</p>
               <h3 className="mt-1 text-xl font-bold">{title}</h3>
               <p className="mt-2 text-muted-foreground">{text}</p>
             </div>

@@ -28,8 +28,8 @@ export function BentoCard({ name, description, icon, background, className, cont
   const Heading = headingLevel
   // Outer frame around the inner panel that holds the content.
   return (
-    <li className={cn("relative min-h-60 rounded-[1.75rem] border border-border p-2", className)}>
-      <div className="relative flex h-full flex-col justify-end gap-5 overflow-hidden rounded-[1.25rem] border border-border/70 bg-card p-6 shadow-soft">
+    <li className={cn("relative min-h-60 rounded-2xl border border-border p-2", className)}>
+      <div className="relative flex h-full flex-col justify-end gap-5 overflow-hidden rounded-lg border border-border/70 bg-card p-6 shadow-soft">
         {background && (
           <div aria-hidden="true" className="pointer-events-none absolute inset-0">
             {background}

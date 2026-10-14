@@ -12,15 +12,17 @@ test("headings never skip a level", async ({ page }) => {
   }
 });
 
-for (const scheme of ["light", "dark"] as const) {
-  test(`no axe violations (${scheme} mode)`, async ({ page }) => {
-    await page.emulateMedia({ colorScheme: scheme });
+// The site is white only (no dark mode); each of the four design candidates must pass on its own.
+for (const v of ["a", "b", "c", "d"] as const) {
+  test(`no axe violations (design ${v.toUpperCase()})`, async ({ page }) => {
+    await page.addInitScript((id) => localStorage.setItem("tasarim", id), v);
     await page.route("https://api.open-meteo.com/**", (r) => r.fulfill({ status: 500, body: "{}" }));
     for (const route of ROUTES) {
       await page.goto(route);
+      await expect(page.locator("html")).toHaveAttribute("data-tasarim", v);
       const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
       const summary = violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`);
-      expect(summary, `${route} (${scheme})`).toEqual([]);
+      expect(summary, `${route} (design ${v})`).toEqual([]);
     }
   });
 }

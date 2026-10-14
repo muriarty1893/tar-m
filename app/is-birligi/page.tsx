@@ -68,7 +68,7 @@ export default function PartnerPage() {
 
         <section
           id="iletisim-formu"
-          className="mx-auto mt-16 max-w-4xl scroll-mt-24 rounded-[2rem] border border-border bg-card p-7 shadow-lift sm:p-10"
+          className="mx-auto mt-16 max-w-4xl scroll-mt-24 rounded-3xl border border-border bg-card p-7 shadow-lift sm:p-10"
         >
           <h2 className="text-3xl font-bold tracking-tight">Bize ulaşın</h2>
           <p className="mb-8 mt-2 text-lg text-muted-foreground">Formu doldurun, en kısa sürede size dönüş yapalım.</p>

@@ -144,19 +144,19 @@ export function CinematicHero({
         </h1>
       </div>
 
-      {/* Foreground: the forest-green card with the phone. */}
+      {/* Foreground: the card with the phone (its look comes from the design's --hero-* tokens). */}
       <div className="pointer-events-none absolute inset-0 z-20 flex items-end justify-center pb-[3svh]" style={{ perspective: "1500px" }}>
         <div
           data-cine="card"
-          className="cine-card pointer-events-auto relative h-[66%] w-[94vw] max-w-[88rem] overflow-hidden rounded-[2rem] md:w-[90vw] md:rounded-[2.5rem] lg:h-[66%]"
+          className="cine-card pointer-events-auto relative h-[66%] w-[94vw] max-w-[88rem] overflow-hidden rounded-[var(--hero-radius)] md:w-[90vw] lg:h-[66%]"
         >
           <div className="relative mx-auto flex h-full max-w-7xl flex-col items-center justify-evenly gap-4 px-5 py-6 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,0.8fr)] lg:gap-10 lg:px-12 lg:py-0">
             {/* Left (desktop) / bottom (mobile): the pitch and actions. */}
             <div data-cine="left" className="order-3 w-full text-center lg:order-1 lg:text-left">
-              <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">{cardHeading}</h2>
-              <p className="mx-auto mt-3 hidden max-w-md text-base leading-relaxed text-emerald-50/80 md:block lg:mx-0 lg:text-lg">{cardDescription}</p>
+              <h2 className="hero-fg text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">{cardHeading}</h2>
+              <p className="mx-auto mt-3 hidden max-w-md text-base leading-relaxed hero-muted md:block lg:mx-0 lg:text-lg">{cardDescription}</p>
               {actions && <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">{actions}</div>}
-              {footnote && <div className="mt-5 hidden text-sm text-emerald-50/75 lg:block">{footnote}</div>}
+              {footnote && <div className="hero-muted mt-5 hidden text-sm lg:block">{footnote}</div>}
             </div>
 
             {/* Centre: the phone render with floating glass badges. */}
@@ -168,7 +168,7 @@ export function CinematicHero({
                   width={phone.width}
                   height={phone.height}
                   sizes="(min-width: 1024px) 280px, 180px"
-                  className="h-full w-auto object-contain drop-shadow-[0_40px_60px_rgb(0_0_0/0.55)]"
+                  className="h-full w-auto object-contain drop-shadow-[var(--hero-phone-shadow)]"
                 />
                 {badges?.map(
                   (b, i) =>
@@ -182,12 +182,12 @@ export function CinematicHero({
                           i === 0 ? "right-[calc(100%-1.75rem)] top-0" : "bottom-[10%] left-[calc(100%-1.75rem)]",
                         )}
                       >
-                        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-400/15 text-emerald-200 ring-1 ring-emerald-300/30 lg:size-10">
+                        <span className="flex size-9 shrink-0 items-center justify-center hero-chip rounded-full lg:size-10">
                           {b.icon}
                         </span>
                         <span className="whitespace-nowrap">
-                          <span className="block text-xs font-bold text-white lg:text-sm">{b.title}</span>
-                          <span className="block text-[11px] text-emerald-100/70 lg:text-xs">{b.detail}</span>
+                          <span className="block text-xs font-bold lg:text-sm">{b.title}</span>
+                          <span className="hero-muted block text-[11px] lg:text-xs">{b.detail}</span>
                         </span>
                       </div>
                     ),
@@ -205,7 +205,7 @@ export function CinematicHero({
                     </span>
                   ))}
                 </p>
-                {brandNote && <p className="mt-4 text-sm font-semibold uppercase tracking-[0.18em] text-emerald-100/70">{brandNote}</p>}
+                {brandNote && <p className="mt-4 hero-muted text-sm font-semibold">{brandNote}</p>}
               </div>
             </div>
           </div>

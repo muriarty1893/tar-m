@@ -122,10 +122,10 @@ function NowPanel({ forecast, placeholder }: ViewProps) {
     { Icon: SunHorizonIcon, label: "Gün doğumu", value: placeholder ? "–" : (today.sunrise ?? "–") },
   ];
   return (
-    <div data-sky={kind} className="wx-sky relative isolate flex flex-col overflow-hidden rounded-[1.75rem] p-5 ring-1 ring-inset ring-foreground/5 sm:p-6">
+    <div data-sky={kind} className="wx-sky relative isolate flex flex-col overflow-hidden rounded-2xl p-5 ring-1 ring-inset ring-foreground/5 sm:p-6">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">Şu an</p>
+          <p className="text-sm font-bold text-muted-foreground">Şu an</p>
           <p className="mt-1 font-heading text-7xl font-bold leading-none tracking-tighter tabular-nums sm:text-8xl" data-testid={placeholder ? undefined : "sicaklik"}>
             {n(current.temp)}
             <span className="align-super text-3xl font-semibold tracking-normal text-muted-foreground sm:text-4xl">°C</span>
@@ -156,8 +156,8 @@ function NowPanel({ forecast, placeholder }: ViewProps) {
 function TodayAdvice({ hint }: { hint: FarmingHint }) {
   const { Icon, tone, tint } = HINT[hint.kind];
   return (
-    <div className={`rounded-[1.75rem] p-5 ring-1 ring-inset sm:p-6 ${tint}`}>
-      <p className={`flex items-center gap-2 text-sm font-bold uppercase tracking-[0.14em] ${tone}`}>
+    <div className={`rounded-2xl p-5 ring-1 ring-inset sm:p-6 ${tint}`}>
+      <p className={`flex items-center gap-2 text-sm font-bold ${tone}`}>
         <Icon aria-hidden="true" weight="duotone" className="size-5" />
         Bugün tarlada
       </p>
@@ -171,7 +171,7 @@ function NextDays({ forecast, placeholder }: ViewProps) {
   return (
     <ul className="grid grid-cols-3 gap-2.5" aria-label="Önümüzdeki günler">
       {forecast.daily.slice(1, 4).map((d, i) => (
-        <li key={d.date} className="flex flex-col items-center rounded-[1.4rem] border border-border bg-background px-2 py-3.5 text-center">
+        <li key={d.date} className="flex flex-col items-center rounded-xl border border-border bg-background px-2 py-3.5 text-center">
           <span className="font-semibold">{placeholder ? "–" : formatTrDay(d.date, i + 1)}</span>
           <ConditionIcon kind={dayKind(d)} size={48} animate={false} className="my-1.5" />
           <span className="font-heading text-lg font-bold tabular-nums">
@@ -190,7 +190,7 @@ function NextDays({ forecast, placeholder }: ViewProps) {
 function WeekPlan({ forecast, placeholder }: ViewProps) {
   const days = forecast.daily.map((d, i) => ({ label: placeholder ? "–" : formatTrDay(d.date, i), kind: farmingHint(d).kind }));
   return (
-    <div className="flex-1 rounded-[1.75rem] border border-border p-5 sm:p-6">
+    <div className="flex-1 rounded-2xl border border-border p-5 sm:p-6">
       <p className="font-heading text-lg font-bold">Bu hafta tarlada</p>
       <ul className="mt-3 space-y-3">
         {(["spray", "frost", "rain"] as const).map((kind) => {
@@ -221,7 +221,7 @@ function WeekList({ forecast, placeholder }: ViewProps) {
   return (
     <div className="mt-6">
       <p className="mb-3 px-1 font-heading text-lg font-bold">7 günlük tahmin</p>
-      <ol className="divide-y divide-border overflow-hidden rounded-[1.75rem] border border-border" aria-label="7 günlük tahmin">
+      <ol className="divide-y divide-border overflow-hidden rounded-2xl border border-border" aria-label="7 günlük tahmin">
         {forecast.daily.map((d, i) => {
           const hint = farmingHint(d);
           const { Icon: HintIcon, tone } = HINT[hint.kind];
@@ -391,7 +391,7 @@ export function WeatherWidget({ compact = false, headingLevel = 3 }: { compact?:
 
 
   return (
-    <div className="overflow-hidden rounded-[2rem] border border-border bg-card shadow-soft" aria-live="polite">
+    <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft" aria-live="polite">
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 pb-1 pt-5 sm:px-7 sm:pt-6">
         <Heading className="flex items-center gap-2 text-2xl font-bold">
           <MapPinIcon aria-hidden="true" weight="duotone" className="size-6 text-primary" />
@@ -426,7 +426,7 @@ export function WeatherWidget({ compact = false, headingLevel = 3 }: { compact?:
         )}
 
         {status === "error" && (
-          <div className="flex flex-col items-center gap-3 rounded-[1.75rem] bg-surface px-5 py-10 text-center">
+          <div className="flex flex-col items-center gap-3 rounded-2xl bg-surface px-5 py-10 text-center">
             <CloudIcon size={72} animate={false} />
             <p className="font-heading text-xl font-bold">Hava durumu şu an alınamadı</p>
             <p className="max-w-sm text-muted-foreground">Bağlantınızı kontrol edip yeniden deneyin.</p>

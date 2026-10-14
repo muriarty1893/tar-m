@@ -1,0 +1,341 @@
+/*
+ * Four white design candidates (lib/tasarim.ts), keyed by `data-tasarim` on <html>. Each sets the
+ * site's tokens (colour, type, radius, elevation, the hero card) and adds a few rules of its own.
+ * Loaded after globals.css (app/layout.tsx). Heading rules skip the demo phone's app (.demo-app),
+ * which keeps its original look.
+ * Every text pair is ≥ 4.5:1 (tests/e2e/a11y.spec.ts runs axe on each design).
+ */
+
+/* A · Sade --------------------------------------------------------------------------------------
+   Plain white, one green, hairlines instead of shadows, one typeface (Onest) set tight. */
+html[data-tasarim="a"] {
+  --site-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
+  --site-heading: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
+  --background: #ffffff;
+  --surface: #ffffff;
+  --foreground: #0f2e1d;
+  --card: #ffffff;
+  --card-foreground: #0f2e1d;
+  --popover: #ffffff;
+  --popover-foreground: #0f2e1d;
+  --primary: #0b7a3b;
+  --primary-foreground: #ffffff;
+  --secondary: #eef5f0;
+  --secondary-foreground: #0f2e1d;
+  --muted: #f2f4f3;
+  --muted-foreground: #4b5a51;
+  --accent: #eef5f0;
+  --accent-foreground: #0f2e1d;
+  --gold: #8f5a00;
+  --gold-foreground: #ffffff;
+  --gold-soft: #fbf3e4;
+  --blob: #e3ece6;
+  --border: #e1e7e3;
+  --input: #b9c6bd;
+  --ring: #0b7a3b;
+  --radius: 0.75rem;
+  --btn-radius: 0.625rem;
+  --elev-1: 0 1px 2px rgb(15 46 29 / 0.05);
+  --elev-2: 0 18px 40px -26px rgb(15 46 29 / 0.3);
+  --panel: #0b7a3b;
+  --panel-foreground: #ffffff;
+  --hero-radius: 1.25rem;
+  --hero-card-bg: #ffffff;
+  --hero-card-border: 1px solid #e1e7e3;
+  --hero-card-shadow: 0 40px 80px -48px rgb(15 46 29 / 0.45);
+  --hero-fg: #0f2e1d;
+  --hero-muted: #4b5a51;
+  --hero-chip-bg: #eef5f0;
+  --hero-chip-fg: #0b7a3b;
+  --hero-badge-bg: #ffffff;
+  --hero-badge-border: 1px solid #e1e7e3;
+  --hero-badge-shadow: 0 14px 30px -20px rgb(15 46 29 / 0.4);
+  --hero-wordmark: linear-gradient(#0b7a3b, #0b7a3b);
+  --hero-line2: linear-gradient(#0b7a3b, #0b7a3b);
+  --hero-phone-shadow: 0 30px 40px rgb(15 46 29 / 0.22);
+}
+html[data-tasarim="a"] {
+  & :where(h1, h2, h3):not(.demo-app *) {
+    letter-spacing: -0.025em;
+  }
+  & .eyebrow {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--primary);
+  }
+  & .site-section {
+    border-top: 1px solid var(--border);
+  }
+  & .pill-nav__list {
+    gap: 2px;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  & .pill-nav__pill {
+    padding: 0 14px;
+    border-radius: 0.5rem;
+  }
+  & .pill-nav__list > li:has([aria-current="page"])::after {
+    bottom: 4px;
+    width: 28px;
+    height: 2px;
+    border-radius: 0;
+  }
+}
+
+/* B · Almanak -----------------------------------------------------------------------------------
+   A farmer's almanac: slab-serif headings (Bitter) over a plain sans (Public Sans), wheat-ink
+   accents, ruled section heads, flat printed surfaces with ink borders and no shadows. */
+html[data-tasarim="b"] {
+  --site-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --site-heading: var(--font-bitter), Georgia, serif;
+  --background: #ffffff;
+  --surface: #ffffff;
+  --foreground: #1c2b21;
+  --card: #ffffff;
+  --card-foreground: #1c2b21;
+  --popover: #ffffff;
+  --popover-foreground: #1c2b21;
+  --primary: #2d6a35;
+  --primary-foreground: #ffffff;
+  --secondary: #f5efdf;
+  --secondary-foreground: #1c2b21;
+  --muted: #f6f4ee;
+  --muted-foreground: #545a50;
+  --accent: #f5efdf;
+  --accent-foreground: #1c2b21;
+  --gold: #875400;
+  --gold-foreground: #ffffff;
+  --gold-soft: #f8eed6;
+  --blob: #efe7d2;
+  --border: #d6cfbd;
+  --input: #9c947f;
+  --ring: #2d6a35;
+  --radius: 0.375rem;
+  --btn-radius: 0.375rem;
+  --elev-1: 0 0 #0000;
+  --elev-2: 0 0 #0000;
+  --panel: #f3e6c0;
+  --panel-foreground: #1c2b21;
+  --hero-radius: 0.5rem;
+  --hero-card-bg: #ffffff;
+  --hero-card-border: 1.5px solid #1c2b21;
+  --hero-card-shadow: none;
+  --hero-fg: #1c2b21;
+  --hero-muted: #545a50;
+  --hero-chip-bg: #f5efdf;
+  --hero-chip-fg: #875400;
+  --hero-badge-bg: #ffffff;
+  --hero-badge-border: 1px solid #1c2b21;
+  --hero-badge-shadow: none;
+  --hero-wordmark: linear-gradient(#2d6a35, #2d6a35);
+  --hero-line2: linear-gradient(#875400, #875400);
+  --hero-phone-shadow: 0 24px 30px rgb(28 43 33 / 0.25);
+}
+html[data-tasarim="b"] {
+  & :where(h1, h2, h3):not(.demo-app *) {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  & .eyebrow {
+    font-family: var(--font-bitter), Georgia, serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1.05rem;
+    color: var(--gold);
+  }
+  & .section-head {
+    border-top: 3px solid var(--foreground);
+    padding-top: 1.1rem;
+  }
+  & .pill-nav__list {
+    gap: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  & .pill-nav__pill {
+    padding: 0 14px;
+    border-radius: 0;
+  }
+  & .pill-nav__list > li + li {
+    border-left: 1px solid var(--border);
+  }
+  & .pill-nav__list > li:has([aria-current="page"])::after {
+    bottom: 6px;
+    width: 32px;
+    height: 4px;
+    border-radius: 0;
+    background: transparent;
+    border-block: 1px solid var(--foreground);
+  }
+}
+
+/* C · Afiş --------------------------------------------------------------------------------------
+   A harvest poster: big condensed Archivo headings, tractor-yellow blocks, ink lines and hard
+   offset shadows, near-square corners. */
+html[data-tasarim="c"] {
+  --site-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --site-heading: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --background: #ffffff;
+  --surface: #ffffff;
+  --foreground: #13241a;
+  --card: #ffffff;
+  --card-foreground: #13241a;
+  --popover: #ffffff;
+  --popover-foreground: #13241a;
+  --primary: #13703a;
+  --primary-foreground: #ffffff;
+  --secondary: #fff4c2;
+  --secondary-foreground: #13241a;
+  --muted: #f3f3ef;
+  --muted-foreground: #46504a;
+  --accent: #fff4c2;
+  --accent-foreground: #13241a;
+  --gold: #7a5300;
+  --gold-foreground: #ffffff;
+  --gold-soft: #fff4c2;
+  --blob: #fff4c2;
+  --border: #13241a;
+  --input: #13241a;
+  --ring: #13703a;
+  --radius: 0.25rem;
+  --btn-radius: 0.25rem;
+  --elev-1: 4px 4px 0 #13241a;
+  --elev-2: 8px 8px 0 #13241a;
+  --panel: #f7c600;
+  --panel-foreground: #13241a;
+  --hero-radius: 0.375rem;
+  --hero-card-bg: #f7c600;
+  --hero-card-border: 2px solid #13241a;
+  --hero-card-shadow: 10px 10px 0 #13241a;
+  --hero-fg: #13241a;
+  --hero-muted: #2f2a10;
+  --hero-chip-bg: #13241a;
+  --hero-chip-fg: #f7c600;
+  --hero-badge-bg: #ffffff;
+  --hero-badge-border: 2px solid #13241a;
+  --hero-badge-shadow: 4px 4px 0 #13241a;
+  --hero-wordmark: linear-gradient(#13241a, #13241a);
+  --hero-line2: linear-gradient(#13703a, #13703a);
+  --hero-phone-shadow: 12px 16px 0 rgb(19 36 26 / 0.85);
+}
+html[data-tasarim="c"] {
+  & :where(h1, h2, h3):not(.demo-app *) {
+    font-stretch: 72%;
+    font-weight: 800;
+    letter-spacing: -0.005em;
+    line-height: 0.98;
+  }
+  & .section-title {
+    font-size: clamp(2.4rem, 5.4vw, 3.8rem);
+  }
+  & .eyebrow {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    background: var(--panel);
+    color: var(--panel-foreground);
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+  /* The hero card is yellow: its gold button turns ink. */
+  & .cine-card {
+    --gold: #13241a;
+    --gold-foreground: #ffffff;
+  }
+  & .pill-nav__list {
+    padding: 3px;
+    border-radius: 0.375rem;
+    background: var(--foreground);
+    box-shadow: none;
+  }
+  & .pill-nav__pill {
+    border-radius: 0.25rem;
+  }
+  & .pill-nav__list > li:has([aria-current="page"]) .pill-nav__pill {
+    background: var(--panel);
+  }
+  & .pill-nav__list > li:has([aria-current="page"])::after {
+    display: none;
+  }
+}
+
+/* D · Fide --------------------------------------------------------------------------------------
+   Soft and legible: Atkinson Hyperlegible (made for low-vision readers), round shapes, gentle
+   shadows, mint chips, a faintly tinted surface for alternate sections. */
+html[data-tasarim="d"] {
+  --site-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
+  --site-heading: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
+  --background: #ffffff;
+  --surface: #f5f9f6;
+  --foreground: #163a26;
+  --card: #ffffff;
+  --card-foreground: #163a26;
+  --popover: #ffffff;
+  --popover-foreground: #163a26;
+  --primary: #13723f;
+  --primary-foreground: #ffffff;
+  --secondary: #e4f3e9;
+  --secondary-foreground: #163a26;
+  --muted: #f1f6f2;
+  --muted-foreground: #475a4e;
+  --accent: #e4f3e9;
+  --accent-foreground: #163a26;
+  --gold: #8a5800;
+  --gold-foreground: #ffffff;
+  --gold-soft: #fdf1dc;
+  --blob: #dcefe3;
+  --border: #e0eae3;
+  --input: #b5c9bb;
+  --ring: #13723f;
+  --radius: 1.5rem;
+  --btn-radius: 9999px;
+  --elev-1: 0 8px 28px -12px rgb(22 58 38 / 0.18);
+  --elev-2: 0 28px 60px -28px rgb(22 58 38 / 0.32);
+  --panel: #e4f3e9;
+  --panel-foreground: #163a26;
+  --hero-radius: 3rem;
+  --hero-card-bg: #eef7f1;
+  --hero-card-border: 0;
+  --hero-card-shadow: 0 50px 90px -50px rgb(22 58 38 / 0.45);
+  --hero-fg: #163a26;
+  --hero-muted: #475a4e;
+  --hero-chip-bg: #e4f3e9;
+  --hero-chip-fg: #13723f;
+  --hero-badge-bg: #ffffff;
+  --hero-badge-border: 0;
+  --hero-badge-shadow: 0 16px 36px -16px rgb(22 58 38 / 0.35);
+  --hero-wordmark: linear-gradient(#13723f, #13723f);
+  --hero-line2: linear-gradient(#13723f, #13723f);
+  --hero-phone-shadow: 0 34px 44px rgb(22 58 38 / 0.22);
+}
+html[data-tasarim="d"] {
+  & :where(h1, h2, h3):not(.demo-app *) {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  & .eyebrow {
+    display: inline-flex;
+    padding: 0.3rem 0.9rem;
+    border-radius: 9999px;
+    background: var(--secondary);
+    color: var(--primary);
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+  & .pill-nav__list {
+    background: var(--secondary);
+    box-shadow: none;
+  }
+  & .pill-nav__pill {
+    background: transparent;
+  }
+  & .pill-nav__list > li:has([aria-current="page"]) .pill-nav__pill {
+    background: #ffffff;
+    box-shadow: var(--elev-1);
+  }
+  & .pill-nav__list > li:has([aria-current="page"])::after {
+    display: none;
+  }
+}
