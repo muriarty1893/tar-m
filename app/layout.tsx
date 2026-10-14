@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
-import { Archivo, Atkinson_Hyperlegible_Next, Bitter, DM_Sans, Onest, Public_Sans, Space_Grotesk } from "next/font/google";
+import { DM_Sans, Onest, Space_Grotesk } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import { siteUrl } from "@/lib/site-url";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { TasarimSwitcher } from "@/components/TasarimSwitcher";
-import { DEFAULT_TASARIM, tasarimScript } from "@/lib/tasarim";
 import "./globals.css";
-import "./tasarim.css";
 
 // latin-ext carries the Turkish letters (ç ğ ı İ ö ş ü).
 const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin", "latin-ext"], preload: false });
@@ -17,14 +14,9 @@ const spaceGrotesk = Space_Grotesk({
   weight: ["500", "600", "700"],
   preload: false,
 });
-// The demo phone keeps DM Sans and Space Grotesk; the four design candidates (lib/tasarim.ts) bring
-// their own. None is preloaded: the browser fetches only the faces the current design uses.
-const onest = Onest({ variable: "--font-onest", subsets: ["latin", "latin-ext"], preload: false });
-const bitter = Bitter({ variable: "--font-bitter", subsets: ["latin", "latin-ext"], style: ["normal", "italic"], preload: false });
-const publicSans = Public_Sans({ variable: "--font-public-sans", subsets: ["latin", "latin-ext"], preload: false });
-const archivo = Archivo({ variable: "--font-archivo", subsets: ["latin", "latin-ext"], axes: ["wdth"], preload: false });
-const atkinson = Atkinson_Hyperlegible_Next({ variable: "--font-atkinson", subsets: ["latin", "latin-ext"], preload: false });
-const fonts = [dmSans, spaceGrotesk, onest, bitter, publicSans, archivo, atkinson].map((f) => f.variable).join(" ");
+// The site is set in Onest; the demo phone's app keeps DM Sans and Space Grotesk (loaded on demand).
+const onest = Onest({ variable: "--font-onest", subsets: ["latin", "latin-ext"] });
+const fonts = [onest, dmSans, spaceGrotesk].map((f) => f.variable).join(" ");
 
 const defaultTitle = `${siteConfig.name} — Çiftçinin yapay zekâ destekli tarla asistanı`;
 
@@ -51,9 +43,8 @@ const cineScript = `(function(){var d=document.documentElement;if(matchMedia("(p
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="tr" data-tasarim={DEFAULT_TASARIM} className={`${fonts} h-full antialiased`} suppressHydrationWarning>
+    <html lang="tr" className={`${fonts} h-full antialiased`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: tasarimScript }} />
         <script dangerouslySetInnerHTML={{ __html: cineScript }} />
       </head>
       <body className="flex min-h-full flex-col font-sans">
@@ -68,7 +59,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <Footer />
-        <TasarimSwitcher />
       </body>
     </html>
   );

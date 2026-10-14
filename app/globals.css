@@ -7,49 +7,63 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * Base tokens (the original Organik Doğa palette). The four white design candidates in
- * app/tasarim.css override them per `html[data-tasarim]`; the demo phone's app pins these originals
- * (.demo-app below). Every text pair is ≥ 4.5:1.
+ * "Sade" design: white, one green, hairlines instead of shadows, one typeface (Onest) set tight.
+ * The demo phone's app keeps the original Organik Doğa palette (.demo-app below).
+ * Every text pair is ≥ 4.5:1.
  */
 :root {
   color-scheme: light;
-  --site-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --site-heading: var(--font-space-grotesk), var(--font-dm-sans), ui-sans-serif, sans-serif;
-  --elev-1: 0 10px 30px -14px rgb(21 128 61 / 0.35);
-  --elev-2: 0 24px 48px -20px rgb(21 128 61 / 0.45);
-  --btn-radius: 9999px;
-  /* Strong panels (the waitlist's side, the features call-out). */
-  --panel: #15803d;
-  --panel-foreground: #ffffff;
+  --site-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
+  --site-heading: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
   --background: #ffffff;
-  /* Alternating sections: a faint mint tint so white cards still stand out (UI UX Pro Max: light theme, card on tinted surface). */
-  --surface: #f4faf5;
-  --foreground: #14532d;
+  --surface: #ffffff;
+  --foreground: #0f2e1d;
   --card: #ffffff;
-  --card-foreground: #14532d;
+  --card-foreground: #0f2e1d;
   --popover: #ffffff;
-  --popover-foreground: #14532d;
-  --primary: #15803d;
+  --popover-foreground: #0f2e1d;
+  --primary: #0b7a3b;
   --primary-foreground: #ffffff;
-  --secondary: #dcfce7;
-  --secondary-foreground: #14532d;
-  --muted: #e8f0f1;
-  --muted-foreground: #475569;
-  --accent: #dcfce7;
-  --accent-foreground: #14532d;
-  --gold: #a16207;
+  --secondary: #eef5f0;
+  --secondary-foreground: #0f2e1d;
+  --muted: #f2f4f3;
+  --muted-foreground: #4b5a51;
+  --accent: #eef5f0;
+  --accent-foreground: #0f2e1d;
+  --gold: #8f5a00;
   --gold-foreground: #ffffff;
-  --gold-soft: #fef3c7;
+  --gold-soft: #fbf3e4;
   --leaf: #22c55e;
-  --blob: #bbf7d0;
+  --blob: #e3ece6;
   --destructive: #b91c1c;
-  --border: #bbf7d0;
-  --input: #86efac;
-  --ring: #15803d;
-  --radius: 1.25rem;
+  --border: #e1e7e3;
+  --input: #b9c6bd;
+  --ring: #0b7a3b;
+  --radius: 0.75rem;
+  --btn-radius: 0.625rem;
+  --elev-1: 0 1px 2px rgb(15 46 29 / 0.05);
+  --elev-2: 0 18px 40px -26px rgb(15 46 29 / 0.3);
+  /* Strong panels (the waitlist's side, the features call-out). */
+  --panel: #0b7a3b;
+  --panel-foreground: #ffffff;
+  /* Home hero: the white card with the phone, over the field. */
+  --hero-radius: 1.25rem;
+  --hero-card-bg: #ffffff;
+  --hero-card-border: 1px solid #e1e7e3;
+  --hero-card-shadow: 0 40px 80px -48px rgb(15 46 29 / 0.45);
+  --hero-fg: #0f2e1d;
+  --hero-muted: #4b5a51;
+  --hero-chip-bg: #eef5f0;
+  --hero-chip-fg: #0b7a3b;
+  --hero-badge-bg: #ffffff;
+  --hero-badge-border: 1px solid #e1e7e3;
+  --hero-badge-shadow: 0 14px 30px -20px rgb(15 46 29 / 0.4);
+  --hero-wordmark: linear-gradient(#0b7a3b, #0b7a3b);
+  --hero-line2: linear-gradient(#0b7a3b, #0b7a3b);
+  --hero-phone-shadow: 0 30px 40px rgb(15 46 29 / 0.22);
   /* shadcn chart series (components/ui/chart.tsx), in the brand palette. */
-  --chart-1: #15803d;
-  --chart-2: #a16207;
+  --chart-1: #0b7a3b;
+  --chart-2: #8f5a00;
   --chart-3: #22c55e;
   --chart-4: #c2410c;
   --chart-5: #b91c1c;
@@ -233,8 +247,7 @@ html.cine [data-cine] {
   mix-blend-mode: overlay;
 }
 
-/* Headline over the field, and the card with the phone. Every colour comes from the --hero-* tokens,
-   which each design candidate sets (app/tasarim.css). */
+/* Headline over the field, and the card with the phone. Every colour comes from the --hero-* tokens. */
 .text-3d-matte {
   color: var(--foreground);
   text-shadow: var(--hero-line-shadow, none);
@@ -283,11 +296,19 @@ html.cine [data-cine] {
   }
 }
 
-/* Section eyebrow (the small line above a section title); each design sets its own look. */
+/* Section eyebrow: the small line above a section title. */
 .eyebrow {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--gold);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+/* Headings set tight (not in the demo phone's app, which keeps its own type). */
+:where(h1, h2, h3):not(.demo-app *) {
+  letter-spacing: -0.025em;
+}
+/* Sections are told apart by a hairline, not by tinted backgrounds. */
+.site-section {
+  border-top: 1px solid var(--border);
 }
 
 /* The demo phone's app is not part of the redesign: it keeps the original palette, type and shapes
@@ -883,9 +904,9 @@ html.cine [data-cine] {
   -webkit-user-drag: none;
 }
 
-/* PillNav (components/ui/pill-nav.tsx), from React Bits: a green bar of light pills. On hover or
+/* PillNav (components/ui/pill-nav.tsx), from React Bits, pared down to plain links. On hover or
    keyboard focus each label rolls: the letters flip up one after another and a green copy rolls
-   in from below. No colour fill. */
+   in from below. The current page gets a short green line. */
 .pill-nav {
   --pill-base: var(--primary);
   --pill-bg: var(--background);
@@ -896,14 +917,11 @@ html.cine [data-cine] {
 .pill-nav__list {
   display: flex;
   align-items: stretch;
-  gap: 3px;
+  gap: 2px;
   height: 46px;
   margin: 0;
-  padding: 3px;
+  padding: 0;
   list-style: none;
-  border-radius: 9999px;
-  background: var(--pill-base);
-  box-shadow: var(--shadow-soft);
 }
 @media (prefers-reduced-motion: no-preference) {
   .pill-nav__list {
@@ -928,8 +946,8 @@ html.cine [data-cine] {
   align-items: center;
   justify-content: center;
   height: 100%;
-  padding: 0 18px;
-  border-radius: 9999px;
+  padding: 0 14px;
+  border-radius: 0.5rem;
   background: var(--pill-bg);
   color: var(--pill-text);
   font-size: 0.95rem;
@@ -963,16 +981,15 @@ html.cine [data-cine] {
 .pill-nav__pill:is(:hover, :focus-visible) .pill-nav__label {
   transform: translateY(-100%);
 }
-/* Current page: a dot under the pill. */
+/* Current page: a short line under the label. */
 .pill-nav__list > li:has([aria-current="page"])::after {
   content: "";
   position: absolute;
-  bottom: -6px;
+  bottom: 4px;
   left: 50%;
   z-index: 4;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
+  width: 28px;
+  height: 2px;
   background: var(--pill-base);
   transform: translateX(-50%);
 }
