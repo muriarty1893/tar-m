@@ -303,44 +303,6 @@ html.cine [data-cine] {
   }
 }
 
-/* Spotlight card (components/ui/spotlight-card.tsx). */
-.spotlight-card__light {
-  background: radial-gradient(260px circle at var(--spot-x, 50%) var(--spot-y, 0%), color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%);
-}
-.spotlight-card__edge {
-  padding: 1.5px;
-  background: radial-gradient(220px circle at var(--spot-x, 50%) var(--spot-y, 0%), color-mix(in srgb, var(--primary) 70%, transparent), transparent 70%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-@media (prefers-reduced-motion: reduce) {
-  .spotlight-card__light,
-  .spotlight-card__edge {
-    transition: none;
-  }
-}
-
-/* Glowing effect (components/ui/glowing-effect.tsx): a conic arc on the border towards the pointer. */
-.glowing-effect::after {
-  content: "";
-  position: absolute;
-  inset: calc(-1 * var(--glow-border));
-  border-radius: inherit;
-  border: var(--glow-border) solid transparent;
-  background:
-    radial-gradient(circle, #16a34a 10%, transparent 20%),
-    radial-gradient(circle at 40% 40%, #ca8a04 5%, transparent 15%),
-    radial-gradient(circle at 60% 60%, #4ade80 10%, transparent 20%),
-    repeating-conic-gradient(from 236.84deg at 50% 50%, #16a34a 0%, #ca8a04 5%, #4ade80 10%, #15803d 15%, #16a34a 20%);
-  background-attachment: fixed;
-  opacity: var(--active);
-  transition: opacity 300ms;
-  mask-clip: padding-box, border-box;
-  mask-composite: intersect;
-  mask-image: linear-gradient(#0000, #0000), conic-gradient(from calc((var(--start) - var(--spread)) * 1deg), #0000 0deg, #fff, #0000 calc(var(--spread) * 2deg));
-}
-
 /* Analyzing-image loader (components/ui/analyzing-image.tsx): the original motion timing as CSS —
    2.5 s per sweep, ease (0.175, 0.885, 0.32, 1), keyframes at 0 / 60 % / 100 %, mirrored, forever. */
 @keyframes analyzing-wipe {
@@ -381,8 +343,8 @@ html.cine [data-cine] {
 
 /*
  * Animated weather icons (components/ui/animated-weather-icons.tsx).
- * They loop on `.wx-live` icons, or on any icon inside a hovered/focused `.wx-hover`;
- * otherwise, and always under reduced motion, they rest on their static drawing.
+ * They loop on `.wx-live` icons; otherwise, and always under reduced motion, they rest
+ * on their static drawing.
  */
 .wx-icon * {
   transform-box: view-box;
@@ -391,50 +353,50 @@ html.cine [data-cine] {
   transform-origin: 24px 24px;
 }
 @media (prefers-reduced-motion: no-preference) {
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-spin {
+  .wx-live .wx-spin {
     animation: wx-spin var(--wx-t, 12s) linear infinite;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-twinkle {
+  .wx-live .wx-twinkle {
     animation: wx-twinkle 2s ease-in-out infinite;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-pulse {
+  .wx-live .wx-pulse {
     animation: wx-pulse 3s ease-in-out infinite;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-star {
+  .wx-live .wx-star {
     animation: wx-star 2s ease-in-out infinite;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-drift {
+  .wx-live .wx-drift {
     animation: wx-drift var(--wx-t, 6s) ease-in-out infinite;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-fall {
+  .wx-live .wx-fall {
     animation: wx-fall var(--wx-t, 0.8s) ease-in infinite;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-flake-r {
+  .wx-live .wx-flake-r {
     animation: wx-flake-r 2s ease-in infinite;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-flake-l {
+  .wx-live .wx-flake-l {
     animation: wx-flake-l 2s ease-in infinite;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-flash {
+  .wx-live .wx-flash {
     animation: wx-flash 3s linear infinite;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-flash-glow {
+  .wx-live .wx-flash-glow {
     animation: wx-flash-glow 3s linear infinite;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-draw {
+  .wx-live .wx-draw {
     stroke-dasharray: 1;
     animation: wx-draw 1.5s ease-in-out infinite;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-haze {
+  .wx-live .wx-haze {
     animation: wx-haze 3s ease-in-out infinite;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-rise {
+  .wx-live .wx-rise {
     animation: wx-rise 3s ease-in-out infinite alternate;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-bob {
+  .wx-live .wx-bob {
     animation: wx-bob 2s ease-in-out infinite;
   }
-  :is(.wx-live, .wx-hover:hover, .wx-hover:focus-within) .wx-arc {
+  .wx-live .wx-arc {
     stroke-dasharray: 1;
     animation: wx-arc 2.5s ease-in-out infinite alternate;
   }
@@ -603,3 +565,73 @@ html.cine [data-cine] {
 .wx-sky[data-sky="thunder"] { --sky: #6366f1; }
 .wx-sky[data-sky="wind"] { --sky: #14b8a6; }
 .wx-sky[data-sky="moon"] { --sky: #8b5cf6; }
+
+/*
+ * Demo coach mark (components/phone-app/TapHint.tsx): a hand tilted in 3D taps the target,
+ * the ring pulses on contact and the shadow tightens. At rest (reduced motion) the hand sits on it.
+ */
+.tap-hand {
+  transform: perspective(260px) rotateX(24deg) rotateY(var(--tap-y, -14deg)) rotateZ(var(--tap-z, -16deg));
+  transform-origin: 30% 0%;
+}
+.tap-hand--flip {
+  --tap-y: 14deg;
+  --tap-z: 16deg;
+  --tap-dir: -1;
+}
+.tap-ring {
+  opacity: 0.7;
+}
+.tap-ring--late {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tap-hand {
+    animation: tap-hand 1.6s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  }
+  .tap-shadow {
+    animation: tap-shadow 1.6s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  }
+  .tap-ring {
+    animation: tap-ring 1.6s ease-out infinite;
+  }
+  .tap-ring--late {
+    animation-delay: 0.18s;
+  }
+}
+@keyframes tap-hand {
+  0%,
+  100% {
+    transform: translate(calc(var(--tap-dir, 1) * 16px), 22px) perspective(260px) rotateX(34deg) rotateY(var(--tap-y, -14deg)) rotateZ(var(--tap-z, -16deg)) translateZ(26px);
+  }
+  42%,
+  54% {
+    transform: translate(0, 0) perspective(260px) rotateX(22deg) rotateY(var(--tap-y, -14deg)) rotateZ(var(--tap-z, -16deg)) translateZ(-6px);
+  }
+}
+@keyframes tap-shadow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translate(calc(var(--tap-dir, 1) * 20%), 40%) scale(1.35);
+  }
+  42%,
+  54% {
+    opacity: 0.9;
+    transform: scale(0.8);
+  }
+}
+@keyframes tap-ring {
+  0%,
+  40% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  50% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+}

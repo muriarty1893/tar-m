@@ -2,8 +2,8 @@
 // but the motion is CSS keyframes (app/globals.css, "wx-") instead of
 // framer-motion, so the weather section adds no animation library to the page.
 // Changes: icons are decorative (aria-hidden; the condition is always written
-// next to them); `animate={false}` rests them on their static drawing, and an
-// ancestor with `wx-hover` plays them on hover/focus; reduced motion keeps them still.
+// next to them); `animate={false}` rests them on their static drawing; reduced
+// motion keeps them still.
 
 import type { CSSProperties, ReactNode } from "react";
 import { cn } from "cn";
@@ -12,7 +12,7 @@ export interface WeatherIconProps {
   /** Pixel size, or "auto" to size it with className (e.g. responsive `size-*` utilities). */
   size?: number | "auto";
   className?: string;
-  /** Loop the micro-animation. Off: still, unless an ancestor `.wx-hover` is hovered or focused. */
+  /** Loop the micro-animation; off, the icon rests on its static drawing. */
   animate?: boolean;
 }
 

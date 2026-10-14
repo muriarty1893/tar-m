@@ -4,16 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { CameraIcon, CheckIcon, InfoIcon } from "@phosphor-icons/react/dist/ssr";
 import { demoScenarios, type DemoScenario } from "@/data/demo-scenarios";
 import { photoCredits } from "@/data/photo-credits";
-import { AppScreen, type AppPhase, type AppTab } from "./phone-app/AppScreen";
+import { AppScreen, type AppPhase, type AppTab, type GuideStep } from "./phone-app/AppScreen";
 import { PhoneStage, usePrefersReducedMotion } from "./phone-app/PhoneStage";
 import { ANALYSIS_MS } from "@/lib/phone-stage";
 import { CtaLink } from "./CtaLink";
 import { Button } from "./ui/button";
 import { FocusCards } from "./ui/focus-cards";
-
-const AUTOPLAY_MS = 2600;
-/** In the auto tour, how long the live camera shows before the shutter "is pressed". */
-const AUTOPLAY_SHUTTER_MS = 1800;
 
 const taken = (p: AppPhase) => p === "analyzing" || p === "done";
 const STEPS: { label: string; reached: (p: AppPhase) => boolean; current: (p: AppPhase) => boolean }[] = [
@@ -27,37 +23,35 @@ export function DemoShowcase() {
   const [phase, setPhase] = useState<AppPhase>("idle");
   const [tab, setTab] = useState<AppTab>("home");
   const [asking, setAsking] = useState(false);
+  // Guide steps the visitor has already done; the tap hand points only at the next new one.
+  const [done, setDone] = useState<ReadonlySet<GuideStep>>(() => new Set());
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stage = useRef<HTMLDivElement>(null);
-  const interacted = useRef(false);
   const reduced = usePrefersReducedMotion();
+  const mark = useCallback((step: GuideStep) => setDone((d) => (d.has(step) ? d : new Set(d).add(step))), []);
 
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current);
   }, []);
 
   // Picking a field opens the live camera on it; a new pick cancels any pending analysis.
-  const aim = useCallback((s: DemoScenario) => {
+  const aim = (s: DemoScenario) => {
     if (timer.current) clearTimeout(timer.current);
+    mark("scan");
     setSelected(s);
     setAsking(false);
     setPhase("camera");
-  }, []);
+  };
 
-  // The shutter takes the photo and starts the analysis.
-  const shoot = useCallback(() => {
+  // The shutter takes the photo and starts the analysis. Nothing is ever photographed by itself.
+  const press = () => {
     if (timer.current) clearTimeout(timer.current);
+    mark("shoot");
     setPhase("analyzing");
     timer.current = setTimeout(() => setPhase("done"), ANALYSIS_MS);
-  }, []);
-
-  const press = () => {
-    interacted.current = true;
-    shoot();
   };
 
   const pick = (s: DemoScenario) => {
-    interacted.current = true;
     aim(s);
     // The picker sits below the phone: bring the phone into view (on phones it is usually off screen).
     const el = stage.current;
@@ -73,7 +67,6 @@ export function DemoShowcase() {
   };
 
   const reset = (to: AppTab = "home") => {
-    interacted.current = true;
     if (timer.current) clearTimeout(timer.current);
     setSelected(null);
     setAsking(false);
@@ -83,38 +76,22 @@ export function DemoShowcase() {
 
   // History list: show a past scan's result without re-running the analysis.
   const open = (s: DemoScenario) => {
-    interacted.current = true;
     if (timer.current) clearTimeout(timer.current);
     setSelected(s);
     setAsking(false);
     setPhase("done");
   };
 
-  // Showcase: once the phone is in view, play one example scan unless the visitor acts first.
-  useEffect(() => {
-    const el = stage.current;
-    if (!el || reduced) return;
-    let pending: ReturnType<typeof setTimeout> | undefined;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting || interacted.current) return;
-        io.disconnect();
-        pending = setTimeout(() => {
-          if (interacted.current) return;
-          aim(demoScenarios[0]);
-          pending = setTimeout(() => {
-            if (!interacted.current) shoot();
-          }, AUTOPLAY_SHUTTER_MS);
-        }, AUTOPLAY_MS);
-      },
-      { threshold: 0.35 },
-    );
-    io.observe(el);
-    return () => {
-      io.disconnect();
-      clearTimeout(pending);
-    };
-  }, [reduced, aim, shoot]);
+  const hint: GuideStep | null =
+    phase === "idle" && tab === "home" && !done.has("scan")
+      ? "scan"
+      : phase === "camera" && !done.has("shoot")
+        ? "shoot"
+        : phase === "done" && !asking && !done.has("ask")
+          ? "ask"
+          : phase === "done" && asking && !done.has("question")
+            ? "question"
+            : null;
 
   return (
     <div className="space-y-10">
@@ -131,9 +108,11 @@ export function DemoShowcase() {
             onShutter={press}
             asking={asking}
             onAsk={(v) => {
-              interacted.current = true;
+              if (v) mark("ask");
               setAsking(v);
             }}
+            hint={hint}
+            onQuestion={() => mark("question")}
           />
         </PhoneStage>
       </div>
@@ -189,7 +168,7 @@ export function DemoShowcase() {
               </Button>
             ) : (
               <p className="text-muted-foreground">
-                {phase === "idle" ? "Bir fotoğraf seçin; telefonun kamerası açılsın." : phase === "analyzing" ? "Yapay zekâ fotoğrafı inceliyor…" : "Sonucu telefonda görün, \u201cSoru sor\u201d ile ayrıntı isteyin."}
+                {phase === "idle" ? "Telefonda \u201cHastalık Tara\u201dya dokunun ya da bir tarla fotoğrafı seçin." : phase === "analyzing" ? "Yapay zekâ fotoğrafı inceliyor…" : "Sonucu telefonda görün, \u201cSoru sor\u201d ile ayrıntı isteyin."}
               </p>
             )}
           </div>

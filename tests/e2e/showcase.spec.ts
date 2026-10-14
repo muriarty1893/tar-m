@@ -21,11 +21,43 @@ test("the 3D phone loads near the demo and runs the app on its screen", async ({
   await expect(demo.getByText("Hızlı İşlemler")).toBeVisible();
 });
 
-test("without interaction the phone plays one example scan by itself", async ({ page }) => {
+test("without interaction the phone waits on the app's home screen, pointing at the scan button", async ({ page }) => {
   await page.goto("/#demo");
-  // On phones the stage sits below the scenario grid; the tour starts once it is in view.
+  const demo = page.locator("#demo");
   await page.locator(CANVAS).scrollIntoViewIfNeeded();
-  await expect(page.locator("#demo").getByTestId("demo-cevap")).toBeVisible({ timeout: 15_000 });
+  await page.waitForTimeout(6000);
+  // No photo is taken by itself: still on the home screen, camera closed, no result.
+  await expect(demo.getByText("Hızlı İşlemler")).toBeVisible();
+  await expect(demo.getByText("CANLI · Kamera")).toHaveCount(0);
+  await expect(demo.getByTestId("demo-cevap")).toHaveCount(0);
+  await expect(demo.getByTestId("tap-hint")).toHaveCount(1);
+  await expect(demo.getByTestId("tap-hint")).toContainText("Taramayı başlatın");
+});
+
+test("the tap pointer walks the visitor through scan, photo and question", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/#demo");
+  const demo = page.locator("#demo");
+  await expect(demo.locator(CANVAS)).toBeVisible({ timeout: 20_000 });
+  const hint = demo.getByTestId("tap-hint");
+
+  await demo.getByRole("button", { name: /Hastalık Tara/ }).click();
+  await expect(hint).toContainText("Fotoğrafı çekin");
+  await demo.getByRole("button", { name: "Fotoğraf çek", exact: true }).click();
+  await expect(hint).toHaveCount(0); // nothing to tap while analysing
+  await expect(demo.getByTestId("demo-cevap")).toBeVisible({ timeout: 4000 });
+  await expect(hint).toContainText("Soru sorun");
+
+  await demo.getByRole("button", { name: "Soru sor", exact: true }).click();
+  await expect(hint).toContainText("Bir soru seçin");
+  await demo.getByRole("log", { name: "Sohbet" }).locator("..").getByRole("button").filter({ hasText: "?" }).first().click();
+  await expect(hint).toHaveCount(0);
+
+  // Steps already done are not pointed at again.
+  await demo.getByRole("button", { name: "Sonuca dön" }).click();
+  await demo.getByRole("button", { name: "Yeni tarama" }).click();
+  await expect(demo.getByText("Hızlı İşlemler")).toBeVisible();
+  await expect(hint).toHaveCount(0);
 });
 
 test("reduced motion: no auto tour and no motion toggle", async ({ page }) => {

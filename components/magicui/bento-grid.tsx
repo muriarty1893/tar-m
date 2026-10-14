@@ -1,11 +1,9 @@
-// Adapted from Magic UI "BentoGrid" (MIT, magicui.design, listed on 21st.dev), with
-// Aceternity UI's "Glowing Effect" border on each card.
+// Adapted from Magic UI "BentoGrid" (MIT, magicui.design, listed on 21st.dev).
 // Changes: server component (no hover-only CTA — UI UX Pro Max forbids
 // hover-only affordances), Phosphor icon slot, Organik Doğa surfaces, and a
 // responsive 1 → 2 → 3 column grid instead of fixed 3 columns.
 import type { ComponentPropsWithoutRef, ReactNode } from "react"
 import { cn } from "cn"
-import { GlowingEffect } from "@/components/ui/glowing-effect"
 
 export function BentoGrid({ children, className, ...props }: ComponentPropsWithoutRef<"ul">) {
   return (
@@ -26,10 +24,9 @@ interface BentoCardProps {
 
 export function BentoCard({ name, description, icon, background, className, headingLevel = "h3" }: BentoCardProps) {
   const Heading = headingLevel
-  // Outer frame carries the Aceternity-style glowing border; the inner panel holds the content.
+  // Outer frame around the inner panel that holds the content.
   return (
     <li className={cn("relative min-h-60 rounded-[1.75rem] border border-border p-2", className)}>
-      <GlowingEffect />
       <div className="relative flex h-full flex-col justify-end gap-5 overflow-hidden rounded-[1.25rem] border border-border/70 bg-card p-6 shadow-soft">
         {background && (
           <div aria-hidden="true" className="pointer-events-none absolute inset-0">

@@ -171,7 +171,7 @@ function NextDays({ forecast, placeholder }: ViewProps) {
   return (
     <ul className="grid grid-cols-3 gap-2.5" aria-label="Önümüzdeki günler">
       {forecast.daily.slice(1, 4).map((d, i) => (
-        <li key={d.date} className="wx-hover flex flex-col items-center rounded-[1.4rem] border border-border bg-background px-2 py-3.5 text-center">
+        <li key={d.date} className="flex flex-col items-center rounded-[1.4rem] border border-border bg-background px-2 py-3.5 text-center">
           <span className="font-semibold">{placeholder ? "–" : formatTrDay(d.date, i + 1)}</span>
           <ConditionIcon kind={dayKind(d)} size={48} animate={false} className="my-1.5" />
           <span className="font-heading text-lg font-bold tabular-nums">
@@ -234,7 +234,7 @@ function WeekList({ forecast, placeholder }: ViewProps) {
           return (
             <li
               key={d.date}
-              className="wx-hover grid grid-cols-[5.6rem_2.25rem_minmax(0,1fr)] items-center gap-x-2.5 gap-y-1.5 px-4 sm:gap-x-3 py-3.5 transition-colors duration-200 hover:bg-surface sm:grid-cols-[6rem_2.75rem_3.75rem_minmax(0,1fr)_minmax(0,16rem)] sm:px-5"
+              className="grid grid-cols-[5.6rem_2.25rem_minmax(0,1fr)] items-center gap-x-2.5 gap-y-1.5 px-4 sm:gap-x-3 py-3.5 sm:grid-cols-[6rem_2.75rem_3.75rem_minmax(0,1fr)_minmax(0,16rem)] sm:px-5"
             >
               <span className="min-w-0">
                 <span className="block truncate font-semibold">{placeholder ? "–" : formatTrDay(d.date, i)}</span>

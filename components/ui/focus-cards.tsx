@@ -2,10 +2,9 @@
 
 // Adapted from Aceternity UI "Focus Cards" (ui.aceternity.com/components/focus-cards).
 // Changes: real <button>s with aria-pressed (it's a picker), next/image, the title is always
-// visible (touch screens have no hover), keyboard focus drives the same focus effect, and the
-// blur/scale is skipped for reduced motion.
+// visible, and no hover effect: the cards stay still; only the picked one gets a ring.
 
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import Image from "next/image";
 import { cn } from "cn";
 
@@ -24,25 +23,18 @@ export function FocusCards({
   icon?: ReactNode;
   className?: string;
 }) {
-  const [focused, setFocused] = useState<number | null>(null);
-
   return (
-    <ul className={cn("grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4", className)} onMouseLeave={() => setFocused(null)}>
-      {cards.map((card, i) => {
+    <ul className={cn("grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4", className)}>
+      {cards.map((card) => {
         const selected = selectedId === card.id;
-        const dimmed = focused !== null && focused !== i;
         return (
           <li key={card.id}>
             <button
               type="button"
               onClick={() => onSelect(card.id)}
-              onMouseEnter={() => setFocused(i)}
-              onFocus={() => setFocused(i)}
-              onBlur={() => setFocused(null)}
               aria-pressed={selected}
               className={cn(
-                "group relative block aspect-[4/5] w-full cursor-pointer overflow-hidden rounded-3xl bg-muted text-left shadow-soft outline-none ring-offset-2 ring-offset-background transition-[filter,transform,opacity,box-shadow] duration-300 ease-out focus-visible:ring-4 focus-visible:ring-ring/40 motion-reduce:transition-none sm:aspect-[3/4]",
-                dimmed && "scale-[0.98] opacity-80 blur-[2px] motion-reduce:scale-100 motion-reduce:blur-none",
+                "relative block aspect-[4/5] w-full cursor-pointer overflow-hidden rounded-3xl bg-muted text-left shadow-soft outline-none ring-offset-2 ring-offset-background focus-visible:ring-4 focus-visible:ring-ring/40 sm:aspect-[3/4]",
                 selected && "ring-4 ring-primary",
               )}
             >
@@ -51,7 +43,7 @@ export function FocusCards({
                 alt={card.alt}
                 fill
                 sizes="(min-width: 1024px) 25vw, 50vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
+                className="object-cover"
               />
               <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
               {selected && (
@@ -65,8 +57,8 @@ export function FocusCards({
                   <span
                     aria-hidden="true"
                     className={cn(
-                      "flex size-10 shrink-0 items-center justify-center rounded-full backdrop-blur transition-colors [&_svg]:size-5",
-                      selected ? "bg-primary text-primary-foreground" : "bg-white/20 text-white group-hover:bg-white/30",
+                      "flex size-10 shrink-0 items-center justify-center rounded-full backdrop-blur [&_svg]:size-5",
+                      selected ? "bg-primary text-primary-foreground" : "bg-white/20 text-white",
                     )}
                   >
                     {icon}

@@ -40,9 +40,12 @@ import { demoScenarios, type DemoScenario } from "@/data/demo-scenarios";
 import { ANALYSIS_MS, SCREEN } from "@/lib/phone-stage";
 import { AnalyzingImage } from "@/components/ui/analyzing-image";
 import { SuccessGauge } from "../SuccessGauge";
+import { TapHint } from "./TapHint";
 
 export type AppPhase = "idle" | "camera" | "analyzing" | "done";
 export type AppTab = "home" | "weather" | "history";
+/** Demo coach marks, in order: start a scan, take the photo, open the chat, pick a question. */
+export type GuideStep = "scan" | "shoot" | "ask" | "question";
 
 type Props = {
   phase: AppPhase;
@@ -59,10 +62,14 @@ type Props = {
   /** The "Soru sor" chat about the current result. */
   asking: boolean;
   onAsk: (open: boolean) => void;
+  /** The step to point at with the tap hand, if any. */
+  hint?: GuideStep | null;
+  /** A question was sent in the chat. */
+  onQuestion?: () => void;
 };
 
 /** Simulated mobile app (siteConfig.name), drawn at phone size (SCREEN px) for the 3D phone or the flat frame. */
-export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen, onShutter, asking, onAsk }: Props) {
+export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen, onShutter, asking, onAsk, hint = null, onQuestion }: Props) {
   const camera = (phase === "camera" || phase === "analyzing") && scenario;
   const result = phase === "done" && scenario;
   const chat = result && asking;
@@ -79,17 +86,17 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
 
       <div aria-live="polite" className="h-full">
         {camera ? (
-          <CameraScreen key="camera" s={scenario} live={phase === "camera"} onShutter={onShutter} />
+          <CameraScreen key="camera" s={scenario} live={phase === "camera"} onShutter={onShutter} hint={hint === "shoot"} />
         ) : chat ? (
-          <AskScreen key={`ask-${scenario.id}`} s={scenario} onBack={() => onAsk(false)} />
+          <AskScreen key={`ask-${scenario.id}`} s={scenario} onBack={() => onAsk(false)} hint={hint === "question"} onQuestion={onQuestion} />
         ) : result ? (
-          <ResultScreen key={`done-${scenario.id}`} s={scenario} onReset={onReset} onAsk={() => onAsk(true)} />
+          <ResultScreen key={`done-${scenario.id}`} s={scenario} onReset={onReset} onAsk={() => onAsk(true)} hint={hint === "ask"} />
         ) : tab === "weather" ? (
           <WeatherScreen key="weather" />
         ) : tab === "history" ? (
           <HistoryScreen key="history" onOpen={onOpen} />
         ) : (
-          <HomeScreen key="home" onScan={onScan} />
+          <HomeScreen key="home" onScan={onScan} hint={hint === "scan"} />
         )}
       </div>
 
@@ -128,12 +135,12 @@ const PRICES = [
   { name: "Pamuk", price: "31,20", change: 0.6, line: "0,10 8,11 16,8 24,9 32,6 40,6" },
 ];
 
-function HomeScreen({ onScan }: { onScan: () => void }) {
+function HomeScreen({ onScan, hint }: { onScan: () => void; hint: boolean }) {
   return (
     <div className={`${scroll} px-3.5 pb-28 pt-[52px] ${enter}`}>
       <WeatherHero />
       <PriceStrip />
-      <QuickActions onScan={onScan} />
+      <QuickActions onScan={onScan} hint={hint} />
     </div>
   );
 }
@@ -232,7 +239,7 @@ function PriceStrip() {
 function ActionCard({ img, icon: Icon, title, sub, badge }: { img: string; icon: typeof EyeIcon; title: string; sub: string; badge?: string }) {
   return (
     <>
-      <Image src={img} alt="" fill sizes="160px" className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none" />
+      <Image src={img} alt="" fill sizes="160px" className="object-cover" />
       <span aria-hidden="true" className={`${scrim} bg-[linear-gradient(0deg,rgb(0_0_0/0.72)_0%,rgb(0_0_0/0.15)_55%,transparent_100%)]`} />
       <span aria-hidden="true" className="absolute left-2.5 top-2.5 flex size-9 items-center justify-center rounded-full bg-white/95 text-primary shadow-soft">
         <Icon weight="duotone" className="size-5" />
@@ -249,19 +256,22 @@ function ActionCard({ img, icon: Icon, title, sub, badge }: { img: string; icon:
   );
 }
 
-function QuickActions({ onScan }: { onScan: () => void }) {
+function QuickActions({ onScan, hint }: { onScan: () => void; hint: boolean }) {
   const card = "group relative h-[128px] overflow-hidden rounded-[20px] shadow-soft";
   return (
     <div className="mt-4">
       <p className="font-heading text-[16px] font-bold">Hızlı İşlemler</p>
       <div className="mt-2 grid grid-cols-2 gap-2.5">
-        <button
-          type="button"
-          onClick={onScan}
-          className={`${card} cursor-pointer ring-2 ring-gold ring-offset-2 ring-offset-background transition-transform duration-150 active:scale-[0.97] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-primary motion-reduce:active:scale-100`}
-        >
-          <ActionCard img="/app/scan-leaf.webp" icon={CameraIcon} title="Hastalık Tara" sub="Kamerayla yaprak teşhisi" badge="Dene" />
-        </button>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={onScan}
+            className={`${card} w-full cursor-pointer ring-2 ring-gold ring-offset-2 ring-offset-background transition-transform duration-150 active:scale-[0.97] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-primary motion-reduce:active:scale-100`}
+          >
+            <ActionCard img="/app/scan-leaf.webp" icon={CameraIcon} title="Hastalık Tara" sub="Kamerayla yaprak teşhisi" badge="Dene" />
+          </button>
+          {hint && <TapHint label="Taramayı başlatın" className="left-1/2 top-[48%]" />}
+        </div>
         <div className={card}>
           <ActionCard img="/app/tractor-field.webp" icon={TractorIcon} title="Tarlalarım" sub="3 tarla ve harcamalar" />
         </div>
@@ -276,7 +286,7 @@ function QuickActions({ onScan }: { onScan: () => void }) {
   );
 }
 
-function CameraScreen({ s, live, onShutter }: { s: DemoScenario; live: boolean; onShutter: () => void }) {
+function CameraScreen({ s, live, onShutter, hint }: { s: DemoScenario; live: boolean; onShutter: () => void; hint: boolean }) {
   return (
     <div className="relative h-full bg-black text-white">
       {/* Viewfinder: the same field as the stage behind the phone, zoomed in. Live it drifts like a
@@ -314,14 +324,17 @@ function CameraScreen({ s, live, onShutter }: { s: DemoScenario; live: boolean; 
             <span aria-hidden="true" className="relative size-12 overflow-hidden rounded-xl ring-2 ring-white/70">
               <Image src={s.imageSrc} alt="" fill sizes="48px" className="object-cover" />
             </span>
-            <button
-              type="button"
-              onClick={onShutter}
-              aria-label="Fotoğraf çek"
-              className="flex size-[78px] cursor-pointer items-center justify-center rounded-full border-4 border-white transition-transform duration-150 active:scale-90 focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-gold motion-reduce:active:scale-100"
-            >
-              <span className="size-[60px] rounded-full bg-white shadow-[0_0_0_2px_rgb(0_0_0/0.15)]" />
-            </button>
+            <span className="relative">
+              <button
+                type="button"
+                onClick={onShutter}
+                aria-label="Fotoğraf çek"
+                className="flex size-[78px] cursor-pointer items-center justify-center rounded-full border-4 border-white transition-transform duration-150 active:scale-90 focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-gold motion-reduce:active:scale-100"
+              >
+                <span className="size-[60px] rounded-full bg-white shadow-[0_0_0_2px_rgb(0_0_0/0.15)]" />
+              </button>
+              {hint && <TapHint label="Fotoğrafı çekin" className="left-1/2 top-1/2" />}
+            </span>
             <span aria-hidden="true" className="flex size-12 items-center justify-center rounded-full bg-black/40 backdrop-blur">
               <ArrowsClockwiseIcon weight="bold" className="size-6" />
             </span>
@@ -370,7 +383,7 @@ const GENERIC_ANSWER =
   "Bu bir demo: gerçek uygulamada yapay zekâ sorunuzu fotoğrafınıza, ürününüze ve bölgenizin hava durumuna göre yanıtlayacak. Şimdilik önerilen sorulardan birini deneyebilirsiniz.";
 
 /** "Soru sor": a scripted chat about the scan, with suggested questions and a free-text box. */
-function AskScreen({ s, onBack }: { s: DemoScenario; onBack: () => void }) {
+function AskScreen({ s, onBack, hint, onQuestion }: { s: DemoScenario; onBack: () => void; hint: boolean; onQuestion?: () => void }) {
   const [messages, setMessages] = useState<Message[]>([
     { from: "ai", text: `Merhaba! "${s.diagnosis}" sonucu hakkında merak ettiklerinizi sorabilirsiniz.` },
   ]);
@@ -393,6 +406,7 @@ function AskScreen({ s, onBack }: { s: DemoScenario; onBack: () => void }) {
     const q = text.trim();
     if (!q || typing) return;
     setMessages((m) => [...m, { from: "me", text: q }]);
+    onQuestion?.();
     setDraft("");
     setTyping(true);
     const answer = s.questions.find((x) => x.q === q)?.a ?? GENERIC_ANSWER;
@@ -446,7 +460,8 @@ function AskScreen({ s, onBack }: { s: DemoScenario; onBack: () => void }) {
         )}
       </div>
 
-      <div className="space-y-2.5 border-t border-border bg-card px-3 pb-7 pt-3">
+      <div className="relative space-y-2.5 border-t border-border bg-card px-3 pb-7 pt-3">
+        {hint && suggestions.length > 0 && <TapHint label="Bir soru seçin" className="left-[64px] top-[32px]" />}
         {suggestions.length > 0 && (
           <div className="-mx-3 flex gap-2 overflow-x-auto px-3 [scrollbar-width:none]">
             {suggestions.map((q) => (
@@ -507,7 +522,7 @@ function Block({ icon: Icon, label, children }: { icon: typeof EyeIcon; label: s
   );
 }
 
-function ResultScreen({ s, onReset, onAsk }: { s: DemoScenario; onReset: () => void; onAsk: () => void }) {
+function ResultScreen({ s, onReset, onAsk, hint }: { s: DemoScenario; onReset: () => void; onAsk: () => void; hint: boolean }) {
   return (
     <div className="relative h-full">
     <div className={`${scroll} pb-28 ${enter}`} data-testid="demo-cevap">
@@ -578,6 +593,7 @@ function ResultScreen({ s, onReset, onAsk }: { s: DemoScenario; onReset: () => v
         <ChatCircleDotsIcon aria-hidden="true" weight="fill" className="size-5" />
         Soru sor
       </button>
+      {hint && <TapHint flip label="Soru sorun" className="bottom-[122px] right-[72px]" />}
     </div>
   );
 }
