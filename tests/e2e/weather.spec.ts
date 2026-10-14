@@ -141,3 +141,39 @@ test("the home page weather card shows today and the next days", async ({ page }
   await expect(next.getByRole("listitem").first()).toContainText("Yarın");
   await expect(section.getByRole("link", { name: /7 günlük tahmin/ })).toHaveAttribute("href", "/hava");
 });
+
+test("no weather icon is cut off: every drawing fits inside its icon box", async ({ page }) => {
+  const codes = [0, 2, 3, 45, 61, 65, 71]; // sun, partly, cloud, fog, rain, heavy rain, snow
+  await page.route("https://api.open-meteo.com/**", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        current: { ...body.current, weather_code: 95 }, // thunder
+        daily: {
+          time: codes.map((_, i) => `2026-10-1${i}`),
+          temperature_2m_min: codes.map(() => 5),
+          temperature_2m_max: codes.map(() => 15),
+          precipitation_probability_max: codes.map(() => 10),
+          precipitation_sum: codes.map(() => 0),
+          wind_speed_10m_max: codes.map(() => 10),
+          weather_code: codes,
+        },
+      }),
+    }),
+  );
+  await page.goto("/hava");
+  await expect(page.getByTestId("sicaklik")).toBeVisible();
+  const overflow = await page.locator("svg.wx-icon").evaluateAll((svgs) =>
+    svgs.flatMap((svg) => {
+      const vb = (svg as SVGSVGElement).viewBox.baseVal;
+      return [...svg.querySelectorAll("path, line, circle")].flatMap((el) => {
+        const b = (el as SVGGraphicsElement).getBBox();
+        const pad = Number(el.getAttribute("stroke-width") ?? 0) / 2;
+        const out = b.y - pad < vb.y || b.x - pad < vb.x || b.x + b.width + pad > vb.x + vb.width || b.y + b.height + pad > vb.y + vb.height;
+        return out ? [`${svg.parentElement?.textContent?.slice(0, 20)} ${el.getAttribute("d") ?? el.tagName} top=${(b.y - pad).toFixed(1)}`] : [];
+      });
+    }),
+  );
+  expect(overflow).toEqual([]);
+});

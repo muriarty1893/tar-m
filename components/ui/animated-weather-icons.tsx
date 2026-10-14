@@ -70,8 +70,10 @@ export function MoonIcon(props: WeatherIconProps) {
 }
 
 const CLOUD = "M36 30H14a8 8 0 01-.5-16A10 10 0 0134 16a7 7 0 012 14z";
-const RAIN_CLOUD = "M36 22H14a7 7 0 01-.5-14A9 9 0 0134 10a6 6 0 012 12z";
-const STORM_CLOUD = "M36 20H14a7 7 0 01-.5-14A9 9 0 0134 8a6 6 0 012 12z";
+// The original rain/storm clouds had a top arc too tight for its radius, so browsers enlarged it
+// and it poked above the 48×48 box (cut off). Redrawn with arcs that fit, same footprint below.
+const RAIN_CLOUD = "M35 22H15a6 6 0 010-12A7 7 0 0129 11.5a6 6 0 016 10.5z";
+const STORM_CLOUD = "M35 20H15a6 6 0 010-12A7 7 0 0129 9.5a6 6 0 016 10.5z";
 
 /* ─── CLOUD ─── */
 export function CloudIcon(props: WeatherIconProps) {
