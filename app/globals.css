@@ -631,3 +631,342 @@ html.cine [data-cine] {
     transform: scale(1.45);
   }
 }
+
+/* SpringCheck (components/ui/spring-check.tsx), from React Bits. The strike is a per-line
+   background wipe on the words (--sc-strike 0 → 100%) so wrapped labels strike line by line. */
+@layer components {
+.spring-check {
+  --sc-ink: #ffffff;
+  --sc-fill: #ffffff;
+  --sc-check: #0b0b0f;
+  --sc-box: 28px;
+  --sc-radius: 9px;
+  --sc-font: 18px;
+  --sc-ring: 2px;
+  --sc-gap: 12px;
+  --sc-row: 44px;
+  --sc-rule: 1.5px;
+  --sc-origin: left;
+  --sc-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sc-gap);
+  min-height: var(--sc-row);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sc-ink);
+  font-family: inherit;
+  font-size: var(--sc-font);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  outline: none;
+}
+.spring-check:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.spring-check__press {
+  flex: none;
+  width: var(--sc-box);
+  height: var(--sc-box);
+  border-radius: var(--sc-radius);
+  transition: transform 160ms var(--sc-ease-out);
+}
+.spring-check[data-pressed] .spring-check__press {
+  transform: scale(0.95);
+}
+.spring-check:focus-visible .spring-check__press {
+  outline: 2px solid color-mix(in srgb, var(--sc-ink) 45%, transparent);
+  outline-offset: 3px;
+}
+.spring-check__box {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
+  transform-origin: center;
+}
+.spring-check__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--sc-ring) var(--sc-ink);
+  opacity: 0.28;
+  transition: opacity 120ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .spring-check:not(:disabled):hover .spring-check__ring {
+    opacity: 0.5;
+  }
+}
+.spring-check__fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--sc-fill);
+  transform-origin: center;
+  transform: scale(0);
+}
+.spring-check__tick {
+  position: relative;
+  width: 68%;
+  height: 68%;
+  overflow: visible;
+  fill: none;
+  stroke: var(--sc-check);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.spring-check__tick path {
+  stroke-dashoffset: 1;
+}
+.spring-check__label {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+.spring-check__word--struck {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: var(--sc-origin) 58%;
+  background-size: var(--sc-strike, 0%) var(--sc-rule);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+@media (prefers-reduced-motion: reduce) {
+  .spring-check__press {
+    transition: none;
+  }
+}
+}
+
+/* CircularText (components/ui/circular-text.tsx), from React Bits. */
+.circular-text-wrap {
+  position: relative;
+  flex: none;
+}
+.circular-text {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  font-weight: 900;
+  text-align: center;
+  transform-origin: 50% 50%;
+}
+.circular-text span {
+  position: absolute;
+  inset: 0;
+  display: inline-block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .circular-text {
+    animation: circular-text-spin var(--ct-duration, 20s) linear infinite;
+  }
+}
+@keyframes circular-text-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* MaskedHeading (components/ui/masked-heading.tsx), from React Bits. Until the script has placed
+   the letters (or without JS), the words are ordinary text and the photo layer stays hidden. */
+.masked-heading {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-wrap: balance;
+  -webkit-font-smoothing: antialiased;
+}
+.masked-heading__measure {
+  color: var(--foreground);
+}
+.masked-heading[data-ready] .masked-heading__measure {
+  color: transparent;
+}
+.masked-heading__word {
+  display: inline-block;
+  white-space: pre;
+}
+.masked-heading__word:not(:last-child)::after {
+  content: " ";
+}
+.masked-heading__baseline {
+  display: inline-block;
+  width: 0;
+  height: 0;
+}
+.masked-heading__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+.masked-heading__reveal {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  visibility: hidden;
+}
+.masked-heading[data-ready] .masked-heading__reveal {
+  visibility: visible;
+}
+.masked-heading__clip,
+.masked-heading__media {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.masked-heading__media {
+  will-change: transform;
+}
+.masked-heading__source {
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* PillNav (components/ui/pill-nav.tsx), from React Bits: a green bar of light pills; hovering or
+   focusing one fills it with green from below while the label slides up and a white copy rises. */
+.pill-nav {
+  --pill-base: var(--primary);
+  --pill-bg: var(--background);
+  --pill-text: var(--foreground);
+  --pill-hover-text: var(--primary-foreground);
+  --pill-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+.pill-nav__list {
+  display: flex;
+  align-items: stretch;
+  gap: 3px;
+  height: 46px;
+  margin: 0;
+  padding: 3px;
+  list-style: none;
+  border-radius: 9999px;
+  background: var(--pill-base);
+  box-shadow: var(--shadow-soft);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pill-nav__list {
+    animation: pill-nav-in 0.6s var(--pill-ease) both;
+  }
+}
+@keyframes pill-nav-in {
+  from {
+    clip-path: inset(0 50% 0 50% round 9999px);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 9999px);
+  }
+}
+.pill-nav__list > li {
+  display: flex;
+}
+.pill-nav__pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 18px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: var(--pill-bg);
+  color: var(--pill-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  outline: none;
+}
+.pill-nav__pill:focus-visible {
+  box-shadow: 0 0 0 3px var(--pill-bg), 0 0 0 6px var(--ring);
+}
+.pill-nav__circle {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 1;
+  display: block;
+  border-radius: 50%;
+  background: var(--pill-base);
+  pointer-events: none;
+  transform: translateX(-50%) scale(0);
+  transition: transform 0.2s var(--pill-ease);
+}
+.pill-nav__stack {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  line-height: 1;
+}
+.pill-nav__label {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.2s var(--pill-ease);
+}
+.pill-nav__label-hover {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--pill-hover-text);
+  opacity: 0;
+  transform: translateY(calc(var(--pill-h, 40px) + 12px));
+  transition:
+    transform 0.2s var(--pill-ease),
+    opacity 0.2s var(--pill-ease);
+}
+.pill-nav__pill:is(:hover, :focus-visible) .pill-nav__circle {
+  transform: translateX(-50%) scale(1.2);
+  transition-duration: 0.3s;
+}
+.pill-nav__pill:is(:hover, :focus-visible) .pill-nav__label {
+  transform: translateY(calc(-1 * (var(--pill-h, 40px) + 8px)));
+  transition-duration: 0.3s;
+}
+.pill-nav__pill:is(:hover, :focus-visible) .pill-nav__label-hover {
+  opacity: 1;
+  transform: translateY(0);
+  transition-duration: 0.3s;
+}
+/* Current page: a dot under the pill. */
+.pill-nav__list > li:has([aria-current="page"])::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  z-index: 4;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--pill-base);
+  transform: translateX(-50%);
+}
+.pill-nav__list > li:has([aria-current="page"]) {
+  position: relative;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pill-nav__circle,
+  .pill-nav__label,
+  .pill-nav__label-hover {
+    transition: none;
+  }
+}

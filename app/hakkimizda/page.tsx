@@ -3,6 +3,7 @@ import { siteConfig } from "@/config/site";
 import { HandHeartIcon, ScalesIcon, ShieldCheckIcon, TranslateIcon, TargetIcon } from "@phosphor-icons/react/dist/ssr";
 import { CtaLink } from "@/components/CtaLink";
 import { PageHero } from "@/components/PageHero";
+import { MaskedHeading } from "@/components/ui/masked-heading";
 
 export const metadata: Metadata = {
   title: "Hakkımızda",
@@ -19,7 +20,15 @@ const values = [
 export default function AboutPage() {
   return (
     <>
-      <PageHero eyebrow="Hakkımızda" title="Hakkımızda" intro="Yapay zekâyı çiftçinin gözünün yerine değil, yanına koyuyoruz." />
+      <PageHero
+        eyebrow="Biz kimiz"
+        title="Hakkımızda"
+        heading={
+          // React Bits MaskedHeading: the sunset field shows through the letters.
+          <MaskedHeading tag="h1" text="Hakkımızda" src="/app/hero-field.webp" align="left" textScale={0.155} parallax={22} drift={14} brightness={0.92} saturation={1.15} className="mt-2" />
+        }
+        intro="Yapay zekâyı çiftçinin gözünün yerine değil, yanına koyuyoruz."
+      />
       <div className="mx-auto max-w-4xl px-4 py-14">
         <div className="space-y-5 text-lg leading-relaxed">
           <p>

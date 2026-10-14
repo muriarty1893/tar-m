@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
@@ -41,6 +42,12 @@ import { ANALYSIS_MS, SCREEN } from "@/lib/phone-stage";
 import { AnalyzingImage } from "@/components/ui/analyzing-image";
 import { SuccessGauge } from "../SuccessGauge";
 import { TapHint } from "./TapHint";
+
+// React Bits SpringCheck (motion) loads with the first result, alongside the gauge's number ticker.
+const SpringCheck = dynamic(() => import("@/components/ui/spring-check").then((m) => m.SpringCheck), {
+  ssr: false,
+  loading: () => <span className="block min-h-11" />,
+});
 
 export type AppPhase = "idle" | "camera" | "analyzing" | "done";
 export type AppTab = "home" | "weather" | "history";
@@ -558,11 +565,21 @@ function ResultScreen({ s, onReset, onAsk, hint }: { s: DemoScenario; onReset: (
           <p className="text-[14px]">{s.seen}</p>
         </Block>
         <Block icon={LightbulbIcon} label="Öneriler">
-          <ul className="mt-1 space-y-1.5 text-[14px]">
+          <p className="text-[12.5px] text-muted-foreground">Yaptıklarınızı işaretleyin.</p>
+          <ul className="mt-1 space-y-1">
             {s.suggestions.map((t) => (
-              <li key={t} className="flex gap-2">
-                <CheckCircleIcon aria-hidden="true" weight="fill" className="mt-0.5 size-4 shrink-0 text-primary" />
-                {t}
+              <li key={t}>
+                <SpringCheck
+                  label={t}
+                  color="var(--foreground)"
+                  fillColor="var(--primary)"
+                  checkColor="var(--primary-foreground)"
+                  boxSize={22}
+                  boxRadius={7}
+                  fontSize={14}
+                  doneOpacity={0.5}
+                  className="w-full items-start py-1 [&_.spring-check\_\_press]:mt-[-2px]"
+                />
               </li>
             ))}
           </ul>

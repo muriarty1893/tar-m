@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { CheckCircleIcon, SealCheckIcon } from "@phosphor-icons/react/dist/ssr";
+import { CheckCircleIcon, GrainsIcon, SealCheckIcon } from "@phosphor-icons/react/dist/ssr";
 import { provinces } from "@/data/provinces";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { CircularText } from "@/components/ui/circular-text";
 import { useFormSubmit } from "./forms/useFormSubmit";
 import { Field, FieldError, FormError, Honeypot, SubmitButton, describedBy } from "./forms/fields";
 
@@ -26,8 +27,7 @@ export function WaitlistForm() {
   return (
     <div id="kayit" className="scroll-mt-24 overflow-hidden rounded-[2rem] border border-border bg-card shadow-lift">
       <div className="grid md:grid-cols-[0.9fr_1.4fr]">
-        <div className="relative overflow-hidden bg-primary p-7 text-primary-foreground sm:p-9">
-          <div aria-hidden="true" className="blob absolute -bottom-16 -right-16 size-56 bg-primary-foreground/10" />
+        <div className="relative flex flex-col overflow-hidden bg-primary p-7 text-primary-foreground sm:p-9">
           <h2 className="relative text-3xl font-bold tracking-tight">Erken erişim listesine katılın</h2>
           <p className="relative mt-3 text-lg">Uygulama hazır olduğunda ilk siz haberdar olun. Kayıt ücretsizdir.</p>
           <ul className="relative mt-7 space-y-3">
@@ -38,6 +38,13 @@ export function WaitlistForm() {
               </li>
             ))}
           </ul>
+          {/* React Bits CircularText as a stamp (its words repeat "Kayıt ücretsizdir" above). Tablet and up:
+              on phones the panel stacks above the form and the stamp would push the form off screen. */}
+          <CircularText text="ÜCRETSİZ • ERKEN ERİŞİM • " spinDuration={18} size={132} fontSize={14} className="mt-auto hidden self-end pt-8 text-primary-foreground/85 md:block">
+            <span className="flex size-14 items-center justify-center rounded-full bg-primary-foreground text-primary">
+              <GrainsIcon weight="duotone" className="size-8" />
+            </span>
+          </CircularText>
         </div>
 
         <div className="p-7 sm:p-9">
