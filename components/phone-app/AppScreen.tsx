@@ -93,7 +93,7 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
 
       <div aria-live="polite" className="h-full">
         {camera ? (
-          <CameraScreen key="camera" s={scenario} live={phase === "camera"} onShutter={onShutter} hint={hint === "shoot"} />
+          <CameraScreen key="camera" s={scenario} live={phase === "camera"} onShutter={onShutter} onClose={onReset} hint={hint === "shoot"} />
         ) : chat ? (
           <AskScreen key={`ask-${scenario.id}`} s={scenario} onBack={() => onAsk(false)} hint={hint === "question"} onQuestion={onQuestion} />
         ) : result ? (
@@ -293,7 +293,7 @@ function QuickActions({ onScan, hint }: { onScan: () => void; hint: boolean }) {
   );
 }
 
-function CameraScreen({ s, live, onShutter, hint }: { s: DemoScenario; live: boolean; onShutter: () => void; hint: boolean }) {
+function CameraScreen({ s, live, onShutter, onClose, hint }: { s: DemoScenario; live: boolean; onShutter: () => void; onClose: () => void; hint: boolean }) {
   return (
     <div className="relative h-full bg-black text-white">
       {/* Viewfinder: the same field as the stage behind the phone, zoomed in. Live it drifts like a
@@ -303,15 +303,21 @@ function CameraScreen({ s, live, onShutter, hint }: { s: DemoScenario; live: boo
           <Image src={s.imageSrc} alt={s.imageAlt} fill sizes="480px" className="object-cover" />
         </div>
       </div>
-      <div aria-hidden="true" className="absolute inset-x-0 top-14 z-10 flex items-center justify-between px-5">
-        <span className="flex size-10 items-center justify-center rounded-full bg-black/40 backdrop-blur">
-          <XIcon weight="bold" className="size-5" />
-        </span>
-        <span className="flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 text-[13px] font-semibold backdrop-blur">
+      <div className="absolute inset-x-0 top-14 z-10 flex items-center justify-between px-5">
+        {/* Closes the camera (and cancels a running analysis), back to the home screen. */}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Kamerayı kapat"
+          className="flex size-11 cursor-pointer items-center justify-center rounded-full bg-black/40 backdrop-blur transition-colors duration-150 hover:bg-black/60 active:bg-black/70 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-white"
+        >
+          <XIcon aria-hidden="true" weight="bold" className="size-5" />
+        </button>
+        <span aria-hidden="true" className="flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 text-[13px] font-semibold backdrop-blur">
           <span className="size-2 rounded-full bg-red-500 motion-safe:animate-pulse" />
           {live ? "CANLI · Kamera" : "CANLI · Tarama"}
         </span>
-        <span className="flex size-10 items-center justify-center rounded-full bg-black/40 backdrop-blur">
+        <span aria-hidden="true" className="flex size-11 items-center justify-center rounded-full bg-black/40 backdrop-blur">
           <LightningIcon weight="fill" className="size-5" />
         </span>
       </div>

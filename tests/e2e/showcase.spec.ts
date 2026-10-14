@@ -24,7 +24,9 @@ test("the 3D phone loads near the demo and runs the app on its screen", async ({
 test("without interaction the phone waits on the app's home screen, pointing at the scan button", async ({ page }) => {
   await page.goto("/#demo");
   const demo = page.locator("#demo");
-  await page.locator(CANVAS).scrollIntoViewIfNeeded();
+  // The canvas is created only once the stage nears the screen: scroll to the stage, then wait for it.
+  await demo.locator(".stage-bg").scrollIntoViewIfNeeded();
+  await expect(demo.locator(CANVAS)).toBeVisible({ timeout: 20_000 });
   await page.waitForTimeout(6000);
   // No photo is taken by itself: still on the home screen, camera closed, no result.
   await expect(demo.getByText("Hızlı İşlemler")).toBeVisible();
@@ -70,12 +72,35 @@ test("reduced motion: no auto tour and no motion toggle", async ({ page }) => {
   await expect(demo.getByRole("button", { name: /Hareketi/ })).toHaveCount(0);
 });
 
-test("the motion toggle pauses and resumes the floating phone", async ({ page }) => {
+test("there is no pause-motion button under the phone", async ({ page }) => {
   await page.goto("/#demo");
   const demo = page.locator("#demo");
   await expect(demo.locator(CANVAS)).toBeVisible({ timeout: 20_000 });
-  await demo.getByRole("button", { name: "Hareketi durdur" }).click();
-  await expect(demo.getByRole("button", { name: "Hareketi başlat" })).toBeVisible();
+  await expect(demo.getByRole("button", { name: /Hareketi/ })).toHaveCount(0);
+});
+
+test("the camera's X closes it, back to the app's home screen, also mid-analysis", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/#demo");
+  const demo = page.locator("#demo");
+  await expect(demo.locator(CANVAS)).toBeVisible({ timeout: 20_000 });
+  const app = demo.getByTestId("uygulama-ekrani");
+
+  await demo.getByRole("button", { name: /Ayçiçeği tarlası/ }).click();
+  await expect(app.getByText("CANLI · Kamera")).toBeVisible();
+  await app.getByRole("button", { name: "Kamerayı kapat" }).click();
+  await expect(app.getByText("CANLI · Kamera")).toHaveCount(0);
+  await expect(app.getByText("Hızlı İşlemler")).toBeVisible();
+  await expect(demo.locator(".stage-bg")).not.toHaveAttribute("data-scene");
+
+  await demo.getByRole("button", { name: /Ayçiçeği tarlası/ }).click();
+  await app.getByRole("button", { name: "Fotoğraf çek", exact: true }).click();
+  await expect(app.getByText("CANLI · Tarama")).toBeVisible();
+  await app.getByRole("button", { name: "Kamerayı kapat" }).click();
+  await expect(app.getByText("Hızlı İşlemler")).toBeVisible();
+  // The cancelled analysis must not pop its result up later.
+  await page.waitForTimeout(2600);
+  await expect(demo.getByTestId("demo-cevap")).toHaveCount(0);
 });
 
 test("without WebGL the app screen shows in a flat phone frame", async ({ page }) => {

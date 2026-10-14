@@ -3,8 +3,6 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { PauseIcon, PlayIcon } from "@phosphor-icons/react/dist/ssr";
-import { Button } from "@/components/ui/button";
 import { SCREEN, shouldLoad3D } from "@/lib/phone-stage";
 import { useMediaQuery, usePrefersReducedMotion } from "@/lib/use-media-query";
 
@@ -40,7 +38,6 @@ export function PhoneStage({ children, scene = null }: { children: ReactNode; sc
   const [load, setLoad] = useState(false);
   const [onScreen, setOnScreen] = useState(false);
   const [ready, setReady] = useState(false);
-  const [paused, setPaused] = useState(false);
   const reduced = usePrefersReducedMotion();
   const dark = useMediaQuery("(prefers-color-scheme: dark)");
   const markReady = useCallback(() => setReady(true), []);
@@ -105,7 +102,7 @@ export function PhoneStage({ children, scene = null }: { children: ReactNode; sc
 
         {load && (
           <div className="absolute inset-0">
-            <PhoneScene animate={!reduced && !paused} intro={!reduced} dark={dark} active={onScreen} overlay={overlay} onReady={markReady} scenery={!scene} />
+            <PhoneScene animate={!reduced} intro={!reduced} dark={dark} active={onScreen} overlay={overlay} onReady={markReady} scenery={!scene} />
           </div>
         )}
         {ready && (
@@ -115,17 +112,6 @@ export function PhoneStage({ children, scene = null }: { children: ReactNode; sc
           </div>
         )}
       </div>
-
-      {ready && (
-        <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-          {!reduced && (
-            <Button variant="ghost" size="sm" onClick={() => setPaused((p) => !p)}>
-              {paused ? <PlayIcon aria-hidden="true" weight="fill" /> : <PauseIcon aria-hidden="true" weight="fill" />}
-              {paused ? "Hareketi başlat" : "Hareketi durdur"}
-            </Button>
-          )}
-        </div>
-      )}
     </div>
   );
 }
