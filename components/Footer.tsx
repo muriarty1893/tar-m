@@ -16,8 +16,6 @@ const links = [
 export function Footer() {
   return (
     <footer className="relative mt-auto overflow-hidden border-t border-border bg-surface">
-      <div aria-hidden="true" className="dot-texture pointer-events-none absolute inset-0 opacity-60" />
-      <div aria-hidden="true" className="blob pointer-events-none absolute -bottom-24 -right-20 size-72 bg-blob opacity-60" />
       <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
         <div className="space-y-4">
           <Logo className="text-xl" />
@@ -47,9 +45,16 @@ export function Footer() {
           </a>
         </div>
       </div>
-      <p className="relative border-t border-border px-4 py-5 text-center text-sm text-muted-foreground">
-        © 2026 {siteConfig.name}. Tüm hakları saklıdır.
-      </p>
+      <div className="relative flex flex-col items-center justify-center gap-x-6 gap-y-1 border-t border-border px-4 py-5 text-center text-sm text-muted-foreground sm:flex-row">
+        <p>© 2026 {siteConfig.name}. Tüm hakları saklıdır.</p>
+        {/* The one emoji on the site, at the owner's request (allowed in tests/unit/no-emoji.test.ts). */}
+        <p data-allow-emoji>
+          vibecoded with <span role="img" aria-label="sevgi">❤️</span> by{" "}
+          <a href={siteConfig.creator.url} rel="noopener" className="font-semibold text-primary underline-offset-4 hover:underline">
+            {siteConfig.creator.name}
+          </a>
+        </p>
+      </div>
     </footer>
   );
 }

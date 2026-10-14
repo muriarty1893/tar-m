@@ -43,7 +43,6 @@ export default function PartnerPage() {
   return (
     <>
       <PageHero
-        eyebrow="İş birliği"
         title={`${siteConfig.name} ile birlikte çalışalım`}
         intro="Yatırımcılar, kooperatifler, ziraat odaları, kamu kurumları ve pilot çiftliklerle sahaya birlikte çıkmak istiyoruz."
       />

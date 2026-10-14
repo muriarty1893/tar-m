@@ -35,6 +35,12 @@
   --ring: #15803d;
   --shadow-tint: 21 128 61;
   --radius: 1.25rem;
+  /* shadcn chart series (components/ui/chart.tsx), in the brand palette. */
+  --chart-1: #15803d;
+  --chart-2: #a16207;
+  --chart-3: #22c55e;
+  --chart-4: #c2410c;
+  --chart-5: #b91c1c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -64,6 +70,11 @@
     --input: #2e5a3c;
     --ring: #4ade80;
     --shadow-tint: 0 0 0;
+    --chart-1: #4ade80;
+    --chart-2: #eab308;
+    --chart-3: #86efac;
+    --chart-4: #fb923c;
+    --chart-5: #f87171;
   }
 }
 
@@ -92,6 +103,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-space-grotesk), var(--font-dm-sans), ui-sans-serif, sans-serif;
   --radius-sm: calc(var(--radius) * 0.5);

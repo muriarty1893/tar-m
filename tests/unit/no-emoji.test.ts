@@ -29,7 +29,8 @@ describe("interface icons", () => {
           .readFileSync(f, "utf8")
           .split("\n")
           .map((line, i) => ({ line, i }))
-          .filter(({ line }) => emoji.test(line))
+          // The owner asked for one emoji: the heart in the footer's maker credit (marked data-allow-emoji).
+          .filter(({ line }, i, all) => emoji.test(line) && !(f.endsWith(path.join("components", "Footer.tsx")) && all[i - 1]?.line.includes("data-allow-emoji")))
           .map(({ i }) => `${path.relative(root, f)}:${i + 1}`),
       );
     expect(offenders).toEqual([]);

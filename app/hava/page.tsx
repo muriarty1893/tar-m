@@ -11,7 +11,6 @@ export default function WeatherPage() {
   return (
     <>
       <PageHero
-        eyebrow="Hava durumu"
         title="Hava Durumu"
         intro="İlinizi seçin; 7 günlük tahminle birlikte don, yoğun yağış ve ilaçlama için uygun günleri görün."
       />

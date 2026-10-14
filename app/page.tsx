@@ -73,10 +73,8 @@ export default async function Home() {
 
       <QuestionSection />
 
-      <section className="relative overflow-hidden px-4 py-20 sm:py-24">
-        <div aria-hidden="true" className="dot-texture pointer-events-none absolute inset-0 opacity-70" />
-        <div aria-hidden="true" className="blob pointer-events-none absolute -left-24 top-10 size-80 bg-blob opacity-70" />
-        <div className="relative mx-auto max-w-4xl">
+      <section className="px-4 py-20 sm:py-24">
+        <div className="mx-auto max-w-4xl">
           <WaitlistForm />
         </div>
       </section>

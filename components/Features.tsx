@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   BugIcon,
   CalendarDotsIcon,
@@ -11,13 +12,13 @@ import { BentoCard, BentoGrid } from "@/components/magicui/bento-grid";
 import { Section } from "./Section";
 import { CtaLink } from "./CtaLink";
 
-/** Decorative backdrop for the large bento cells. */
-function LeafField() {
+/** The disease card's backdrop: a real photo of stripe rust on a leaf, fading into the card. */
+function RustPhoto() {
   return (
-    <>
-      <div className="dot-texture absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent_75%)]" />
-      <div className="blob absolute -right-10 -top-12 size-52 bg-blob opacity-80" />
-    </>
+    // Phones: a strip across the top; wider screens: the right side, so the text keeps its full measure.
+    <div className="absolute inset-x-0 top-0 h-36 [mask-image:linear-gradient(to_bottom,black_55%,transparent)] sm:inset-x-auto sm:inset-y-0 sm:right-0 sm:h-auto sm:w-[44%] sm:[mask-image:linear-gradient(to_left,black_60%,transparent)]">
+      <Image src="/demo/bugday-sari-pas.webp" alt="" fill sizes="(min-width: 1024px) 360px, 44vw" className="object-cover object-[60%_50%]" />
+    </div>
   );
 }
 
@@ -36,8 +37,9 @@ const features = [
     icon: <BugIcon weight="duotone" />,
     name: "Hastalık ve zararlı tespiti",
     description: "Pas, mildiyö, kurumcuk gibi hastalıkların ve zararlıların belirtilerini fotoğraftan tanır.",
-    className: "lg:col-span-2 min-h-[17rem]",
-    background: <LeafField />,
+    className: "lg:col-span-2 min-h-[22rem] sm:min-h-[17rem]",
+    contentClassName: "sm:max-w-[54%]",
+    background: <RustPhoto />,
   },
   {
     icon: <ChartLineUpIcon weight="duotone" />,

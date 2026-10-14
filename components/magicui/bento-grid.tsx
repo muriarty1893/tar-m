@@ -19,10 +19,12 @@ interface BentoCardProps {
   icon: ReactNode
   background?: ReactNode
   className?: string
+  /** Narrows the text, e.g. to keep it clear of a photo on one side. */
+  contentClassName?: string
   headingLevel?: "h3" | "h2"
 }
 
-export function BentoCard({ name, description, icon, background, className, headingLevel = "h3" }: BentoCardProps) {
+export function BentoCard({ name, description, icon, background, className, contentClassName, headingLevel = "h3" }: BentoCardProps) {
   const Heading = headingLevel
   // Outer frame around the inner panel that holds the content.
   return (
@@ -36,7 +38,7 @@ export function BentoCard({ name, description, icon, background, className, head
         <span className="relative flex size-12 w-fit items-center justify-center rounded-xl border border-border bg-background p-2.5 text-primary [&_svg]:size-7">
           {icon}
         </span>
-        <div className="relative">
+        <div className={cn("relative", contentClassName)}>
           <Heading className="text-xl font-bold">{name}</Heading>
           <p className="mt-2 text-muted-foreground">{description}</p>
         </div>

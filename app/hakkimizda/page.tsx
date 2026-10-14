@@ -21,11 +21,11 @@ export default function AboutPage() {
   return (
     <>
       <PageHero
-        eyebrow="Biz kimiz"
         title="Hakkımızda"
+        photo={null}
         heading={
           // React Bits MaskedHeading: the sunset field shows through the letters.
-          <MaskedHeading tag="h1" text="Hakkımızda" src="/app/hero-field.webp" align="left" textScale={0.155} parallax={22} drift={14} brightness={0.92} saturation={1.15} className="mt-2" />
+          <MaskedHeading tag="h1" text="Hakkımızda" src="/app/hero-field.webp" align="left" textScale={0.155} parallax={22} drift={14} brightness={0.92} saturation={1.15} />
         }
         intro="Yapay zekâyı çiftçinin gözünün yerine değil, yanına koyuyoruz."
       />

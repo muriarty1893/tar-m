@@ -43,9 +43,7 @@ export default async function ArticlePage({ params }: PageProps<"/haberler/[slug
 
   return (
     <article>
-      <header className="relative overflow-hidden border-b border-border px-4 pb-12 pt-10 sm:pt-14">
-        <div aria-hidden="true" className="dot-texture pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top_left,black,transparent_70%)]" />
-        <div aria-hidden="true" className="blob pointer-events-none absolute -right-24 -top-24 size-72 bg-blob opacity-70" />
+      <header className="relative border-b border-border bg-surface px-4 pb-12 pt-10 sm:pt-14">
         <div className="relative mx-auto max-w-3xl">
           <Link
             href="/haberler"

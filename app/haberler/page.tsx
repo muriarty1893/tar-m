@@ -15,7 +15,6 @@ export default async function NewsPage() {
   return (
     <>
       <PageHero
-        eyebrow="Haberler"
         title="Haberler"
         intro={<>Tarım dünyasından haberler, mevsimlik öneriler ve {siteConfig.name} duyuruları.</>}
       />

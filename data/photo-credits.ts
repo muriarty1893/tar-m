@@ -4,7 +4,7 @@ export type PhotoCredit = {
   /** Short Turkish label shown in the credit line. */
   label: string;
   author: string;
-  license: "Kamu malı" | "CC0" | "CC BY 2.0" | "CC BY 4.0" | "CC BY-SA 2.0" | "CC BY-SA 3.0";
+  license: "Kamu malı" | "CC0" | "CC BY 2.0" | "CC BY 4.0" | "CC BY-SA 2.0" | "CC BY-SA 3.0" | "CC BY-SA 4.0";
   licenseUrl?: string;
   sourceUrl: string;
 };
@@ -13,7 +13,18 @@ const BY2 = "https://creativecommons.org/licenses/by/2.0/";
 const BY4 = "https://creativecommons.org/licenses/by/4.0/";
 const BYSA2 = "https://creativecommons.org/licenses/by-sa/2.0/";
 const BYSA3 = "https://creativecommons.org/licenses/by-sa/3.0/";
+const BYSA4 = "https://creativecommons.org/licenses/by-sa/4.0/";
 const CC0 = "https://creativecommons.org/publicdomain/zero/1.0/";
+
+/** Background of the subpage header band (components/PageHero.tsx), credited in the band itself. */
+export const pageHeroPhoto: PhotoCredit = {
+  src: "/hero/susehri-wheat.webp",
+  label: "Suşehri'nde buğday tarlası (Sivas)",
+  author: "Maurice Flesier",
+  license: "CC BY-SA 4.0",
+  licenseUrl: BYSA4,
+  sourceUrl: "https://commons.wikimedia.org/wiki/File:A_wheat_field_in_Su%C5%9Fehri,_Sivas_Province.jpg",
+};
 
 export const photoCredits: PhotoCredit[] = [
   { src: "/demo/bugday-sari-pas.webp", label: "Sarı pas (tritikale yaprağı)", author: "Rasbak", license: "CC BY-SA 3.0", licenseUrl: BYSA3, sourceUrl: "https://commons.wikimedia.org/wiki/File:Puccinia_striiformis_f.sp._triticale,_gele_roest_op_triticale_(2).jpg" },
@@ -26,4 +37,5 @@ export const photoCredits: PhotoCredit[] = [
   { src: "/app/tractor-field.webp", label: "Traktör", author: "U.S. Fish and Wildlife Service", license: "Kamu malı", sourceUrl: "https://commons.wikimedia.org/wiki/File:Tractor_plow_fields_cultivated.jpg" },
   { src: "/app/field-map.webp", label: "Tarlalar (havadan)", author: "Carol M. Highsmith", license: "Kamu malı", sourceUrl: "https://commons.wikimedia.org/wiki/File:Aerial_view_of_Pennsylvania_farmland_LCCN2011631350_(flipped_%26_removed_vignette).tif" },
   { src: "/app/seedlings.webp", label: "Çimlenen tohumlar", author: "Aerospectra", license: "CC BY 4.0", licenseUrl: BY4, sourceUrl: "https://commons.wikimedia.org/wiki/File:Sprouting_seeds.jpg" },
+  pageHeroPhoto,
 ];

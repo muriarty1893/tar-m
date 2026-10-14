@@ -14,7 +14,6 @@ export default function FaqPage() {
   return (
     <>
       <PageHero
-        eyebrow="SSS"
         title="Sıkça Sorulan Sorular"
         intro={
           <>
