@@ -32,6 +32,8 @@ export interface CinematicHeroProps {
   footnote?: ReactNode;
   phone: { src: string; alt: string; width: number; height: number };
   background: { src: string; alt?: string };
+  /** A photo filling the card itself, under a dark scrim; the card's text turns white over it. */
+  cardPhoto?: { src: string; position?: string };
   badges?: [CinematicBadge, CinematicBadge?];
   className?: string;
 }
@@ -48,6 +50,7 @@ export function CinematicHero({
   footnote,
   phone,
   background,
+  cardPhoto,
   badges,
   className,
 }: CinematicHeroProps) {
@@ -148,8 +151,25 @@ export function CinematicHero({
       <div className="pointer-events-none absolute inset-0 z-20 flex items-end justify-center pb-[3svh]" style={{ perspective: "1500px" }}>
         <div
           data-cine="card"
+          data-photo={cardPhoto ? "" : undefined}
           className="cine-card pointer-events-auto relative h-[66%] w-[94vw] max-w-[88rem] overflow-hidden rounded-[var(--hero-radius)] md:w-[90vw] lg:h-[66%]"
         >
+          {cardPhoto && (
+            <>
+              <Image
+                data-card-photo
+                src={cardPhoto.src}
+                alt=""
+                fill
+                preload
+                sizes="(min-width: 768px) 90vw, 94vw"
+                className="object-cover"
+                style={{ objectPosition: cardPhoto.position ?? "50% 70%" }}
+              />
+              {/* Scrim: darkest behind the text (the bottom on phones, the left on desktops). */}
+              <div aria-hidden="true" className="cine-card-scrim absolute inset-0" />
+            </>
+          )}
           <div className="relative mx-auto flex h-full max-w-7xl flex-col items-center justify-evenly gap-4 px-5 py-6 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,0.8fr)] lg:gap-10 lg:px-12 lg:py-0">
             {/* Left (desktop) / bottom (mobile): the pitch and actions. */}
             <div data-cine="left" className="order-3 w-full text-center lg:order-1 lg:text-left">

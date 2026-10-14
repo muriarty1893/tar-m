@@ -272,6 +272,33 @@ html.cine [data-cine] {
   box-shadow: var(--hero-card-shadow);
   border: var(--hero-card-border);
 }
+/* The card over its wheat photo: white text on a dark green scrim; badges stay white chips. */
+.cine-card[data-photo] {
+  --hero-fg: #ffffff;
+  --hero-muted: rgb(255 255 255 / 0.9);
+  --hero-chip-bg: #eef5f0;
+  --hero-wordmark: linear-gradient(180deg, #ffffff 0%, #e7f3ea 100%);
+  --hero-phone-shadow: 0 30px 40px rgb(0 0 0 / 0.45);
+  --hero-card-border: 0;
+  & .text-card-silver {
+    filter: drop-shadow(0 4px 18px rgb(0 0 0 / 0.45));
+  }
+  & .text-card-silver + p {
+    text-shadow: 0 1px 8px rgb(0 0 0 / 0.6);
+  }
+  & .cine-badge {
+    --hero-fg: #0f2e1d;
+    --hero-muted: #4b5a51;
+  }
+}
+.cine-card-scrim {
+  background:
+    linear-gradient(0deg, rgb(6 24 14 / 0.88) 0%, rgb(6 24 14 / 0.55) 45%, rgb(6 24 14 / 0.3) 100%);
+  @media (min-width: 64rem) {
+    background:
+      linear-gradient(90deg, rgb(6 24 14 / 0.86) 0%, rgb(6 24 14 / 0.62) 42%, rgb(6 24 14 / 0.38) 70%, rgb(6 24 14 / 0.5) 100%);
+  }
+}
 .cine-badge {
   background: var(--hero-badge-bg);
   color: var(--hero-fg);

@@ -47,3 +47,20 @@ test("the hero stays still under the mouse: no phone tilt, no light following th
   expect(await phone.evaluate((el) => getComputedStyle(el).transform)).toBe(before);
   await expect(page.locator(".cine-sheen")).toHaveCount(0);
 });
+
+test("the hero card is filled with a ripe wheat field, unlike the bare soil behind it", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const card = page.locator("[data-cine='card']");
+  const photo = card.locator("img[data-card-photo]");
+  await expect(photo).toHaveAttribute("src", /susehri-wheat/);
+  // Inside the card, not behind it: the photo fills the card's box exactly.
+  const [c, p] = await Promise.all([card.boundingBox(), photo.boundingBox()]);
+  expect(Math.round(p!.width)).toBe(Math.round(c!.width));
+  expect(Math.round(p!.height)).toBe(Math.round(c!.height));
+  // Text over the photo turns white; the floating badges stay dark on their white chips.
+  const heading = card.getByRole("heading", { name: "Ziraat uzmanınız cebinizde." });
+  await expect(heading).toHaveCSS("color", "rgb(255, 255, 255)");
+  const badges = card.locator(".cine-badge");
+  if (await badges.first().isVisible()) await expect(badges.first()).toHaveCSS("color", "rgb(15, 46, 29)");
+});

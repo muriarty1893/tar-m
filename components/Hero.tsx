@@ -4,11 +4,13 @@ import { siteConfig } from "@/config/site";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CinematicHero } from "@/components/ui/cinematic-landing-hero";
+import { pageHeroPhoto } from "@/data/photo-credits";
 import { CtaLink } from "./CtaLink";
 
 const [line1, line2] = siteConfig.tagline.split(/(?<=,)\s/);
 
-/** Home hero: field-to-horizon backdrop, headline, then the card with the app on our phone. */
+/** Home hero: bare soil running to the horizon behind the headline, then a card filled with a ripe
+ *  wheat field (Suşehri, Sivas) holding the app on our phone: the field before and after. */
 export function Hero() {
   return (
     <CinematicHero
@@ -51,6 +53,7 @@ export function Hero() {
         height: 1512,
       }}
       background={{ src: "/hero/field-horizon.webp" }}
+      cardPhoto={{ src: pageHeroPhoto.src }}
       badges={[
         { icon: <ScanIcon weight="duotone" className="size-5" />, title: "Sarı pas tespit edildi", detail: "Buğday · erken evre" },
         { icon: <CloudSunIcon weight="duotone" className="size-5" />, title: "İlaçlama için uygun gün", detail: "Konya · 18°C" },

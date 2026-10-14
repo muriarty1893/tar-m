@@ -154,9 +154,14 @@ function HomeScreen({ onScan, hint }: { onScan: () => void; hint: boolean }) {
 
 function WeatherHero() {
   return (
-    <div className="relative h-[238px] overflow-hidden rounded-[26px] text-white shadow-lift">
-      <Image src="/app/hero-field.webp" alt="" fill sizes="320px" className="object-cover" />
-      <div aria-hidden="true" className={`${scrim} bg-[linear-gradient(180deg,rgb(0_0_0/0.5)_0%,rgb(0_0_0/0.05)_42%,rgb(0_0_0/0.65)_100%)]`} />
+    <div className="relative h-[238px] rounded-[26px] text-white shadow-lift">
+      {/* Photo layers clipped with clip-path, not just overflow + radius: the blurred bottom bar would
+          otherwise paint square corners past the rounded ones. The shadow stays on the outer box. */}
+      <div data-testid="hava-karti-foto" className="absolute inset-0 overflow-hidden rounded-[26px] [clip-path:inset(0_round_26px)]">
+        <Image src="/app/hero-field.webp" alt="" fill sizes="320px" className="object-cover" />
+        <div aria-hidden="true" className={`${scrim} bg-[linear-gradient(180deg,rgb(0_0_0/0.5)_0%,rgb(0_0_0/0.05)_42%,rgb(0_0_0/0.65)_100%)]`} />
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[42px] bg-black/30 backdrop-blur-sm" />
+      </div>
       <div className="relative flex items-start justify-between gap-2 p-3.5">
         <span className="flex min-w-0 items-center gap-2">
           <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/25 ring-1 ring-white/40 backdrop-blur">
@@ -182,7 +187,7 @@ function WeatherHero() {
         </p>
         <p className="mt-1.5 text-[13px] opacity-95">Tarım havası ve iklim durumu</p>
       </div>
-      <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/30 px-3.5 py-2.5 text-[11.5px] font-medium backdrop-blur-sm">
+      <div className="absolute inset-x-0 bottom-0 flex h-[42px] items-center justify-between gap-1 px-3.5 text-[11.5px] font-medium">
         <span className="flex items-center gap-1">
           <DropIcon aria-hidden="true" weight="fill" className="size-4 text-sky-300" />
           Nem: %42
