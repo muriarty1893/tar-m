@@ -1,6 +1,6 @@
-# Bereket AI — website
+# Çiftçi Destek — website
 
-The official website for Bereket AI, a Turkish AI farming assistant app (in development). It has a landing page, a scripted demo, news, an 81-province weather page with farming hints, a waitlist, and a partner page. All visible text is Turkish.
+The official website for Çiftçi Destek (formerly Bereket AI), a Turkish AI farming assistant app (in development). It has a landing page, a scripted demo, news, an 81-province weather page with farming hints, a waitlist, and a partner page. All visible text is Turkish.
 
 Built with Next.js 16 (App Router, Cache Components) and Tailwind CSS 4. Deployed on Vercel.
 

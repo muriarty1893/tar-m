@@ -6,7 +6,7 @@ test("news list shows sample articles newest first and opens one", async ({ page
 
   const titles = page.locator("article h2");
   await expect(titles).toHaveCount(3);
-  await expect(titles.first()).toHaveText("Bereket AI erken erişim listesi açıldı");
+  await expect(titles.first()).toHaveText("Çiftçi Destek erken erişim listesi açıldı");
 
   await page.getByRole("link", { name: "Buğdayda sarı pas hastalığına karşı erken uyarı işaretleri" }).click();
   await expect(page).toHaveURL(/\/haberler\/bugdayda-pas-hastaligi$/);
@@ -15,7 +15,7 @@ test("news list shows sample articles newest first and opens one", async ({ page
     "Buğdayda sarı pas hastalığına karşı erken uyarı işaretleri",
   );
   await expect(page.getByText("3 Ekim 2026").filter({ visible: true })).toBeVisible();
-  await expect(page).toHaveTitle(/Buğdayda sarı pas.*\| Bereket AI/);
+  await expect(page).toHaveTitle(/Buğdayda sarı pas.*\| Çiftçi Destek/);
 });
 
 test("unknown article slug shows a Turkish not-found page that is not indexed", async ({ page }) => {

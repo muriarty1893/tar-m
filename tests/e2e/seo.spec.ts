@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const SLUGS = ["bereket-ai-erken-erisim", "bugdayda-pas-hastaligi", "kis-oncesi-toprak-hazirligi"];
+const SLUGS = ["ciftci-destek-erken-erisim", "bugdayda-pas-hastaligi", "kis-oncesi-toprak-hazirligi"];
 
 test("sitemap lists static routes and every article", async ({ request }) => {
   const res = await request.get("/sitemap.xml");
@@ -21,8 +21,8 @@ test("robots.txt allows crawling and points at the sitemap", async ({ request })
 
 test("home page has description and Open Graph tags with an absolute image", async ({ page, request }) => {
   await page.goto("/");
-  await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /Bereket AI/);
-  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", /Bereket AI/);
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /Çiftçi Destek/);
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", /Çiftçi Destek/);
   await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute("content", "tr_TR");
   const image = await page.locator('meta[property="og:image"]').first().getAttribute("content");
   expect(image).toMatch(/^http:\/\/localhost:3100\//);
@@ -40,7 +40,7 @@ test("article page has its own title and og:type article", async ({ page }) => {
 // (The no-cover fallback to the site share image is unit-tested via shareImage in lib/news.)
 test("article shares its cover image and the site name", async ({ page, request }) => {
   await page.goto(`/haberler/${SLUGS[1]}`);
-  await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute("content", "Bereket AI");
+  await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute("content", "Çiftçi Destek");
   await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", `http://localhost:3100/haberler/${SLUGS[1]}`);
   const image = await page.locator('meta[property="og:image"]').first().getAttribute("content");
   expect(image).toBe("http://localhost:3100/demo/bugday-sari-pas.webp");
@@ -49,8 +49,8 @@ test("article shares its cover image and the site name", async ({ page, request 
 
 test("the slogan names the page, and the logo badge shows in the header and the browser tab", async ({ page }) => {
   await page.goto("/");
-  await expect(page).toHaveTitle("Bereket AI — Çiftçinin Akıllı Rehberi");
-  const logo = page.locator("header").getByRole("link", { name: /Bereket AI/ }).locator("img");
+  await expect(page).toHaveTitle("Çiftçi Destek — Çiftçinin Akıllı Rehberi");
+  const logo = page.locator("header").getByRole("link", { name: /Çiftçi Destek/ }).locator("img");
   await expect(logo).toHaveAttribute("src", /brand%2Flogo|brand\/logo/);
   await expect(logo).toBeVisible();
   expect(await logo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
@@ -58,4 +58,10 @@ test("the slogan names the page, and the logo badge shows in the header and the 
   await expect(icon).toHaveAttribute("href", /\/icon/);
   const res = await page.request.get((await icon.getAttribute("href"))!);
   expect(res.headers()["content-type"]).toMatch(/image\/png/);
+});
+
+test("the launch article's old address (under the previous name) redirects to its new one", async ({ request }) => {
+  const res = await request.get("/haberler/bereket-ai-erken-erisim", { maxRedirects: 0 });
+  expect(res.status()).toBe(308);
+  expect(res.headers()["location"]).toMatch(/\/haberler\/ciftci-destek-erken-erisim$/);
 });

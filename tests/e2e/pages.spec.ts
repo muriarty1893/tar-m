@@ -61,7 +61,7 @@ test("every route returns 200 with a unique title", async ({ page }) => {
     const res = await page.goto(route);
     expect(res?.status(), route).toBe(200);
     const title = await page.title();
-    expect(title, route).toContain("Bereket AI");
+    expect(title, route).toContain("Çiftçi Destek");
     expect(titles.has(title), `duplicate title on ${route}: ${title}`).toBe(false);
     titles.add(title);
   }

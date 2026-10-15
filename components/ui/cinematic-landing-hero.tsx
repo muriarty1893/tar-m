@@ -203,7 +203,7 @@ export function CinematicHero({
             {/* Right (desktop): the wordmark. */}
             <div data-cine="right" aria-hidden="true" className="order-1 hidden justify-end lg:order-3 lg:flex">
               <div className="text-right">
-                <p className="text-card-silver font-heading text-[4.5rem] font-bold uppercase leading-[0.9] tracking-tighter xl:text-[5.75rem]">
+                <p className="text-card-silver pt-[0.12em] font-heading text-[4.5rem] font-bold uppercase leading-[1.02] tracking-tighter xl:text-[5.75rem]">
                   {brandName.split(" ").map((w) => (
                     <span key={w} className="block">
                       {w}

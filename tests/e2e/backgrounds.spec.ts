@@ -66,7 +66,7 @@ test("footer: the brand name spans the full width, with Türkiye's time and the 
   const footer = page.locator("footer");
   await footer.scrollIntoViewIfNeeded();
   const mark = footer.getByTestId("footer-wordmark");
-  await expect(mark).toHaveText("BEREKET AI");
+  await expect(mark).toHaveText("ÇİFTÇİ DESTEK");
   const [markW, innerW, overflow] = await mark.evaluate((el) => {
     const box = el.parentElement!.getBoundingClientRect();
     const cs = getComputedStyle(el.parentElement!);

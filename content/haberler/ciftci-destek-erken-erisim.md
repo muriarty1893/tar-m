@@ -1,11 +1,11 @@
 ---
-title: Bereket AI erken erişim listesi açıldı
+title: Çiftçi Destek erken erişim listesi açıldı
 date: 2026-10-10
 summary: "(Örnek haber) Tarlasının fotoğrafını çekip yapay zekâdan öneri almak isteyen çiftçiler için erken erişim kaydı başladı."
 cover: /app/hero-field.webp
 ---
 
-Bereket AI, çiftçilerin tarlalarının fotoğrafını göndererek **hastalık tespiti**, **verim tahmini** ve **bakım önerileri** alabileceği Türkçe bir mobil uygulama olarak geliştiriliyor.
+Çiftçi Destek, çiftçilerin tarlalarının fotoğrafını göndererek **hastalık tespiti**, **verim tahmini** ve **bakım önerileri** alabileceği Türkçe bir mobil uygulama olarak geliştiriliyor.
 
 ## Erken erişimde neler olacak?
 

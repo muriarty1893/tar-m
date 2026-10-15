@@ -1,5 +1,5 @@
 /**
- * Bereket AI — form receiver.
+ * Çiftçi Destek — form receiver.
  * Appends each website submission as a row to the tab named by `sheet`
  * ("waitlist", "partner", "question" or "source"). See docs/apps-script.md for setup.
  *

@@ -1207,11 +1207,11 @@ html.cine :is([data-cine="line2"], [data-cine="phone"], [data-cine="badge"]) {
   line-height: 1.1;
   color: var(--footer-muted);
 }
-/* Sized in container units so "BEREKET AI" fills the width exactly, from phone to desktop. */
+/* Sized in container units so the brand name fills the width exactly, from phone to desktop. */
 .site-footer__wordmark {
   margin-top: 2.25rem;
   font-family: var(--footer-display);
-  font-size: 28.2cqi;
+  font-size: 22.2cqi;
   font-weight: 800;
   line-height: 0.82;
   letter-spacing: -0.076em;

@@ -6,7 +6,7 @@ Google Sheet. This takes about 10 minutes, once.
 
 ## 1. Create the sheet
 
-1. Go to <https://sheets.google.com> and create a blank spreadsheet, e.g. "Bereket AI Kayıtlar".
+1. Go to <https://sheets.google.com> and create a blank spreadsheet, e.g. "Çiftçi Destek Kayıtlar".
 2. Rename the first tab to `waitlist` (exactly, lowercase).
 3. Add a second tab named `partner`, a third named `question` (the home page's "Sorunuz mu var?" form)
    and a fourth named `source` (answers to the welcome question shown on a visitor's first visit).

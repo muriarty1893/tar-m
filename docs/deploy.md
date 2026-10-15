@@ -1,4 +1,4 @@
-# Deploying Bereket AI to Vercel (free tier)
+# Deploying Çiftçi Destek to Vercel (free tier)
 
 ## 1. Put the code on GitHub
 
@@ -54,7 +54,7 @@ What keeps the home page fast: the scroll-reveal is CSS (no animation library on
 
 - [ ] **Agronomist review** of the demo answers (`data/demo-scenarios.ts`), weather hint thresholds (`lib/weather.ts` → `farmingHint`), sample news, and FAQ answers.
 - [ ] **KVKK legal review** of `/gizlilik`: fill in the data controller, retention period, and the basis for transferring data abroad (Google Sheets); then remove the "Taslak" note.
-- [ ] **Name check**: trademark search for "Bereket AI" (TÜRKPATENT) and domain availability.
+- [ ] **Name check**: trademark search for "Çiftçi Destek" (TÜRKPATENT) and domain availability.
 - [ ] **Replace placeholders**: see [placeholders.md](placeholders.md) (logo, demo images, contact e-mail, favicon).
 - [ ] **Replace sample news** in `content/haberler/` with real posts (or delete them; the site handles zero articles).
 - [ ] **Forms**: submit both forms on the live site and confirm rows appear in the sheet.

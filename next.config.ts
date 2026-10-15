@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
@@ -11,6 +10,10 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+  // The site was called "Bereket AI" before; its launch article's address followed the old name.
+  async redirects() {
+    return [{ source: "/haberler/bereket-ai-erken-erisim", destination: "/haberler/ciftci-destek-erken-erisim", permanent: true }];
   },
 };
 
