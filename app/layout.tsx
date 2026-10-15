@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Barlow_Condensed, DM_Sans, IBM_Plex_Mono, Onest, Space_Grotesk } from "next/font/google";
+import { DM_Sans, Onest, Sofia_Sans_Condensed, Space_Grotesk, Spline_Sans_Mono } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import { siteUrl } from "@/lib/site-url";
 import { Header } from "@/components/Header";
@@ -18,9 +18,9 @@ const spaceGrotesk = Space_Grotesk({
 // The site is set in Onest; the demo phone's app keeps DM Sans and Space Grotesk (loaded on demand).
 const onest = Onest({ variable: "--font-onest", subsets: ["latin", "latin-ext"] });
 // The footer's type: a condensed display face for the brand name and address, a monospace for its labels.
-const barlowCondensed = Barlow_Condensed({ variable: "--font-barlow-condensed", subsets: ["latin", "latin-ext"], weight: "700", preload: false });
-const plexMono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin", "latin-ext"], weight: ["400", "500"], preload: false });
-const fonts = [onest, dmSans, spaceGrotesk, barlowCondensed, plexMono].map((f) => f.variable).join(" ");
+const sofiaCondensed = Sofia_Sans_Condensed({ variable: "--font-sofia-condensed", subsets: ["latin", "latin-ext"], preload: false });
+const splineMono = Spline_Sans_Mono({ variable: "--font-spline-mono", subsets: ["latin", "latin-ext"], preload: false });
+const fonts = [onest, dmSans, spaceGrotesk, sofiaCondensed, splineMono].map((f) => f.variable).join(" ");
 
 const defaultTitle = `${siteConfig.name} — Çiftçinin yapay zekâ destekli tarla asistanı`;
 

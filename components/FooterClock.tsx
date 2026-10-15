@@ -14,7 +14,7 @@ export function FooterClock({ className }: { className?: string }) {
   const now = useSyncExternalStore(subscribe, () => time.format(new Date()), () => "--:--");
   return (
     <p data-testid="footer-clock" className={className}>
-      TÜRKİYE (GMT+3) <time suppressHydrationWarning>{now}</time>
+      <span>TÜRKİYE:</span> (GMT+3) <time suppressHydrationWarning>{now}</time>
     </p>
   );
 }

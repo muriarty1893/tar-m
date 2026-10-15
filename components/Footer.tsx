@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { ArrowUpRight } from "@/components/ui/arrow-up-right";
+import { RollText } from "@/components/ui/roll-text";
 import { CtaLink } from "./CtaLink";
 import { FooterClock } from "./FooterClock";
 
@@ -23,29 +24,30 @@ const actions = [
 ];
 
 /**
- * Swiss-style footer: the contact address set large, the actions as underlined links, the pages in
- * a plain list and in brackets, and the brand name across the full width at the bottom.
+ * Footer modelled on olhalazarieva.com: the contact address set large, underlined actions whose line
+ * wipes across on hover, rolling page links (in brackets for the secondary ones), the brand name
+ * across the full width and a bottom row with the clock, the maker credit and the legal line.
  */
 export function Footer() {
   return (
     <footer className="site-footer mt-auto">
-      <div className="site-footer__inner mx-auto max-w-7xl px-4 pt-14 sm:px-8 sm:pt-20">
-        <a href={`mailto:${siteConfig.contactEmail}`} className="site-footer__email ml-auto block w-fit">
+      <div className="site-footer__inner px-4 pt-16 sm:px-8 sm:pt-24 lg:px-[3.9vw]">
+        <a href={`mailto:${siteConfig.contactEmail}`} className="site-footer__email">
           {siteConfig.contactEmail}
         </a>
 
-        <div className="mt-10 grid gap-x-10 gap-y-12 md:grid-cols-[auto_1fr]">
-          <ul className="site-footer__mono order-2 md:order-1 md:pt-10">
+        <div className="mt-8 grid gap-x-10 gap-y-12 md:grid-cols-[auto_1fr]">
+          <ul className="order-2 md:order-1 md:pt-8">
             {pages.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="site-footer__page">
-                  {l.label}
+                <Link href={l.href} aria-label={l.label} className="site-footer__page">
+                  <RollText text={l.label} />
                 </Link>
               </li>
             ))}
           </ul>
           <div className="order-1 flex flex-col gap-10 md:order-2 md:items-end">
-            <ul className="site-footer__mono flex flex-wrap gap-x-10 gap-y-2 md:justify-end">
+            <ul className="flex flex-wrap gap-x-[clamp(2rem,6vw,6rem)] gap-y-4 md:justify-end">
               <li>
                 <CtaLink variant="text" className="site-footer__action" />
               </li>
@@ -58,36 +60,46 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-            <p className="site-footer__note max-w-64 md:text-right">{siteConfig.tagline}</p>
+            <p className="site-footer__note max-w-60">
+              {siteConfig.name}:
+              <br />
+              {siteConfig.tagline}
+            </p>
           </div>
         </div>
 
-        <ul className="site-footer__mono mt-12 flex flex-col sm:flex-row sm:flex-wrap sm:justify-between sm:gap-x-6">
+        <ul className="mt-14 flex flex-col items-start sm:flex-row sm:flex-wrap sm:justify-between">
           {more.map((l) => (
             <li key={l.href}>
-              <Link href={l.href} className="site-footer__bracket">
-                <span aria-hidden="true">[</span>
-                {l.label}
-                <span aria-hidden="true">]</span>
+              <Link href={l.href} aria-label={l.label} className="site-footer__bracket">
+                <RollText text={l.label} />
               </Link>
             </li>
           ))}
         </ul>
 
         <p data-testid="footer-wordmark" aria-hidden="true" className="site-footer__wordmark">
-          BEREKET AI
+          {siteConfig.name.toLocaleUpperCase("tr")}
         </p>
 
-        <div className="site-footer__mono grid items-end gap-x-8 gap-y-3 pb-6 pt-6 text-sm sm:pt-8 md:grid-cols-3">
-          <FooterClock />
-          <p className="normal-case md:text-center">
-            vibecoded with <span role="img" aria-label="sevgi">♡</span> by{" "}
-            <a href={siteConfig.creator.url} rel="noopener" className="site-footer__credit">
-              {siteConfig.creator.name}
-            </a>
-          </p>
-          <p className="site-footer__legal md:text-right">
+        <div className="grid items-end gap-x-8 gap-y-4 pb-7 pt-6 sm:pt-8 md:grid-cols-[1fr_auto_1fr]">
+          <FooterClock className="site-footer__clock" />
+          <a href={siteConfig.creator.url} rel="noopener" aria-label={`vibecoded with love by ${siteConfig.creator.name}`} className="site-footer__dev">
+            VIBECODED WITH ♡ BY{" "}
+            <span className="site-footer__swap">
+              <span className="site-footer__initials">
+                <span>M</span>
+                <span>E</span>
+              </span>
+              <span className="site-footer__fullname">{siteConfig.creator.name}</span>
+            </span>
+          </a>
+          <p className="site-footer__legal md:justify-self-end">
             © 2026 {siteConfig.name}. Tüm hakları saklıdır.
+            <br />
+            İçeriklerin izinsiz kopyalanması, çoğaltılması
+            <br />
+            veya kullanılması yasaktır.
           </p>
         </div>
       </div>

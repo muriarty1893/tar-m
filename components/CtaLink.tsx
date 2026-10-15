@@ -23,17 +23,22 @@ function scrollToForm(form: HTMLElement) {
 }
 
 /**
- * "Erken erişim için kaydol". On the home page it scrolls to the form itself, so it works every
+ * A link to the sign-up form ("Erken erişim için kaydol" unless labelled otherwise). On the home page it scrolls to the form itself, so it works every
  * time: once the address already ends in #kayit, a plain link would do nothing.
  */
 export function CtaLink({
   className = "",
+  label = siteConfig.ctaLabel,
+  ariaLabel,
   onClick,
   size = "default",
   variant = "default",
   withArrow = true,
 }: {
   className?: string;
+  /** The visible text; defaults to "Erken erişim için kaydol". */
+  label?: string;
+  ariaLabel?: string;
   onClick?: () => void;
   size?: "default" | "lg";
   /** "text": no button chrome; the caller styles it (the footer's underlined links). */
@@ -54,10 +59,11 @@ export function CtaLink({
   return (
     <Link
       href="/#kayit"
+      aria-label={ariaLabel}
       onClick={handleClick}
       className={cn(variant !== "text" && buttonVariants({ size, variant }), "group/cta", className)}
     >
-      {siteConfig.ctaLabel}
+      {label}
       {withArrow && <ArrowUpRight />}
     </Link>
   );

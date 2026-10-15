@@ -9,6 +9,7 @@ import { DemoShowcase } from "@/components/DemoShowcase";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { NewsCard } from "@/components/NewsCard";
 import { PartnerCta } from "@/components/PartnerCta";
+import { Pricing } from "@/components/Pricing";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { QuestionSection } from "@/components/QuestionSection";
 import { BlurFade } from "@/components/magicui/blur-fade";
@@ -66,6 +67,8 @@ export default async function Home() {
           <ArrowRightIcon aria-hidden="true" weight="bold" className="transition-transform group-hover:translate-x-0.5" />
         </Link>
       </Section>
+
+      <Pricing />
 
       <BlurFade>
         <PartnerCta />

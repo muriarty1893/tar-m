@@ -1044,105 +1044,257 @@ html.cine [data-cine] {
 }
 
 
-/* Footer (components/Footer.tsx), Swiss style: soft grey, the brand name across the full width,
-   a condensed display face for the large type and a monospace for the labels. */
+/* Footer (components/Footer.tsx), modelled on olhalazarieva.com: #f7f7f7 and #101010, Sofia Sans
+   Condensed for the large type, Spline Sans Mono for the labels, hover effects that roll and wipe. */
 .site-footer {
-  --footer-bg: #f3f4f2;
-  --footer-display: var(--font-barlow-condensed), "Arial Narrow", ui-sans-serif, sans-serif;
-  --footer-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --footer-bg: #f7f7f7;
+  --footer-fg: #101010;
+  --footer-muted: #606060;
+  --footer-ease: cubic-bezier(0.76, 0, 0.24, 1);
+  --footer-display: var(--font-sofia-condensed), "Arial Narrow", ui-sans-serif, sans-serif;
+  --footer-mono: var(--font-spline-mono), ui-monospace, monospace;
   background: var(--footer-bg);
-  color: var(--foreground);
-  border-top: 1px solid var(--border);
+  color: var(--footer-fg);
+  font-family: var(--footer-mono);
   overflow: hidden;
 }
 .site-footer__inner {
   container-type: inline-size;
 }
-.site-footer__mono {
-  font-family: var(--footer-mono);
-  text-transform: uppercase;
-  letter-spacing: 0.01em;
-}
+/* The address, set large; a line draws in from the left on hover and leaves to the right. */
 .site-footer__email {
+  position: relative;
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin-left: auto;
   font-family: var(--footer-display);
-  font-size: clamp(1.75rem, 8.6cqi, 4.75rem);
-  line-height: 1;
-  letter-spacing: -0.01em;
-  text-align: right;
+  font-size: clamp(1.6rem, 7.4cqi, 2.67rem);
+  font-weight: 700;
+  line-height: 0.99;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
   overflow-wrap: anywhere;
-  transition: color 0.2s ease;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.04em;
+    width: 100%;
+    height: 3px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.8s var(--footer-ease);
+  }
+  &:is(:hover, :focus-visible)::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
 }
-.site-footer__email:hover {
-  color: var(--primary);
-}
-.site-footer__page,
-.site-footer__bracket,
+/* Underlined actions: on hover the line wipes away to the right while a new one draws from the left. */
 .site-footer__action {
+  position: relative;
   display: inline-flex;
   min-height: 2.75rem;
   align-items: center;
-  transition: color 0.2s ease;
+  gap: 1.1rem;
+  font-size: 1.08rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  & .btn-arrow {
+    width: 1rem;
+    height: 1rem;
+    transition-duration: 0.5s;
+  }
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.45rem;
+    height: 2px;
+    background: currentColor;
+    transition: transform 0.6s var(--footer-ease);
+  }
+  &::before {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+  &::after {
+    transform: scaleX(0);
+    transform-origin: right center;
+  }
+  &:is(:hover, :focus-visible)::before {
+    transform: scaleX(0);
+    transform-origin: right center;
+  }
+  &:is(:hover, :focus-visible)::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+    transition-delay: 0.15s;
+  }
+}
+.site-footer__page,
+.site-footer__bracket {
+  position: relative;
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  font-size: 1rem;
+  text-transform: uppercase;
 }
 .site-footer__page {
-  font-size: 1.05rem;
+  letter-spacing: -0.02em;
 }
-.site-footer__action {
-  gap: 0.7em;
-  font-size: 1.05rem;
-  font-weight: 500;
-  text-decoration: underline;
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 0.35em;
-}
+/* Bracketed links: the brackets sit close to the word and spread apart on hover. */
 .site-footer__bracket {
-  gap: 0.6em;
-  & > span {
-    transition: translate 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  padding-inline: 1.9rem;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  &::before,
+  &::after {
+    position: absolute;
+    top: 50%;
+    font-size: 1.1rem;
+    font-weight: 300;
+    translate: 0 -50%;
+    transition: left 0.5s var(--footer-ease), right 0.5s var(--footer-ease);
   }
-  &:is(:hover, :focus-visible) > span:first-child {
-    translate: -0.25em 0;
+  &::before {
+    content: "[";
+    left: 0.65rem;
   }
-  &:is(:hover, :focus-visible) > span:last-child {
-    translate: 0.25em 0;
+  &::after {
+    content: "]";
+    right: 0.65rem;
+  }
+  &:is(:hover, :focus-visible)::before {
+    left: 0;
+  }
+  &:is(:hover, :focus-visible)::after {
+    right: 0;
   }
 }
-:is(.site-footer__page, .site-footer__bracket, .site-footer__action, .site-footer__credit):hover {
-  color: var(--primary);
+/* At rest the "[" lines up with the page links above; on hover it moves out past the edge. */
+.site-footer li > .site-footer__bracket {
+  margin-left: -0.65rem;
+}
+@media (min-width: 640px) {
+  .site-footer li:not(:first-child) > .site-footer__bracket {
+    margin-left: 0;
+  }
+  .site-footer li:last-child > .site-footer__bracket {
+    margin-right: -0.65rem;
+  }
 }
 .site-footer__note {
-  font-family: var(--footer-mono);
-  font-size: 0.8rem;
-  line-height: 1.45;
-  color: var(--muted-foreground);
+  font-size: 0.67rem;
+  line-height: 1.1;
+  color: var(--footer-muted);
 }
 /* Sized in container units so "BEREKET AI" fills the width exactly, from phone to desktop. */
 .site-footer__wordmark {
-  margin-top: 2.5rem;
+  margin-top: 2.25rem;
   font-family: var(--footer-display);
-  font-size: 24.9cqi;
-  line-height: 0.78;
-  letter-spacing: -0.015em;
+  font-size: 28.2cqi;
+  font-weight: 800;
+  line-height: 0.82;
+  letter-spacing: -0.076em;
+  word-spacing: 0.12em;
   white-space: nowrap;
-  padding-top: 0.06em;
+  /* Pull the B's side bearing back so the ink lines up with the text above. */
+  margin-left: -0.045em;
   user-select: none;
 }
-.site-footer__credit {
-  font-weight: 500;
-  text-decoration: underline;
-  text-underline-offset: 0.25em;
+.site-footer__clock {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 0.75rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+/* "VIBECODED WITH ♡ BY ME": on hover the initials roll up and the full name rolls in from below. */
+.site-footer__dev {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.6em;
+  font-size: 0.875rem;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.site-footer__swap {
+  display: inline-grid;
+  overflow: hidden;
+  & > * {
+    grid-area: 1 / 1;
+    transition: translate 0.6s var(--footer-ease);
+  }
+}
+.site-footer__fullname {
+  translate: 0 110%;
+}
+.site-footer__dev:is(:hover, :focus-visible) {
+  & .site-footer__initials {
+    translate: 0 -110%;
+  }
+  & .site-footer__fullname {
+    translate: 0;
+  }
 }
 .site-footer__legal {
-  font-size: 0.7rem;
-  line-height: 1.4;
-  color: var(--muted-foreground);
+  font-size: 0.6rem;
+  line-height: 1.3;
+  color: var(--footer-muted);
 }
-.site-footer :is(a):focus-visible {
+.site-footer a:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 3px;
   border-radius: 2px;
 }
+
+/* RollText (components/ui/roll-text.tsx): letters roll up, a copy rolls in from below. */
+.roll {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+  line-height: 1.2;
+}
+.roll__row {
+  display: flex;
+  & > span {
+    display: inline-block;
+    transition: translate 0.5s var(--footer-ease, cubic-bezier(0.76, 0, 0.24, 1)) calc(var(--i) * 22ms);
+  }
+}
+.roll__row--clone {
+  position: absolute;
+  inset: 0;
+  & > span {
+    translate: 0 100%;
+  }
+}
+:is(a, button):is(:hover, :focus-visible) .roll__row > span {
+  translate: 0 -100%;
+}
+:is(a, button):is(:hover, :focus-visible) .roll__row--clone > span {
+  translate: 0;
+}
 @media (prefers-reduced-motion: reduce) {
-  .site-footer__bracket > span {
+  .roll__row > span,
+  .site-footer__swap > *,
+  .site-footer__action::before,
+  .site-footer__action::after,
+  .site-footer__email::after,
+  .site-footer__bracket::before,
+  .site-footer__bracket::after {
     transition: none;
   }
 }
