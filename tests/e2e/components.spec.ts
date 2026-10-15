@@ -75,7 +75,7 @@ test("every sign-up button carries the diagonal arrow, which turns to point ahea
   const n = await signups.count();
   expect(n).toBeGreaterThan(2);
   for (let i = 0; i < n; i++) await expect(signups.nth(i).locator(".btn-arrow svg"), `sign-up button ${i}`).toHaveCount(1);
-  await expect(page.locator("main section").first().getByRole("link", { name: "Demoyu deneyin" }).locator(".btn-arrow")).toHaveCount(1);
+  await expect(page.getByRole("link", { name: "Demoyu deneyin" }).locator(".btn-arrow")).toHaveCount(1);
   test.skip(isMobile, "hover is a pointer interaction");
 
   const cta = page.locator("[data-cine='card']").getByRole("link", { name: /Erken erişim/ });

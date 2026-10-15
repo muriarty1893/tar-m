@@ -243,9 +243,9 @@ test("the demo section's intro no longer mentions the pointing finger", async ({
 });
 
 test("while the 3D phone loads, the demo window shows the bars loader, then the phone", async ({ page }) => {
-  // Hold the model back so the loading state is long enough to see (it is also fetched ahead while idle).
+  // Hold the model back so the loading state is long enough to see.
   await page.route("**/models/phone.glb", async (r) => {
-    await new Promise((res) => setTimeout(res, 7000));
+    await new Promise((res) => setTimeout(res, 2500));
     await r.continue();
   });
   await page.goto("/");

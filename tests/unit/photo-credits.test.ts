@@ -9,7 +9,7 @@ const publicFiles = (dir: string) => fs.readdirSync(path.join(process.cwd(), "pu
 describe("photo credits", () => {
   it("credits every photo shipped in public/demo, public/app and public/hero", () => {
     const credited = new Set(photoCredits.map((c) => c.src));
-    for (const f of [...publicFiles("demo"), ...publicFiles("app"), ...publicFiles("hero").filter((f) => !f.startsWith("/hero/hero-video"))]) expect(credited, f).toContain(f);
+    for (const f of [...publicFiles("demo"), ...publicFiles("app"), ...publicFiles("hero").filter((f) => f !== "/hero/phone.webp")]) expect(credited, f).toContain(f);
   });
 
   it("credits every demo scenario image", () => {

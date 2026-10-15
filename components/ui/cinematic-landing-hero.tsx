@@ -1,25 +1,28 @@
 "use client";
 
-// Adapted from a 21st.dev "cinematic landing hero". Changes: no scripted intro; instead a short
-// video (the phone flying in over a wheat field) plays once on load and rests on its last frame;
-// our copy, colours and CTAs; one <h1>; Phosphor icons instead of emoji; everything visible
-// without JS or with reduced motion (they get the video's last frame as a still); no pointer effects.
+// Adapted from a 21st.dev "cinematic landing hero". Changes: plays once on load
+// instead of a 7000px pinned scroll and then rests; uses our real phone render
+// instead of a CSS mockup; our copy, colours and CTAs; one <h1>; Phosphor
+// icons instead of emoji; content stays visible without JS or with reduced motion; no
+// pointer effects (the phone doesn't tilt and no light follows the mouse).
 
 import { useEffect, useRef, type ReactNode } from "react";
 import Image from "next/image";
+import type { gsap as Gsap } from "gsap";
 import { cn } from "cn";
 import { CINE_DONE } from "@/lib/cine";
 
 export type CinematicBadge = { icon: ReactNode; title: string; detail: string };
 
-/** If the video hasn't finished by then (slow network, stalled), the last frame is shown instead. */
-const GIVE_UP_MS = 10_000;
+// GSAP loads after first paint, so it never delays the hero's first frame.
+let gsapPromise: Promise<typeof Gsap> | undefined;
+const loadGsap = () => (gsapPromise ??= import("gsap").then((m) => m.gsap));
 
 export interface CinematicHeroProps {
   /** Large wordmark on the card (one word per line). */
   brandName: string;
   brandNote?: string;
-  /** The page's <h1>, in two lines. */
+  /** The page's <h1>, in two lines that reveal one after the other. */
   tagline1: string;
   tagline2: string;
   eyebrow?: ReactNode;
@@ -28,10 +31,10 @@ export interface CinematicHeroProps {
   /** CTA buttons and other actions inside the card. */
   actions?: ReactNode;
   footnote?: ReactNode;
-  /** The card's background, played once on load (wide; on phones it fills the card's top). `poster` is its
-   *  first frame; `end`, its last, stands in for reduced motion and no JS. */
-  video: { mp4: string; webm: string; poster: string; end: string; alt: string };
+  phone: { src: string; alt: string; width: number; height: number };
   background: { src: string; alt?: string };
+  /** A photo filling the card itself, under a dark scrim; the card's text turns white over it. */
+  cardPhoto?: { src: string; position?: string };
   badges?: [CinematicBadge, CinematicBadge?];
   className?: string;
 }
@@ -46,44 +49,84 @@ export function CinematicHero({
   cardDescription,
   actions,
   footnote,
-  video,
+  phone,
   background,
+  cardPhoto,
   badges,
   className,
 }: CinematicHeroProps) {
   const root = useRef<HTMLElement>(null);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  // Play the video once. Runs only if the <head> script armed the hero (motion allowed, not timed
-  // out); html[data-cine-done] and CINE_DONE mark the end, so the welcome question waits for it.
+  // One-time intro, then rest. Runs only if the <head> script armed it (motion allowed, not timed out).
   useEffect(() => {
     const html = document.documentElement;
-    const v = videoRef.current;
-    if (!v || !html.classList.contains("cine")) return;
+    if (!html.classList.contains("cine")) return;
     html.dataset.cineRun = "1";
-    let finished = false;
-    const done = () => {
-      if (finished) return;
-      finished = true;
-      window.clearTimeout(guard);
-      html.dataset.cineDone = "1";
-      window.dispatchEvent(new Event(CINE_DONE));
-    };
-    // Autoplay blocked (e.g. iOS Low Power Mode), a load error or a stall: show the last frame.
-    const fail = () => {
-      v.pause();
-      html.classList.remove("cine");
-      done();
-    };
-    const guard = window.setTimeout(fail, GIVE_UP_MS);
-    v.addEventListener("ended", done);
-    v.addEventListener("error", fail);
-    v.play().catch(fail);
+    let ctx: ReturnType<typeof Gsap.context> | undefined;
+    let cancelled = false;
+
+    loadGsap().then((gsap) => {
+      if (cancelled) return;
+      ctx = gsap.context(() => {
+        gsap
+          // Mark the end, so first-visit UI (the welcome question) can wait for the intro to finish.
+          .timeline({
+            delay: 0.1,
+            onComplete: () => {
+              html.dataset.cineDone = "1";
+              window.dispatchEvent(new Event(CINE_DONE));
+            },
+          })
+          .fromTo(
+            "[data-cine='line1']",
+            { autoAlpha: 0, y: 60, scale: 0.88, filter: "blur(18px)", rotationX: -20 },
+            { autoAlpha: 1, y: 0, scale: 1, filter: "blur(0px)", rotationX: 0, duration: 1.3, ease: "expo.out" },
+          )
+          .fromTo(
+            "[data-cine='line2']",
+            { autoAlpha: 1, clipPath: "inset(0 100% 0 0)" },
+            { clipPath: "inset(0 0% 0 0)", duration: 1.1, ease: "power4.inOut" },
+            "-=0.8",
+          )
+          .addLabel("card", "-=0.2")
+          .to("[data-cine-backdrop]", { scale: 1.06, duration: 1.6, ease: "power2.inOut" }, "card")
+          // The card rises only a little as it fades in: sliding up from below the screen read as the page scrolling.
+          .fromTo(
+            "[data-cine='card']",
+            { autoAlpha: 0, y: 48, scale: 0.97 },
+            { autoAlpha: 1, y: 0, scale: 1, duration: 1, ease: "expo.out" },
+            "card",
+          )
+          .fromTo(
+            "[data-cine='phone']",
+            { autoAlpha: 0, y: 260, z: -500, rotationX: 50, rotationY: -30, scale: 0.6 },
+            { autoAlpha: 1, y: 0, z: 0, rotationX: 0, rotationY: 0, scale: 1, duration: 1.3, ease: "expo.out" },
+            "-=0.45",
+          )
+          .fromTo(
+            "[data-cine='left']",
+            { autoAlpha: 0, x: -50 },
+            { autoAlpha: 1, x: 0, duration: 0.9, ease: "power4.out" },
+            "-=1.1",
+          )
+          .fromTo(
+            "[data-cine='right']",
+            { autoAlpha: 0, x: 50, scale: 0.85 },
+            { autoAlpha: 1, x: 0, scale: 1, duration: 0.9, ease: "expo.out" },
+            "<",
+          )
+          .fromTo(
+            "[data-cine='badge']",
+            { autoAlpha: 0, y: 80, scale: 0.7, rotationZ: -10 },
+            { autoAlpha: 1, y: 0, scale: 1, rotationZ: 0, duration: 0.8, ease: "back.out(1.5)", stagger: 0.12 },
+            "-=0.8",
+          );
+      }, root);
+    });
+
     return () => {
-      window.clearTimeout(guard);
-      v.removeEventListener("ended", done);
-      v.removeEventListener("error", fail);
+      cancelled = true;
+      ctx?.revert();
     };
   }, []);
 
@@ -112,37 +155,49 @@ export function CinematicHero({
         </h1>
       </div>
 
-      {/* Foreground: the card, its background the video of the phone flying in over a wheat field. */}
-      <div className="pointer-events-none absolute inset-0 z-20 flex items-end justify-center pb-[3svh]">
+      {/* Foreground: the card with the phone (its look comes from the design's --hero-* tokens). */}
+      <div className="pointer-events-none absolute inset-0 z-20 flex items-end justify-center pb-[3svh]" style={{ perspective: "1500px" }}>
         <div
           data-cine="card"
-          data-photo=""
+          data-photo={cardPhoto ? "" : undefined}
           className="cine-card pointer-events-auto relative h-[66%] w-[94vw] max-w-[88rem] overflow-hidden rounded-[var(--hero-radius)] md:w-[90vw] lg:h-[66%]"
         >
-          {/* Desktop: the whole card. Phones and tablets: the card's top, fading into the text's dark ground. */}
-          <div data-cine="phone" className="hero-media absolute inset-x-0 top-0 h-[60%] lg:inset-0 lg:h-full">
-            <Image src={video.poster} alt="" fill preload sizes="(min-width: 768px) 90vw, 94vw" className="object-cover" />
-            <video ref={videoRef} aria-label={video.alt} muted playsInline preload="auto" className="absolute inset-0 size-full object-cover">
-              <source src={video.webm} type="video/webm" />
-              <source src={video.mp4} type="video/mp4" />
-            </video>
-            {/* The last frame, on top unless the video is going to play (html.cine). */}
-            <Image data-hero-endframe src={video.end} alt="" fill sizes="(min-width: 768px) 90vw, 94vw" className="hero-endframe object-cover" />
-          </div>
-          {/* Scrim: darkest behind the text (the bottom on phones, the left on desktops), clear over the phone. */}
-          <div aria-hidden="true" className="cine-card-scrim absolute inset-0" />
-
-          <div className="relative mx-auto flex h-full max-w-7xl flex-col items-center justify-end px-5 pb-6 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem_minmax(0,1fr)] lg:items-center lg:gap-10 lg:px-12 lg:py-0">
+          {cardPhoto && (
+            <>
+              <Image
+                data-card-photo
+                src={cardPhoto.src}
+                alt=""
+                fill
+                preload
+                sizes="(min-width: 768px) 90vw, 94vw"
+                className="object-cover"
+                style={{ objectPosition: cardPhoto.position ?? "50% 70%" }}
+              />
+              {/* Scrim: darkest behind the text (the bottom on phones, the left on desktops). */}
+              <div aria-hidden="true" className="cine-card-scrim absolute inset-0" />
+            </>
+          )}
+          <div className="relative mx-auto flex h-full max-w-7xl flex-col items-center justify-evenly gap-4 px-5 py-6 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,0.8fr)] lg:gap-10 lg:px-12 lg:py-0">
             {/* Left (desktop) / bottom (mobile): the pitch and actions. */}
-            <div data-cine="left" className="w-full text-center lg:text-left">
+            <div data-cine="left" className="order-3 w-full text-center lg:order-1 lg:text-left">
               <h2 className="hero-fg text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">{cardHeading}</h2>
               <p className="mx-auto mt-3 hidden max-w-md text-base leading-relaxed hero-muted md:block lg:mx-0 lg:text-lg">{cardDescription}</p>
-              {actions && <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap lg:justify-start">{actions}</div>}
+              {actions && <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">{actions}</div>}
               {footnote && <div className="hero-muted mt-5 hidden text-sm lg:block">{footnote}</div>}
             </div>
 
-            {/* Centre (desktop): room for the phone in the video, with floating glass badges. */}
-            <div aria-hidden="true" className="relative hidden h-full lg:block">
+            {/* Centre: the phone render with floating glass badges. */}
+            <div data-cine="phone" className="relative order-2 flex min-h-0 w-full flex-1 items-center justify-center lg:h-full lg:w-auto lg:flex-none" style={{ perspective: "1000px" }}>
+              <div className="relative h-full max-h-[34rem] py-1 [transform-style:preserve-3d] lg:h-[88%]">
+                <Image
+                  src={phone.src}
+                  alt={phone.alt}
+                  width={phone.width}
+                  height={phone.height}
+                  sizes="(min-width: 1024px) 280px, 180px"
+                  className="h-full w-auto object-contain drop-shadow-[var(--hero-phone-shadow)]"
+                />
                 {badges?.map(
                   (b, i) =>
                     b && (
@@ -151,8 +206,8 @@ export function CinematicHero({
                         data-cine="badge"
                         aria-hidden="true"
                         className={cn(
-                          "cine-badge absolute hidden items-center gap-3 rounded-2xl p-3.5 text-left lg:flex",
-                          i === 0 ? "left-[calc(100%-2.5rem)] top-[8%]" : "bottom-[16%] left-[calc(100%-2.5rem)]",
+                          "cine-badge absolute hidden items-center gap-3 rounded-2xl p-3.5 text-left [transform:translateZ(60px)] lg:flex",
+                          i === 0 ? "right-[calc(100%-1.75rem)] top-0" : "bottom-[10%] left-[calc(100%-1.75rem)]",
                         )}
                       >
                         <span className="flex size-9 shrink-0 items-center justify-center hero-chip rounded-full lg:size-10">
@@ -165,10 +220,11 @@ export function CinematicHero({
                       </div>
                     ),
                 )}
+              </div>
             </div>
 
             {/* Right (desktop): the wordmark. */}
-            <div data-cine="right" aria-hidden="true" className="hidden justify-end lg:flex">
+            <div data-cine="right" aria-hidden="true" className="order-1 hidden justify-end lg:order-3 lg:flex">
               <div className="text-right">
                 <p className="text-card-silver font-heading text-[4.5rem] font-bold uppercase leading-[0.9] tracking-tighter xl:text-[5.75rem]">
                   {brandName.split(" ").map((w) => (

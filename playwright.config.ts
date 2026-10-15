@@ -13,9 +13,7 @@ export default defineConfig({
     // Visitors who already answered the first-visit welcome question (tests/e2e/welcome.spec.ts starts fresh).
     storageState: "tests/e2e/state/welcome-seen.json",
     // Hardware WebGL: the site skips the 3D phone on software renderers (headless default).
-    // Hardware video decoding is off: on this Intel/Mesa machine it crashes the GPU process under
-    // forced ANGLE GL, which takes WebGL (the 3D demo) down with it once the hero video plays.
-    launchOptions: { args: ["--use-angle=gl", "--disable-accelerated-video-decode"] },
+    launchOptions: { args: ["--use-angle=gl"] },
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
