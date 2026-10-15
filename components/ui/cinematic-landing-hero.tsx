@@ -109,11 +109,12 @@ export function CinematicHero({
   return (
     <section
       ref={root}
-      className={cn("relative isolate flex h-[calc(100svh-4.5rem)] min-h-[40rem] items-center justify-center overflow-hidden", className)}
+      className={cn("relative isolate flex h-[calc(100svh-4.5rem)] min-h-[40rem] items-center justify-center overflow-x-clip", className)}
       style={{ perspective: "1500px" }}
     >
-      {/* Backdrop: field running to the horizon, washed to white at the top, and the headline. */}
-      <div data-cine-backdrop className="absolute inset-0 -z-10">
+      {/* Backdrop: field running to the horizon, washed to white at the top. It runs on below the hero
+          through the next section's top padding and fades out there, so no blank band follows the hero. */}
+      <div data-cine-backdrop className="hero-backdrop absolute inset-x-0 top-0 -bottom-20 -z-10 sm:-bottom-24">
         <Image src={background.src} alt={background.alt ?? ""} fill preload sizes="100vw" className="object-cover object-bottom" />
         <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,var(--background)_0%,var(--background)_8%,color-mix(in_srgb,var(--background)_60%,transparent)_24%,color-mix(in_srgb,var(--background)_20%,transparent)_40%,transparent_60%)]" />
       </div>

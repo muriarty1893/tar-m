@@ -99,3 +99,20 @@ test("the field photo fills the hero up to the headline: no white band between t
   // Plain white is 255; the washed-out field reads clearly darker.
   expect(mean).toBeLessThan(235);
 });
+
+test("the field photo carries on below the hero and fades out before the next heading: no blank band", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const heroBottom = await page.locator("main section").first().evaluate((el) => el.getBoundingClientRect().bottom + window.scrollY);
+  const eyebrowTop = await page.locator("#nasil-calisir .eyebrow").first().evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+  const width = page.viewportSize()!.width;
+  const meanOf = async (y: number, height: number) => {
+    const shot = await page.screenshot({ fullPage: true, clip: { x: 0, y, width, height } });
+    const { channels } = await sharp(shot).stats();
+    return (channels[0].mean + channels[1].mean + channels[2].mean) / 3;
+  };
+  // Just below the hero: still the photo, not white.
+  expect(await meanOf(Math.round(heroBottom) + 2, 24)).toBeLessThan(235);
+  // Right above the next heading: faded out to white, so the heading reads as before.
+  expect(await meanOf(Math.round(eyebrowTop) - 10, 8)).toBeGreaterThan(245);
+});

@@ -245,6 +245,15 @@ html.cine :is([data-cine="line2"], [data-cine="phone"], [data-cine="badge"]) {
   opacity: 0;
 }
 
+/* The hero's field photo runs on below the hero (5rem, 6rem from sm, matching the next section's top
+   padding) and fades out across it, ending just above the next heading. */
+.hero-backdrop {
+  mask-image: linear-gradient(180deg, #000 calc(100% - 5rem), transparent calc(100% - 1.25rem));
+  @media (min-width: 40rem) {
+    mask-image: linear-gradient(180deg, #000 calc(100% - 6rem), transparent calc(100% - 1.25rem));
+  }
+}
+
 .cine-grain {
   background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>');
   mix-blend-mode: overlay;

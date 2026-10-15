@@ -27,6 +27,8 @@ export function HowItWorks() {
       title="Nasıl çalışır?"
       intro="Karmaşık menüler yok. Çek, gönder, öğren."
       align="center"
+      // No top rule: the hero's field photo fades out across this section's top padding.
+      className="border-t-0!"
     >
       <ol className="grid gap-5 md:grid-cols-3">
         {steps.map(({ icon: Icon, title, text }, i) => (
