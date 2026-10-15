@@ -1,4 +1,13 @@
 /** The plans shown in the home page's "Planlar" section (components/Pricing.tsx). */
+
+/** Paying for a year at once takes this share off the monthly price. */
+export const YEARLY_DISCOUNT = 0.2;
+
+/** The monthly price on the yearly plan, in whole lira (₺149 → ₺119). */
+export function yearlyMonthlyPrice(price: number): number {
+  return Math.round(price * (1 - YEARLY_DISCOUNT));
+}
+
 export type Plan = {
   name: string;
   /** Monthly price in lira, or null for a quote ("Size özel"). */

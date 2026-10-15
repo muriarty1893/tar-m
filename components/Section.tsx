@@ -9,6 +9,7 @@ export function Section({
   children,
   className = "",
   align = "left",
+  backdrop,
 }: {
   id?: string;
   eyebrow?: string;
@@ -17,10 +18,13 @@ export function Section({
   children: ReactNode;
   className?: string;
   align?: "left" | "center";
+  /** Decoration filling the whole section behind its content (e.g. a starfield). */
+  backdrop?: ReactNode;
 }) {
   return (
     <section id={id} className={cn("site-section relative scroll-mt-20 px-4 py-20 sm:py-24", className)}>
-      <div className="mx-auto max-w-6xl">
+      {backdrop}
+      <div className="relative mx-auto max-w-6xl">
         <div className={cn("section-head max-w-2xl", align === "center" && "mx-auto text-center")}>
           {eyebrow && <p className="eyebrow">{eyebrow}</p>}
           <h2 className="section-title mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{title}</h2>
