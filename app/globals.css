@@ -1210,6 +1210,10 @@ html.cine :is([data-cine="line2"], [data-cine="phone"], [data-cine="badge"]) {
 /* Sized in container units so the brand name fills the width exactly, from phone to desktop. */
 .site-footer__wordmark {
   margin-top: 2.25rem;
+  /* Room, in step with the type size, for the dots on İ and the cedillas on Ç, which rise and drop
+     beyond the tight line height; without it they ran into the links above. */
+  padding-top: 0.1em;
+  padding-bottom: 0.08em;
   font-family: var(--footer-display);
   font-size: 22.2cqi;
   font-weight: 800;

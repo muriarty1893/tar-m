@@ -107,3 +107,30 @@ test("footer runs from one side of a wide screen to the other, with only a small
   const email = (await page.locator("footer").getByRole("link", { name: "iletisim@bereketai.com" }).boundingBox())!;
   expect(1920 - (email.x + email.width)).toBeLessThan(1920 * 0.05);
 });
+
+test("the footer's brand name, dots and cedillas included, stays clear of the links above and the row below", async ({ page, isMobile }) => {
+  const widths = isMobile ? [page.viewportSize()!.width] : [1280, 1440, 1920];
+  for (const width of widths) {
+    if (!isMobile) await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    await page.locator("footer").scrollIntoViewIfNeeded();
+    await page.evaluate(() => document.fonts.ready);
+    const m = await page.evaluate(() => {
+      const el = document.querySelector<HTMLElement>("[data-testid=footer-wordmark]")!;
+      const cs = getComputedStyle(el);
+      const ctx = document.createElement("canvas").getContext("2d")!;
+      ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const t = ctx.measureText(el.textContent!);
+      // CSS line box: the baseline sits half-leading + font ascent below the content box's top.
+      const box = el.getBoundingClientRect();
+      const top = box.top + parseFloat(cs.paddingTop);
+      const lineHeight = parseFloat(cs.lineHeight);
+      const baseline = top + (lineHeight - (t.fontBoundingBoxAscent + t.fontBoundingBoxDescent)) / 2 + t.fontBoundingBoxAscent;
+      const above = Math.max(...[...document.querySelectorAll("footer .site-footer__bracket")].map((a) => a.getBoundingClientRect().bottom));
+      const below = document.querySelector("[data-testid=footer-clock]")!.getBoundingClientRect().top;
+      return { inkTop: baseline - t.actualBoundingBoxAscent, inkBottom: baseline + t.actualBoundingBoxDescent, above, below };
+    });
+    expect(m.inkTop, `dots clear the links above at ${width}px`).toBeGreaterThanOrEqual(m.above + 4);
+    expect(m.inkBottom, `cedillas clear the row below at ${width}px`).toBeLessThanOrEqual(m.below - 4);
+  }
+});
