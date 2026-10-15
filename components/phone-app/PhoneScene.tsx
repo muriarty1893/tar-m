@@ -32,6 +32,11 @@ type SceneProps = {
   view?: View;
 };
 
+/** Starts downloading the model ahead of time; PhoneStage calls it once the page is idle. */
+export function preloadPhoneModel() {
+  useGLTF.preload(MODEL, false, true);
+}
+
 type View = { fov: number; position: [number, number, number]; lookAt: [number, number, number] };
 
 /** Demo stage: facing the viewer straight on, leaning slightly back. */

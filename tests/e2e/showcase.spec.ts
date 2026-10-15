@@ -241,3 +241,41 @@ test("the demo section's intro no longer mentions the pointing finger", async ({
   await expect(page.locator("#demo")).toContainText("Telefondaki uygulamayı kendiniz kullanın");
   await expect(page.locator("#demo")).not.toContainText("Parmak işareti");
 });
+
+test("while the 3D phone loads, the demo window shows the bars loader, then the phone", async ({ page }) => {
+  // Hold the model back so the loading state is long enough to see.
+  await page.route("**/models/phone.glb", async (r) => {
+    await new Promise((res) => setTimeout(res, 2500));
+    await r.continue();
+  });
+  await page.goto("/");
+  const demo = page.locator("#demo");
+  await demo.locator(".stage-bg").scrollIntoViewIfNeeded();
+  const loader = demo.getByRole("status", { name: "Demo yükleniyor" });
+  await expect(loader).toBeVisible();
+  await expect(loader.locator("span.rounded-full")).toHaveCount(4);
+  // In the brand green, like the rest of the demo.
+  await expect(loader).toHaveCSS("color", "rgb(11, 122, 59)");
+  // The flat stand-in phone is not shown while the real one is on its way.
+  await expect(demo.locator(".stage-bg").getByText("Hızlı İşlemler")).toBeHidden();
+  await expect(demo.locator(CANVAS)).toBeVisible({ timeout: 20_000 });
+  await expect(loader).toHaveCount(0, { timeout: 20_000 });
+  await expect(demo.getByText("Hızlı İşlemler")).toBeVisible();
+});
+
+test("the 3D phone starts downloading once the page has loaded, before the demo is reached", async ({ page }) => {
+  const model = page.waitForRequest(/\/models\/phone\.glb/, { timeout: 15_000 });
+  await page.goto("/");
+  // Never scrolled: the request still goes out.
+  expect((await model).url()).toMatch(/phone\.glb/);
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+});
+
+test("if the 3D phone fails to load, the flat phone appears instead of an endless loader", async ({ page }) => {
+  await page.route("**/models/phone.glb", (r) => r.abort());
+  await page.goto("/");
+  const demo = page.locator("#demo");
+  await demo.locator(".stage-bg").scrollIntoViewIfNeeded();
+  await expect(demo.getByText("Hızlı İşlemler")).toBeVisible({ timeout: 15_000 });
+  await expect(demo.getByRole("status", { name: "Demo yükleniyor" })).toHaveCount(0);
+});

@@ -2,13 +2,34 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { SCREEN, shouldLoad3D } from "@/lib/phone-stage";
+import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { shouldLoad3D } from "@/lib/phone-stage";
 import { usePrefersReducedMotion } from "@/lib/use-media-query";
+import { Loader } from "@/components/ui/loader";
 import { StageBackdrop, type Backdrop } from "./StageBackdrop";
 
-// three.js, R3F and the 1 MB model load only when the demo nears the viewport.
+// three.js, R3F and the 1 MB model download once the page is idle (or when the demo nears the
+// viewport, if that comes first), so the phone is usually ready by the time the visitor gets there.
 const PhoneScene = dynamic(() => import("./PhoneScene"), { ssr: false, loading: () => null });
+
+/** How long the loader may spin before the flat phone takes over (a stalled download). */
+const GIVE_UP_MS = 12_000;
+
+type Connection = { saveData?: boolean; effectiveType?: string };
+
+/** A failed model download or WebGL error shows the flat phone instead of breaking the page. */
+class SceneBoundary extends Component<{ onError: () => void; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  componentDidCatch() {
+    this.props.onError();
+  }
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
 
 export { useMediaQuery, usePrefersReducedMotion } from "@/lib/use-media-query";
 
@@ -48,6 +69,8 @@ export function PhoneStage({
   const [load, setLoad] = useState(false);
   const [onScreen, setOnScreen] = useState(false);
   const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const markFailed = useCallback(() => setFailed(true), []);
   const reduced = usePrefersReducedMotion();
   const markReady = useCallback(() => setReady(true), []);
   // Keep the last scene mounted so clearing it fades out instead of popping.
@@ -76,6 +99,39 @@ export function PhoneStage({
     };
   }, []);
 
+  // Fetch the 3D code and model while the visitor is still reading the top of the page.
+  useEffect(() => {
+    const conn = (navigator as Navigator & { connection?: Connection }).connection;
+    if (conn?.saveData || /2g/.test(conn?.effectiveType ?? "")) return;
+    let idle = 0;
+    let timer = 0;
+    const fetchAhead = () => {
+      if (!shouldLoad3D({ renderer: webglRenderer(), saveData: false })) return;
+      import("./PhoneScene").then((m) => m.preloadPhoneModel()).catch(() => {});
+    };
+    const start = () => {
+      if ("requestIdleCallback" in window) idle = window.requestIdleCallback(fetchAhead, { timeout: 3000 });
+      else timer = globalThis.setTimeout(fetchAhead, 1500) as unknown as number;
+    };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+    return () => {
+      window.removeEventListener("load", start);
+      if (idle) window.cancelIdleCallback(idle);
+      window.clearTimeout(timer);
+    };
+  }, []);
+
+  // A download that stalls must not leave the loader spinning: show the flat phone instead.
+  useEffect(() => {
+    if (!load || ready) return;
+    const t = window.setTimeout(markFailed, GIVE_UP_MS);
+    return () => window.clearTimeout(t);
+  }, [load, ready, markFailed]);
+
+  const loading = near && load && !failed && !ready;
+  const flat = near && (!load || failed) && !ready;
+
   return (
     <div>
       <div
@@ -101,20 +157,29 @@ export function PhoneStage({
           </div>
         )}
 
-        {!ready && (
+        {loading && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+            <Loader variant="bars" size={44} label="Demo yükleniyor" className="text-primary" />
+            <p aria-hidden="true" className="text-sm font-semibold text-muted-foreground">
+              Demo yükleniyor…
+            </p>
+          </div>
+        )}
+
+        {flat && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="shrink-0 scale-[0.74] sm:scale-[0.86] lg:scale-[0.95]">
-              {/* Same size before and after: the app screen (~200 nodes) mounts only once the demo is near, keeping first paint light. */}
-              <div className="rounded-[70px] bg-[#1d211f] p-[10px] shadow-lift ring-2 ring-[#9ca3a0]">
-                {near ? children : <div className="bg-background" style={{ width: SCREEN.width, height: SCREEN.height, borderRadius: SCREEN.radius }} />}
-              </div>
+              {/* Without 3D (no WebGL, Save-Data or a failed download) the app runs in a flat phone frame. */}
+              <div className="rounded-[70px] bg-[#1d211f] p-[10px] shadow-lift ring-2 ring-[#9ca3a0]">{children}</div>
             </div>
           </div>
         )}
 
         {load && (
           <div className="absolute inset-0">
-            <PhoneScene animate={!reduced} intro={!reduced} dark={false} active={onScreen} overlay={overlay} onReady={markReady} scenery={!scene && backdrop === "meadow"} />
+            <SceneBoundary onError={markFailed}>
+              <PhoneScene animate={!reduced} intro={!reduced} dark={false} active={onScreen} overlay={overlay} onReady={markReady} scenery={!scene && backdrop === "meadow"} />
+            </SceneBoundary>
           </div>
         )}
         {ready && (
