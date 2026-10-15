@@ -46,3 +46,16 @@ test("article shares its cover image and the site name", async ({ page, request 
   expect(image).toBe("http://localhost:3100/demo/bugday-sari-pas.webp");
   expect((await request.get(image!)).headers()["content-type"]).toBe("image/webp");
 });
+
+test("the slogan names the page, and the logo badge shows in the header and the browser tab", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveTitle("Bereket AI — Çiftçinin Akıllı Rehberi");
+  const logo = page.locator("header").getByRole("link", { name: /Bereket AI/ }).locator("img");
+  await expect(logo).toHaveAttribute("src", /brand%2Flogo|brand\/logo/);
+  await expect(logo).toBeVisible();
+  expect(await logo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+  const icon = page.locator('link[rel="icon"]').first();
+  await expect(icon).toHaveAttribute("href", /\/icon/);
+  const res = await page.request.get((await icon.getAttribute("href"))!);
+  expect(res.headers()["content-type"]).toMatch(/image\/png/);
+});

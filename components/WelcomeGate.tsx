@@ -36,8 +36,10 @@ export function WelcomeGate() {
     const open = () => setSettled(true);
     const afterLoad = () => {
       timer = window.setTimeout(() => {
-        // The home hero is playing its opening animation: wait for it to finish (or 12 s at most).
-        if (html.dataset.cineRun && !html.dataset.cineDone) {
+        // The home hero is playing its opening animation, or is armed for it but its script hasn't
+        // started yet (slow phones): wait for it to finish (or 12 s at most).
+        const armed = html.classList.contains("cine") && document.querySelector("[data-cine]");
+        if ((html.dataset.cineRun || armed) && !html.dataset.cineDone) {
           window.addEventListener(CINE_DONE, open, { once: true });
           timer = window.setTimeout(open, 12_000);
         } else open();

@@ -3,16 +3,18 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { siteConfig } from "@/config/site";
 
-export const alt = `${siteConfig.name} — Çiftçinin yapay zekâ destekli tarla asistanı`;
+export const alt = `${siteConfig.name} — ${siteConfig.tagline}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 // Read once at module scope (Cache Components treats this as build-time data).
 const fontDir = join(process.cwd(), "assets", "fonts");
-const [latin, latinExt] = await Promise.all([
+const [latin, latinExt, logo] = await Promise.all([
   readFile(join(fontDir, "space-grotesk-latin-700.woff")),
   readFile(join(fontDir, "space-grotesk-latin-ext-700.woff")),
+  readFile(join(process.cwd(), "assets", "brand-logo.png")),
 ]);
+const logoSrc = `data:image/png;base64,${logo.toString("base64")}`;
 
 export default function OpengraphImage() {
   return new ImageResponse(
@@ -31,24 +33,10 @@ export default function OpengraphImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 48, color: "#15803d" }}>
-          <div
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: 36,
-              background: "#15803d",
-              color: "#ffffff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 44,
-            }}
-          >
-            B
-          </div>
+          <img src={logoSrc} alt="" width={96} height={96} />
           {siteConfig.name}
         </div>
-        <div style={{ display: "flex", fontSize: 68, lineHeight: 1.15, maxWidth: 1000 }}>{siteConfig.tagline}</div>
+        <div style={{ display: "flex", fontSize: 96, lineHeight: 1.1, maxWidth: 1000 }}>{siteConfig.tagline}</div>
         <div style={{ display: "flex", fontSize: 32, color: "#15803d" }}>
           Hastalık tespiti · Hasat başarı tahmini · Çiftçiye özel hava uyarıları
         </div>

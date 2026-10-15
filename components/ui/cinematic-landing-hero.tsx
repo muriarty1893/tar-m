@@ -145,7 +145,7 @@ export function CinematicHero({
 
       <div className="absolute inset-x-0 top-[4%] z-10 flex flex-col items-center px-4 text-center">
         {eyebrow && <div className="hidden sm:block">{eyebrow}</div>}
-        <h1 className="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl" style={{ perspective: "800px" }}>
+        <h1 className="mt-4 text-[2.6rem] font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl" style={{ perspective: "800px" }}>
           <span data-cine="line1" className="text-3d-matte block">
             {tagline1}
           </span>{" "}

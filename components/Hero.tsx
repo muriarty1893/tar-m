@@ -8,7 +8,8 @@ import { pageHeroPhoto } from "@/data/photo-credits";
 import { ArrowUpRight } from "@/components/ui/arrow-up-right";
 import { CtaLink } from "./CtaLink";
 
-const [line1, line2] = siteConfig.tagline.split(/(?<=,)\s/);
+// The slogan on two lines: its first word, then the rest ("Çiftçinin" / "Akıllı Rehberi").
+const [line1, line2] = siteConfig.tagline.split(/(?<=^\S+)\s/);
 
 /** Home hero: bare soil running to the horizon behind the headline, then a card filled with a ripe
  *  wheat field (Suşehri, Sivas) holding the app on our phone: the field before and after. */

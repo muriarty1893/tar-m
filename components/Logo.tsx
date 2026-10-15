@@ -1,13 +1,11 @@
-import { GrainsIcon } from "@phosphor-icons/react/dist/ssr";
+import Image from "next/image";
 import { siteConfig } from "@/config/site";
 
-/** Placeholder mark: Phosphor "Grains" in an organic leaf-green shape. Replace with the real logo. */
+/** The round badge logo (public/brand/logo.webp) and the brand name beside it. */
 export function Logo({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2.5 font-heading font-bold tracking-tight ${className}`}>
-      <span aria-hidden="true" className="blob flex size-10 items-center justify-center bg-primary text-primary-foreground">
-        <GrainsIcon weight="duotone" className="size-6" />
-      </span>
+      <Image src="/brand/logo.webp" alt="" width={192} height={192} className="size-12 shrink-0" />
       <span>{siteConfig.name}</span>
     </span>
   );

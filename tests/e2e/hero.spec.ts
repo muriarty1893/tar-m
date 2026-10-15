@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const H1 = "Tarlanızın fotoğrafını çekin, yapay zekâ size yol göstersin.";
+const H1 = "Çiftçinin Akıllı Rehberi";
 
 test("the cinematic intro plays by itself and rests with the card, phone and CTAs", async ({ page }) => {
   await page.goto("/");

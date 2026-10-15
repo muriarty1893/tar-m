@@ -22,7 +22,7 @@ const sofiaCondensed = Sofia_Sans_Condensed({ variable: "--font-sofia-condensed"
 const splineMono = Spline_Sans_Mono({ variable: "--font-spline-mono", subsets: ["latin", "latin-ext"], preload: false });
 const fonts = [onest, dmSans, spaceGrotesk, sofiaCondensed, splineMono].map((f) => f.variable).join(" ");
 
-const defaultTitle = `${siteConfig.name} — Çiftçinin yapay zekâ destekli tarla asistanı`;
+const defaultTitle = `${siteConfig.name} — ${siteConfig.tagline}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
