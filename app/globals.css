@@ -235,10 +235,11 @@
 /* ---------------------------------------------------------------------------
    Cinematic landing hero (adapted from a 21st.dev "cinematic hero" component).
    html.cine is set by an inline <head> script when motion is allowed; only then
-   do intro elements start hidden, so no-JS and reduced-motion visitors get the
-   final state straight away. The script drops the class if the hero never starts.
+   is the video's last frame lifted off the video, so it can play from the start.
+   No-JS and reduced-motion visitors keep the last frame as a still. The script
+   drops the class if the hero never starts; a blocked or failed video drops it too.
 --------------------------------------------------------------------------- */
-html.cine [data-cine] {
+html.cine .hero-endframe {
   opacity: 0;
 }
 
@@ -272,8 +273,10 @@ html.cine [data-cine] {
   box-shadow: var(--hero-card-shadow);
   border: var(--hero-card-border);
 }
-/* The card over its wheat photo: white text on a dark green scrim; badges stay white chips. */
+/* The card over its video: white text on a dark green scrim; badges stay white chips. On phones and
+   tablets the video fills the card's top and fades into this dark ground. */
 .cine-card[data-photo] {
+  background: #06180e;
   --hero-fg: #ffffff;
   --hero-muted: rgb(255 255 255 / 0.9);
   --hero-chip-bg: #eef5f0;
@@ -291,12 +294,25 @@ html.cine [data-cine] {
     --hero-muted: #4b5a51;
   }
 }
+/* Darkest behind the text (the bottom on phones, the left on desktops), clear over the phone. */
 .cine-card-scrim {
-  background:
-    linear-gradient(0deg, rgb(6 24 14 / 0.88) 0%, rgb(6 24 14 / 0.55) 45%, rgb(6 24 14 / 0.3) 100%);
+  background: linear-gradient(0deg, rgb(6 24 14 / 0.96) 0%, rgb(6 24 14 / 0.9) 42%, rgb(6 24 14 / 0) 62%);
   @media (min-width: 64rem) {
-    background:
-      linear-gradient(90deg, rgb(6 24 14 / 0.86) 0%, rgb(6 24 14 / 0.62) 42%, rgb(6 24 14 / 0.38) 70%, rgb(6 24 14 / 0.5) 100%);
+    background: linear-gradient(
+      90deg,
+      rgb(6 24 14 / 0.86) 0%,
+      rgb(6 24 14 / 0.62) 28%,
+      rgb(6 24 14 / 0) 43%,
+      rgb(6 24 14 / 0) 58%,
+      rgb(6 24 14 / 0.45) 76%,
+      rgb(6 24 14 / 0.7) 100%
+    );
+  }
+}
+.hero-media {
+  mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
+  @media (min-width: 64rem) {
+    mask-image: none;
   }
 }
 .cine-badge {

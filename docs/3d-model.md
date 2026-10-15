@@ -34,14 +34,13 @@ The scene finds the display by its material name `OLED`, so keep that name if yo
 
 `components/ui/cinematic-landing-hero.tsx` (adapted from a 21st.dev cinematic hero) plays a one-time GSAP intro on load and then rests; there is no scroll pinning. The headline reveals over a field running to the horizon (`public/hero/field-horizon.webp`). Then a forest-green card rises with the phone render (mouse tilt on desktop), two glass badges, the pitch and the CTAs. An inline `<head>` script in `app/layout.tsx` adds `html.cine` only when motion is allowed, so intro elements start hidden only then. Without JS, with reduced motion, or if the hero hasn't started within 4 s, everything shows in its final state. GSAP is loaded lazily after first paint.
 
-## The hero image
+## The hero video
 
-`public/hero/phone.webp` is a cinematic still of the bare phone (no meadow, transparent background) on the app's home screen. To re-render it after changing the app screens:
+The home hero card's background is `public/hero/hero-video.{webm,mp4}` (1920×800), played once on load: a phone with the app flying in over a wheat field. The source is a portrait clip made with Kling AI (its watermark is cropped off). To make it wide, `scripts/hero-video.sh` keeps the moving clip sharp in the middle and fills the sides with its first frame mirrored outward and blurred progressively, like a shallow depth of field. It also writes `hero-video-start.webp` (the poster) and `hero-video-end.webp` (the last frame, shown as a still with reduced motion, without JavaScript, or if the video can't play).
 
-1. Add a temporary client page that renders `PhoneScene` with `scenery={false}`, `animate={false}`, `intro={false}`, `pose={[-0.12, -0.32, 0.035]}` and `view={{ fov: 24, position: [0, -0.3, 4.5], lookAt: [0, 0, 0] }}`, plus `AppScreen` in the overlay div (as `PhoneStage` does), in a 700×1000 box.
-2. Run `npm run dev`. In Playwright (Chromium with `--use-angle=gl`, 2× device scale), make the page background transparent and screenshot the canvas with `omitBackground: true`.
-3. Trim and convert: `magick render.png -trim +repage -bordercolor none -border 24 -resize 760x -quality 84 public/hero/phone.webp`
-4. Delete the temporary page.
+To use a new portrait clip: `scripts/hero-video.sh clip.mp4 [bottom-px-to-crop]` (the default crop, 80 px, removes Kling's watermark; pass 0 for none). It needs `ffmpeg` and ImageMagick (`magick`).
+
+The previous hero (a still render of the 3D phone with a scripted GSAP intro) is kept on the `hero-cinematic-animation` branch.
 
 ## Photos
 
