@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import sharp from "sharp";
 
 const H1 = "Çiftçinin Akıllı Rehberi";
 
@@ -82,4 +83,19 @@ test("the hero card, its text and buttons are there from the first frame: no bla
   await expect.poll(() => page.evaluate(() => (window as unknown as { __card: string[] }).__card.length)).toBe(90);
   const samples = await page.evaluate(() => (window as unknown as { __card: string[] }).__card);
   expect(new Set(samples)).toEqual(new Set(["1/visible/1"]));
+});
+
+test("the field photo fills the hero up to the headline: no white band between the headline and the card", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const h1 = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
+  const card = (await page.locator("[data-cine='card']").boundingBox())!;
+  const top = Math.ceil(h1.y + h1.height + 4);
+  const height = Math.floor(card.y - 4) - top;
+  test.skip(height < 8, "no gap between the headline and the card at this size");
+  const shot = await page.screenshot({ clip: { x: 0, y: top, width: page.viewportSize()!.width, height } });
+  const { channels } = await sharp(shot).stats();
+  const mean = (channels[0].mean + channels[1].mean + channels[2].mean) / 3;
+  // Plain white is 255; the washed-out field reads clearly darker.
+  expect(mean).toBeLessThan(235);
 });

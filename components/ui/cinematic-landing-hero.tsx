@@ -115,7 +115,7 @@ export function CinematicHero({
       {/* Backdrop: field running to the horizon, washed to white at the top, and the headline. */}
       <div data-cine-backdrop className="absolute inset-0 -z-10">
         <Image src={background.src} alt={background.alt ?? ""} fill preload sizes="100vw" className="object-cover object-bottom" />
-        <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,var(--background)_0%,var(--background)_38%,color-mix(in_srgb,var(--background)_55%,transparent)_62%,transparent_100%)]" />
+        <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,var(--background)_0%,var(--background)_8%,color-mix(in_srgb,var(--background)_60%,transparent)_24%,color-mix(in_srgb,var(--background)_20%,transparent)_40%,transparent_60%)]" />
       </div>
       <div aria-hidden="true" className="cine-grain pointer-events-none absolute inset-0 z-50 opacity-[0.05]" />
 
