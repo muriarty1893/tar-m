@@ -235,3 +235,9 @@ test("the calendar tab lists the month's farm tasks by day, and tasks can be tic
   await month.getByRole("button", { name: /^2 Ekim/ }).click();
   await expect(app.getByText("Bu gün için görev yok")).toBeVisible();
 });
+
+test("the demo section's intro no longer mentions the pointing finger", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("#demo")).toContainText("Telefondaki uygulamayı kendiniz kullanın");
+  await expect(page.locator("#demo")).not.toContainText("Parmak işareti");
+});

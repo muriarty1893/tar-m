@@ -1043,3 +1043,106 @@ html.cine [data-cine] {
   }
 }
 
+
+/* Footer (components/Footer.tsx), Swiss style: soft grey, the brand name across the full width,
+   a condensed display face for the large type and a monospace for the labels. */
+.site-footer {
+  --footer-bg: #f3f4f2;
+  --footer-display: var(--font-barlow-condensed), "Arial Narrow", ui-sans-serif, sans-serif;
+  --footer-mono: var(--font-plex-mono), ui-monospace, monospace;
+  background: var(--footer-bg);
+  color: var(--foreground);
+  border-top: 1px solid var(--border);
+  overflow: hidden;
+}
+.site-footer__inner {
+  container-type: inline-size;
+}
+.site-footer__mono {
+  font-family: var(--footer-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.site-footer__email {
+  font-family: var(--footer-display);
+  font-size: clamp(1.75rem, 8.6cqi, 4.75rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-align: right;
+  overflow-wrap: anywhere;
+  transition: color 0.2s ease;
+}
+.site-footer__email:hover {
+  color: var(--primary);
+}
+.site-footer__page,
+.site-footer__bracket,
+.site-footer__action {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+.site-footer__page {
+  font-size: 1.05rem;
+}
+.site-footer__action {
+  gap: 0.7em;
+  font-size: 1.05rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.35em;
+}
+.site-footer__bracket {
+  gap: 0.6em;
+  & > span {
+    transition: translate 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  &:is(:hover, :focus-visible) > span:first-child {
+    translate: -0.25em 0;
+  }
+  &:is(:hover, :focus-visible) > span:last-child {
+    translate: 0.25em 0;
+  }
+}
+:is(.site-footer__page, .site-footer__bracket, .site-footer__action, .site-footer__credit):hover {
+  color: var(--primary);
+}
+.site-footer__note {
+  font-family: var(--footer-mono);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--muted-foreground);
+}
+/* Sized in container units so "BEREKET AI" fills the width exactly, from phone to desktop. */
+.site-footer__wordmark {
+  margin-top: 2.5rem;
+  font-family: var(--footer-display);
+  font-size: 24.9cqi;
+  line-height: 0.78;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  padding-top: 0.06em;
+  user-select: none;
+}
+.site-footer__credit {
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+.site-footer__legal {
+  font-size: 0.7rem;
+  line-height: 1.4;
+  color: var(--muted-foreground);
+}
+.site-footer :is(a):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-footer__bracket > span {
+    transition: none;
+  }
+}

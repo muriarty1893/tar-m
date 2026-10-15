@@ -26,11 +26,35 @@ test("about page keeps the photo inside its title instead of behind it", async (
   await expect(band.locator(":scope > img, [data-hero-photo]")).toHaveCount(0);
 });
 
-test("footer credits the maker with a LinkedIn link", async ({ page }) => {
+test("footer credits the maker with a link to their website and a plain-text heart", async ({ page }) => {
   await page.goto("/");
   const footer = page.locator("footer");
-  await expect(footer).toContainText("vibecoded with");
-  await expect(footer.getByRole("link", { name: "Murat Eker" })).toHaveAttribute("href", "https://www.linkedin.com/in/murat-eker");
+  await expect(footer).toContainText("vibecoded with ♡ by Murat Eker");
+  await expect(footer.getByRole("link", { name: "Murat Eker" })).toHaveAttribute("href", "https://murateker.com.tr");
+  expect(await footer.textContent()).not.toMatch(/\p{Emoji_Presentation}|\uFE0F/u);
+});
+
+test("footer: the brand name spans the full width, with Türkiye's time and the contact address", async ({ page }) => {
+  await page.goto("/");
+  const footer = page.locator("footer");
+  await footer.scrollIntoViewIfNeeded();
+  const mark = footer.getByTestId("footer-wordmark");
+  await expect(mark).toHaveText("BEREKET AI");
+  const [markW, innerW, overflow] = await mark.evaluate((el) => {
+    const box = el.parentElement!.getBoundingClientRect();
+    const cs = getComputedStyle(el.parentElement!);
+    const inner = box.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    return [range.getBoundingClientRect().width, inner, document.documentElement.scrollWidth - innerWidth];
+  });
+  expect(markW / innerW).toBeGreaterThan(0.9);
+  expect(markW / innerW).toBeLessThanOrEqual(1.01);
+  expect(overflow).toBeLessThanOrEqual(0);
+  await expect(footer.getByTestId("footer-clock")).toHaveText(/TÜRKİYE \(GMT\+3\) \d{2}:\d{2}/);
+  await expect(footer.getByRole("link", { name: "iletisim@bereketai.com" })).toHaveAttribute("href", "mailto:iletisim@bereketai.com");
+  for (const name of ["Hakkımızda", "İş Birliği", "Haberler", "Hava Durumu", "SSS", "Gizlilik ve KVKK", "Görsel kaynakları"])
+    await expect(footer.getByRole("link", { name, exact: true })).toBeVisible();
 });
 
 test("demo result: the success estimate is a half donut chart", async ({ page }) => {

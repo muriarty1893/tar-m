@@ -7,7 +7,7 @@ export const siteConfig = {
     "Bereket AI, çiftçilerin tarlalarının fotoğrafını göndererek hastalık tespiti, verim tahmini ve tarım önerileri alabildiği Türkçe yapay zekâ destekli mobil uygulamadır.",
   contactEmail: "iletisim@bereketai.com",
   /** Footer maker credit. */
-  creator: { name: "Murat Eker", url: "https://www.linkedin.com/in/murat-eker" },
+  creator: { name: "Murat Eker", url: "https://murateker.com.tr" },
   ctaLabel: "Erken erişim için kaydol",
   nav: [
     { label: "Nasıl Çalışır", href: "/#nasil-calisir" },

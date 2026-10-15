@@ -1,60 +1,95 @@
 import Link from "next/link";
-import { EnvelopeIcon } from "@phosphor-icons/react/dist/ssr";
 import { siteConfig } from "@/config/site";
-import { Logo } from "./Logo";
+import { ArrowUpRight } from "@/components/ui/arrow-up-right";
 import { CtaLink } from "./CtaLink";
+import { FooterClock } from "./FooterClock";
 
-const links = [
+const pages = [
   { label: "Hakkımızda", href: "/hakkimizda" },
   { label: "İş Birliği", href: "/is-birligi" },
   { label: "Haberler", href: "/haberler" },
   { label: "Hava Durumu", href: "/hava" },
-  { label: "Sıkça Sorulan Sorular", href: "/sss" },
+];
+
+const more = [
+  { label: "SSS", href: "/sss" },
   { label: "Gizlilik ve KVKK", href: "/gizlilik" },
   { label: "Görsel kaynakları", href: "/kaynaklar" },
 ];
 
+const actions = [
+  { label: "Demoyu deneyin", href: "/#demo" },
+  { label: "Soru sorun", href: "/#sorular" },
+];
+
+/**
+ * Swiss-style footer: the contact address set large, the actions as underlined links, the pages in
+ * a plain list and in brackets, and the brand name across the full width at the bottom.
+ */
 export function Footer() {
   return (
-    <footer className="relative mt-auto overflow-hidden border-t border-border bg-surface">
-      <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
-        <div className="space-y-4">
-          <Logo className="text-xl" />
-          <p className="max-w-sm text-muted-foreground">{siteConfig.tagline}</p>
-          <CtaLink />
-        </div>
-        <nav aria-label="Alt menü">
-          <p className="font-heading text-base font-bold">Sayfalar</p>
-          <ul className="mt-3 space-y-1">
-            {links.map((l) => (
+    <footer className="site-footer mt-auto">
+      <div className="site-footer__inner mx-auto max-w-7xl px-4 pt-14 sm:px-8 sm:pt-20">
+        <a href={`mailto:${siteConfig.contactEmail}`} className="site-footer__email ml-auto block w-fit">
+          {siteConfig.contactEmail}
+        </a>
+
+        <div className="mt-10 grid gap-x-10 gap-y-12 md:grid-cols-[auto_1fr]">
+          <ul className="site-footer__mono order-2 md:order-1 md:pt-10">
+            {pages.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="inline-flex min-h-11 items-center text-muted-foreground transition-colors hover:text-primary">
+                <Link href={l.href} className="site-footer__page">
                   {l.label}
                 </Link>
               </li>
             ))}
           </ul>
-        </nav>
-        <div>
-          <p className="font-heading text-base font-bold">İletişim</p>
-          <a
-            href={`mailto:${siteConfig.contactEmail}`}
-            className="mt-3 inline-flex min-h-11 items-center gap-2 break-all font-medium text-primary underline-offset-4 hover:underline"
-          >
-            <EnvelopeIcon aria-hidden="true" weight="duotone" className="size-5 shrink-0" />
-            {siteConfig.contactEmail}
-          </a>
+          <div className="order-1 flex flex-col gap-10 md:order-2 md:items-end">
+            <ul className="site-footer__mono flex flex-wrap gap-x-10 gap-y-2 md:justify-end">
+              <li>
+                <CtaLink variant="text" className="site-footer__action" />
+              </li>
+              {actions.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="site-footer__action">
+                    {l.label}
+                    <ArrowUpRight />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <p className="site-footer__note max-w-64 md:text-right">{siteConfig.tagline}</p>
+          </div>
         </div>
-      </div>
-      <div className="relative flex flex-col items-center justify-center gap-x-6 gap-y-1 border-t border-border px-4 py-5 text-center text-sm text-muted-foreground sm:flex-row">
-        <p>© 2026 {siteConfig.name}. Tüm hakları saklıdır.</p>
-        {/* The one emoji on the site, at the owner's request (allowed in tests/unit/no-emoji.test.ts). */}
-        <p data-allow-emoji>
-          vibecoded with <span role="img" aria-label="sevgi">❤️</span> by{" "}
-          <a href={siteConfig.creator.url} rel="noopener" className="font-semibold text-primary underline-offset-4 hover:underline">
-            {siteConfig.creator.name}
-          </a>
+
+        <ul className="site-footer__mono mt-12 flex flex-col sm:flex-row sm:flex-wrap sm:justify-between sm:gap-x-6">
+          {more.map((l) => (
+            <li key={l.href}>
+              <Link href={l.href} className="site-footer__bracket">
+                <span aria-hidden="true">[</span>
+                {l.label}
+                <span aria-hidden="true">]</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        <p data-testid="footer-wordmark" aria-hidden="true" className="site-footer__wordmark">
+          BEREKET AI
         </p>
+
+        <div className="site-footer__mono grid items-end gap-x-8 gap-y-3 pb-6 pt-6 text-sm sm:pt-8 md:grid-cols-3">
+          <FooterClock />
+          <p className="normal-case md:text-center">
+            vibecoded with <span role="img" aria-label="sevgi">♡</span> by{" "}
+            <a href={siteConfig.creator.url} rel="noopener" className="site-footer__credit">
+              {siteConfig.creator.name}
+            </a>
+          </p>
+          <p className="site-footer__legal md:text-right">
+            © 2026 {siteConfig.name}. Tüm hakları saklıdır.
+          </p>
+        </div>
       </div>
     </footer>
   );

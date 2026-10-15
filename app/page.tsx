@@ -33,7 +33,7 @@ export default async function Home() {
         id="demo"
         eyebrow="Canlı demo"
         title="Uygulamayı deneyin"
-        intro="Telefondaki uygulamayı kendiniz kullanın: taramayı başlatın, fotoğrafı çekin ve yapay zekânın yanıtını görün. Parmak işareti sıradaki adımı gösterir."
+        intro="Telefondaki uygulamayı kendiniz kullanın: taramayı başlatın, fotoğrafı çekin ve yapay zekânın yanıtını görün."
         className="bg-surface"
       >
         <DemoShowcase />
