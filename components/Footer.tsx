@@ -84,7 +84,14 @@ export function Footer() {
 
         <div className="grid items-end gap-x-8 gap-y-4 pb-7 pt-6 sm:pt-8 md:grid-cols-[1fr_auto_1fr]">
           <FooterClock className="site-footer__clock" />
-          <a href={siteConfig.creator.url} rel="noopener" aria-label={`vibecoded with love by ${siteConfig.creator.name}`} className="site-footer__dev">
+          {/* The maker's portfolio opens in a new tab, so visitors don't lose their place here. */}
+          <a
+            href={siteConfig.creator.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`vibecoded with love by ${siteConfig.creator.name} (yeni sekmede açılır)`}
+            className="site-footer__dev"
+          >
             VIBECODED WITH ♡ BY{" "}
             <span className="site-footer__swap">
               <span className="site-footer__initials">

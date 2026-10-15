@@ -29,8 +29,17 @@ test("about page keeps the photo inside its title instead of behind it", async (
 test("footer credit reads like the reference: 'BY ME' rolls into the maker's full name", async ({ page, isMobile }) => {
   await page.goto("/");
   const footer = page.locator("footer");
-  const credit = footer.getByRole("link", { name: "vibecoded with love by Murat Eker" });
+  const credit = footer.getByRole("link", { name: "vibecoded with love by Murat Eker (yeni sekmede açılır)" });
   await expect(credit).toHaveAttribute("href", "https://murateker.com.tr");
+  // The maker's portfolio opens in a new tab; this page stays where it is.
+  await expect(credit).toHaveAttribute("target", "_blank");
+  await expect(credit).toHaveAttribute("rel", /\bnoopener\b.*\bnoreferrer\b|\bnoreferrer\b.*\bnoopener\b/);
+  await page.context().route("https://murateker.com.tr/**", (r) => r.fulfill({ body: "portfolio", contentType: "text/html" }));
+  await credit.scrollIntoViewIfNeeded();
+  const [tab] = await Promise.all([page.context().waitForEvent("page"), credit.click()]);
+  await expect(tab).toHaveURL(/murateker\.com\.tr/);
+  expect(page.url()).not.toMatch(/murateker/);
+  await tab.close();
   await expect(credit).toContainText("VIBECODED WITH ♡ BY");
   expect(await footer.textContent()).not.toMatch(/\p{Emoji_Presentation}|\uFE0F/u);
   test.skip(isMobile, "hover is a pointer interaction");
