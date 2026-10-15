@@ -32,12 +32,19 @@ export const waitlistSchema = z.object({
 
 
 /** The first-visit "Bizi nereden duydunuz?" answer. */
-export const sourceSchema = z.object({
-  source: z.enum(WELCOME_SOURCES.map((s) => s.id) as [WelcomeSource, ...WelcomeSource[]], {
-    error: "Lütfen bir seçenek işaretleyin.",
-  }),
-  website: honeypot,
-});
+export const sourceSchema = z
+  .object({
+    source: z.enum(WELCOME_SOURCES.map((s) => s.id) as [WelcomeSource, ...WelcomeSource[]], {
+      error: "Lütfen bir seçenek işaretleyin.",
+    }),
+    /** Required when the answer is "Diğer": where, in the visitor's words. */
+    other: optionalText("Cevap", 100),
+    website: honeypot,
+  })
+  .refine((v) => v.source !== "diger" || (v.other ?? "").length >= 2, {
+    path: ["other"],
+    error: "Bizi nereden duyduğunuzu yazın.",
+  });
 
 export const partnerSchema = z.object({
   name: requiredText("Ad soyad", 2, 100),

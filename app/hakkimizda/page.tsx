@@ -69,7 +69,7 @@ export default function AboutPage() {
 
         <div className="mt-14 flex flex-col items-start gap-4 rounded-3xl bg-panel p-8 text-panel-foreground sm:flex-row sm:items-center sm:justify-between">
           <p className="font-heading text-2xl font-bold">Yolculuğumuza katılın.</p>
-          <CtaLink className="bg-panel-foreground text-panel shadow-none hover:bg-panel-foreground/90" withArrow />
+          <CtaLink className="bg-panel-foreground text-panel shadow-none hover:bg-panel-foreground/90" />
         </div>
       </div>
     </>

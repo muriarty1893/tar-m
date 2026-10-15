@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRightIcon, CalendarBlankIcon, NewspaperIcon } from "@phosphor-icons/react/dist/ssr";
+import { CalendarBlankIcon, NewspaperIcon } from "@phosphor-icons/react/dist/ssr";
+import { ArrowUpRight } from "@/components/ui/arrow-up-right";
 import type { Article } from "@/lib/news";
 import { formatTrDate } from "@/lib/format";
 
@@ -43,7 +44,7 @@ export function NewsCard({ article, headingLevel = 3 }: { article: Article; head
               className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-secondary px-4 font-semibold text-primary transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
             >
               Devamını oku
-              <ArrowRightIcon weight="bold" />
+              <ArrowUpRight />
             </Link>
           </div>
         </div>

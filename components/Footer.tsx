@@ -21,7 +21,7 @@ export function Footer() {
         <div className="space-y-4">
           <Logo className="text-xl" />
           <p className="max-w-sm text-muted-foreground">{siteConfig.tagline}</p>
-          <CtaLink withArrow />
+          <CtaLink />
         </div>
         <nav aria-label="Alt menü">
           <p className="font-heading text-base font-bold">Sayfalar</p>

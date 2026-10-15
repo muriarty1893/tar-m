@@ -86,7 +86,7 @@ export function Features() {
       </BentoGrid>
       <div className="mt-12 flex flex-col items-start gap-4 overflow-hidden panel-cta rounded-3xl bg-panel p-8 text-panel-foreground sm:flex-row sm:items-center sm:justify-between">
         <p className="font-heading text-2xl font-bold">Uygulama çıktığında ilk kullananlardan olun.</p>
-        <CtaLink className="bg-panel-foreground text-panel shadow-none hover:bg-panel-foreground/90" withArrow />
+        <CtaLink className="bg-panel-foreground text-panel shadow-none hover:bg-panel-foreground/90" />
       </div>
     </Section>
   );

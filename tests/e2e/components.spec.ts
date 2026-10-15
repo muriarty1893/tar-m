@@ -68,3 +68,19 @@ test.describe("MaskedHeading without JavaScript", () => {
     expect(color).not.toBe("rgba(0, 0, 0, 0)");
   });
 });
+
+test("every sign-up button carries the diagonal arrow, which turns to point ahead on hover", async ({ page, isMobile }) => {
+  await page.goto("/");
+  const signups = page.locator('a[href="/#kayit"]');
+  const n = await signups.count();
+  expect(n).toBeGreaterThan(2);
+  for (let i = 0; i < n; i++) await expect(signups.nth(i).locator(".btn-arrow svg"), `sign-up button ${i}`).toHaveCount(1);
+  await expect(page.getByRole("link", { name: "Demoyu deneyin" }).locator(".btn-arrow")).toHaveCount(1);
+  test.skip(isMobile, "hover is a pointer interaction");
+
+  const cta = page.locator("[data-cine='card']").getByRole("link", { name: /Erken erişim/ });
+  const arrow = cta.locator(".btn-arrow");
+  await expect(arrow).toHaveCSS("rotate", "none");
+  await cta.hover();
+  await expect(arrow).toHaveCSS("rotate", "45deg");
+});

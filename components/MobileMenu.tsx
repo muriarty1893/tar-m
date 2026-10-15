@@ -75,7 +75,7 @@ export default function MobileMenu({
           </ul>
         </nav>
         <div className="mt-6 grid gap-3 motion-safe:animate-in motion-safe:fade-in motion-safe:fill-mode-both motion-safe:duration-500" style={{ animationDelay: "340ms" }}>
-          <CtaLink size="lg" withArrow className="w-full" onClick={close} />
+          <CtaLink size="lg" className="w-full" onClick={close} />
           <Link href="/#demo" onClick={close} className={buttonVariants({ variant: "outline", size: "lg", className: "w-full" })}>
             Demoyu deneyin
           </Link>

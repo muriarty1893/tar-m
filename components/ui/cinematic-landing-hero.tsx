@@ -10,6 +10,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import Image from "next/image";
 import type { gsap as Gsap } from "gsap";
 import { cn } from "cn";
+import { CINE_DONE } from "@/lib/cine";
 
 export type CinematicBadge = { icon: ReactNode; title: string; detail: string };
 
@@ -69,7 +70,14 @@ export function CinematicHero({
       if (cancelled) return;
       ctx = gsap.context(() => {
         gsap
-          .timeline({ delay: 0.1 })
+          // Mark the end, so first-visit UI (the welcome question) can wait for the intro to finish.
+          .timeline({
+            delay: 0.1,
+            onComplete: () => {
+              html.dataset.cineDone = "1";
+              window.dispatchEvent(new Event(CINE_DONE));
+            },
+          })
           .fromTo(
             "[data-cine='line1']",
             { autoAlpha: 0, y: 60, scale: 0.88, filter: "blur(18px)", rotationX: -20 },

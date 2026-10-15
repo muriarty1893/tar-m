@@ -5,6 +5,8 @@ import AxeBuilder from "@axe-core/playwright";
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test("first visit: the welcome question must be answered before the site can be used", async ({ page }) => {
+  // Motion off: on the home page the welcome otherwise waits for the hero's intro (tested below).
+  await page.emulateMedia({ reducedMotion: "reduce" });
   const sent: unknown[] = [];
   await page.route("**/api/source", async (r) => {
     sent.push(r.request().postDataJSON());
@@ -63,4 +65,47 @@ test("the welcome dialog has no axe violations, before and after an answer is pi
   expect(await scan()).toEqual([]);
   await dialog.getByRole("radio", { name: "Diğer" }).check();
   expect(await scan()).toEqual([]);
+});
+
+test("picking 'Diğer' asks where, and 'Bitti' waits for an answer there too", async ({ page }) => {
+  const sent: unknown[] = [];
+  await page.route("**/api/source", async (r) => {
+    sent.push(r.request().postDataJSON());
+    await r.fulfill({ json: { ok: true } });
+  });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/sss");
+  const dialog = page.getByRole("dialog", { name: /hoş geldiniz/i });
+  const done = dialog.getByRole("button", { name: "Bitti" });
+  const where = dialog.getByRole("textbox", { name: /Nereden duydunuz/ });
+  await expect(where).toHaveCount(0);
+
+  await dialog.getByRole("radio", { name: "Diğer" }).check();
+  await expect(where).toBeVisible();
+  await expect(where).toBeFocused();
+  await expect(where).toHaveAttribute("aria-required", "true");
+  await expect(done).toBeDisabled();
+  await where.fill("a");
+  await expect(done).toBeDisabled();
+
+  // Another answer needs no text; back to "Diğer" keeps what was typed.
+  await dialog.getByRole("radio", { name: "Sosyal medya" }).check();
+  await expect(where).toHaveCount(0);
+  await expect(done).toBeEnabled();
+  await dialog.getByRole("radio", { name: "Diğer" }).check();
+  await expect(where).toHaveValue("a");
+  await expect(done).toBeDisabled();
+
+  await where.fill("Tarım fuarı");
+  await expect(done).toBeEnabled();
+  await where.press("Enter");
+  await expect(dialog).toBeHidden();
+  expect(sent).toEqual([expect.objectContaining({ source: "diger", other: "Tarım fuarı" })]);
+});
+
+test("on the home page the welcome waits until the hero's opening animation has finished", async ({ page }) => {
+  await page.goto("/");
+  const dialog = page.getByRole("dialog", { name: /hoş geldiniz/i });
+  await expect(dialog).toBeVisible({ timeout: 15_000 });
+  expect(await page.evaluate(() => document.documentElement.dataset.cineDone)).toBe("1");
 });

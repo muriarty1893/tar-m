@@ -15,6 +15,7 @@ import { siteConfig } from "@/config/site";
 import { pageHeroPhoto } from "@/data/photo-credits";
 import { WELCOME_KEY, WELCOME_SOURCES, type WelcomeSource } from "@/lib/welcome";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const ICONS: Record<WelcomeSource, typeof UsersThreeIcon> = {
   arkadas: UsersThreeIcon,
@@ -28,25 +29,35 @@ const ICONS: Record<WelcomeSource, typeof UsersThreeIcon> = {
 /**
  * First-visit welcome: one required question, "Bizi nereden duydunuz?". The dialog can't be
  * dismissed (no close button, Escape or outside click) and "Bitti" stays disabled until an answer
- * is picked. The answer is remembered in this browser and sent to the team's sheet (/api/source).
+ * is picked; for "Diğer", until the visitor has also written where. The answer is remembered in this browser and sent to the team's sheet (/api/source).
  */
 export default function WelcomeDialog({ onDone }: { onDone: () => void }) {
   const [open, setOpen] = useState(true);
   const [source, setSource] = useState<WelcomeSource | null>(null);
+  // "Diğer" asks where, in the visitor's words; kept if they switch answers and come back.
+  const [other, setOther] = useState("");
   const title = useRef<HTMLHeadingElement>(null);
-  const ids = { question: useId(), hint: useId() };
+  const ids = { question: useId(), hint: useId(), other: useId() };
+  const needsOther = source === "diger";
+  const ready = !!source && (!needsOther || other.trim().length >= 2);
+  const hint = !source
+    ? "Devam etmek için bir seçenek işaretleyin."
+    : !ready
+      ? "Devam etmek için nereden duyduğunuzu yazın."
+      : "Teşekkürler, siteye geçebilirsiniz.";
 
   const finish = (e: FormEvent) => {
     e.preventDefault();
-    if (!source) return;
+    if (!ready) return;
+    const answer = needsOther ? { source, other: other.trim() } : { source };
     try {
-      localStorage.setItem(WELCOME_KEY, JSON.stringify({ source, at: new Date().toISOString() }));
+      localStorage.setItem(WELCOME_KEY, JSON.stringify({ ...answer, at: new Date().toISOString() }));
     } catch {}
     // Fire and forget: the visitor never waits on the sheet.
     fetch("/api/source", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ source }),
+      body: JSON.stringify(answer),
       keepalive: true,
     }).catch(() => {});
     setOpen(false);
@@ -105,15 +116,36 @@ export default function WelcomeDialog({ onDone }: { onDone: () => void }) {
                 })}
               </div>
 
+              {needsOther && (
+                <div className="mt-4">
+                  <label htmlFor={ids.other} className="font-semibold">
+                    Nereden duydunuz? <span className="font-normal text-muted-foreground">(zorunlu)</span>
+                  </label>
+                  <Input
+                    id={ids.other}
+                    // Picking "Diğer" moves straight here.
+                    autoFocus
+                    value={other}
+                    onChange={(e) => setOther(e.target.value)}
+                    maxLength={100}
+                    required
+                    aria-required="true"
+                    aria-describedby={ids.hint}
+                    placeholder="Örn. bir tarım fuarı, YouTube kanalı"
+                    className="mt-2"
+                  />
+                </div>
+              )}
+
               <div className="mt-6 flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p id={ids.hint} aria-live="polite" className="text-sm text-muted-foreground">
-                  {source ? "Teşekkürler, siteye geçebilirsiniz." : "Devam etmek için bir seçenek işaretleyin."}
+                  {hint}
                 </p>
                 {/* Greyed out and unclickable until an answer is picked. */}
-                <span className={source ? "" : "cursor-not-allowed"}>
+                <span className={ready ? "" : "cursor-not-allowed"}>
                   <Button
                     type="submit"
-                    disabled={!source}
+                    disabled={!ready}
                     aria-describedby={ids.hint}
                     className="w-full disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100 disabled:shadow-none sm:w-auto sm:min-w-32"
                   >

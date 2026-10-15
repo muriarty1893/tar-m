@@ -12,7 +12,7 @@ var COLUMNS = {
   partner: ["submittedAt", "name", "organization", "email", "phone", "type", "message"],
   question: ["submittedAt", "name", "email", "question", "consent"],
   // First-visit "Bizi nereden duydunuz?" answers (lib/welcome.ts lists the ids).
-  source: ["submittedAt", "source"],
+  source: ["submittedAt", "source", "other"],
 };
 
 function doPost(e) {

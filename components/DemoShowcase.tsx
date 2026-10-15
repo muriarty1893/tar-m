@@ -185,7 +185,7 @@ export function DemoShowcase() {
           <InfoIcon aria-hidden="true" weight="duotone" className="mt-0.5 size-5 shrink-0 text-gold" />
           Örnek gösterim — gerçek uygulamada kendi tarlanızın fotoğrafını yükleyeceksiniz.
         </p>
-        <CtaLink withArrow className="shrink-0" />
+        <CtaLink className="shrink-0" />
       </div>
     </div>
   );

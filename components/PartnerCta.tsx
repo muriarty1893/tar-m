@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowRightIcon, BankIcon, BriefcaseIcon, TractorIcon, UsersThreeIcon } from "@phosphor-icons/react/dist/ssr";
+import { BankIcon, BriefcaseIcon, TractorIcon, UsersThreeIcon } from "@phosphor-icons/react/dist/ssr";
 import { buttonVariants } from "@/components/ui/button";
+import { ArrowUpRight } from "@/components/ui/arrow-up-right";
 import { Section } from "./Section";
 
 const audiences = [
@@ -30,9 +31,9 @@ export function PartnerCta() {
           </li>
         ))}
       </ul>
-      <Link href="/is-birligi" className={buttonVariants({ variant: "outline", className: "group/p mt-10" })}>
+      <Link href="/is-birligi" className={buttonVariants({ variant: "outline", className: "mt-10" })}>
         İş birliği için bize ulaşın
-        <ArrowRightIcon aria-hidden="true" weight="bold" className="transition-transform group-hover/p:translate-x-0.5" />
+        <ArrowUpRight />
       </Link>
     </Section>
   );

@@ -5,6 +5,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CinematicHero } from "@/components/ui/cinematic-landing-hero";
 import { pageHeroPhoto } from "@/data/photo-credits";
+import { ArrowUpRight } from "@/components/ui/arrow-up-right";
 import { CtaLink } from "./CtaLink";
 
 const [line1, line2] = siteConfig.tagline.split(/(?<=,)\s/);
@@ -33,7 +34,7 @@ export function Hero() {
       }
       actions={
         <>
-          <CtaLink variant="gold" withArrow />
+          <CtaLink variant="gold" />
           <Link
             href="/#demo"
             className={buttonVariants({
@@ -42,6 +43,7 @@ export function Hero() {
             })}
           >
             Demoyu deneyin
+            <ArrowUpRight />
           </Link>
         </>
       }

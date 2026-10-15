@@ -190,7 +190,7 @@ test("the picked field becomes the scene behind the phone, live in its camera", 
   await expect(stage).not.toHaveAttribute("data-scene");
 });
 
-test("each app tab sets its own scene behind the phone: grass, sky, ploughed rows, harvest", async ({ page }) => {
+test("each app tab sets its own scene behind the phone: grass, then photos of sky, ploughed field, straw bales", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/#demo");
   const demo = page.locator("#demo");
@@ -198,10 +198,15 @@ test("each app tab sets its own scene behind the phone: grass, sky, ploughed row
   const stage = demo.locator(".stage-bg");
   const nav = demo.getByTestId("uygulama-ekrani").getByRole("navigation", { name: "Uygulama menüsü" });
   await expect(stage).toHaveAttribute("data-backdrop", "meadow");
+  // Real photographs behind the weather, calendar and history tabs; home keeps the 3D meadow.
+  const photos = { sky: /sahne-gokyuzu/, furrows: /sahne-surulmus-tarla/, harvest: /sahne-balyalar/ } as const;
+  await expect(stage.locator("[data-scene-layer] img")).toHaveCount(0);
   for (const [tab, backdrop] of [["Hava", "sky"], ["Takvim", "furrows"], ["Geçmiş", "harvest"], ["Ana sayfa", "meadow"]] as const) {
     await nav.getByRole("button", { name: tab }).click();
     await expect(stage).toHaveAttribute("data-backdrop", backdrop);
-    await expect(stage.locator(`[data-scene-layer="${backdrop}"]`)).toHaveCSS("opacity", "1");
+    const layer = stage.locator(`[data-scene-layer="${backdrop}"]`);
+    await expect(layer).toHaveCSS("opacity", "1");
+    if (backdrop !== "meadow") await expect(layer.locator("img")).toHaveAttribute("src", photos[backdrop]);
   }
 });
 
