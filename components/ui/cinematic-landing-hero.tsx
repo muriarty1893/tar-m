@@ -71,55 +71,31 @@ export function CinematicHero({
         gsap
           // Mark the end, so first-visit UI (the welcome question) can wait for the intro to finish.
           .timeline({
-            delay: 0.1,
             onComplete: () => {
               html.dataset.cineDone = "1";
               window.dispatchEvent(new Event(CINE_DONE));
             },
           })
-          .fromTo(
-            "[data-cine='line1']",
-            { autoAlpha: 0, y: 60, scale: 0.88, filter: "blur(18px)", rotationX: -20 },
-            { autoAlpha: 1, y: 0, scale: 1, filter: "blur(0px)", rotationX: 0, duration: 1.3, ease: "expo.out" },
-          )
+          // The card, its text and buttons are on screen from the first frame; only the second
+          // headline line, the phone and its badges come in, all starting at once (no blank wait).
           .fromTo(
             "[data-cine='line2']",
             { autoAlpha: 1, clipPath: "inset(0 100% 0 0)" },
-            { clipPath: "inset(0 0% 0 0)", duration: 1.1, ease: "power4.inOut" },
-            "-=0.8",
+            { clipPath: "inset(0 0% 0 0)", duration: 0.9, ease: "power4.inOut" },
+            0,
           )
-          .addLabel("card", "-=0.2")
-          .to("[data-cine-backdrop]", { scale: 1.06, duration: 1.6, ease: "power2.inOut" }, "card")
-          // The card rises only a little as it fades in: sliding up from below the screen read as the page scrolling.
-          .fromTo(
-            "[data-cine='card']",
-            { autoAlpha: 0, y: 48, scale: 0.97 },
-            { autoAlpha: 1, y: 0, scale: 1, duration: 1, ease: "expo.out" },
-            "card",
-          )
+          .to("[data-cine-backdrop]", { scale: 1.06, duration: 1.6, ease: "power2.inOut" }, 0)
           .fromTo(
             "[data-cine='phone']",
-            { autoAlpha: 0, y: 260, z: -500, rotationX: 50, rotationY: -30, scale: 0.6 },
-            { autoAlpha: 1, y: 0, z: 0, rotationX: 0, rotationY: 0, scale: 1, duration: 1.3, ease: "expo.out" },
-            "-=0.45",
-          )
-          .fromTo(
-            "[data-cine='left']",
-            { autoAlpha: 0, x: -50 },
-            { autoAlpha: 1, x: 0, duration: 0.9, ease: "power4.out" },
-            "-=1.1",
-          )
-          .fromTo(
-            "[data-cine='right']",
-            { autoAlpha: 0, x: 50, scale: 0.85 },
-            { autoAlpha: 1, x: 0, scale: 1, duration: 0.9, ease: "expo.out" },
-            "<",
+            { autoAlpha: 0, y: 160, z: -400, rotationX: 40, rotationY: -25, scale: 0.7 },
+            { autoAlpha: 1, y: 0, z: 0, rotationX: 0, rotationY: 0, scale: 1, duration: 1.2, ease: "expo.out" },
+            0.1,
           )
           .fromTo(
             "[data-cine='badge']",
-            { autoAlpha: 0, y: 80, scale: 0.7, rotationZ: -10 },
-            { autoAlpha: 1, y: 0, scale: 1, rotationZ: 0, duration: 0.8, ease: "back.out(1.5)", stagger: 0.12 },
-            "-=0.8",
+            { autoAlpha: 0, y: 60, scale: 0.7, rotationZ: -10 },
+            { autoAlpha: 1, y: 0, scale: 1, rotationZ: 0, duration: 0.7, ease: "back.out(1.5)", stagger: 0.12 },
+            0.6,
           );
       }, root);
     });

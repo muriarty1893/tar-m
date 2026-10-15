@@ -65,3 +65,21 @@ test("the hero card is filled with a ripe wheat field, unlike the bare soil behi
   const badges = card.locator(".cine-badge");
   if (await badges.first().isVisible()) await expect(badges.first()).toHaveCSS("color", "rgb(15, 46, 29)");
 });
+
+test("the hero card, its text and buttons are there from the first frame: no blank space while the intro runs", async ({ page }) => {
+  await page.addInitScript(() => {
+    const w = window as unknown as { __card: string[] };
+    w.__card = [];
+    const tick = () => {
+      const card = document.querySelector("[data-cine='card']");
+      const left = document.querySelector("[data-cine='left']");
+      if (card && left) w.__card.push(`${getComputedStyle(card).opacity}/${getComputedStyle(card).visibility}/${getComputedStyle(left).opacity}`);
+      if (w.__card.length < 90) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+  await page.goto("/");
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __card: string[] }).__card.length)).toBe(90);
+  const samples = await page.evaluate(() => (window as unknown as { __card: string[] }).__card);
+  expect(new Set(samples)).toEqual(new Set(["1/visible/1"]));
+});

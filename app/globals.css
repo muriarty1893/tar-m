@@ -235,10 +235,13 @@
 /* ---------------------------------------------------------------------------
    Cinematic landing hero (adapted from a 21st.dev "cinematic hero" component).
    html.cine is set by an inline <head> script when motion is allowed; only then
-   do intro elements start hidden, so no-JS and reduced-motion visitors get the
-   final state straight away. The script drops the class if the hero never starts.
+   do the intro's moving parts (the headline's second line, the phone and its
+   badges) start hidden. The card, its text and buttons always show from the
+   first frame, so the hero is never blank while the intro code loads. No-JS and
+   reduced-motion visitors get the final state; the script drops the class if
+   the hero never starts.
 --------------------------------------------------------------------------- */
-html.cine [data-cine] {
+html.cine :is([data-cine="line2"], [data-cine="phone"], [data-cine="badge"]) {
   opacity: 0;
 }
 
