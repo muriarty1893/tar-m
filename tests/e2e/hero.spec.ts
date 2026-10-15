@@ -12,9 +12,10 @@ test("the cinematic intro plays by itself and rests with the card, phone and CTA
   await expect(hero.getByRole("link", { name: "Erken erişim için kaydol" })).toHaveAttribute("href", "/#kayit");
   await expect(hero.getByRole("link", { name: "Demoyu deneyin" })).toHaveAttribute("href", "/#demo");
   await expect(hero.getByRole("img", { name: /mobil uygulamasının ana ekranı/ })).toBeVisible();
-  // No scroll-jacking: the page scrolls normally right away.
+  // No scroll-jacking: the page scrolls right away. (Phone emulation divides a synthetic wheel's
+  // delta by the pixel ratio, 2.625 on the Pixel 7, so 900 arrives as ~343 there.)
   await page.mouse.wheel(0, 900);
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(500);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(300);
 });
 
 test("reduced motion shows the final hero at once, without arming the intro", async ({ page }) => {

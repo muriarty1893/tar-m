@@ -5,6 +5,8 @@ import { siteUrl } from "@/lib/site-url";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { WelcomeGate } from "@/components/WelcomeGate";
+import { SmoothScroll } from "@/components/SmoothScroll";
+import "lenis/dist/lenis.css";
 import "./globals.css";
 
 // latin-ext carries the Turkish letters (ç ğ ı İ ö ş ü).
@@ -64,6 +66,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </main>
         <Footer />
         <WelcomeGate />
+        <SmoothScroll />
       </body>
     </html>
   );

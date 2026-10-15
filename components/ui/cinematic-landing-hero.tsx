@@ -62,7 +62,6 @@ export function CinematicHero({
     const html = document.documentElement;
     if (!html.classList.contains("cine")) return;
     html.dataset.cineRun = "1";
-    const vh = window.innerHeight;
     let ctx: ReturnType<typeof Gsap.context> | undefined;
     let cancelled = false;
 
@@ -91,10 +90,11 @@ export function CinematicHero({
           )
           .addLabel("card", "-=0.2")
           .to("[data-cine-backdrop]", { scale: 1.06, duration: 1.6, ease: "power2.inOut" }, "card")
+          // The card rises only a little as it fades in: sliding up from below the screen read as the page scrolling.
           .fromTo(
             "[data-cine='card']",
-            { autoAlpha: 1, y: vh + 200 },
-            { y: 0, duration: 0.95, ease: "power3.out" },
+            { autoAlpha: 0, y: 48, scale: 0.97 },
+            { autoAlpha: 1, y: 0, scale: 1, duration: 1, ease: "expo.out" },
             "card",
           )
           .fromTo(
