@@ -1,6 +1,6 @@
 # Çiftçi Destek mobile app: design record
 
-Date: 2026-10-16 · Status: first prototype built (`mobile/`)
+Date: 2026-10-16 · Status: prototype in `mobile/`, rebuilt after feedback
 
 ## Agreed with the owner
 
@@ -8,48 +8,39 @@ Date: 2026-10-16 · Status: first prototype built (`mobile/`)
 - One app for Android and iOS.
 - The first version is a **clickable prototype on sample data**: no real AI, sign-in, server or payments.
 
-**Product**
-- The core flow is the **disease scan**: camera → analysing → diagnosis with treatment steps.
-- Keep the Çiftçi Destek **name and logo**. The rest of the look is free, and features may go beyond the website.
+**Design**
+- **First version (Sleek "Toprak" theme).** It was built from four Sleek-designed screens plus extra features: onboarding, fields, profile, market prices and a voice assistant. The owner did not like it.
+- **Current version.** The owner asked for the **design and features of the website's demo phone** (`components/phone-app/`, `data/demo-scenarios.ts`, `data/farm-calendar.ts`). That is what the app is now: the same palette, fonts, icons, screens and scripted content.
 
-**Design and build**
-- **Design.** The look was made with design skills. Sleek produced four screens: the free tier caps a project at four. An image-generation skill was tried and could not run here. The owner chose to build from the Sleek screens rather than wait for more mockups.
-- **Components.** Use ready-made free React components, not hand-made UI elements.
+**Components:** use ready-made free React components, not hand-made UI elements.
 
 ## Decisions
 
 **Stack**
-- **Expo SDK 57 with Expo Router.** The owner's Expo Go from the Play Store (57.0.9) supports SDK 57 only; SDK 58 was out but not yet in that Expo Go.
-- **Components.** React Native Reusables (shadcn/ui for React Native, Uniwind variant) is the ready-made library. HeroUI Native was the first choice but did not support SDK 58's gesture-handler 3.
-- **Icons.** The Solar icons match the Sleek design. They come from the official `@iconify-json/solar` data.
+- **Expo SDK 57 with Expo Router.** The owner's Expo Go from the Play Store (57.0.9) supports SDK 57 only.
+- **Components.** React Native Reusables (shadcn/ui for React Native, Uniwind variant), restyled with the demo's tokens. The used ones are Dialog, Checkbox, Progress and Text.
+- **Icons.** Phosphor (`phosphor-react-native`), imported one file at a time to keep the bundle small, the same set the website uses.
 
-**Look ("Toprak")**
-- Cream paper background, soil-brown text and controls.
-- Terracotta is reserved for scanning. Olive means healthy; amber and brick mean risk.
-- Fonts: Bricolage Grotesque (headings) and Atkinson Hyperlegible Next (body).
-- Large type and touch targets, for outdoor use.
+**Look**
+- The `.demo-app` palette: white, green `#15803d` and deep green `#14532d`, gold `#a16207`, borders `#bbf7d0`.
+- DM Sans for text, Space Grotesk for headings.
+- Rounded 18–26 px cards, soft green shadows.
 
 **Navigation**
-- Five tabs: Bugün, Tarlalar, a raised centre Tara button, Takvim and Profil.
-- The scan flow and detail screens are stack screens above the tabs.
+- Five tabs as in the demo: Ana sayfa, Taramalar (opens the camera), Hava, Takvim, Geçmiş.
+- The camera, result and chat are stack screens above the tabs.
 
-**Features added beyond the website**
-- The spraying-window verdict.
-- Regional outbreak warnings.
-- Field health and scan history.
-- Market prices.
-- A Turkish voice assistant that reads its answers aloud.
-- An "ask an agronomist" request.
-- Sample photos for trying a scan without a diseased plant.
+**Content**
+- **Scenarios.** The demo's four scenarios, copied as they are; the text still needs an agronomist's review.
+- **Calendar.** The demo's tasks, shifted so that the demo's "today" (14 October) is the real today.
+- **Weather and prices.** The demo's 5-day forecast and prices.
 
 **Simulated parts**
-- **Diagnosis** is `diagnose()`. It is deterministic per photo, and sample photos have fixed results.
-- **Weather** is a deterministic 48-hour sample. Spraying needs no rain, wind ≤ 15 km/s, 8–28 °C, and 06:00–20:00.
-- **Prices and alerts** are sample data.
-- **Voice input** is simulated, because speech-to-text needs a native module that Expo Go lacks. Text-to-speech is real (`expo-speech`).
+- **Scan result.** A photo maps to a scenario by a stable hash. Without camera permission, the shutter uses the chosen sample.
+- **"Coming soon".** "Tarlalarım", "Tarla Haritası" and "Tümünü gör" open a "yakında" dialog.
 
 ## Verification at hand-over
 
-- **Tests:** 34 Jest tests pass. Typecheck, Expo lint and Expo Doctor (20/20) are clean.
-- **Web:** 15 end-to-end flow checks pass at phone size, with no console errors.
-- **Native:** the Android and iOS Hermes bundles build. They have not yet been run on a physical device or emulator.
+- **Tests:** 23 Jest tests pass. Typecheck, Expo lint and Expo Doctor (21/21) are clean.
+- **Web:** 14 end-to-end checks pass at phone size, with no console errors.
+- **Native:** the Android and iOS Hermes bundles build. They have not been run on a device by us.

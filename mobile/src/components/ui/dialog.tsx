@@ -133,7 +133,7 @@ function DialogDescription({
 }: React.ComponentProps<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
-      className={cn('text-muted-foreground text-sm', className)}
+      className={cn('font-sans text-muted-foreground text-sm', className)}
       {...props}
     />
   );

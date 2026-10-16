@@ -1,0 +1,37 @@
+// Phosphor icons, the set the website demo uses. Imported one by one: the package index pulls in every icon.
+
+export { ArrowDownIcon } from 'phosphor-react-native/src/icons/ArrowDown';
+export { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft';
+export { ArrowUpIcon } from 'phosphor-react-native/src/icons/ArrowUp';
+export { ArrowsClockwiseIcon } from 'phosphor-react-native/src/icons/ArrowsClockwise';
+export { BatteryFullIcon } from 'phosphor-react-native/src/icons/BatteryFull';
+export { CalendarDotsIcon } from 'phosphor-react-native/src/icons/CalendarDots';
+export { CameraIcon } from 'phosphor-react-native/src/icons/Camera';
+export { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight';
+export { ChatCircleDotsIcon } from 'phosphor-react-native/src/icons/ChatCircleDots';
+export { CheckCircleIcon } from 'phosphor-react-native/src/icons/CheckCircle';
+export { ClockCounterClockwiseIcon } from 'phosphor-react-native/src/icons/ClockCounterClockwise';
+export { CloudRainIcon } from 'phosphor-react-native/src/icons/CloudRain';
+export { CloudSunIcon } from 'phosphor-react-native/src/icons/CloudSun';
+export { DropIcon } from 'phosphor-react-native/src/icons/Drop';
+export { EyeIcon } from 'phosphor-react-native/src/icons/Eye';
+export { FirstAidKitIcon } from 'phosphor-react-native/src/icons/FirstAidKit';
+export { FlaskIcon } from 'phosphor-react-native/src/icons/Flask';
+export { GrainsIcon } from 'phosphor-react-native/src/icons/Grains';
+export { HouseIcon } from 'phosphor-react-native/src/icons/House';
+export { ImageSquareIcon } from 'phosphor-react-native/src/icons/ImageSquare';
+export { LightbulbIcon } from 'phosphor-react-native/src/icons/Lightbulb';
+export { LightningIcon } from 'phosphor-react-native/src/icons/Lightning';
+export { MapPinIcon } from 'phosphor-react-native/src/icons/MapPin';
+export { MapTrifoldIcon } from 'phosphor-react-native/src/icons/MapTrifold';
+export { PaperPlaneRightIcon } from 'phosphor-react-native/src/icons/PaperPlaneRight';
+export { PlantIcon } from 'phosphor-react-native/src/icons/Plant';
+export { ScanIcon } from 'phosphor-react-native/src/icons/Scan';
+export { ShovelIcon } from 'phosphor-react-native/src/icons/Shovel';
+export { SnowflakeIcon } from 'phosphor-react-native/src/icons/Snowflake';
+export { SunIcon } from 'phosphor-react-native/src/icons/Sun';
+export { TractorIcon } from 'phosphor-react-native/src/icons/Tractor';
+export { UserIcon } from 'phosphor-react-native/src/icons/User';
+export { WindIcon } from 'phosphor-react-native/src/icons/Wind';
+export { XIcon } from 'phosphor-react-native/src/icons/X';
+export type { Icon as PhosphorIcon } from 'phosphor-react-native';

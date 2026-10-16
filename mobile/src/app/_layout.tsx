@@ -17,15 +17,7 @@ SplashScreen.preventAutoHideAsync();
 
 const NAV_THEME: Theme = {
   ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: COLORS.background,
-    card: COLORS.background,
-    text: COLORS.foreground,
-    border: COLORS.border,
-    primary: COLORS.accent,
-    notification: COLORS.accent,
-  },
+  colors: { ...DefaultTheme.colors, background: COLORS.background, card: COLORS.background, text: COLORS.foreground, border: COLORS.border, primary: COLORS.primary, notification: COLORS.primary },
 };
 
 /** True once the saved state has been read from the device. */
@@ -54,7 +46,8 @@ export default function RootLayout() {
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: COLORS.background } }}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="tara" options={{ presentation: 'fullScreenModal', animation: 'fade' }} />
-            <Stack.Screen name="analiz" options={{ animation: 'fade', gestureEnabled: false }} />
+            <Stack.Screen name="sonuc/[id]" options={{ animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="soru/[id]" />
           </Stack>
           <PortalHost />
         </ThemeProvider>

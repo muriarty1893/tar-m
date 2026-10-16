@@ -1,159 +1,200 @@
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { CameraView, useCameraPermissions, type CameraType } from 'expo-camera';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useRef, useState } from 'react';
-import { Platform, Pressable, ScrollView, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import { Pressable, View } from 'react-native';
+import Animated, { Easing, ReduceMotion, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { goBack } from '@/components/app/headers';
-import { RoundButton } from '@/components/app/round-button';
-import { Button } from '@/components/ui/button';
+import { AnalyzingImage } from '@/components/app/analyzing-image';
+import { ArrowsClockwiseIcon, CheckCircleIcon, ImageSquareIcon, LightningIcon, XIcon } from '@/components/icons';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Progress } from '@/components/ui/progress';
 import { Text } from '@/components/ui/text';
-import { CROPS, type CropId } from '@/domain/crops';
-import { SAMPLE_PHOTOS, type SamplePhoto } from '@/domain/diagnosis';
+import { SCENARIOS, pickScenario, type Scenario } from '@/domain/scenarios';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/state/store';
+import { COLORS } from '@/theme/tokens';
 
-export default function ScanCamera() {
+/** How long the (simulated) AI takes, as in the website demo. */
+const ANALYSIS_MS = 2000;
+
+const BRACKETS = [
+  { top: 0, left: 0, borderTopWidth: 4, borderLeftWidth: 4, borderTopLeftRadius: 24 },
+  { top: 0, right: 0, borderTopWidth: 4, borderRightWidth: 4, borderTopRightRadius: 24 },
+  { bottom: 0, left: 0, borderBottomWidth: 4, borderLeftWidth: 4, borderBottomLeftRadius: 24 },
+  { bottom: 0, right: 0, borderBottomWidth: 4, borderRightWidth: 4, borderBottomRightRadius: 24 },
+] as const;
+
+/** The demo's live camera, then "Analiz ediliyor…" over the frozen frame, then the result. */
+export default function Scan() {
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams<{ field?: string }>();
-  const profile = useAppStore((s) => s.profile);
-  const fields = useAppStore((s) => s.fields);
-  const presetField = fields.find((f) => f.id === params.field);
-  const [crop, setCrop] = useState<CropId>(presetField?.crop ?? profile.crops[0] ?? 'bugday');
+  const addScan = useAppStore((s) => s.addScan);
   const [permission, requestPermission] = useCameraPermissions();
+  const [facing, setFacing] = useState<CameraType>('back');
   const [torch, setTorch] = useState(false);
   const [ready, setReady] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
+  const [sample, setSample] = useState<Scenario>(SCENARIOS[0]);
+  const [shot, setShot] = useState<{ photo?: string; scenario: Scenario } | null>(null);
+  const [picking, setPicking] = useState(false);
+  const [progress, setProgress] = useState(0);
   const camera = useRef<CameraView>(null);
+  const live = !!permission?.granted;
 
-  // Crops the farmer grows first, then the rest.
-  const crops = [...CROPS].sort((a, b) => Number(profile.crops.includes(b.id)) - Number(profile.crops.includes(a.id)));
-  const fieldFor = (c: CropId) => (presetField?.crop === c ? presetField.id : fields.find((f) => f.crop === c)?.id);
+  // The scan line sweeps while analysing.
+  const line = useSharedValue(0);
+  const flash = useSharedValue(0);
+  useEffect(() => {
+    if (!shot) return;
+    line.set(withRepeat(withTiming(1, { duration: 1400, easing: Easing.inOut(Easing.quad), reduceMotion: ReduceMotion.System }), -1, true));
+    flash.set(withSequence(withTiming(0.9, { duration: 1 }), withTiming(0, { duration: 450, reduceMotion: ReduceMotion.System })));
+  }, [shot, line, flash]);
+  const lineStyle = useAnimatedStyle(() => ({ top: `${2 + line.value * 94}%` }));
+  const flashStyle = useAnimatedStyle(() => ({ opacity: flash.value }));
 
-  const analyse = (photo: string, c: CropId) => {
-    const field = fieldFor(c);
-    router.replace({ pathname: '/analiz', params: { photo, crop: c, ...(field ? { field } : {}) } });
-  };
+  // Analysing: fill the bar, then open the result.
+  useEffect(() => {
+    if (!shot) return;
+    const start = Date.now();
+    const id = setInterval(() => {
+      const p = Math.min(100, ((Date.now() - start) / ANALYSIS_MS) * 100);
+      setProgress(p);
+      if (p >= 100) {
+        clearInterval(id);
+        const scanId = addScan({ scenarioId: shot.scenario.id, photo: shot.photo });
+        router.replace({ pathname: '/sonuc/[id]', params: { id: scanId } });
+      }
+    }, 50);
+    return () => clearInterval(id);
+  }, [shot, addScan]);
 
   const shoot = async () => {
-    if (!camera.current || !ready || busy) return;
-    setBusy(true);
-    try {
+    if (shot) return;
+    if (live && ready && camera.current) {
       const pic = await camera.current.takePictureAsync({ quality: 0.7 });
-      if (pic?.uri) analyse(pic.uri, crop);
-    } finally {
-      setBusy(false);
+      if (pic?.uri) return setShot({ photo: pic.uri, scenario: pickScenario(pic.uri) });
     }
+    setShot({ scenario: sample });
   };
 
-  const pickFromGallery = async () => {
+  const fromGallery = async () => {
+    setPicking(false);
     const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.7 });
-    if (!res.canceled && res.assets[0]) analyse(res.assets[0].uri, crop);
+    if (!res.canceled && res.assets[0]) setShot({ photo: res.assets[0].uri, scenario: pickScenario(res.assets[0].uri) });
   };
 
-  const trySample = (s: SamplePhoto) => {
-    setHelpOpen(false);
-    analyse(s.id, s.crop);
-  };
-
-  const granted = !!permission?.granted;
+  const frame = shot ? (shot.photo ? { uri: shot.photo } : shot.scenario.image) : sample.image;
 
   return (
-    <View className="flex-1 bg-foreground">
-      {granted ? (
-        <CameraView ref={camera} style={{ position: 'absolute', inset: 0 }} facing="back" enableTorch={torch} onCameraReady={() => setReady(true)} />
+    <View className="flex-1 bg-black">
+      {live && !shot ? (
+        <CameraView ref={camera} style={{ position: 'absolute', inset: 0 }} facing={facing} enableTorch={torch} onCameraReady={() => setReady(true)} />
       ) : (
-        <Image source={require('@/assets/images/app/leaf-rust.jpg')} style={{ position: 'absolute', inset: 0, opacity: 0.9 }} contentFit="cover" />
+        <Image source={frame} style={{ position: 'absolute', inset: 0, transform: [{ scale: shot?.photo ? 1 : 1.35 }] }} contentFit="cover" accessibilityLabel={shot ? shot.scenario.imageAlt : sample.imageAlt} />
       )}
-      <View className="absolute inset-0 bg-foreground/30" pointerEvents="none" />
 
-      <View className="flex-row items-center justify-between px-6" style={{ paddingTop: insets.top + 8 }}>
-        <RoundButton icon="close-circle-linear" label="Kapat" tone="dark" onPress={goBack} />
-        <Text role="heading" className="font-heading text-2xl text-background">
-          Tara
-        </Text>
-        <RoundButton icon="bolt-linear" label={torch ? 'Flaşı kapat' : 'Flaşı aç'} tone="dark" iconColor={torch ? 'amber' : 'background'} onPress={() => setTorch((t) => !t)} />
-      </View>
-
-      <View className="flex-1 items-center justify-center px-10">
-        {granted ? (
-          <>
-            <View className="aspect-[3/4] max-h-[46vh] w-full rounded-[28px] border-2 border-background/80" />
-            <Text className="mt-6 overflow-hidden rounded-full bg-foreground/70 px-5 py-3 font-sans-bold text-lg text-background">Yaprağı çerçeveye al</Text>
-          </>
-        ) : (
-          <View className="w-full gap-4 rounded-[28px] bg-card p-6">
-            <Text className="font-heading text-2xl">Kamera izni gerekli</Text>
-            <Text className="text-lg text-muted-foreground">
-              Yaprağın fotoğrafını çekmek için kameraya izin ver. İstersen örnek bir fotoğrafla da deneyebilirsin.
-            </Text>
-            {permission?.canAskAgain !== false ? (
-              <Button onPress={requestPermission}>
-                <Text>Kameraya izin ver</Text>
-              </Button>
-            ) : (
-              <Text className="text-base text-muted-foreground">İzin daha önce reddedildi. Telefonun ayarlarından açabilirsin.</Text>
-            )}
-            <Button variant="outline" onPress={() => setHelpOpen(true)}>
-              <Text>Örnek fotoğrafla dene</Text>
-            </Button>
-          </View>
-        )}
-      </View>
-
-      <View style={{ paddingBottom: insets.bottom + 20 }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2 px-6">
-          {crops.map((c) => {
-            const on = c.id === crop;
-            return (
-              <Pressable
-                key={c.id}
-                accessibilityRole="radio"
-                accessibilityState={{ checked: on }}
-                onPress={() => setCrop(c.id)}
-                className={cn('h-12 justify-center rounded-full px-5', on ? 'bg-accent' : 'bg-foreground/60')}>
-                <Text className={cn('text-lg', on ? 'font-sans-bold text-accent-foreground' : 'font-sans-semibold text-background')}>{c.name}</Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-        <View className="mt-6 flex-row items-center justify-around px-8">
-          <RoundButton icon="gallery-linear" label="Galeriden seç" tone="dark" onPress={pickFromGallery} className="size-14" />
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Fotoğraf çek"
-            accessibilityState={{ disabled: !granted || !ready || busy }}
-            onPress={granted ? shoot : () => setHelpOpen(true)}
-            className="size-24 items-center justify-center rounded-full border-4 border-background active:opacity-80">
-            <View className={cn('size-[72px] rounded-full bg-accent', busy && 'opacity-60')} />
-          </Pressable>
-          <RoundButton icon="question-circle-linear" label="Yardım ve örnek fotoğraflar" tone="dark" onPress={() => setHelpOpen(true)} className="size-14" />
+      <View className="absolute inset-x-0 z-10 flex-row items-center justify-between px-5" style={{ top: insets.top + 8 }}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Kamerayı kapat" onPress={() => router.back()} className="size-12 items-center justify-center rounded-full bg-black/40 active:bg-black/70">
+          <XIcon size={21} weight="bold" color={COLORS.white} />
+        </Pressable>
+        <View className="flex-row items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5">
+          <View className="size-2 rounded-full bg-red-500" />
+          <Text className="font-sans-semibold text-[14px] text-white">{shot ? 'CANLI · Tarama' : 'CANLI · Kamera'}</Text>
         </View>
+        <Pressable accessibilityRole="button" accessibilityLabel={torch ? 'Flaşı kapat' : 'Flaşı aç'} onPress={() => setTorch((t) => !t)} className="size-12 items-center justify-center rounded-full bg-black/40 active:bg-black/70">
+          <LightningIcon size={21} weight="fill" color={torch ? COLORS.sun : COLORS.white} />
+        </Pressable>
       </View>
 
-      <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
-        <DialogContent className="mx-4 rounded-[28px] bg-background">
+      {/* Framing brackets; the scan line sweeps only while analysing. */}
+      <View pointerEvents="none" className="absolute inset-x-8 h-[300px]" style={{ top: insets.top + 96 }}>
+        {BRACKETS.map((b, i) => (
+          <View key={i} className="absolute size-12" style={{ ...b, borderColor: shot ? COLORS.gold : 'rgba(255,255,255,0.9)' }} />
+        ))}
+        {shot ? <Animated.View className="absolute inset-x-3 h-1 rounded-full bg-gold" style={[{ boxShadow: `0px 0px 18px 4px ${COLORS.gold}` }, lineStyle]} /> : null}
+      </View>
+
+      {!shot ? (
+        <LinearGradient colors={['transparent', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0.8)']} className="absolute inset-x-0 bottom-0 z-10 items-center gap-4 px-6 pt-12" style={{ paddingBottom: insets.bottom + 24 }}>
+          {!live ? (
+            <Pressable accessibilityRole="button" onPress={requestPermission} className="rounded-full bg-gold px-4 py-2 active:opacity-80">
+              <Text className="font-sans-semibold text-[14px] text-gold-foreground">Kameraya izin ver · ya da örnekle dene</Text>
+            </Pressable>
+          ) : null}
+          <Text className="overflow-hidden rounded-full bg-black/50 px-3.5 py-1.5 font-sans-semibold text-[14px] text-white">Hastalıklı bölgeyi çerçeveye alın</Text>
+          <View className="w-full flex-row items-center justify-between">
+            <Pressable accessibilityRole="button" accessibilityLabel="Örnek fotoğraf veya galeri" onPress={() => setPicking(true)} className="size-14 overflow-hidden rounded-xl border-2 border-white/70">
+              <Image source={sample.image} style={{ width: '100%', height: '100%' }} contentFit="cover" />
+            </Pressable>
+            <Pressable accessibilityRole="button" accessibilityLabel="Fotoğraf çek" onPress={shoot} className="size-[82px] items-center justify-center rounded-full border-4 border-white active:scale-90">
+              <View className="size-[64px] rounded-full bg-white" />
+            </Pressable>
+            <Pressable accessibilityRole="button" accessibilityLabel="Kamerayı çevir" onPress={() => setFacing((f) => (f === 'back' ? 'front' : 'back'))} className="size-14 items-center justify-center rounded-full bg-black/40">
+              <ArrowsClockwiseIcon size={26} weight="bold" color={COLORS.white} />
+            </Pressable>
+          </View>
+          <Text className="font-sans-bold text-[13px] tracking-[2.6px] text-gold">FOTOĞRAF</Text>
+        </LinearGradient>
+      ) : (
+        <>
+          <Animated.View pointerEvents="none" className="absolute inset-0 z-20 bg-white" style={flashStyle} />
+          <View className="absolute inset-x-0 bottom-0 z-10 rounded-t-[30px] bg-card px-5 pt-5" style={{ paddingBottom: insets.bottom + 28 }} accessibilityLiveRegion="polite">
+            <View className="flex-row items-center gap-3.5">
+              <AnalyzingImage size={56} />
+              <View>
+                <Text className="font-heading text-[19px]">Analiz ediliyor…</Text>
+                <Text className="text-[14px] text-muted-foreground">Yapay zekâ fotoğrafı inceliyor</Text>
+              </View>
+            </View>
+            <Progress value={progress} className="mt-4 h-2 bg-muted" indicatorClassName="bg-primary" />
+            <View className="mt-3 gap-1.5">
+              <Step done label="Yaprak ve toprak dokusu" />
+              <Step done={progress > 50} label="Renk ve leke örüntüleri" />
+              <Step done={progress > 95} label="Öneriler hazırlanıyor" />
+            </View>
+          </View>
+        </>
+      )}
+
+      <Dialog open={picking} onOpenChange={setPicking}>
+        <DialogContent className="mx-4 rounded-[24px] border-border bg-background">
           <DialogHeader>
-            <DialogTitle>İyi bir fotoğraf için</DialogTitle>
-            <DialogDescription className="text-lg leading-7">
-              Tek bir yaprağı yakından, gölgesiz ve net çek. Lekeli kısım çerçevenin ortasında olsun.
-            </DialogDescription>
+            <DialogTitle className="font-heading text-[20px]">Fotoğraf seçin</DialogTitle>
+            <DialogDescription className="text-[14px] text-muted-foreground">Örnek bir tarla seçin ya da galeriden fotoğraf yükleyin.</DialogDescription>
           </DialogHeader>
-          <Text className="font-sans-bold text-lg">{Platform.OS === 'web' ? 'Örnek fotoğrafla dene' : 'Kameran yoksa örnekle dene'}</Text>
-          <View className="flex-row flex-wrap justify-between gap-y-3">
-            {SAMPLE_PHOTOS.map((s) => (
-              <Pressable key={s.id} accessibilityRole="button" accessibilityLabel={`Örnek: ${s.label}`} onPress={() => trySample(s)} className="w-[48%] overflow-hidden rounded-2xl bg-card active:opacity-80">
-                <Image source={s.image} style={{ width: '100%', aspectRatio: 1.3 }} contentFit="cover" />
-                <Text className="px-3 py-2 font-sans-semibold text-base">{s.label}</Text>
+          <View className="flex-row flex-wrap justify-between gap-y-2.5">
+            {SCENARIOS.map((s) => (
+              <Pressable
+                key={s.id}
+                accessibilityRole="button"
+                accessibilityState={{ selected: s.id === sample.id }}
+                onPress={() => {
+                  setSample(s);
+                  setPicking(false);
+                }}
+                className={cn('w-[48.5%] overflow-hidden rounded-[16px] border-2 bg-card', s.id === sample.id ? 'border-primary' : 'border-border')}>
+                <Image source={s.image} style={{ width: '100%', aspectRatio: 1.4 }} contentFit="cover" />
+                <Text className="px-2.5 py-2 font-sans-semibold text-[14px]">{s.title}</Text>
               </Pressable>
             ))}
           </View>
+          <Pressable accessibilityRole="button" onPress={fromGallery} className="flex-row items-center justify-center gap-2 rounded-full border border-border py-3 active:bg-secondary">
+            <ImageSquareIcon size={20} color={COLORS.primary} />
+            <Text className="font-sans-semibold text-[15px] text-primary">Galeriden seç</Text>
+          </Pressable>
         </DialogContent>
       </Dialog>
+    </View>
+  );
+}
+
+function Step({ done, label }: { done: boolean; label: string }) {
+  return (
+    <View className="flex-row items-center gap-2">
+      {done ? <CheckCircleIcon size={17} weight="fill" color={COLORS.primary} /> : <View className="size-4 rounded-full border-2 border-border" />}
+      <Text className="text-[15px] text-muted-foreground">{label}</Text>
     </View>
   );
 }
