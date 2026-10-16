@@ -45,7 +45,16 @@ Scans, ticked suggestions and ticked tasks are saved on the phone.
 
 - **Look.** The demo phone's palette ("Organik Doğa": white, deep green, gold), fonts (DM Sans and Space Grotesk) and Phosphor icons. They match `components/phone-app/` and `.demo-app` in the website.
 - **Theme.** The tokens are in `src/global.css`, mirrored in `src/theme/tokens.ts`.
-- **Components.** Ready-made [React Native Reusables](https://reactnativereusables.com) (shadcn/ui for React Native) in `src/components/ui/`, styled with [Uniwind](https://uniwind.dev) (Tailwind 4). The demo's loader ("Analyzing image") is ported in `src/components/app/analyzing-image.tsx`.
+- **The website's components, copied unchanged.** These are the same files as on the website, byte for byte, run through [Expo DOM components](https://docs.expo.dev/guides/dom-components/) (`'use dom'`, a built-in web view):
+  - React Bits **SpringCheck** (`src/components/ui/spring-check.tsx`);
+  - the Magic UI **NumberTicker** (`src/components/magicui/number-ticker.tsx`);
+  - the shadcn/recharts half-donut **SuccessPie** with `chart.tsx`;
+  - the 21st.dev **"Analyzing image"** loader (`src/components/ui/analyzing-image.tsx`);
+  - `SuccessGauge`, with one change: Next.js's `dynamic()`, which only exists in Next.js, is replaced by plain imports.
+
+  Their styles (`src/components/dom/demo.css`) are copied verbatim from the website's `app/globals.css`. The wrappers in `src/components/dom/` place them as the demo does: the "Öneriler" list, the calendar task list, the gauge and the loader.
+- **Other components.** Ready-made [React Native Reusables](https://reactnativereusables.com) (shadcn/ui for React Native) in `src/components/ui/`, styled with [Uniwind](https://uniwind.dev) (Tailwind 4).
+- **Keep the copies in step with the website.** If one of the website's components changes, copy the file over again: they are meant to stay identical.
 - **Routes** live in `src/app/` (Expo Router):
   - `(tabs)/` holds the five tabs;
   - `tara` is the camera and analysis;

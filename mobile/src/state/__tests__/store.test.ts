@@ -15,20 +15,20 @@ describe('app store', () => {
     expect(store.getState().scans[0]).toMatchObject({ id, scenarioId: 'aycicegi', photo: 'file:///x.jpg', date: NOW.toISOString() });
   });
 
-  test('toggleSuggestion ticks and unticks a suggestion of one scan', () => {
+
+
+  test('setSuggestion and setTask set a tick to a given value, repeat-safe', () => {
     const store = createAppStore(NOW);
     const id = store.getState().scans[0].id;
-    store.getState().toggleSuggestion(id, 1);
-    expect(store.getState().doneSuggestions[id]).toEqual([1]);
-    store.getState().toggleSuggestion(id, 1);
+    store.getState().setSuggestion(id, 2, true);
+    store.getState().setSuggestion(id, 2, true);
+    expect(store.getState().doneSuggestions[id]).toEqual([2]);
+    store.getState().setSuggestion(id, 2, false);
     expect(store.getState().doneSuggestions[id]).toEqual([]);
-  });
-
-  test('toggleTask ticks and unticks a calendar task', () => {
-    const store = createAppStore(NOW);
-    store.getState().toggleTask('2026-10-16:Buğday ekimi');
-    expect(store.getState().doneTasks).toContain('2026-10-16:Buğday ekimi');
-    store.getState().toggleTask('2026-10-16:Buğday ekimi');
-    expect(store.getState().doneTasks).not.toContain('2026-10-16:Buğday ekimi');
+    store.getState().setTask('2026-10-16:Buğday ekimi', true);
+    store.getState().setTask('2026-10-16:Buğday ekimi', true);
+    expect(store.getState().doneTasks).toEqual(['2026-10-16:Buğday ekimi']);
+    store.getState().setTask('2026-10-16:Buğday ekimi', false);
+    expect(store.getState().doneTasks).toEqual([]);
   });
 });

@@ -14,4 +14,6 @@ The photos are the website demo's (see `data/photo-credits.ts` and the site's /k
 | `field-map.webp` | Tarlalar (havadan) | Carol M. Highsmith | Kamu malı | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Aerial_view_of_Pennsylvania_farmland_LCCN2011631350_(flipped_%26_removed_vignette).tif) |
 | `seedlings.webp` | Çimlenen tohumlar | Aerospectra | CC BY 4.0 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sprouting_seeds.jpg) |
 
+Components, unchanged from the website: React Bits SpringCheck (MIT), Magic UI NumberTicker (MIT), the 21st.dev Loading UI "Analyzing image", shadcn/ui chart with Recharts (MIT).
+
 Icons: [Phosphor Icons](https://phosphoricons.com) (MIT). Fonts: DM Sans and Space Grotesk (SIL Open Font License).

@@ -5,6 +5,6 @@ const expoConfig = require('eslint-config-expo/flat');
 module.exports = defineConfig([
   expoConfig,
   { ignores: ['dist/*', '.expo/*', 'src/uniwind-types.d.ts'] },
-  // Bundled images are required the React Native way.
-  { rules: { '@typescript-eslint/no-require-imports': ['error', { allow: ['\\.(png|jpe?g|webp)$'] }] } },
+  // Bundled images and fonts are required the React Native way.
+  { rules: { '@typescript-eslint/no-require-imports': ['error', { allow: ['\\.(png|jpe?g|webp|ttf)$'] }] } },
 ]);

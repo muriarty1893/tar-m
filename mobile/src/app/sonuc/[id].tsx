@@ -5,12 +5,12 @@ import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Block } from '@/components/app/block';
-import { SuccessGauge } from '@/components/app/success-gauge';
+import SuccessGaugeDom from '@/components/dom/success-gauge-dom';
+import SuggestionsDom from '@/components/dom/suggestions-dom';
+import { useDomHeight } from '@/components/dom/use-dom-height';
 import { ArrowLeftIcon, CaretRightIcon, ChatCircleDotsIcon, CheckCircleIcon, EyeIcon, FirstAidKitIcon, LightbulbIcon } from '@/components/icons';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Text } from '@/components/ui/text';
 import { scenarioById } from '@/domain/scenarios';
-import { cn } from '@/lib/utils';
 import { useAppStore } from '@/state/store';
 import { COLORS, SHADOW } from '@/theme/tokens';
 
@@ -20,7 +20,9 @@ export default function Result() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const scan = useAppStore((s) => s.scans.find((x) => x.id === id));
   const done = useAppStore((s) => (id ? s.doneSuggestions[id] : undefined)) ?? [];
-  const toggleSuggestion = useAppStore((s) => s.toggleSuggestion);
+  const setSuggestion = useAppStore((s) => s.setSuggestion);
+  const gauge = useDomHeight(166);
+  const list = useDomHeight(150);
   const s = scan ? scenarioById(scan.scenarioId) : undefined;
   if (!scan || !s) return null;
 
@@ -54,31 +56,19 @@ export default function Result() {
         </View>
 
         <View className="-mt-3 gap-2.5 rounded-t-[24px] bg-background px-4 pt-4">
-          <SuccessGauge value={s.successRate} />
+          <SuccessGaugeDom value={s.successRate} onHeight={gauge.onHeight} dom={gauge.dom} />
           <Block Icon={EyeIcon} label="NE GÖRÜYORUM">
             <Text className="text-[15px] leading-6">{s.seen}</Text>
           </Block>
           <Block Icon={LightbulbIcon} label="ÖNERİLER">
             <Text className="text-[13.5px] text-muted-foreground">Yaptıklarınızı işaretleyin.</Text>
-            <View className="mt-1">
-              {s.suggestions.map((t, i) => {
-                const checked = done.includes(i);
-                return (
-                  <Pressable key={t} onPress={() => toggleSuggestion(scan.id, i)} className="flex-row items-start gap-2.5 py-1.5">
-                    <Checkbox
-                      checked={checked}
-                      onCheckedChange={() => toggleSuggestion(scan.id, i)}
-                      accessibilityLabel={t}
-                      className="mt-0.5 size-[22px] rounded-[7px] border-2 border-primary"
-                      checkedClassName="border-primary"
-                      indicatorClassName="bg-primary"
-                      iconSize={15}
-                    />
-                    <Text className={cn('flex-1 text-[15px] leading-6', checked && 'opacity-50 line-through')}>{t}</Text>
-                  </Pressable>
-                );
-              })}
-            </View>
+            <SuggestionsDom
+              suggestions={s.suggestions}
+              done={done}
+              onToggle={async (i, checked) => setSuggestion(scan.id, i, checked)}
+              onHeight={list.onHeight}
+              dom={list.dom}
+            />
           </Block>
           <Pressable accessibilityRole="button" onPress={ask} className="flex-row items-center gap-3 rounded-[20px] border-2 border-primary/30 bg-secondary p-3.5 active:bg-primary/15">
             <View className="size-10 items-center justify-center rounded-xl bg-primary">

@@ -2,32 +2,23 @@ import { useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { ScreenTitle, TabScreen } from '@/components/app/screen';
-import { DropIcon, FirstAidKitIcon, FlaskIcon, GrainsIcon, PlantIcon, ShovelIcon, SnowflakeIcon, TractorIcon, type PhosphorIcon } from '@/components/icons';
-import { Checkbox } from '@/components/ui/checkbox';
+import CalendarTasksDom from '@/components/dom/calendar-tasks-dom';
+import { useDomHeight } from '@/components/dom/use-dom-height';
 import { Text } from '@/components/ui/text';
-import { TASK_KINDS, taskId, tasksOn, type TaskKind } from '@/domain/farm-calendar';
+import { taskId, tasksOn } from '@/domain/farm-calendar';
 import { WEEKDAYS, WEEKDAY_INITIALS, dayKey, monthGrid, monthName } from '@/domain/format';
 import { useNow } from '@/hooks/use-now';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/state/store';
 import { COLORS, KIND_COLORS } from '@/theme/tokens';
 
-const KIND_ICON: Record<TaskKind, PhosphorIcon> = {
-  analiz: FlaskIcon,
-  toprak: ShovelIcon,
-  gubre: PlantIcon,
-  ilac: FirstAidKitIcon,
-  ekim: GrainsIcon,
-  sulama: DropIcon,
-  hasat: TractorIcon,
-  uyari: SnowflakeIcon,
-};
 
 /** "Tarım takvimi", as in the website demo: the month's farm tasks, a day at a time, tickable. */
 export default function Calendar() {
   const now = useNow();
   const done = useAppStore((s) => s.doneTasks);
-  const toggleTask = useAppStore((s) => s.toggleTask);
+  const setTask = useAppStore((s) => s.setTask);
+  const list = useDomHeight(80);
   const [picked, setPicked] = useState(() => new Date(now.getFullYear(), now.getMonth(), now.getDate()));
 
   const weeks = useMemo(() => monthGrid(now.getFullYear(), now.getMonth()), [now]);
@@ -99,38 +90,14 @@ export default function Calendar() {
           Bu gün için görev yok. Noktalı günlere dokunun.
         </Text>
       ) : (
-        <View className="gap-2">
-          {tasks.map((t) => {
-            const id = taskId(picked, t);
-            const checked = done.includes(id);
-            const Icon = KIND_ICON[t.kind];
-            const c = KIND_COLORS[t.kind];
-            return (
-              <Pressable key={id} onPress={() => toggleTask(id)} className="flex-row items-start gap-3 rounded-[18px] border border-border bg-card px-3 py-3">
-                <View className="mt-0.5 size-11 items-center justify-center rounded-[12px]" style={{ backgroundColor: c.tile }}>
-                  <Icon size={24} weight="duotone" color={c.icon} />
-                </View>
-                <View className="min-w-0 flex-1 flex-row gap-2.5">
-                  <Checkbox
-                    checked={checked}
-                    onCheckedChange={() => toggleTask(id)}
-                    accessibilityLabel={t.title}
-                    className="mt-0.5 size-[21px] rounded-[6px] border-2 border-primary"
-                    checkedClassName="border-primary"
-                    indicatorClassName="bg-primary"
-                    iconSize={14}
-                  />
-                  <View className="min-w-0 flex-1">
-                    <Text className={cn('font-sans-medium text-[15px] leading-5', checked && 'opacity-50 line-through')}>{t.title}</Text>
-                    <Text className="text-[13px] text-muted-foreground">
-                      {TASK_KINDS[t.kind].label} · {t.field} · {t.time}
-                    </Text>
-                  </View>
-                </View>
-              </Pressable>
-            );
-          })}
-        </View>
+        <CalendarTasksDom
+          key={dayKey(picked)}
+          label={`${picked.getDate()} ${monthName(picked.getMonth())} görevleri`}
+          tasks={tasks.map((t) => ({ id: taskId(picked, t), title: t.title, kind: t.kind, field: t.field, time: t.time, done: done.includes(taskId(picked, t)) }))}
+          onToggle={async (id, checked) => setTask(id, checked)}
+          onHeight={list.onHeight}
+          dom={list.dom}
+        />
       )}
     </TabScreen>
   );

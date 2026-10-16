@@ -8,7 +8,7 @@ import { Pressable, View } from 'react-native';
 import Animated, { Easing, ReduceMotion, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AnalyzingImage } from '@/components/app/analyzing-image';
+import AnalyzingImageDom from '@/components/dom/analyzing-image-dom';
 import { ArrowsClockwiseIcon, CheckCircleIcon, ImageSquareIcon, LightningIcon, XIcon } from '@/components/icons';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
@@ -142,7 +142,7 @@ export default function Scan() {
           <Animated.View pointerEvents="none" className="absolute inset-0 z-20 bg-white" style={flashStyle} />
           <View className="absolute inset-x-0 bottom-0 z-10 rounded-t-[30px] bg-card px-5 pt-5" style={{ paddingBottom: insets.bottom + 28 }} accessibilityLiveRegion="polite">
             <View className="flex-row items-center gap-3.5">
-              <AnalyzingImage size={56} />
+              <AnalyzingImageDom dom={{ scrollEnabled: false, containerStyle: { width: 56, height: 56 }, style: { width: 56, height: 56 } }} />
               <View>
                 <Text className="font-heading text-[19px]">Analiz ediliyor…</Text>
                 <Text className="text-[14px] text-muted-foreground">Yapay zekâ fotoğrafı inceliyor</Text>

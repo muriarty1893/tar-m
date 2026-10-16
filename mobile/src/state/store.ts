@@ -22,8 +22,8 @@ type Data = {
 
 export type AppState = Data & {
   addScan: (scan: Omit<Scan, 'id' | 'date'>, now?: Date) => string;
-  toggleSuggestion: (scanId: string, index: number) => void;
-  toggleTask: (id: string) => void;
+  setSuggestion: (scanId: string, index: number, done: boolean) => void;
+  setTask: (id: string, done: boolean) => void;
 };
 
 let seq = 0;
@@ -49,7 +49,7 @@ function seed(now: Date): Data {
   };
 }
 
-const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
+const setIn = <T,>(list: T[], v: T, on: boolean) => (on ? (list.includes(v) ? list : [...list, v]) : list.filter((x) => x !== v));
 
 function actions(set: (fn: (s: AppState) => Partial<AppState>) => void): Omit<AppState, keyof Data> {
   return {
@@ -58,9 +58,9 @@ function actions(set: (fn: (s: AppState) => Partial<AppState>) => void): Omit<Ap
       set((s) => ({ scans: [{ ...scan, id, date: now.toISOString() }, ...s.scans] }));
       return id;
     },
-    toggleSuggestion: (scanId, index) =>
-      set((s) => ({ doneSuggestions: { ...s.doneSuggestions, [scanId]: toggle(s.doneSuggestions[scanId] ?? [], index) } })),
-    toggleTask: (id) => set((s) => ({ doneTasks: toggle(s.doneTasks, id) })),
+    setSuggestion: (scanId, index, done) =>
+      set((s) => ({ doneSuggestions: { ...s.doneSuggestions, [scanId]: setIn(s.doneSuggestions[scanId] ?? [], index, done) } })),
+    setTask: (id, done) => set((s) => ({ doneTasks: setIn(s.doneTasks, id, done) })),
   };
 }
 

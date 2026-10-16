@@ -18,7 +18,8 @@ Date: 2026-10-16 · Status: prototype in `mobile/`, rebuilt after feedback
 
 **Stack**
 - **Expo SDK 57 with Expo Router.** The owner's Expo Go from the Play Store (57.0.9) supports SDK 57 only.
-- **Components.** React Native Reusables (shadcn/ui for React Native, Uniwind variant), restyled with the demo's tokens. The used ones are Dialog, Checkbox, Progress and Text.
+- **The website's own components, unchanged (owner's request).** SpringCheck, NumberTicker, SuccessPie and chart, the Analyzing-image loader and SuccessGauge are the website's files. SuccessGauge's only change: Next.js's `dynamic()` becomes plain imports. They run in Expo DOM components (`'use dom'`), with their CSS copied verbatim from `app/globals.css`.
+- **Other components.** React Native Reusables (shadcn/ui for React Native, Uniwind variant) for the native parts. Dialog, Progress and Text are used.
 - **Icons.** Phosphor (`phosphor-react-native`), imported one file at a time to keep the bundle small, the same set the website uses.
 
 **Look**
