@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+@import 'uniwind';
+
+/*
+ * Çiftçi Destek design tokens, ported from the Sleek project theme ("Toprak": cream paper,
+ * soil brown, terracotta for scanning, olive for healthy, amber/brick for risk).
+ * The same values live in src/theme/tokens.ts for the few places that need raw colours
+ * (SVG icons, gradients, navigation theme); keep the two in step.
+ */
+@theme {
+  --color-background: #f7f0e3;
+  --color-foreground: #3b2a1e;
+  --color-card: #efe4cf;
+  --color-card-foreground: #3b2a1e;
+  --color-popover: #fbf6ec;
+  --color-popover-foreground: #3b2a1e;
+  --color-primary: #3b2a1e;
+  --color-primary-foreground: #f7f0e3;
+  --color-secondary: #e6d8bd;
+  --color-secondary-foreground: #3b2a1e;
+  --color-muted: #e9dec9;
+  --color-muted-foreground: #6e5e4e;
+  --color-accent: #c0643b;
+  --color-accent-foreground: #fff8ee;
+  --color-destructive: #b3361f;
+  --color-destructive-foreground: #fff8ee;
+  --color-border: #dccdb0;
+  --color-input: #fbf6ec;
+  --color-ring: #6b7a3a;
+
+  /* Meaning colours: healthy, risk, disease. */
+  --color-olive: #6b7a3a;
+  --color-amber: #d98e2b;
+  --color-brick: #b3361f;
+  --color-sand: #a08262;
+  --color-wheat: #c9b79a;
+
+  /* Families are the names the fonts are loaded under (see src/theme/fonts.ts). */
+  --font-sans: 'AtkinsonHyperlegibleNext_400Regular';
+  --font-sans-semibold: 'AtkinsonHyperlegibleNext_600SemiBold';
+  --font-sans-bold: 'AtkinsonHyperlegibleNext_700Bold';
+  --font-sans-italic: 'AtkinsonHyperlegibleNext_400Regular_Italic';
+  --font-heading: 'BricolageGrotesque_700Bold';
+  --font-heading-black: 'BricolageGrotesque_800ExtraBold';
+
+  --radius-xs: 16px;
+  --radius-sm: 20px;
+  --radius-md: 22px;
+  --radius-lg: 24px;
+  --radius-xl: 28px;
+  --radius-2xl: 32px;
+  --radius-3xl: 40px;
+}

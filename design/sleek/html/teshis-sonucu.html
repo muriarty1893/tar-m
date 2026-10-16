@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TeşhisSonucu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@200;300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+    <style type="text/tailwindcss">
+      @theme inline {
+        --color-background: var(--background);
+        --color-foreground: var(--foreground);
+        --color-primary: var(--primary);
+        --color-primary-foreground: var(--primary-foreground);
+        --color-secondary: var(--secondary);
+        --color-secondary-foreground: var(--secondary-foreground);
+        --color-muted: var(--muted);
+        --color-muted-foreground: var(--muted-foreground);
+        --color-accent: var(--accent);
+        --color-accent-foreground: var(--accent-foreground);
+        --color-destructive: var(--destructive);
+        --color-destructive-foreground: var(--destructive-foreground);
+        --color-card: var(--card);
+        --color-card-foreground: var(--card-foreground);
+        --color-popover: var(--popover);
+        --color-popover-foreground: var(--popover-foreground);
+        --color-border: var(--border);
+        --color-input: var(--input);
+        --color-ring: var(--ring);
+        --color-chart-1: var(--chart-1);
+        --color-chart-2: var(--chart-2);
+        --color-chart-3: var(--chart-3);
+        --color-chart-4: var(--chart-4);
+        --color-chart-5: var(--chart-5);
+
+        --font-sans: var(--font-sans);
+        --font-heading: var(--font-heading, var(--font-sans));
+        --font-serif: var(--font-serif);
+        --font-mono: var(--font-mono);
+      }
+
+      @theme {
+        --radius-xs: calc(var(--radius) - 8px);
+        --radius-sm: calc(var(--radius) - 4px);
+        --radius-md: calc(var(--radius) - 2px);
+        --radius-lg: var(--radius);
+        --radius-xl: calc(var(--radius) + 4px);
+        --radius-2xl: calc(var(--radius) + 8px);
+        --radius-3xl: calc(var(--radius) + 16px);
+        --radius-4xl: calc(var(--radius) + 24px);
+      }
+
+      * {
+        corner-shape: var(--shape, round);
+      }
+
+      .rounded-full,
+      .rounded-none,
+      .rounded-t-full,
+      .rounded-t-none,
+      .rounded-r-full,
+      .rounded-r-none,
+      .rounded-b-full,
+      .rounded-b-none,
+      .rounded-l-full,
+      .rounded-l-none,
+      .rounded-s-full,
+      .rounded-s-none,
+      .rounded-e-full,
+      .rounded-e-none,
+      .rounded-tl-full,
+      .rounded-tl-none,
+      .rounded-tr-full,
+      .rounded-tr-none,
+      .rounded-bl-full,
+      .rounded-bl-none,
+      .rounded-br-full,
+      .rounded-br-none,
+      .rounded-ss-full,
+      .rounded-ss-none,
+      .rounded-se-full,
+      .rounded-se-none,
+      .rounded-es-full,
+      .rounded-es-none,
+      .rounded-ee-full,
+      .rounded-ee-none {
+        corner-shape: round;
+      }
+
+      @utility rounded-* {
+        border-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-t-* {
+        border-top-left-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+        border-top-right-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-r-* {
+        border-top-right-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+        border-bottom-right-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-b-* {
+        border-bottom-right-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+        border-bottom-left-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-l-* {
+        border-top-left-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+        border-bottom-left-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-tl-* {
+        border-top-left-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-tr-* {
+        border-top-right-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-bl-* {
+        border-bottom-left-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-br-* {
+        border-bottom-right-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-s-* {
+        border-start-start-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+        border-end-start-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-e-* {
+        border-start-end-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+        border-end-end-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-ss-* {
+        border-start-start-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-se-* {
+        border-start-end-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-es-* {
+        border-end-start-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+      @utility rounded-ee-* {
+        border-end-end-radius: calc(
+          --value(--radius-*, [length], [percentage]) * var(--shape-multiplier, 1)
+        );
+      }
+
+      @layer base {
+        * {
+          @apply border-border outline-ring/50;
+        }
+        body {
+          @apply bg-background text-foreground font-sans;
+        }
+      }
+
+      :root {
+        --shape: round;
+        --shape-multiplier: 1;
+
+        --background: #f7f0e3;
+        --foreground: #3b2a1e;
+        --primary: #3b2a1e;
+        --primary-foreground: #f7f0e3;
+        --secondary: #e6d8bd;
+        --secondary-foreground: #3b2a1e;
+        --muted: #e9dec9;
+        --muted-foreground: #6e5e4e;
+        --accent: #c0643b;
+        --accent-foreground: #fff8ee;
+        --destructive: #b3361f;
+        --destructive-foreground: #fff8ee;
+        --card: #efe4cf;
+        --card-foreground: #3b2a1e;
+        --popover: #fbf6ec;
+        --popover-foreground: #3b2a1e;
+        --border: #dccdb0;
+        --input: #fbf6ec;
+        --ring: #6b7a3a;
+        --chart-1: #6b7a3a;
+        --chart-2: #d98e2b;
+        --chart-3: #b3361f;
+        --chart-4: #a08262;
+        --chart-5: #3b2a1e;
+
+        --font-sans: "Atkinson Hyperlegible", sans-serif;
+        --font-heading: "Bricolage Grotesque", sans-serif;
+        --font-serif: "Playfair Display", serif;
+        --font-mono: "JetBrains Mono", monospace;
+
+        --radius: 1.5rem;
+      }
+
+      /* Prevent layout shift for icons without explicit dimensions */
+      iconify-icon:not([width]):not([height]) {
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+      }
+
+      /* Hide scrollbars */
+      *,
+      *::before,
+      *::after {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      *::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="min-h-screen w-full bg-background text-foreground pb-10">
+      <div class="relative h-80 w-full overflow-hidden">
+        <img
+          alt="Yaprak fotoğrafı"
+          src="https://ggrhecslgdflloszjkwl.supabase.co/storage/v1/object/public/user-assets/8ErRTq5pgUe/components/wTOkKq0L0EK.jpeg"
+          class="absolute inset-0 size-full object-cover"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-b from-foreground/40 via-transparent to-transparent"
+        ></div>
+        <div class="absolute top-14 left-6 right-6 flex items-center justify-between">
+          <button
+            class="size-12 rounded-full bg-background/90 flex items-center justify-center"
+            aria-label="Geri"
+          >
+            <iconify-icon
+              icon="solar:alt-arrow-left-linear"
+              width="28"
+              height="28"
+            ></iconify-icon></button
+          ><button
+            class="size-12 rounded-full bg-background/90 flex items-center justify-center"
+            aria-label="Paylaş"
+          >
+            <iconify-icon icon="solar:share-linear" width="24" height="24"></iconify-icon>
+          </button>
+        </div>
+        <span
+          class="absolute top-[38%] left-[30%] size-12 rounded-full border-[3px] border-chart-2 bg-chart-2/15"
+        ></span
+        ><span
+          class="absolute top-[55%] left-[58%] size-10 rounded-full border-[3px] border-chart-2 bg-chart-2/15"
+        ></span
+        ><span
+          class="absolute top-[70%] left-[38%] size-9 rounded-full border-[3px] border-chart-2 bg-chart-2/15"
+        ></span>
+      </div>
+      <div class="-mt-8 relative mx-4 rounded-[28px] bg-card p-6">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="text-base text-muted-foreground">Teşhis</p>
+            <h1 class="font-heading text-3xl font-bold tracking-tight mt-1">Sarı pas</h1>
+            <p class="text-base italic text-muted-foreground mt-1">Puccinia striiformis</p>
+          </div>
+          <div class="text-right">
+            <p class="font-heading text-5xl font-bold leading-none">%87</p>
+            <p class="text-base text-muted-foreground mt-1">güven</p>
+          </div>
+        </div>
+        <div class="mt-5 grid grid-cols-2 gap-3">
+          <div class="rounded-2xl bg-secondary p-4">
+            <p class="text-base text-muted-foreground">Şiddet</p>
+            <p class="mt-1 inline-flex items-center gap-2 text-lg font-bold">
+              <span class="size-3 rounded-full bg-chart-2"></span>Orta
+            </p>
+          </div>
+          <div class="rounded-2xl bg-secondary p-4">
+            <p class="text-base text-muted-foreground">Yayılma hızı</p>
+            <p class="mt-1 text-lg font-bold">Hızlı</p>
+            <p class="text-base text-muted-foreground">3–5 gün içinde</p>
+          </div>
+        </div>
+      </div>
+      <div class="mx-4 mt-4 rounded-[28px] bg-card p-6">
+        <h2 class="font-heading text-2xl font-bold tracking-tight">Ne yapmalısın?</h2>
+        <ol class="mt-4 flex flex-col gap-5">
+          <li class="flex gap-4">
+            <span
+              class="size-9 shrink-0 rounded-full bg-primary text-primary-foreground text-lg font-bold flex items-center justify-center"
+              >1</span
+            >
+            <p class="text-lg leading-snug pt-1">
+              Etkilenen tarlayı bu hafta gözden geçir, belirtili bitkileri işaretle.
+            </p>
+          </li>
+          <li class="flex gap-4">
+            <span
+              class="size-9 shrink-0 rounded-full bg-primary text-primary-foreground text-lg font-bold flex items-center justify-center"
+              >2</span
+            >
+            <div>
+              <p class="text-lg leading-snug pt-1">
+                Kimyasal seçenek: triazol grubu fungisit uygula.
+              </p>
+              <p class="text-base text-muted-foreground mt-1">
+                Ürün etiketindeki dozu ve bekleme süresini mutlaka uy.
+              </p>
+            </div>
+          </li>
+          <li class="flex gap-4">
+            <span
+              class="size-9 shrink-0 rounded-full bg-primary text-primary-foreground text-lg font-bold flex items-center justify-center"
+              >3</span
+            >
+            <div>
+              <p class="text-lg leading-snug pt-1">
+                Organik seçenek: kükürt bazlı preparat veya bitki çayı ile yaprakları ıslat.
+              </p>
+              <p class="text-base text-muted-foreground mt-1">
+                Daha yavaş etki eder, 7 gün sonra tekrarla.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </div>
+      <div class="mx-4 mt-4 rounded-[28px] bg-secondary p-6 flex items-center gap-4">
+        <iconify-icon
+          icon="solar:cloud-sun-linear"
+          class="shrink-0 text-chart-1"
+          width="40"
+          height="40"
+        ></iconify-icon>
+        <div>
+          <p class="text-base text-muted-foreground">İlaçlama için en iyi zaman</p>
+          <p class="text-lg font-bold">Yarın sabah 06:00 – 09:00</p>
+          <p class="text-base text-muted-foreground">Rüzgâr 8 km/s, sıcaklık 14 °C</p>
+        </div>
+      </div>
+      <div class="mx-4 mt-6 flex flex-col gap-3">
+        <button
+          class="w-full h-16 rounded-full bg-primary text-primary-foreground text-lg font-bold flex items-center justify-center gap-2"
+        >
+          <iconify-icon icon="solar:calendar-add-linear" width="24" height="24"></iconify-icon
+          >Takvime ekle
+        </button>
+        <div class="grid grid-cols-2 gap-3">
+          <button
+            class="h-14 rounded-full border border-border text-lg font-semibold flex items-center justify-center gap-2"
+          >
+            <iconify-icon icon="solar:user-speak-linear" width="24" height="24"></iconify-icon
+            >Uzmana sor</button
+          ><button
+            class="h-14 rounded-full border border-border text-lg font-semibold flex items-center justify-center gap-2"
+          >
+            <iconify-icon icon="solar:restart-linear" width="24" height="24"></iconify-icon>Yeniden
+            tara
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+{
+  "expo": {
+    "name": "Çiftçi Destek",
+    "slug": "ciftci-destek",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "ciftcidestek",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "tr.com.ciftcidestek.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F7F0E3",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "package": "tr.com.ciftcidestek.app",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png",
+      "name": "Çiftçi Destek",
+      "themeColor": "#F7F0E3",
+      "backgroundColor": "#F7F0E3"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F7F0E3",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 180
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Yaprağın fotoğrafını çekip hastalığı tespit etmek için kameraya erişmemiz gerekiyor.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Galerinden bir yaprak fotoğrafı seçip taramak için fotoğraflarına erişmemiz gerekiyor.",
+          "cameraPermission": "Yaprağın fotoğrafını çekmek için kameraya erişmemiz gerekiyor.",
+          "microphonePermission": false
+        }
+      ],
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}
