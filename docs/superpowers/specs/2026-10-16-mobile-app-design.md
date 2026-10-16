@@ -19,8 +19,8 @@ Date: 2026-10-16 · Status: first prototype built (`mobile/`)
 ## Decisions
 
 **Stack**
-- **Expo SDK 58 with Expo Router.** It runs on the newest Expo Go, so the owner can test on their own phone.
-- **Components.** React Native Reusables (shadcn/ui for React Native, Uniwind variant) is the ready-made library. HeroUI Native was the first choice but does not support SDK 58's gesture-handler 3 yet.
+- **Expo SDK 57 with Expo Router.** The owner's Expo Go from the Play Store (57.0.9) supports SDK 57 only; SDK 58 was out but not yet in that Expo Go.
+- **Components.** React Native Reusables (shadcn/ui for React Native, Uniwind variant) is the ready-made library. HeroUI Native was the first choice but did not support SDK 58's gesture-handler 3.
 - **Icons.** The Solar icons match the Sleek design. They come from the official `@iconify-json/solar` data.
 
 **Look ("Toprak")**

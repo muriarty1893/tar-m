@@ -26,7 +26,7 @@ const tap = () => {
 };
 
 /** The floating soil-brown tab bar, with scanning as a raised terracotta button in the middle. */
-export function TabBar({ state, navigateToTab }: BottomTabBarProps) {
+export function TabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   return (
     <View pointerEvents="box-none" className="absolute inset-x-0 bottom-0 px-4" style={{ paddingBottom: Math.max(insets.bottom, 12) }}>
@@ -57,9 +57,10 @@ export function TabBar({ state, navigateToTab }: BottomTabBarProps) {
               accessibilityState={{ selected: focused }}
               accessibilityLabel={tab.label}
               onPress={() => {
-                if (focused) return;
+                const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+                if (focused || event.defaultPrevented) return;
                 tap();
-                navigateToTab(route.key);
+                navigation.navigate(route.name, route.params);
               }}
               className="min-w-[60px] items-center justify-center gap-0.5 py-2">
               <SolarIcon name={focused ? tab.active : tab.icon} size={26} color={focused ? 'background' : 'wheat'} />
