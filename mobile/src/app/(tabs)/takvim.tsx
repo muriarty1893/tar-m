@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { ScreenTitle, TabScreen } from '@/components/app/screen';
 import CalendarTasksDom from '@/components/dom/calendar-tasks-dom';
-import { useDomHeight } from '@/components/dom/use-dom-height';
+import { useDomHeight, useDomStart } from '@/components/dom/use-dom-height';
 import { Text } from '@/components/ui/text';
 import { taskId, tasksOn } from '@/domain/farm-calendar';
 import { WEEKDAYS, WEEKDAY_INITIALS, dayKey, monthGrid, monthName } from '@/domain/format';
@@ -18,8 +18,9 @@ export default function Calendar() {
   const now = useNow();
   const done = useAppStore((s) => s.doneTasks);
   const setTask = useAppStore((s) => s.setTask);
-  const list = useDomHeight(80);
   const [picked, setPicked] = useState(() => new Date(now.getFullYear(), now.getMonth(), now.getDate()));
+  const list = useDomHeight(80);
+  const listView = useDomStart(dayKey(picked));
 
   const weeks = useMemo(() => monthGrid(now.getFullYear(), now.getMonth()), [now]);
   const total = weeks.flat().reduce((n, d) => n + (d ? tasksOn(d, now).length : 0), 0);
@@ -95,6 +96,7 @@ export default function Calendar() {
           label={`${picked.getDate()} ${monthName(picked.getMonth())} görevleri`}
           tasks={tasks.map((t) => ({ id: taskId(picked, t), title: t.title, kind: t.kind, field: t.field, time: t.time, done: done.includes(taskId(picked, t)) }))}
           onToggle={async (id, checked) => setTask(id, checked)}
+          ref={listView}
           onHeight={list.onHeight}
           dom={list.dom}
         />

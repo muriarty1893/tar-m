@@ -13,6 +13,7 @@ export const COLORS = {
   destructive: '#b91c1c',
   border: '#bbf7d0',
   white: '#ffffff',
+  black: '#000000',
   sun: '#fde047',
   sky300: '#7dd3fc',
   sky200: '#bae6fd',

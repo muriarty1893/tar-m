@@ -53,6 +53,8 @@ Scans, ticked suggestions and ticked tasks are saved on the phone.
   - `SuccessGauge`, with one change: Next.js's `dynamic()`, which only exists in Next.js, is replaced by plain imports.
 
   Their styles (`src/components/dom/demo.css`) are copied verbatim from the website's `app/globals.css`. The wrappers in `src/components/dom/` place them as the demo does: the "Öneriler" list, the calendar task list, the gauge and the loader.
+
+  In Expo Go, these run in `react-native-webview`, not Expo's default web view (`@expo/dom-webview`): Expo Go 57 doesn't include the default one, and mounting one crashed the app. On Android, `src/components/dom/use-dom-height.ts` also works around a startup race in that web view that left the components blank.
 - **Other components.** Ready-made [React Native Reusables](https://reactnativereusables.com) (shadcn/ui for React Native) in `src/components/ui/`, styled with [Uniwind](https://uniwind.dev) (Tailwind 4).
 - **Keep the copies in step with the website.** If one of the website's components changes, copy the file over again: they are meant to stay identical.
 - **Routes** live in `src/app/` (Expo Router):

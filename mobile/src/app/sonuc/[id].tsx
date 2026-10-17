@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Block } from '@/components/app/block';
 import SuccessGaugeDom from '@/components/dom/success-gauge-dom';
 import SuggestionsDom from '@/components/dom/suggestions-dom';
-import { useDomHeight } from '@/components/dom/use-dom-height';
+import { useDomHeight, useDomStart } from '@/components/dom/use-dom-height';
 import { ArrowLeftIcon, CaretRightIcon, ChatCircleDotsIcon, CheckCircleIcon, EyeIcon, FirstAidKitIcon, LightbulbIcon } from '@/components/icons';
 import { Text } from '@/components/ui/text';
 import { scenarioById } from '@/domain/scenarios';
@@ -23,6 +23,8 @@ export default function Result() {
   const setSuggestion = useAppStore((s) => s.setSuggestion);
   const gauge = useDomHeight(166);
   const list = useDomHeight(150);
+  const gaugeView = useDomStart();
+  const listView = useDomStart();
   const s = scan ? scenarioById(scan.scenarioId) : undefined;
   if (!scan || !s) return null;
 
@@ -56,7 +58,7 @@ export default function Result() {
         </View>
 
         <View className="-mt-3 gap-2.5 rounded-t-[24px] bg-background px-4 pt-4">
-          <SuccessGaugeDom value={s.successRate} onHeight={gauge.onHeight} dom={gauge.dom} />
+          <SuccessGaugeDom ref={gaugeView} value={s.successRate} onHeight={gauge.onHeight} dom={gauge.dom} />
           <Block Icon={EyeIcon} label="NE GÖRÜYORUM">
             <Text className="text-[15px] leading-6">{s.seen}</Text>
           </Block>
@@ -67,6 +69,7 @@ export default function Result() {
               done={done}
               onToggle={async (i, checked) => setSuggestion(scan.id, i, checked)}
               onHeight={list.onHeight}
+              ref={listView}
               dom={list.dom}
             />
           </Block>

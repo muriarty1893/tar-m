@@ -41,7 +41,7 @@ export function DomRoot({ children, onHeight }: { children: ReactNode; onHeight?
     return () => ro.disconnect();
   }, [onHeight]);
   return (
-    <div ref={ref} className="demo-app text-[15px] leading-snug text-foreground antialiased">
+    <div ref={ref} className="demo-app w-full text-[15px] leading-snug text-foreground antialiased">
       {children}
     </div>
   );

@@ -8,7 +8,9 @@ import { Pressable, View } from 'react-native';
 import Animated, { Easing, ReduceMotion, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppStatusBar } from '@/components/app/status-bar';
 import AnalyzingImageDom from '@/components/dom/analyzing-image-dom';
+import { DOM_BASE, useDomStart } from '@/components/dom/use-dom-height';
 import { ArrowsClockwiseIcon, CheckCircleIcon, ImageSquareIcon, LightningIcon, XIcon } from '@/components/icons';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
@@ -41,6 +43,7 @@ export default function Scan() {
   const [picking, setPicking] = useState(false);
   const [progress, setProgress] = useState(0);
   const camera = useRef<CameraView>(null);
+  const loader = useDomStart(!!shot); // the loader appears with the shot
   const live = !!permission?.granted;
 
   // The scan line sweeps while analysing.
@@ -73,22 +76,31 @@ export default function Scan() {
   const shoot = async () => {
     if (shot) return;
     if (live && ready && camera.current) {
-      const pic = await camera.current.takePictureAsync({ quality: 0.7 });
-      if (pic?.uri) return setShot({ photo: pic.uri, scenario: pickScenario(pic.uri) });
+      try {
+        const pic = await camera.current.takePictureAsync({ quality: 0.7 });
+        if (pic?.uri) return setShot({ photo: pic.uri, scenario: pickScenario(pic.uri) });
+      } catch {
+        // The camera couldn't take it (busy, closed, no hardware): carry on with the sample, as without a camera.
+      }
     }
     setShot({ scenario: sample });
   };
 
   const fromGallery = async () => {
     setPicking(false);
-    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.7 });
-    if (!res.canceled && res.assets[0]) setShot({ photo: res.assets[0].uri, scenario: pickScenario(res.assets[0].uri) });
+    try {
+      const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.7 });
+      if (!res.canceled && res.assets[0]) setShot({ photo: res.assets[0].uri, scenario: pickScenario(res.assets[0].uri) });
+    } catch {
+      // The gallery couldn't open: stay on the camera, where the samples still work.
+    }
   };
 
   const frame = shot ? (shot.photo ? { uri: shot.photo } : shot.scenario.image) : sample.image;
 
   return (
     <View className="flex-1 bg-black">
+      <AppStatusBar dark />
       {live && !shot ? (
         <CameraView ref={camera} style={{ position: 'absolute', inset: 0 }} facing={facing} enableTorch={torch} onCameraReady={() => setReady(true)} />
       ) : (
@@ -142,7 +154,7 @@ export default function Scan() {
           <Animated.View pointerEvents="none" className="absolute inset-0 z-20 bg-white" style={flashStyle} />
           <View className="absolute inset-x-0 bottom-0 z-10 rounded-t-[30px] bg-card px-5 pt-5" style={{ paddingBottom: insets.bottom + 28 }} accessibilityLiveRegion="polite">
             <View className="flex-row items-center gap-3.5">
-              <AnalyzingImageDom dom={{ scrollEnabled: false, containerStyle: { width: 56, height: 56 }, style: { width: 56, height: 56 } }} />
+              <AnalyzingImageDom ref={loader} dom={{ ...DOM_BASE, containerStyle: { width: 56, height: 56 }, style: { width: 56, height: 56 } }} />
               <View>
                 <Text className="font-heading text-[19px]">Analiz ediliyor…</Text>
                 <Text className="text-[14px] text-muted-foreground">Yapay zekâ fotoğrafı inceliyor</Text>

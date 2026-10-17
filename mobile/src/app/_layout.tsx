@@ -4,11 +4,11 @@ import { PortalHost } from '@rn-primitives/portal';
 import { useFonts } from 'expo-font';
 import { DefaultTheme, Stack, ThemeProvider, type Theme } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AppStatusBar } from '@/components/app/status-bar';
 import { useAppStore } from '@/state/store';
 import { APP_FONTS } from '@/theme/fonts';
 import { COLORS } from '@/theme/tokens';
@@ -42,7 +42,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider value={NAV_THEME}>
-          <StatusBar style="dark" />
+          <AppStatusBar />
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: COLORS.background } }}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="tara" options={{ presentation: 'fullScreenModal', animation: 'fade' }} />

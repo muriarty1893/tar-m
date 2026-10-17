@@ -14,6 +14,8 @@ type Props = {
   onToggle: (index: number, checked: boolean) => Promise<void>;
   onHeight?: (height: number) => Promise<void>;
   dom?: import('expo/dom').DOMProps;
+  /** Native side only: the web view, so the screen can restart it (see use-dom-height). */
+  ref?: import('react').Ref<import('./use-dom-height').DomViewRef>;
 };
 
 /** The demo result's "Öneriler" list: React Bits SpringCheck rows, exactly as in the website demo. */

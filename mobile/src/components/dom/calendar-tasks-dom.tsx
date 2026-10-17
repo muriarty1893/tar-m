@@ -38,6 +38,8 @@ type Props = {
   onToggle: (id: string, checked: boolean) => Promise<void>;
   onHeight?: (height: number) => Promise<void>;
   dom?: import('expo/dom').DOMProps;
+  /** Native side only: the web view, so the screen can restart it (see use-dom-height). */
+  ref?: import('react').Ref<import('./use-dom-height').DomViewRef>;
 };
 
 /** The demo calendar's task list, exactly as in the website demo: kind tiles and React Bits SpringCheck rows. */
