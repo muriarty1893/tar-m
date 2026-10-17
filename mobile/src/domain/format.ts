@@ -74,3 +74,14 @@ export function monthGrid(year: number, month: number): (Date | null)[][] {
   while (cells.length % 7) cells.push(null);
   return Array.from({ length: cells.length / 7 }, (_, i) => cells.slice(i * 7, i * 7 + 7));
 }
+
+/** The "-den/-dan/-ten/-tan" ending after a year, as the number is read: "2019’dan", "2020’den", "2023’ten". */
+export function fromYear(year: number) {
+  // The last spoken word decides: its last vowel (e/a) and whether it ends in a hard consonant (t).
+  const ones = ['', 'bir', 'iki', 'üç', 'dört', 'beş', 'altı', 'yedi', 'sekiz', 'dokuz'];
+  const tens = ['', 'on', 'yirmi', 'otuz', 'kırk', 'elli', 'altmış', 'yetmiş', 'seksen', 'doksan'];
+  const word = ones[year % 10] || tens[Math.floor(year / 10) % 10] || (year % 1000 === 0 ? 'bin' : 'yüz');
+  const vowel = [...word].reverse().find((c) => 'aeıioöuü'.includes(c)) ?? 'e';
+  const hard = 'fstkçşhp'.includes(word[word.length - 1]);
+  return `${year}’${hard ? 't' : 'd'}${'aıou'.includes(vowel) ? 'an' : 'en'}`;
+}

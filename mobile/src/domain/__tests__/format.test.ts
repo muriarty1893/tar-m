@@ -1,4 +1,4 @@
-import { dayKey, dayTitle, formatPercent, formatTL, monthGrid, relativeDayLabel, shortDate, timeRange } from '../format';
+import { dayKey, dayTitle, formatPercent, formatTL, fromYear, monthGrid, relativeDayLabel, shortDate, timeRange } from '../format';
 
 describe('Turkish formatting', () => {
   test('dayTitle names the day and month in Turkish', () => {
@@ -47,5 +47,18 @@ describe('monthGrid', () => {
     const days = weeks.flat().filter(Boolean);
     expect(days).toHaveLength(31);
     expect(weeks[weeks.length - 1].includes(null)).toBe(true);
+  });
+});
+
+describe('fromYear (Turkish ablative after a year)', () => {
+  test('follows how the number is read', () => {
+    expect(fromYear(2017)).toBe('2017’den');
+    expect(fromYear(2019)).toBe('2019’dan');
+    expect(fromYear(2020)).toBe('2020’den');
+    expect(fromYear(2023)).toBe('2023’ten');
+    expect(fromYear(2024)).toBe('2024’ten');
+    expect(fromYear(2026)).toBe('2026’dan');
+    expect(fromYear(2030)).toBe('2030’dan');
+    expect(fromYear(2040)).toBe('2040’tan');
   });
 });

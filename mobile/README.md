@@ -16,15 +16,17 @@ The Çiftçi Destek app for Android and iOS, built with Expo SDK 57 (React Nativ
 
 `npx expo start --web` opens the same app in the browser.
 
-## Screens (as in the website demo)
+## Screens
 
 | Tab | What it shows |
 | --- | --- |
-| **Ana sayfa** | Weather card over a field photo (Ayşe Yılmaz, Konya, 18,5°C), "Tarım Borsası Fiyatları" price cards, and "Hızlı İşlemler": Hastalık Tara, Tarlalarım, Tarla Haritası, Tarım Takvimi. |
+| **Ana sayfa** | Weather card over a field photo (Ayşe Yılmaz, Konya, 18,5°C) with the messages button and "5 günlük tahmin", "Tarım Borsası Fiyatları" price cards, "Hızlı İşlemler" (Hastalık Tara, Tarlalarım, Tarla Haritası, Tarım Takvimi), and "Pazarda yeni" listings. |
 | **Taramalar** | Opens the camera. |
-| **Hava** | The weather card and the 5-day farm forecast. |
+| **Pazar** | The farmers' market: search, Keşfet / Favoriler / İlanlarım, categories (Ürün, Tohum & Gübre, Alet, Ekipman, Araç) and the listings. "İlan ver" posts one. |
 | **Takvim** | "Tarım takvimi": the month with task dots, the day's tasks with coloured kind tiles. Tasks can be ticked. |
 | **Geçmiş** | "Geçmiş taramalar": past scans with their success percentage. Each one opens its result. |
+
+The weather card and 5-day forecast (`hava`) open from the home weather card.
 
 **The scan flow:**
 1. **Camera.** The live camera (CANLI · Kamera), with framing brackets, flash and flip.
@@ -33,13 +35,22 @@ The Çiftçi Destek app for Android and iOS, built with Expo SDK 57 (React Nativ
 4. **Result.** The diagnosis, then the "Hasat başarı tahmini" gauge, "Ne görüyorum", and "Öneriler" that can be ticked.
 5. **"Soru sor".** A chat with the agronomist assistant, with suggested questions.
 
+**The market (Pazar) and messages:**
+1. **A listing.** Photo, price (with unit for produce), facts, specs, description, the seller (rating, reply time, verified phone) and safety tips. "Mesaj gönder" opens a chat; "Teklif ver" sends an offer. On your own listing: "Satıldı olarak işaretle" and remove.
+2. **İlan ver.** Photos (gallery or camera; without one, the category's photo is used and marked "Temsilî görsel"), title, category, condition, price and unit, quantity, location, description, "Pazarlık payı var". Checked on blur and on submit, with a summary of what to fix.
+3. **Mesajlar.** Every listing chat (Tümü / Alıyorum / Satıyorum), unread ones in bold with a count; the count also shows on the home card and in Pazar.
+4. **A chat.** The listing pinned on top, quick replies, offers and counter-offers you can accept or turn down, and a typing indicator.
+
+The design follows the ui-ux-pro-max marketplace pattern (search first, categories in view, trust cues, "list your item" always at hand) in the app's own look: see `docs/superpowers/specs/2026-10-17-pazar-mesajlar-design.md`.
+
 **What's simulated:**
 - **The result.** A photo is matched to one of the demo's four scenarios (`src/domain/scenarios.ts`), always the same one for the same photo. Without camera permission, the shutter uses the chosen sample.
 - **Weather and prices.** They are the demo's values.
 - **The calendar.** It is the demo month, placed around today.
 - **"Tarlalarım", "Tarla Haritası" and "Tümünü gör".** They say "yakında" (coming soon), as they have no screen on the website either.
+- **The market.** The 15 listings and their sellers are sample data (`src/domain/market.ts`). The other side of a chat answers by script (`src/domain/chat.ts`): by topic for questions; offers at 92 % of the price or more are accepted, under 60 % turned down, and the rest countered halfway.
 
-Scans, ticked suggestions and ticked tasks are saved on the phone.
+Scans, ticks, favourites, your listings and the chats are saved on the phone.
 
 ## Design and code
 
@@ -59,6 +70,9 @@ Scans, ticked suggestions and ticked tasks are saved on the phone.
 - **Keep the copies in step with the website.** If one of the website's components changes, copy the file over again: they are meant to stay identical.
 - **Routes** live in `src/app/` (Expo Router):
   - `(tabs)/` holds the five tabs;
+  - `hava` is the forecast;
+  - `ilan/[id]` and `ilan/yeni` are a listing and the new-listing form;
+  - `mesajlar/` and `mesajlar/[id]` are the inbox and a chat;
   - `tara` is the camera and analysis;
   - `sonuc/[id]` is the result;
   - `soru/[id]` is the chat.
@@ -67,7 +81,7 @@ Scans, ticked suggestions and ticked tasks are saved on the phone.
 ## Checks
 
 ```bash
-npm test             # Jest: scenarios, calendar and forecast, dates, store
+npm test             # Jest: scenarios, calendar and forecast, dates, market, chat, store
 npm run typecheck
 npx expo lint
 npx expo-doctor
@@ -75,7 +89,8 @@ npx expo-doctor
 
 ## Next steps toward a real app
 
-1. **A real model.** Send the photo to a plant-disease model, served by our own API, and return the same shape as `Scenario`. The screens stay the same.
-2. **Live data.** Live weather for the user's location, plus real market prices.
-3. **Accounts and the empty cards.** Sign-in, plus screens for Tarlalarım and Tarla Haritası.
-4. **Release builds.** Build with EAS (`npx eas-cli build`). Publishing needs Google Play and Apple developer accounts.
+1. **A real market.** Listings, photos and chats on a server with sign-in, push notifications for messages, and moderation and reporting. The screens keep their shape (`Listing`, `Conversation`).
+2. **A real model.** Send the photo to a plant-disease model, served by our own API, and return the same shape as `Scenario`. The screens stay the same.
+3. **Live data.** Live weather for the user's location, plus real market prices.
+4. **Accounts and the empty cards.** Sign-in, plus screens for Tarlalarım and Tarla Haritası.
+5. **Release builds.** Build with EAS (`npx eas-cli build`). Publishing needs Google Play and Apple developer accounts.

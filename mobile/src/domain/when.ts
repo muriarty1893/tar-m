@@ -10,3 +10,13 @@ export function whenLabel(date: Date, now: Date) {
   const weeks = Math.floor(days / 7);
   return weeks < 5 ? `${weeks} hafta önce` : `${Math.floor(days / 30)} ay önce`;
 }
+
+/** Short times for listings and chats: "Az önce", "25 dk önce", "3 saat önce", "Dün", "3 gün önce", "2 hafta önce". */
+export function agoLabel(date: Date, now: Date) {
+  const minutes = Math.floor((now.getTime() - date.getTime()) / 60_000);
+  if (minutes < 1) return 'Az önce';
+  if (minutes < 60) return `${minutes} dk önce`;
+  if (dayKey(date) === dayKey(now)) return `${Math.floor(minutes / 60)} saat önce`;
+  const label = whenLabel(date, now);
+  return label.startsWith('Dün') ? 'Dün' : label;
+}

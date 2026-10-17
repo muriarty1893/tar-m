@@ -7,7 +7,7 @@ export default function TabsLayout() {
     <Tabs tabBar={(props) => <TabBar {...props} />} screenOptions={{ headerShown: false }}>
       <Tabs.Screen name="index" options={{ title: 'Ana sayfa' }} />
       <Tabs.Screen name={SCAN_TAB} options={{ title: 'Taramalar' }} />
-      <Tabs.Screen name="hava" options={{ title: 'Hava' }} />
+      <Tabs.Screen name="pazar" options={{ title: 'Pazar' }} />
       <Tabs.Screen name="takvim" options={{ title: 'Takvim' }} />
       <Tabs.Screen name="gecmis" options={{ title: 'Geçmiş' }} />
     </Tabs>

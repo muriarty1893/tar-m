@@ -48,6 +48,11 @@ export default function RootLayout() {
             <Stack.Screen name="tara" options={{ presentation: 'fullScreenModal', animation: 'fade' }} />
             <Stack.Screen name="sonuc/[id]" options={{ animation: 'slide_from_bottom' }} />
             <Stack.Screen name="soru/[id]" />
+            <Stack.Screen name="hava" />
+            <Stack.Screen name="ilan/[id]" />
+            <Stack.Screen name="ilan/yeni" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="mesajlar/index" />
+            <Stack.Screen name="mesajlar/[id]" />
           </Stack>
           <PortalHost />
         </ThemeProvider>

@@ -40,3 +40,12 @@ export const KIND_COLORS = {
   hasat: { tile: '#ffedd5', icon: '#7c2d12', dot: '#ea580c' },
   uyari: { tile: '#fee2e2', icon: '#b91c1c', dot: '#b91c1c' },
 } as const;
+
+/** Tints for people's initials (avatars), from the same Tailwind palette. */
+export const AVATAR_TONES = [
+  { bg: '#dcfce7', fg: '#15803d' },
+  { bg: '#fef3c7', fg: '#a16207' },
+  { bg: '#e0f2fe', fg: '#075985' },
+  { bg: '#ede9fe', fg: '#5b21b6' },
+  { bg: '#ffedd5', fg: '#9a3412' },
+] as const;
