@@ -12,7 +12,6 @@ import { cn } from '@/lib/utils';
 import { useAppStore } from '@/state/store';
 import { COLORS, KIND_COLORS } from '@/theme/tokens';
 
-
 /** "Tarım takvimi", as in the website demo: the month's farm tasks, a day at a time, tickable. */
 export default function Calendar() {
   const now = useNow();
@@ -20,7 +19,8 @@ export default function Calendar() {
   const setTask = useAppStore((s) => s.setTask);
   const [picked, setPicked] = useState(() => new Date(now.getFullYear(), now.getMonth(), now.getDate()));
   const list = useDomHeight(80);
-  const listView = useDomStart(dayKey(picked));
+  // One web view for every day: switching days sends it new tasks instead of loading a new one.
+  const listView = useDomStart();
 
   const weeks = useMemo(() => monthGrid(now.getFullYear(), now.getMonth()), [now]);
   const total = weeks.flat().reduce((n, d) => n + (d ? tasksOn(d, now).length : 0), 0);
@@ -90,9 +90,10 @@ export default function Calendar() {
         <Text className="rounded-[18px] border border-dashed border-border px-4 py-5 text-center text-[14px] text-muted-foreground">
           Bu gün için görev yok. Noktalı günlere dokunun.
         </Text>
-      ) : (
+      ) : null}
+      {/* Kept mounted (hidden) on empty days, so the next day with tasks shows at once. */}
+      <View style={tasks.length === 0 ? { display: 'none' } : undefined}>
         <CalendarTasksDom
-          key={dayKey(picked)}
           label={`${picked.getDate()} ${monthName(picked.getMonth())} görevleri`}
           tasks={tasks.map((t) => ({ id: taskId(picked, t), title: t.title, kind: t.kind, field: t.field, time: t.time, done: done.includes(taskId(picked, t)) }))}
           onToggle={async (id, checked) => setTask(id, checked)}
@@ -100,7 +101,7 @@ export default function Calendar() {
           onHeight={list.onHeight}
           dom={list.dom}
         />
-      )}
+      </View>
     </TabScreen>
   );
 }
