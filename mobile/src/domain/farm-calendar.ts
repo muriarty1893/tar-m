@@ -59,11 +59,3 @@ export function forecast(today: Date): ForecastDay[] {
   ];
   return rows.map((r, i) => ({ ...r, day: i === 0 ? 'Bugün' : WEEKDAYS[addDays(today, i).getDay()] }));
 }
-
-/** The demo's market prices (Tarım Borsası), with a tiny trend line on a 40×16 box. */
-export const PRICES = [
-  { name: 'Buğday', price: '9,85', change: 2.1, line: [14, 12, 13, 8, 9, 3] },
-  { name: 'Fındık', price: '165,00', change: 3.1, line: [13, 11, 12, 7, 6, 2] },
-  { name: 'Mısır', price: '8,40', change: -0.8, line: [4, 6, 5, 9, 8, 12] },
-  { name: 'Pamuk', price: '31,20', change: 0.6, line: [10, 11, 8, 9, 6, 6] },
-];

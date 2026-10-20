@@ -26,7 +26,12 @@ The Çiftçi Destek app for Android and iOS, built with Expo SDK 57 (React Nativ
 | **Takvim** | "Tarım takvimi": the month with task dots, the day's tasks with coloured kind tiles. Tasks can be ticked. |
 | **Geçmiş** | "Geçmiş taramalar": past scans with their success percentage. Each one opens its result. |
 
-The weather card and 5-day forecast (`hava`) open from the home weather card.
+Screens that open from Ana sayfa:
+- **Hava durumu** (`hava`): the weather card and the 5-day forecast, from the home weather card.
+- **Borsa fiyatları** (`fiyatlar`): every crop's price per kilo, from "Tümünü gör" on the price cards. It has search (by crop or exchange), groups (Tahıl, Baklagil, Yağlı tohum, Meyve & sebze, Sanayi bitkisi), and sorting A–Z or by largest change.
+- **Tarlalarım** (`tarlalar`): this season's area, expenses and expected yield, then each field with its health, last scan and next calendar task. A field's page shows its expenses by kind, its upcoming tasks and a link to its last scan.
+- **Tarla Haritası** (`harita`): the fields outlined on a top-down photo, tinted and labelled by plant health (Sağlıklı, İzlenmeli, Riskli). Tap a field or its name for its plant-health index.
+- **Görsel kaynakları** (`kaynaklar`): the credits for every photo, component, icon and font, linked from the bottom of Ana sayfa.
 
 **The scan flow:**
 1. **Camera.** The live camera (CANLI · Kamera), with framing brackets, flash and flip.
@@ -47,7 +52,8 @@ The design follows the ui-ux-pro-max marketplace pattern (search first, categori
 - **The result.** A photo is matched to one of the demo's four scenarios (`src/domain/scenarios.ts`), always the same one for the same photo. Without camera permission, the shutter uses the chosen sample.
 - **Weather and prices.** They are the demo's values.
 - **The calendar.** It is the demo month, placed around today.
-- **"Tarlalarım", "Tarla Haritası" and "Tümünü gör".** They say "yakında" (coming soon), as they have no screen on the website either.
+- **The fields.** Ayşe's four fields, their expenses and their plant-health index are sample data (`src/domain/fields.ts`). A field's health comes from its last scan's harvest-success estimate, on the gauge's scale. The map is an example photo, not Konya.
+- **Prices.** The 14 crops' prices and trends are sample data (`src/domain/prices.ts`).
 - **The market.** The 15 listings and their sellers are sample data (`src/domain/market.ts`). The other side of a chat answers by script (`src/domain/chat.ts`): by topic for questions; offers at 92 % of the price or more are accepted, under 60 % turned down, and the rest countered halfway.
 
 Scans, ticks, favourites, your listings and the chats are saved on the phone.
@@ -71,6 +77,10 @@ Scans, ticks, favourites, your listings and the chats are saved on the phone.
 - **Routes** live in `src/app/` (Expo Router):
   - `(tabs)/` holds the five tabs;
   - `hava` is the forecast;
+  - `fiyatlar` is the price list;
+  - `tarlalar/` and `tarlalar/[id]` are the fields and a field;
+  - `harita` is the field map;
+  - `kaynaklar` is the credits;
   - `ilan/[id]` and `ilan/yeni` are a listing and the new-listing form;
   - `mesajlar/` and `mesajlar/[id]` are the inbox and a chat;
   - `tara` is the camera and analysis;
@@ -81,7 +91,7 @@ Scans, ticks, favourites, your listings and the chats are saved on the phone.
 ## Checks
 
 ```bash
-npm test             # Jest: scenarios, calendar and forecast, dates, market, chat, store
+npm test             # Jest: scenarios, calendar and forecast, dates, market, chat, store, fields, prices, credits
 npm run typecheck
 npx expo lint
 npx expo-doctor
@@ -92,5 +102,5 @@ npx expo-doctor
 1. **A real market.** Listings, photos and chats on a server with sign-in, push notifications for messages, and moderation and reporting. The screens keep their shape (`Listing`, `Conversation`).
 2. **A real model.** Send the photo to a plant-disease model, served by our own API, and return the same shape as `Scenario`. The screens stay the same.
 3. **Live data.** Live weather for the user's location, plus real market prices.
-4. **Accounts and the empty cards.** Sign-in, plus screens for Tarlalarım and Tarla Haritası.
+4. **Accounts and real fields.** Sign-in, fields drawn on a real map, satellite plant-health data, and expenses the farmer enters.
 5. **Release builds.** Build with EAS (`npx eas-cli build`). Publishing needs Google Play and Apple developer accounts.

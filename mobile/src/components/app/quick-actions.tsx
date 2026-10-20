@@ -4,6 +4,7 @@ import { Pressable, View } from 'react-native';
 
 import { CalendarDotsIcon, CameraIcon, CaretRightIcon, MapTrifoldIcon, TractorIcon, type PhosphorIcon } from '@/components/icons';
 import { Text } from '@/components/ui/text';
+import { FIELDS } from '@/domain/fields';
 import { cn } from '@/lib/utils';
 import { COLORS, SHADOW } from '@/theme/tokens';
 
@@ -13,7 +14,7 @@ type Action = { img: number; Icon: PhosphorIcon; title: string; sub: string; bad
 export function QuickActions({ onScan, onFields, onMap, onCalendar }: { onScan: () => void; onFields: () => void; onMap: () => void; onCalendar: () => void }) {
   const actions: Action[] = [
     { img: require('@/assets/images/app/scan-leaf.webp'), Icon: CameraIcon, title: 'Hastalık Tara', sub: 'Kamerayla yaprak teşhisi', badge: 'Dene', onPress: onScan },
-    { img: require('@/assets/images/app/tractor-field.webp'), Icon: TractorIcon, title: 'Tarlalarım', sub: '3 tarla ve harcamalar', onPress: onFields },
+    { img: require('@/assets/images/app/tractor-field.webp'), Icon: TractorIcon, title: 'Tarlalarım', sub: `${FIELDS.length} tarla ve harcamalar`, onPress: onFields },
     { img: require('@/assets/images/app/field-map.webp'), Icon: MapTrifoldIcon, title: 'Tarla Haritası', sub: 'Uydu ile izleme', onPress: onMap },
     { img: require('@/assets/images/app/seedlings.webp'), Icon: CalendarDotsIcon, title: 'Tarım Takvimi', sub: 'Ekim ve ilaçlama', onPress: onCalendar },
   ];

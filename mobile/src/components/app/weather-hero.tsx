@@ -6,7 +6,12 @@ import { Pressable, View } from 'react-native';
 import { CaretRightIcon, CloudRainIcon, DropIcon, MapPinIcon, SunIcon, UserIcon, WindIcon } from '@/components/icons';
 import { InboxButton } from '@/components/market/parts';
 import { Text } from '@/components/ui/text';
+import { FIELDS, healthOf, seasonSummary } from '@/domain/fields';
 import { COLORS, SHADOW } from '@/theme/tokens';
+
+const RISKY = FIELDS.filter((f) => healthOf(f) === 'riskli').length;
+/** "4 tarla (103 dönüm) · 1 tarla riskli", from Tarlalarım's fields. */
+const FIELD_LINE = `${FIELDS.length} tarla (${seasonSummary(FIELDS).areaDonum} dönüm) · ${RISKY ? `${RISKY} tarla riskli` : 'Durum iyi'}`;
 
 /**
  * The demo's weather card: a field photo with the farmer, the location, the temperature and a frosted strip.
@@ -31,7 +36,7 @@ export function WeatherHero({ onForecast, inbox = false }: { onForecast?: () => 
               Ayşe Yılmaz
             </Text>
             <Text numberOfLines={1} className="text-[12.5px] text-white/90">
-              3 tarla (42 dönüm) · Durum iyi
+              {FIELD_LINE}
             </Text>
           </View>
         </View>

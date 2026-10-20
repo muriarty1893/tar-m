@@ -1,6 +1,6 @@
 # Image and icon credits
 
-The photos are the website demo's (see `data/photo-credits.ts` and the site's /kaynaklar page). CC BY and CC BY-SA photos must stay credited: a credits screen is needed before a store release.
+The photos are the website demo's (see `data/photo-credits.ts` and the site's /kaynaklar page). CC BY and CC BY-SA photos must stay credited: the app lists them on its "Görsel kaynakları" screen (`src/app/kaynaklar.tsx`, data in `src/domain/credits.ts`), and a test fails if a photo under `assets/images` has no credit there.
 
 | File | Photo | Author | Licence | Source |
 | --- | --- | --- | --- | --- |
@@ -12,6 +12,7 @@ The photos are the website demo's (see `data/photo-credits.ts` and the site's /k
 | `hero-field.webp` | Gün batımında tarla | Summer Stock | CC0 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sunflower_field_at_sunset.jpg) |
 | `tractor-field.webp` | Traktör | U.S. Fish and Wildlife Service | Kamu malı | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tractor_plow_fields_cultivated.jpg) |
 | `field-map.webp` | Tarlalar (havadan) | Carol M. Highsmith | Kamu malı | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Aerial_view_of_Pennsylvania_farmland_LCCN2011631350_(flipped_%26_removed_vignette).tif) |
+| `harita-uydu.webp` | Tarlalar, tepeden (Tarla Haritası) | Bhullargraphic | CC BY-SA 4.0 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Aerial_view_of_agricultural_fields_in_Punjab,_India.jpg), cropped, colours toned down |
 | `seedlings.webp` | Çimlenen tohumlar | Aerospectra | CC BY 4.0 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sprouting_seeds.jpg) |
 
 
