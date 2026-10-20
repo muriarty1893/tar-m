@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native';
 
 import { BackHeader } from '@/components/app/back-header';
 import { SectionTitle, TabScreen } from '@/components/app/screen';
-import { ArrowSquareOutIcon, ImagesIcon, PackageIcon, TextAaIcon, type PhosphorIcon } from '@/components/icons';
+import { ArrowSquareOutIcon, CloudSunIcon, ImagesIcon, PackageIcon, TextAaIcon, type PhosphorIcon } from '@/components/icons';
 import { Text } from '@/components/ui/text';
 import { OTHER_CREDITS, PHOTO_CREDITS, type OtherCredit } from '@/domain/credits';
 import { COLORS } from '@/theme/tokens';
@@ -40,11 +40,11 @@ const THUMBS: Record<string, number> = {
 
 const open = (url: string) => void WebBrowser.openBrowserAsync(url).catch(() => undefined);
 
-/** "Görsel kaynakları": who made the photos, components, icons and fonts, as their licences ask. */
+/** "Görsel kaynakları": who made the photos, components, icons and fonts, and the weather data's source, as their licences ask. */
 export default function Sources() {
   return (
     <TabScreen>
-      <BackHeader title="Görsel kaynakları" subtitle="Fotoğraflar, bileşenler ve yazı tipleri" />
+      <BackHeader title="Görsel kaynakları" subtitle="Fotoğraflar, veriler, bileşenler ve yazı tipleri" />
       <Text className="text-[14px] leading-5 text-muted-foreground">
         Uygulamadaki fotoğraflar Wikimedia Commons’tan; kırpılmış ve küçültülmüş olarak kullanılıyor. Bir satıra dokunursanız kaynağı tarayıcıda açılır.
       </Text>
@@ -71,6 +71,9 @@ export default function Sources() {
           </Pressable>
         ))}
       </View>
+
+      <Section Icon={CloudSunIcon} title="Veriler" />
+      <OtherList items={OTHER_CREDITS.filter((c) => c.group === 'veri')} />
 
       <Section Icon={PackageIcon} title="Bileşenler" />
       <OtherList items={OTHER_CREDITS.filter((c) => c.group === 'bilesen')} />

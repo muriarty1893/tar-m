@@ -1,4 +1,4 @@
-import { TASK_KINDS, forecast, taskId, tasksOn } from '../farm-calendar';
+import { TASK_KINDS, taskId, tasksOn } from '../farm-calendar';
 
 const TODAY = new Date(2026, 9, 16, 15);
 
@@ -21,14 +21,5 @@ describe('farm calendar (the website demo month, placed around today)', () => {
   test('task ids are stable per date and title', () => {
     const [t] = tasksOn(TODAY, TODAY);
     expect(taskId(TODAY, t)).toBe('2026-10-16:Taban gübresi (DAP) at');
-  });
-});
-
-describe('forecast', () => {
-  test('five days from today, Turkish day names, the demo values', () => {
-    const f = forecast(TODAY);
-    expect(f.map((d) => d.day)).toEqual(['Bugün', 'Cumartesi', 'Pazar', 'Pazartesi', 'Salı']);
-    expect(f[0]).toMatchObject({ max: 19, min: 7, rain: 5, tip: 'İlaçlama için uygun' });
-    expect(f[4].tip).toBe('Don riski: fideleri örtün');
   });
 });

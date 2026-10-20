@@ -49,6 +49,7 @@ export default function RootLayout() {
             <Stack.Screen name="sonuc/[id]" options={{ animation: 'slide_from_bottom' }} />
             <Stack.Screen name="soru/[id]" />
             <Stack.Screen name="hava" />
+            <Stack.Screen name="konum" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
             <Stack.Screen name="tarlalar/index" />
             <Stack.Screen name="tarlalar/[id]" />
             <Stack.Screen name="harita" />

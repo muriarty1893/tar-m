@@ -27,8 +27,8 @@ describe('image credits (Görsel kaynakları)', () => {
     }
   });
 
-  test('the components, icons and fonts are credited too', () => {
+  test('the weather data, components, icons and fonts are credited too', () => {
     const names = OTHER_CREDITS.map((c) => c.name).join(' ');
-    for (const n of ['SpringCheck', 'NumberTicker', 'Phosphor', 'DM Sans', 'Space Grotesk']) expect(names).toContain(n);
+    for (const n of ['Open-Meteo', 'SpringCheck', 'NumberTicker', 'Phosphor', 'DM Sans', 'Space Grotesk']) expect(names).toContain(n);
   });
 });

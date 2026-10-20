@@ -1,4 +1,4 @@
-import { WEEKDAYS, addDays, dayKey } from './format';
+import { dayKey } from './format';
 
 /**
  * The website demo's farm calendar (data/farm-calendar.ts). The demo is set on 14 October; here
@@ -45,17 +45,3 @@ export function tasksOn(day: Date, today: Date): FarmTask[] {
 
 /** A task's id for remembering it was done: its date and title. */
 export const taskId = (day: Date, task: FarmTask) => `${dayKey(day)}:${task.title}`;
-
-export type ForecastDay = { day: string; icon: 'sun' | 'cloud-sun' | 'cloud-rain' | 'snowflake'; max: number; min: number; rain: number; tip: string };
-
-/** The demo's 5-day farm forecast, labelled from today. */
-export function forecast(today: Date): ForecastDay[] {
-  const rows: Omit<ForecastDay, 'day'>[] = [
-    { icon: 'sun', max: 19, min: 7, rain: 5, tip: 'İlaçlama için uygun' },
-    { icon: 'cloud-sun', max: 17, min: 6, rain: 20, tip: 'Sulama yapılabilir' },
-    { icon: 'cloud-rain', max: 13, min: 5, rain: 85, tip: 'İlaçlamayı erteleyin' },
-    { icon: 'cloud-sun', max: 15, min: 3, rain: 30, tip: 'Toprak işlemeye uygun' },
-    { icon: 'snowflake', max: 9, min: -1, rain: 10, tip: 'Don riski: fideleri örtün' },
-  ];
-  return rows.map((r, i) => ({ ...r, day: i === 0 ? 'Bugün' : WEEKDAYS[addDays(today, i).getDay()] }));
-}

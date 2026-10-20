@@ -1,5 +1,5 @@
 /**
- * "Görsel kaynakları": who made the photos, components, icons and fonts the app uses. CC BY and
+ * "Görsel kaynakları": who made the photos, components, icons and fonts the app uses, and where its live data comes from. CC BY and
  * CC BY-SA photos must stay credited. CREDITS.md has the same list; a test checks that every photo
  * under assets/images/app and assets/images/market is here.
  */
@@ -69,9 +69,10 @@ export const PHOTO_CREDITS: PhotoCredit[] = [
   photo('market/ilan-nohut.webp', 'Nohut', 'Fumikas Sagisavas', 'CC0', 'Chickpeas%F0%9F%AB%98.jpg'),
 ];
 
-export type OtherCredit = { group: 'bilesen' | 'ikon-yazi'; name: string; license?: string; url: string };
+export type OtherCredit = { group: 'veri' | 'bilesen' | 'ikon-yazi'; name: string; license?: string; url: string };
 
 export const OTHER_CREDITS: OtherCredit[] = [
+  { group: 'veri', name: 'Hava durumu: Open-Meteo.com', license: 'CC BY 4.0', url: 'https://open-meteo.com' },
   { group: 'bilesen', name: 'React Bits SpringCheck', license: 'MIT', url: 'https://reactbits.dev' },
   { group: 'bilesen', name: 'Magic UI NumberTicker', license: 'MIT', url: 'https://magicui.design' },
   { group: 'bilesen', name: '21st.dev “Analyzing image” yükleyicisi', url: 'https://21st.dev' },
