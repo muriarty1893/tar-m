@@ -14,7 +14,7 @@ export function BackHeader({ title, subtitle, right, fallback = '/' }: { title: 
         accessibilityRole="button"
         accessibilityLabel="Geri"
         onPress={() => (router.canGoBack() ? router.back() : router.replace(fallback))}
-        className="size-11 items-center justify-center rounded-full bg-card active:bg-secondary"
+        className="size-11 items-center justify-center rounded-full border border-border bg-card active:bg-secondary"
         style={{ boxShadow: SHADOW.soft }}>
         <ArrowLeftIcon size={21} weight="bold" color={COLORS.foreground} />
       </Pressable>

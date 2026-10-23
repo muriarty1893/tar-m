@@ -15,6 +15,8 @@ export type DailyForecast = {
   windMax: number;
   /** WMO weather code, when the API sent one. */
   code?: number;
+  /** Local sunrise, "07:04", when the API sent one. */
+  sunrise?: string;
 };
 
 export type Forecast = {
@@ -27,11 +29,30 @@ export type FarmingHint = { kind: 'frost' | 'rain' | 'spray' | 'normal'; text: s
 /**
  * The website's launch thresholds, to be reviewed by an agronomist. The first matching rule wins.
  */
+const isFrost = (day: DailyForecast) => day.min <= 0;
+const isHeavyRain = (day: DailyForecast) => day.rainMm >= 20 || day.rainProb >= 80;
+
 export function farmingHint(day: DailyForecast): FarmingHint {
-  if (day.min <= 0) return { kind: 'frost', text: 'Don riski: hassas ürünleri örtün' };
-  if (day.rainMm >= 20 || day.rainProb >= 80) return { kind: 'rain', text: 'Yoğun yağış: ilaçlama ve sulamayı erteleyin' };
+  if (isFrost(day)) return { kind: 'frost', text: 'Don riski: hassas ürünleri örtün' };
+  if (isHeavyRain(day)) return { kind: 'rain', text: 'Yoğun yağış: ilaçlama ve sulamayı erteleyin' };
   if (day.windMax < 15 && day.rainProb < 20) return { kind: 'spray', text: 'İlaçlama için uygun' };
   return { kind: 'normal', text: 'Tarla işleri için koşullar normal' };
+}
+
+export type OutlookRow = { kind: 'spray' | 'frost' | 'rain'; title: string; days: string[]; text: string };
+
+/**
+ * "Bu Hafta Tarlada": which days of the forecast suit spraying, and which bring frost or heavy rain
+ * (each on its own, so a frosty, rainy day is in both lists), by day name.
+ */
+export function weekOutlook(daily: DailyForecast[], today: Date): OutlookRow[] {
+  const names = (pick: (d: DailyForecast) => boolean) => daily.filter(pick).map((d) => dayLabel(d.date, today));
+  const row = (kind: OutlookRow['kind'], title: string, days: string[], none: string): OutlookRow => ({ kind, title, days, text: days.length ? days.join(', ') : none });
+  return [
+    row('spray', 'İlaçlamaya uygun', names((d) => farmingHint(d).kind === 'spray'), 'Bu hafta uygun gün yok'),
+    row('frost', 'Don riski', names(isFrost), 'Bu hafta beklenmiyor'),
+    row('rain', 'Yoğun yağış', names(isHeavyRain), 'Bu hafta beklenmiyor'),
+  ];
 }
 
 const API = 'https://api.open-meteo.com/v1/forecast';
@@ -43,7 +64,7 @@ export function forecastUrl(lat: number, lon: number) {
     ['latitude', lat.toFixed(2)],
     ['longitude', lon.toFixed(2)],
     ['current', 'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,is_day'],
-    ['daily', 'temperature_2m_min,temperature_2m_max,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,weather_code'],
+    ['daily', 'temperature_2m_min,temperature_2m_max,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,weather_code,sunrise'],
     ['forecast_days', '7'],
     ['timezone', 'auto'],
   ];
@@ -76,6 +97,10 @@ export function parseForecast(body: ApiResponse): Forecast {
     const day: DailyForecast = { date, ...(row as Omit<DailyForecast, 'date'>) };
     const dayCode = d.weather_code?.[i];
     if (isNum(dayCode)) day.code = dayCode;
+    // "2026-10-20T07:04", in the place's own time (timezone=auto).
+    const sunrise = d.sunrise?.[i];
+    const hhmm = typeof sunrise === 'string' ? /T(\d{2}:\d{2})/.exec(sunrise)?.[1] : undefined;
+    if (hhmm) day.sunrise = hhmm;
     daily.push(day);
   });
   if (!daily.length) throw new Error('Hava durumu verisi eksik (günlük).');

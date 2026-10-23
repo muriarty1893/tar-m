@@ -1,4 +1,4 @@
-import { dayLabel, describeWeather, farmingHint, fetchForecast, forecastUrl, parseForecast, tempLabel, weatherIcon, type DailyForecast } from '../weather';
+import { dayLabel, describeWeather, farmingHint, fetchForecast, forecastUrl, parseForecast, tempLabel, weatherIcon, weekOutlook, type DailyForecast } from '../weather';
 
 const day = (over: Partial<DailyForecast> = {}): DailyForecast => ({ date: '2026-10-20', min: 8, max: 20, rainProb: 50, rainMm: 2, windMax: 20, ...over });
 
@@ -36,6 +36,7 @@ const body = (over: Record<string, unknown> = {}) => ({
     precipitation_sum: [0, 22.5],
     wind_speed_10m_max: [12.3, 25.1],
     weather_code: [3, 63],
+    sunrise: ['2026-10-20T07:04', '2026-10-21T07:05'],
     ...over,
   },
 });
@@ -45,7 +46,14 @@ describe('parseForecast', () => {
     const f = parseForecast(body());
     expect(f.current).toEqual({ temp: 17.4, humidity: 61, wind: 9.2, code: 3, isDay: true });
     expect(f.daily).toHaveLength(2);
-    expect(f.daily[1]).toEqual({ date: '2026-10-21', min: 4.2, max: 18, rainProb: 85, rainMm: 22.5, windMax: 25.1, code: 63 });
+    expect(f.daily[1]).toEqual({ date: '2026-10-21', min: 4.2, max: 18, rainProb: 85, rainMm: 22.5, windMax: 25.1, code: 63, sunrise: '07:05' });
+  });
+
+  test('a missing or odd sunrise leaves the day without one, but keeps the day', () => {
+    const f = parseForecast(body({ sunrise: [null, 'yarın'] }));
+    expect(f.daily).toHaveLength(2);
+    expect(f.daily[0].sunrise).toBeUndefined();
+    expect(f.daily[1].sunrise).toBeUndefined();
   });
 
   test('a day with a missing value is dropped, not shown as NaN', () => {
@@ -72,6 +80,7 @@ describe('fetchForecast', () => {
     expect(url).toContain('longitude=32.48');
     expect(url).toContain('forecast_days=7');
     expect(url).toContain('timezone=auto');
+    expect(decodeURIComponent(url)).toMatch(/daily=[^&]*sunrise/);
   });
 
   test('an HTTP error is an error', async () => {
@@ -105,5 +114,29 @@ describe('labels', () => {
     expect(dayLabel('2026-10-20', today)).toBe('Bugün');
     expect(dayLabel('2026-10-21', today)).toBe('Yarın');
     expect(dayLabel('2026-10-22', today)).toBe('Perşembe');
+  });
+});
+
+describe('weekOutlook ("Bu Hafta Tarlada")', () => {
+  const today = new Date(2026, 9, 20, 9);
+  const week = [
+    day({ date: '2026-10-20', windMax: 8, rainProb: 5 }), // Bugün: spraying
+    day({ date: '2026-10-21', windMax: 9, rainProb: 10 }), // Yarın: spraying
+    day({ date: '2026-10-22', rainMm: 25 }), // Perşembe: heavy rain
+    day({ date: '2026-10-23', min: -1, rainProb: 90 }), // Cuma: frost and heavy rain
+    day({ date: '2026-10-24' }), // Cumartesi: normal
+  ];
+
+  test('lists the spraying days, the frost days and the heavy-rain days by name', () => {
+    expect(weekOutlook(week, today)).toEqual([
+      { kind: 'spray', title: 'İlaçlamaya uygun', days: ['Bugün', 'Yarın'], text: 'Bugün, Yarın' },
+      { kind: 'frost', title: 'Don riski', days: ['Cuma'], text: 'Cuma' },
+      { kind: 'rain', title: 'Yoğun yağış', days: ['Perşembe', 'Cuma'], text: 'Perşembe, Cuma' },
+    ]);
+  });
+
+  test('says so when nothing is expected', () => {
+    const calm = [day({ date: '2026-10-20' }), day({ date: '2026-10-21' })];
+    expect(weekOutlook(calm, today).map((r) => r.text)).toEqual(['Bu hafta uygun gün yok', 'Bu hafta beklenmiyor', 'Bu hafta beklenmiyor']);
   });
 });

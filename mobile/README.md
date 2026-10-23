@@ -20,7 +20,7 @@ The Çiftçi Destek app for Android and iOS, built with Expo SDK 57 (React Nativ
 
 | Tab | What it shows |
 | --- | --- |
-| **Ana sayfa** | Live weather card over a field photo (Ayşe Yılmaz, the province, temperature, today's farming hint) with the messages button and "7 günlük tahmin", "Tarım Borsası Fiyatları" price cards, "Hızlı İşlemler" (Hastalık Tara, Tarlalarım, Tarla Haritası, Tarım Takvimi), and "Pazarda yeni" listings. |
+| **Ana sayfa** | A top bar (logo, "Dijital Tarım", the notifications bell for new messages, the demo profile), a sample sponsor banner and a "Reklam Vermek İçin Dokun" box, "Hızlı Menü Kısayolları" (eight tiles in two rows that scroll sideways), the "Tarla Konumu" weather card (province, temperature, rain, wind, sunrise and today's farming hint, which opens the 7-day forecast), "Bu Hafta Tarlada" (spraying days, frost, heavy rain), "Tarım Borsası Fiyatları" price cards and "Pazarda yeni" listings. |
 | **Taramalar** | Opens the camera. |
 | **Pazar** | The farmers' market: search, Keşfet / Favoriler / İlanlarım, categories (Ürün, Tohum & Gübre, Alet, Ekipman, Araç) and the listings. "İlan ver" posts one. |
 | **Takvim** | "Tarım takvimi": the month with task dots, the day's tasks with coloured kind tiles. Tasks can be ticked. |
@@ -60,9 +60,11 @@ Scans, ticks, favourites, your listings, the chats, the chosen province and the 
 
 **What's live:** the weather. Open-Meteo is free and needs no key or server, so the phone calls it directly (`src/domain/weather.ts`, `src/state/weather.ts`). A forecast under 30 minutes old is reused; offline, the last one is shown with its time. The farming hints use the website's thresholds and still need an agronomist's review. Open-Meteo's free API is for non-commercial use: a commercial launch needs one of its paid plans.
 
+**Ads.** The sponsor banner and the "advertise here" box show sample content (`src/domain/ads.ts`); tapping them explains the space. An app that shows ads counts as commercial for Open-Meteo, so real ads need a paid weather plan first.
+
 ## Design and code
 
-- **Look.** The demo phone's palette ("Organik Doğa": white, deep green, gold), fonts (DM Sans and Space Grotesk) and Phosphor icons. They match `components/phone-app/` and `.demo-app` in the website.
+- **Look.** "Dijital Tarım": slate text on a pale page, white cards with hairline borders, emerald green, a dark green gradient for the weather card and bright tinted icon tiles (`TILE_TONES`), all in Plus Jakarta Sans, with Phosphor icons and the round badge logo (`assets/images/brand/logo.webp`, as on the website). The website's demo phone (`components/phone-app/` and `.demo-app`) uses the same look.
 - **Theme.** The tokens are in `src/global.css`, mirrored in `src/theme/tokens.ts`.
 - **The website's components, copied unchanged.** These are the same files as on the website, byte for byte, run through [Expo DOM components](https://docs.expo.dev/guides/dom-components/) (`'use dom'`, a built-in web view):
   - React Bits **SpringCheck** (`src/components/ui/spring-check.tsx`);

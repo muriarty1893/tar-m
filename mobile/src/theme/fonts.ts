@@ -1,8 +1,13 @@
-import { DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
-import { SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
+import {
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
+} from '@expo-google-fonts/plus-jakarta-sans';
 
 /**
- * The website demo's fonts (DM Sans, Space Grotesk headings), loaded at runtime so they work in
+ * The app's one typeface, Plus Jakarta Sans (headings in ExtraBold), loaded at runtime so it works in
  * Expo Go. The keys are the family names src/global.css maps the font-* classes to.
  */
-export const APP_FONTS = { DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold, SpaceGrotesk_700Bold };
+export const APP_FONTS = { PlusJakartaSans_400Regular, PlusJakartaSans_500Medium, PlusJakartaSans_600SemiBold, PlusJakartaSans_700Bold, PlusJakartaSans_800ExtraBold };

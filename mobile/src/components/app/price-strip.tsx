@@ -11,11 +11,11 @@ import { ChangePill, Sparkline } from './price-bits';
 /** The demo's "Tarım Borsası Fiyatları": a sideways row of price cards with a tiny trend line. */
 export function PriceStrip({ onSeeAll }: { onSeeAll?: () => void }) {
   return (
-    <View className="mt-5">
+    <View className="mt-6">
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center gap-2">
-          <View className="size-2 rounded-full bg-primary" />
-          <Text role="heading" className="font-heading text-[17px]">
+          <View className="size-2.5 rounded-full bg-primary" />
+          <Text role="heading" className="font-heading text-[19px]">
             Tarım Borsası Fiyatları
           </Text>
         </View>
@@ -26,7 +26,7 @@ export function PriceStrip({ onSeeAll }: { onSeeAll?: () => void }) {
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-4 mt-2" contentContainerClassName="gap-2.5 px-4 pb-1" accessibilityLabel="Ürün fiyatları">
         {PRICES.slice(0, 4).map((p) => (
-          <View key={p.name} className="w-[148px] rounded-[18px] border border-border bg-card p-3" accessible accessibilityLabel={`${p.name}: kilosu ${formatTL(p.price)}, ${trendLabel(p.change)}`}>
+          <View key={p.name} className="w-[148px] rounded-[20px] border border-border bg-card p-3.5" accessible accessibilityLabel={`${p.name}: kilosu ${formatTL(p.price)}, ${trendLabel(p.change)}`}>
             <View className="flex-row items-center justify-between">
               <Text className="font-sans-bold text-[14.5px]">{p.name}</Text>
               <Sparkline line={p.line} change={p.change} />

@@ -1,17 +1,18 @@
 /** Raw colour values, mirrored from src/global.css, for places that cannot take a class. */
 export const COLORS = {
-  background: '#ffffff',
-  surface: '#f4faf5',
-  foreground: '#14532d',
-  primary: '#15803d',
+  background: '#f8fafc',
+  surface: '#f1f5f9',
+  foreground: '#0f172a',
+  primary: '#047857',
   primaryForeground: '#ffffff',
-  secondary: '#dcfce7',
-  muted: '#e8f0f1',
+  secondary: '#d1fae5',
+  muted: '#f1f5f9',
   mutedForeground: '#475569',
   gold: '#a16207',
   goldSoft: '#fef3c7',
   destructive: '#b91c1c',
-  border: '#bbf7d0',
+  border: '#e2e8f0',
+  card: '#ffffff',
   white: '#ffffff',
   black: '#000000',
   sun: '#fde047',
@@ -19,15 +20,37 @@ export const COLORS = {
   sky200: '#bae6fd',
   sky500: '#0ea5e9',
   sky600: '#0284c7',
+  emerald300: '#6ee7b7',
+  emerald400: '#34d399',
 } as const;
 
 export type ColorName = keyof typeof COLORS;
 
-/** The demo's two shadows ("soft" and "lift"). */
+/** A soft slate shadow for cards, and a deeper green one for the weather card. */
 export const SHADOW = {
-  soft: '0px 10px 30px -14px rgba(21, 128, 61, 0.35)',
-  lift: '0px 24px 48px -20px rgba(21, 128, 61, 0.45)',
+  soft: '0px 8px 24px -14px rgba(15, 23, 42, 0.22)',
+  lift: '0px 22px 40px -20px rgba(6, 78, 59, 0.55)',
 } as const;
+
+/** The weather card's dark green, top left to bottom right. */
+export const FIELD_CARD_GRADIENT = ['#047857', '#065f46', '#0b3b30', '#0f2a2a'] as const;
+
+/**
+ * The bright tiles of the quick menu (and the week's rows): a pale fill, a matching border and a
+ * saturated square behind a white icon. The label beside it is always dark text, so the colour only helps.
+ */
+export const TILE_TONES = {
+  emerald: { bg: '#ecfdf5', line: '#a7f3d0', solid: '#059669', ink: '#047857' },
+  sky: { bg: '#f0f9ff', line: '#bae6fd', solid: '#0ea5e9', ink: '#0369a1' },
+  indigo: { bg: '#eef2ff', line: '#c7d2fe', solid: '#4f46e5', ink: '#4338ca' },
+  amber: { bg: '#fffbeb', line: '#fde68a', solid: '#f59e0b', ink: '#92400e' },
+  teal: { bg: '#f0fdfa', line: '#99f6e4', solid: '#0d9488', ink: '#0f766e' },
+  purple: { bg: '#faf5ff', line: '#e9d5ff', solid: '#9333ea', ink: '#7e22ce' },
+  orange: { bg: '#fff7ed', line: '#fed7aa', solid: '#f97316', ink: '#c2410c' },
+  rose: { bg: '#fff1f2', line: '#fecdd3', solid: '#e11d48', ink: '#be123c' },
+} as const;
+
+export type TileTone = keyof typeof TILE_TONES;
 
 /** Farm-task kinds: icon tile background, icon colour and the dot under a calendar day (Tailwind's palette, as on the website). */
 export const KIND_COLORS = {

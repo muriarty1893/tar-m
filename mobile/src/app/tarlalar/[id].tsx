@@ -149,7 +149,7 @@ export default function FieldDetail() {
                     <Text className="text-[14px]">{EXPENSE_KINDS[e.kind]}</Text>
                     <Text className="font-sans-semibold text-[14px]">{formatPrice(e.amount)}</Text>
                   </View>
-                  <Progress value={share} className="h-1.5" />
+                  <Progress value={share} className="h-1.5 bg-muted" indicatorClassName="bg-primary" />
                 </View>
               );
             })}

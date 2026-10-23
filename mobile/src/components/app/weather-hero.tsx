@@ -1,136 +1,152 @@
-import { BlurView } from 'expo-blur';
-import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Pressable, View } from 'react-native';
 
-import { CaretRightIcon, CloudRainIcon, DropIcon, MapPinIcon, UserIcon, WifiSlashIcon, WindIcon } from '@/components/icons';
-import { InboxButton } from '@/components/market/parts';
+import { CaretDownIcon, CaretRightIcon, CloudRainIcon, MapPinIcon, PlantIcon, SnowflakeIcon, SprayBottleIcon, WifiSlashIcon, type PhosphorIcon } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
-import { FIELDS, healthOf, seasonSummary } from '@/domain/fields';
 import { clock } from '@/domain/format';
-import { describeWeather, farmingHint, tempLabel, weatherIcon } from '@/domain/weather';
+import { describeWeather, farmingHint, tempLabel, weatherIcon, type FarmingHint } from '@/domain/weather';
 import { useWeather } from '@/hooks/use-weather';
-import { COLORS, SHADOW } from '@/theme/tokens';
+import { COLORS, FIELD_CARD_GRADIENT, SHADOW } from '@/theme/tokens';
 
 import { WeatherIcon } from './weather-icon';
 
-const RISKY = FIELDS.filter((f) => healthOf(f) === 'riskli').length;
-/** "4 tarla (103 dönüm) · 1 tarla riskli", from Tarlalarım's fields. */
-const FIELD_LINE = `${FIELDS.length} tarla (${seasonSummary(FIELDS).areaDonum} dönüm) · ${RISKY ? `${RISKY} tarla riskli` : 'Durum iyi'}`;
+export const HINT_ICONS: Record<FarmingHint['kind'], PhosphorIcon> = { spray: SprayBottleIcon, frost: SnowflakeIcon, rain: CloudRainIcon, normal: PlantIcon };
 
 /**
- * The demo's weather card, with live weather (Open-Meteo) for the chosen province: a field photo with the
- * farmer, the place (tap to change), the temperature, today's farming hint and a frosted strip.
- * On the home screen it also carries the messages button and opens the 7-day forecast.
+ * "Tarla Konumu": live weather (Open-Meteo) for the chosen province on a dark green card: the place
+ * (tap to change) with a live/offline badge, the temperature, rain, wind and sunrise tiles, and
+ * today's farming hint on a white card. With `onForecast`, the hint opens the 7-day forecast.
  */
-export function WeatherHero({ onForecast, inbox = false }: { onForecast?: () => void; inbox?: boolean }) {
+export function WeatherHero({ onForecast }: { onForecast?: () => void }) {
   const { province, forecast, status, retry } = useWeather();
   const now = forecast?.data.current;
   const today = forecast?.data.daily[0];
   const kind = now ? weatherIcon(now.code, now.isDay) : 'sun';
+  const offline = !!forecast && status === 'error';
+  const hint = today ? farmingHint(today) : null;
+  const HintIcon = hint ? HINT_ICONS[hint.kind] : PlantIcon;
+
+  const hintCard = (
+    <View className="flex-row items-center gap-3 overflow-hidden rounded-[20px] border-l-4 border-emerald-400 bg-card py-3 pl-3 pr-3.5">
+      <View className="size-12 items-center justify-center rounded-2xl bg-secondary">
+        <HintIcon size={24} weight="duotone" color={COLORS.primary} />
+      </View>
+      <View className="min-w-0 flex-1">
+        <Text className="font-sans-bold text-[12px] uppercase tracking-[1px] text-primary">Bugün tarlada</Text>
+        <Text numberOfLines={2} className="font-sans-bold text-[15.5px] leading-5">
+          {hint ? `${hint.text}.` : status === 'error' ? 'Bağlantınızı kontrol edin.' : 'Tahmin yükleniyor…'}
+        </Text>
+      </View>
+      {onForecast ? <CaretRightIcon size={18} weight="bold" color={COLORS.mutedForeground} /> : null}
+    </View>
+  );
 
   return (
-    <View className="h-[248px] rounded-[26px]" style={{ boxShadow: SHADOW.lift }}>
-      <View className="absolute inset-0 overflow-hidden rounded-[26px]">
-        <Image source={require('@/assets/images/app/hero-field.webp')} style={{ position: 'absolute', inset: 0 }} contentFit="cover" />
-        <LinearGradient colors={['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.05)', 'rgba(0,0,0,0.65)']} locations={[0, 0.42, 1]} style={{ position: 'absolute', inset: 0 }} />
-        <BlurView intensity={20} tint="dark" className="absolute inset-x-0 bottom-0 h-[44px]" />
-      </View>
-
-      <View className="flex-row items-start justify-between gap-2 p-3.5">
-        <View className="min-w-0 flex-1 flex-row items-center gap-2">
-          <View className="size-10 items-center justify-center rounded-full border border-white/40 bg-white/25">
-            <UserIcon size={20} weight="bold" color={COLORS.white} />
-          </View>
-          <View className="min-w-0 flex-1">
-            <Text numberOfLines={1} className="font-heading text-[17px] leading-tight text-white">
-              Ayşe Yılmaz
-            </Text>
-            <Text numberOfLines={1} className="text-[12.5px] text-white/90">
-              {FIELD_LINE}
-            </Text>
-          </View>
-        </View>
+    <View className="rounded-[28px]" style={{ boxShadow: SHADOW.lift }}>
+      <LinearGradient colors={FIELD_CARD_GRADIENT} locations={[0, 0.35, 0.75, 1]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ borderRadius: 28, padding: 16 }}>
         <View className="flex-row items-center gap-2">
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Hava durumu konumu: ${province.name}. Değiştir`}
+            accessibilityLabel={`Tarla konumu: ${province.name}. Değiştir`}
             onPress={() => router.push('/konum')}
-            hitSlop={6}
-            className="min-h-9 flex-row items-center gap-1 rounded-full bg-white/95 px-2.5 active:bg-white/80">
-            <MapPinIcon size={14} weight="fill" color={COLORS.primary} />
-            <Text numberOfLines={1} className="max-w-[110px] font-sans-semibold text-[12.5px] text-primary">
-              {province.name}
-            </Text>
-          </Pressable>
-          {inbox ? <InboxButton onPhoto /> : null}
-        </View>
-      </View>
-
-      <View className="px-4 pt-1" accessibilityLiveRegion="polite">
-        {now && today ? (
-          <View accessible accessibilityLabel={`${province.name}: ${tempLabel(now.temp)}C, ${describeWeather(now.code)}`} className="flex-row items-center gap-2.5">
-            <Text className="font-heading text-[46px] leading-[50px] tracking-tight text-white">{tempLabel(now.temp)}C</Text>
-            <View className="min-w-0 flex-1 flex-row items-center gap-1">
-              <WeatherIcon kind={kind} size={24} weight="fill" color={kind === 'sun' ? COLORS.sun : COLORS.white} />
-              <Text numberOfLines={1} className="flex-1 font-sans-semibold text-[15px] text-white">
-                {describeWeather(now.code)}
-              </Text>
+            className="min-w-0 flex-1 flex-row items-center gap-3 rounded-2xl active:opacity-75">
+            <View className="size-11 items-center justify-center rounded-2xl border border-white/15 bg-white/10">
+              <MapPinIcon size={22} weight="duotone" color={COLORS.emerald300} />
             </View>
-          </View>
-        ) : status === 'error' ? (
-          <View className="h-[50px] flex-row items-center gap-3" accessibilityRole="alert">
-            <Text numberOfLines={2} className="flex-1 font-heading text-[19px] leading-6 text-white">
-              Hava durumu alınamadı
-            </Text>
-            <Pressable accessibilityRole="button" onPress={() => void retry()} className="min-h-11 justify-center rounded-full bg-white/95 px-4 active:bg-white/80">
-              <Text className="font-sans-bold text-[14px] text-primary">Tekrar dene</Text>
-            </Pressable>
-          </View>
-        ) : (
-          <View className="h-[50px] flex-row items-center gap-3" accessibilityLabel="Hava durumu yükleniyor">
-            <Skeleton className="h-10 w-36 rounded-xl bg-white/35" />
-            <Skeleton className="h-5 w-24 rounded-lg bg-white/30" />
-          </View>
-        )}
-        <View className="mt-1 flex-row items-center justify-between gap-2">
-          {forecast && status === 'error' ? (
-            <View className="flex-1 flex-row items-center gap-1.5">
-              <WifiSlashIcon size={15} weight="bold" color={COLORS.white} />
-              <Text numberOfLines={1} className="flex-1 text-[13.5px] text-white/95">
-                Çevrimdışı · {clock(new Date(forecast.at))} verisi
+            <View className="min-w-0 flex-1">
+              <Text className="font-sans-bold text-[12px] uppercase tracking-[1px] text-emerald-300">Tarla konumu</Text>
+              <View className="flex-row items-center gap-1">
+                <Text numberOfLines={1} className="shrink font-heading text-[21px] leading-7 text-white">
+                  {province.name}
+                </Text>
+                <CaretDownIcon size={15} weight="bold" color={COLORS.white} />
+              </View>
+            </View>
+          </Pressable>
+          <LiveBadge offline={offline} at={forecast?.at} loading={!forecast && status !== 'error'} />
+        </View>
+
+        <View className="my-3.5 h-px bg-white/15" />
+
+        <View accessibilityLiveRegion="polite">
+          {now ? (
+            <View accessible accessibilityLabel={`${province.name}: ${tempLabel(now.temp)}C, ${describeWeather(now.code)}, nem yüzde ${Math.round(now.humidity)}`} className="flex-row items-center gap-3">
+              <Text className="font-heading text-[44px] leading-[50px] tracking-tight text-white">{tempLabel(now.temp)}C</Text>
+              <View className="min-w-0 flex-1">
+                <View className="flex-row items-center gap-1.5">
+                  <WeatherIcon kind={kind} size={22} weight="fill" color={kind === 'sun' ? COLORS.sun : COLORS.white} />
+                  <Text numberOfLines={1} className="flex-1 font-sans-bold text-[15px] text-white">
+                    {describeWeather(now.code)}
+                  </Text>
+                </View>
+                <Text className="text-[13px] text-white/80">Nem %{Math.round(now.humidity)}</Text>
+              </View>
+            </View>
+          ) : status === 'error' ? (
+            <View className="h-[50px] flex-row items-center gap-3" accessibilityRole="alert">
+              <Text numberOfLines={2} className="flex-1 font-heading text-[18px] leading-6 text-white">
+                Hava durumu alınamadı
               </Text>
+              <Pressable accessibilityRole="button" onPress={() => void retry()} className="min-h-11 justify-center rounded-full bg-white px-4 active:bg-white/80">
+                <Text className="font-sans-bold text-[14px] text-primary">Tekrar dene</Text>
+              </Pressable>
             </View>
           ) : (
-            <Text numberOfLines={1} className="flex-1 text-[14px] text-white/95">
-              {today ? farmingHint(today).text : status === 'error' ? 'Bağlantınızı kontrol edin' : 'Tarım havası ve iklim durumu'}
-            </Text>
+            <View className="h-[50px] flex-row items-center gap-3" accessibilityLabel="Hava durumu yükleniyor">
+              <Skeleton className="h-10 w-32 rounded-xl bg-white/20" />
+              <Skeleton className="h-5 w-24 rounded-lg bg-white/15" />
+            </View>
           )}
-          {onForecast ? (
-            <Pressable accessibilityRole="button" accessibilityLabel="7 günlük tahmini aç" onPress={onForecast} hitSlop={6} className="min-h-9 flex-row items-center gap-0.5 rounded-full border border-white/50 bg-white/20 pl-3 pr-2 active:bg-white/35">
-              <Text className="font-sans-semibold text-[13px] text-white">7 günlük tahmin</Text>
-              <CaretRightIcon size={14} weight="bold" color={COLORS.white} />
-            </Pressable>
-          ) : null}
         </View>
-      </View>
 
-      <View className="absolute inset-x-0 bottom-0 h-[44px] flex-row items-center justify-between gap-1 px-3.5">
-        <Stat Icon={DropIcon} color={COLORS.sky300} label={`Nem: ${now ? `%${Math.round(now.humidity)}` : '–'}`} />
-        <Stat Icon={CloudRainIcon} color={COLORS.sky200} label={`Yağış: ${today ? `%${Math.round(today.rainProb)}` : '–'}`} />
-        <Stat Icon={WindIcon} color={COLORS.white} label={`Rüzgâr: ${now ? `${Math.round(now.wind)} km/s` : '–'}`} bold />
-      </View>
+        <View className="mt-3.5 flex-row gap-2.5">
+          <Stat label="Yağış" value={today ? `%${Math.round(today.rainProb)}` : '–'} />
+          <Stat label="Rüzgâr" value={now ? `${Math.round(now.wind)} km/s` : '–'} />
+          <Stat label="Gün doğumu" value={today?.sunrise ?? '–'} />
+        </View>
+
+        <View className="mt-3.5">
+          {onForecast ? (
+            <Pressable accessibilityRole="button" accessibilityLabel={`Bugün tarlada: ${hint?.text ?? 'tahmin yok'}. 7 günlük tahmini aç`} onPress={onForecast} className="active:opacity-90">
+              {hintCard}
+            </Pressable>
+          ) : (
+            hintCard
+          )}
+        </View>
+      </LinearGradient>
     </View>
   );
 }
 
-function Stat({ Icon, color, label, bold }: { Icon: typeof DropIcon; color: string; label: string; bold?: boolean }) {
+/** "Canlı Hava" with a green dot; "Çevrimdışı · 13:13" on old data; "Yükleniyor" before the first forecast. */
+function LiveBadge({ offline, at, loading }: { offline: boolean; at?: string; loading: boolean }) {
+  if (offline && at)
+    return (
+      <View className="h-9 flex-row items-center gap-1.5 rounded-full border border-amber-300/50 bg-amber-400/15 px-3">
+        <WifiSlashIcon size={14} weight="bold" color="#fcd34d" />
+        <Text className="font-sans-bold text-[12.5px] text-amber-200">Çevrimdışı · {clock(new Date(at))}</Text>
+      </View>
+    );
   return (
-    <View className="flex-row items-center gap-1">
-      <Icon size={16} weight={bold ? 'bold' : 'fill'} color={color} />
-      <Text className="font-sans-medium text-[12.5px] text-white">{label}</Text>
+    <View className="h-9 flex-row items-center gap-1.5 rounded-full border border-emerald-400/50 bg-emerald-500/20 px-3">
+      <View className={loading ? 'size-2 rounded-full bg-white/50' : 'size-2 rounded-full bg-emerald-400'} />
+      <Text className="font-sans-bold text-[12.5px] text-white">{loading ? 'Yükleniyor' : 'Canlı Hava'}</Text>
+    </View>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <View accessible accessibilityLabel={`${label}: ${value === '–' ? 'bilinmiyor' : value}`} className="flex-1 items-center gap-0.5 rounded-[18px] border border-white/15 bg-white/10 px-1 py-3">
+      <Text numberOfLines={1} className="text-[12.5px] text-white/80">
+        {label}
+      </Text>
+      <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} className="font-heading text-[20px] text-white">
+        {value}
+      </Text>
     </View>
   );
 }

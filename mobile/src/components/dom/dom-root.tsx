@@ -1,13 +1,13 @@
 import { Asset } from 'expo-asset';
 import { useEffect, useRef, type ReactNode } from 'react';
 
-// The demo's fonts as the website loads them (next/font): one family per typeface, with weights.
+// The app's typeface as the website loads it (next/font): one family, with weights.
 const FACES: [family: string, weight: number, file: number][] = [
-  ['DM Sans', 400, require('@expo-google-fonts/dm-sans/400Regular/DMSans_400Regular.ttf')],
-  ['DM Sans', 500, require('@expo-google-fonts/dm-sans/500Medium/DMSans_500Medium.ttf')],
-  ['DM Sans', 600, require('@expo-google-fonts/dm-sans/600SemiBold/DMSans_600SemiBold.ttf')],
-  ['DM Sans', 700, require('@expo-google-fonts/dm-sans/700Bold/DMSans_700Bold.ttf')],
-  ['Space Grotesk', 700, require('@expo-google-fonts/space-grotesk/700Bold/SpaceGrotesk_700Bold.ttf')],
+  ['Plus Jakarta Sans', 400, require('@expo-google-fonts/plus-jakarta-sans/400Regular/PlusJakartaSans_400Regular.ttf')],
+  ['Plus Jakarta Sans', 500, require('@expo-google-fonts/plus-jakarta-sans/500Medium/PlusJakartaSans_500Medium.ttf')],
+  ['Plus Jakarta Sans', 600, require('@expo-google-fonts/plus-jakarta-sans/600SemiBold/PlusJakartaSans_600SemiBold.ttf')],
+  ['Plus Jakarta Sans', 700, require('@expo-google-fonts/plus-jakarta-sans/700Bold/PlusJakartaSans_700Bold.ttf')],
+  ['Plus Jakarta Sans', 800, require('@expo-google-fonts/plus-jakarta-sans/800ExtraBold/PlusJakartaSans_800ExtraBold.ttf')],
 ];
 
 function useDemoFonts() {

@@ -19,11 +19,11 @@ export function MarketStrip() {
   const toggleFavorite = useAppStore((s) => s.toggleFavorite);
   const latest = filterListings(LISTINGS, { query: '', category: 'tumu', view: 'kesfet', favorites, status }).slice(0, 5);
   return (
-    <View className="mt-5">
+    <View className="mt-6">
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center gap-2">
-          <View className="size-2 rounded-full bg-gold" />
-          <Text role="heading" className="font-heading text-[17px]">
+          <View className="size-2.5 rounded-full bg-gold" />
+          <Text role="heading" className="font-heading text-[19px]">
             Pazarda yeni
           </Text>
         </View>

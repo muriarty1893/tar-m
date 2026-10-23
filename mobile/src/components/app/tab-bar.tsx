@@ -47,7 +47,9 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
               if (!on && !event.defaultPrevented) navigation.navigate(route.name, route.params);
             }}
             className="min-h-12 w-[68px] items-center gap-1 rounded-2xl pt-1 active:bg-secondary">
-            <View className={cn('h-7 w-12 items-center justify-center rounded-full', on && 'bg-secondary')}>
+            <View className="h-7 w-12 items-center justify-center">
+              {/* Its own view, mounted when active: a toggled background lost its rounded corners on Android. */}
+              {on ? <View className="absolute inset-0 rounded-full bg-secondary" /> : null}
               <Icon size={22} weight={on ? 'fill' : 'regular'} color={on ? COLORS.primary : COLORS.mutedForeground} />
             </View>
             <Text className={cn('font-sans-semibold text-[12px]', on ? 'text-primary' : 'text-muted-foreground')}>{tab.label}</Text>

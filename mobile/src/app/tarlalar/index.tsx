@@ -1,4 +1,5 @@
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Pressable, View } from 'react-native';
 
@@ -13,7 +14,7 @@ import { relativeDayLabel } from '@/domain/format';
 import { formatPrice } from '@/domain/market';
 import { scenarioById } from '@/domain/scenarios';
 import { useNow } from '@/hooks/use-now';
-import { COLORS, SHADOW } from '@/theme/tokens';
+import { COLORS, FIELD_CARD_GRADIENT, SHADOW } from '@/theme/tokens';
 
 /** "Tarlalarım": the season at a glance, then each field with its health, last scan and next task. */
 export default function Fields() {
@@ -23,13 +24,15 @@ export default function Fields() {
     <TabScreen>
       <BackHeader title="Tarlalarım" subtitle={`${FIELDS.length} tarla · Konya`} />
 
-      <View className="rounded-[22px] bg-primary p-4" style={{ boxShadow: SHADOW.lift }}>
-        <Text className="font-sans-semibold text-[13px] text-primary-foreground/85">Bu sezon</Text>
-        <View className="mt-2 flex-row gap-2">
-          <Stat value={`${season.areaDonum} dönüm`} label="Toplam alan" />
-          <Stat value={formatPrice(season.expenses)} label="Harcama" />
-          <Stat value={tonsLabel(season.yieldKg)} label="Beklenen ürün" />
-        </View>
+      <View className="rounded-[28px]" style={{ boxShadow: SHADOW.lift }}>
+        <LinearGradient colors={FIELD_CARD_GRADIENT} locations={[0, 0.35, 0.75, 1]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ borderRadius: 28, padding: 16 }}>
+          <Text className="font-sans-bold text-[12px] uppercase tracking-[1px] text-emerald-300">Bu sezon</Text>
+          <View className="mt-2 flex-row gap-2">
+            <Stat value={`${season.areaDonum} dönüm`} label="Toplam alan" />
+            <Stat value={formatPrice(season.expenses)} label="Harcama" />
+            <Stat value={tonsLabel(season.yieldKg)} label="Beklenen ürün" />
+          </View>
+        </LinearGradient>
       </View>
 
       <Button variant="outline" size="sm" className="mt-3 rounded-full bg-card" onPress={() => router.push('/harita')}>

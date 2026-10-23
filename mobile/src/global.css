@@ -2,41 +2,42 @@
 @import 'uniwind';
 
 /*
- * The website demo phone's palette and type ("Organik Doğa", app/globals.css `.demo-app`).
- * The same values live in src/theme/tokens.ts for the few places that need raw colours
- * (icons, gradients, the navigation theme); keep the two in step.
+ * "Dijital Tarım": slate text on a pale page, white cards with hairline borders, emerald green,
+ * bright tinted icon tiles, one typeface (Plus Jakarta Sans). The website's demo phone
+ * (.demo-app in app/globals.css) uses the same values, and src/theme/tokens.ts mirrors them
+ * for the places that need raw colours (icons, gradients, the navigation theme); keep all three in step.
  */
 @theme {
-  --color-background: #ffffff;
-  --color-surface: #f4faf5;
-  --color-foreground: #14532d;
+  --color-background: #f8fafc;
+  --color-surface: #f1f5f9;
+  --color-foreground: #0f172a;
   --color-card: #ffffff;
-  --color-card-foreground: #14532d;
+  --color-card-foreground: #0f172a;
   --color-popover: #ffffff;
-  --color-popover-foreground: #14532d;
-  --color-primary: #15803d;
+  --color-popover-foreground: #0f172a;
+  --color-primary: #047857;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #dcfce7;
-  --color-secondary-foreground: #14532d;
-  --color-muted: #e8f0f1;
+  --color-secondary: #d1fae5;
+  --color-secondary-foreground: #064e3b;
+  --color-muted: #f1f5f9;
   --color-muted-foreground: #475569;
-  --color-accent: #dcfce7;
-  --color-accent-foreground: #14532d;
+  --color-accent: #ecfdf5;
+  --color-accent-foreground: #064e3b;
   --color-gold: #a16207;
   --color-gold-foreground: #ffffff;
   --color-gold-soft: #fef3c7;
   --color-destructive: #b91c1c;
   --color-destructive-foreground: #ffffff;
-  --color-border: #bbf7d0;
-  --color-input: #86efac;
-  --color-ring: #15803d;
+  --color-border: #e2e8f0;
+  --color-input: #cbd5e1;
+  --color-ring: #047857;
 
   /* Families are the names the fonts are loaded under (see src/theme/fonts.ts). */
-  --font-sans: 'DMSans_400Regular';
-  --font-sans-medium: 'DMSans_500Medium';
-  --font-sans-semibold: 'DMSans_600SemiBold';
-  --font-sans-bold: 'DMSans_700Bold';
-  --font-heading: 'SpaceGrotesk_700Bold';
+  --font-sans: 'PlusJakartaSans_400Regular';
+  --font-sans-medium: 'PlusJakartaSans_500Medium';
+  --font-sans-semibold: 'PlusJakartaSans_600SemiBold';
+  --font-sans-bold: 'PlusJakartaSans_700Bold';
+  --font-heading: 'PlusJakartaSans_800ExtraBold';
 
   --radius-sm: 12px;
   --radius-md: 16px;
