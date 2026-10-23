@@ -8,7 +8,7 @@
 
 /*
  * "Sade" design: white, one green, hairlines instead of shadows, one typeface (Onest) set tight.
- * The demo phone's app keeps the original Organik Doğa palette (.demo-app below).
+ * The demo phone's app uses the mobile app's palette (.demo-app below).
  * Every text pair is ≥ 4.5:1.
  */
 :root {
@@ -367,43 +367,43 @@ html.cine :is([data-cine="line2"], [data-cine="phone"], [data-cine="badge"]) {
   border-top: 1px solid var(--border);
 }
 
-/* The demo phone's app is not part of the redesign: it keeps the original palette, type and shapes
+/* The demo phone's app is drawn in the mobile app's own look ("Dijital Tarım", mobile/src/global.css),
    whatever design the site around it uses. */
 .demo-app {
-  --background: #ffffff;
-  --surface: #f4faf5;
-  --foreground: #14532d;
+  --background: #f8fafc;
+  --surface: #f1f5f9;
+  --foreground: #0f172a;
   --card: #ffffff;
-  --card-foreground: #14532d;
+  --card-foreground: #0f172a;
   --popover: #ffffff;
-  --popover-foreground: #14532d;
-  --primary: #15803d;
+  --popover-foreground: #0f172a;
+  --primary: #047857;
   --primary-foreground: #ffffff;
-  --secondary: #dcfce7;
-  --secondary-foreground: #14532d;
-  --muted: #e8f0f1;
+  --secondary: #d1fae5;
+  --secondary-foreground: #064e3b;
+  --muted: #f1f5f9;
   --muted-foreground: #475569;
-  --accent: #dcfce7;
-  --accent-foreground: #14532d;
+  --accent: #ecfdf5;
+  --accent-foreground: #064e3b;
   --gold: #a16207;
   --gold-foreground: #ffffff;
   --gold-soft: #fef3c7;
-  --leaf: #22c55e;
+  --leaf: #34d399;
   --destructive: #b91c1c;
-  --border: #bbf7d0;
-  --input: #86efac;
-  --ring: #15803d;
+  --border: #e2e8f0;
+  --input: #cbd5e1;
+  --ring: #047857;
   --radius: 1.25rem;
   --btn-radius: 9999px;
-  --elev-1: 0 10px 30px -14px rgb(21 128 61 / 0.35);
-  --elev-2: 0 24px 48px -20px rgb(21 128 61 / 0.45);
-  --chart-1: #15803d;
+  --elev-1: 0 8px 24px -14px rgb(15 23 42 / 0.22);
+  --elev-2: 0 22px 40px -20px rgb(6 78 59 / 0.55);
+  --chart-1: #047857;
   --chart-2: #a16207;
-  --chart-3: #22c55e;
+  --chart-3: #34d399;
   --chart-4: #c2410c;
   --chart-5: #b91c1c;
-  --site-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --site-heading: var(--font-space-grotesk), var(--font-dm-sans), ui-sans-serif, sans-serif;
+  --site-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --site-heading: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   font-family: var(--site-sans);
   color: var(--foreground);
 }

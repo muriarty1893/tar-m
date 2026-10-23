@@ -9,8 +9,8 @@ test("the 3D phone loads near the demo and runs the app on its screen", async ({
   const demo = page.locator("#demo");
   await expect(demo.locator(CANVAS)).toBeVisible({ timeout: 20_000 });
   // The app screen lives on the phone exactly once (no leftover 2D fallback copy).
-  await expect(demo.getByText("Hızlı İşlemler")).toHaveCount(1);
-  await expect(demo.getByText("Hızlı İşlemler")).toBeVisible();
+  await expect(demo.getByText("Hızlı Menü Kısayolları")).toHaveCount(1);
+  await expect(demo.getByText("Hızlı Menü Kısayolları")).toBeVisible();
 
   await demo.getByRole("button", { name: /Hastalık Tara/ }).click();
   await demo.getByRole("button", { name: "Fotoğraf çek", exact: true }).click();
@@ -18,7 +18,7 @@ test("the 3D phone loads near the demo and runs the app on its screen", async ({
   await expect(demo.getByTestId("demo-cevap")).toBeVisible({ timeout: 4000 });
 
   await demo.getByRole("button", { name: "Yeni tarama" }).click();
-  await expect(demo.getByText("Hızlı İşlemler")).toBeVisible();
+  await expect(demo.getByText("Hızlı Menü Kısayolları")).toBeVisible();
 });
 
 test("without interaction the phone waits on the app's home screen, pointing at the scan button", async ({ page }) => {
@@ -29,7 +29,7 @@ test("without interaction the phone waits on the app's home screen, pointing at 
   await expect(demo.locator(CANVAS)).toBeVisible({ timeout: 20_000 });
   await page.waitForTimeout(6000);
   // No photo is taken by itself: still on the home screen, camera closed, no result.
-  await expect(demo.getByText("Hızlı İşlemler")).toBeVisible();
+  await expect(demo.getByText("Hızlı Menü Kısayolları")).toBeVisible();
   await expect(demo.getByText("CANLI · Kamera")).toHaveCount(0);
   await expect(demo.getByTestId("demo-cevap")).toHaveCount(0);
   await expect(demo.getByTestId("tap-hint")).toHaveCount(1);
@@ -58,7 +58,7 @@ test("the tap pointer walks the visitor through scan, photo and question", async
   // Steps already done are not pointed at again.
   await demo.getByRole("button", { name: "Sonuca dön" }).click();
   await demo.getByRole("button", { name: "Yeni tarama" }).click();
-  await expect(demo.getByText("Hızlı İşlemler")).toBeVisible();
+  await expect(demo.getByText("Hızlı Menü Kısayolları")).toBeVisible();
   await expect(hint).toHaveCount(0);
 });
 
@@ -90,14 +90,14 @@ test("the camera's X closes it, back to the app's home screen, also mid-analysis
   await expect(app.getByText("CANLI · Kamera")).toBeVisible();
   await app.getByRole("button", { name: "Kamerayı kapat" }).click();
   await expect(app.getByText("CANLI · Kamera")).toHaveCount(0);
-  await expect(app.getByText("Hızlı İşlemler")).toBeVisible();
+  await expect(app.getByText("Hızlı Menü Kısayolları")).toBeVisible();
   await expect(demo.locator(".stage-bg")).not.toHaveAttribute("data-scene");
 
   await demo.getByRole("button", { name: /Ayçiçeği tarlası/ }).click();
   await app.getByRole("button", { name: "Fotoğraf çek", exact: true }).click();
   await expect(app.getByText("CANLI · Tarama")).toBeVisible();
   await app.getByRole("button", { name: "Kamerayı kapat" }).click();
-  await expect(app.getByText("Hızlı İşlemler")).toBeVisible();
+  await expect(app.getByText("Hızlı Menü Kısayolları")).toBeVisible();
   // The cancelled analysis must not pop its result up later.
   await page.waitForTimeout(2600);
   await expect(demo.getByTestId("demo-cevap")).toHaveCount(0);
@@ -113,7 +113,7 @@ test("without WebGL the app screen shows in a flat phone frame", async ({ page }
   });
   await page.goto("/#demo");
   const demo = page.locator("#demo");
-  await expect(demo.getByText("Hızlı İşlemler")).toBeVisible();
+  await expect(demo.getByText("Hızlı Menü Kısayolları")).toBeVisible();
   await page.waitForTimeout(1500);
   await expect(demo.locator("canvas")).toHaveCount(0);
 });
@@ -168,7 +168,7 @@ test("the phone's bottom bar switches screens and opens past scans", async ({ pa
   await expect(app.getByRole("meter")).toHaveAttribute("aria-valuenow", "48");
 
   await nav.getByRole("button", { name: "Ana sayfa" }).click();
-  await expect(app.getByText("Hızlı İşlemler")).toBeVisible();
+  await expect(app.getByText("Hızlı Menü Kısayolları")).toBeVisible();
 });
 
 test("the picked field becomes the scene behind the phone, live in its camera", async ({ page }) => {
@@ -257,10 +257,10 @@ test("while the 3D phone loads, the demo window shows the bars loader, then the 
   // In the brand green, like the rest of the demo.
   await expect(loader).toHaveCSS("color", "rgb(11, 122, 59)");
   // The flat stand-in phone is not shown while the real one is on its way.
-  await expect(demo.locator(".stage-bg").getByText("Hızlı İşlemler")).toBeHidden();
+  await expect(demo.locator(".stage-bg").getByText("Hızlı Menü Kısayolları")).toBeHidden();
   await expect(demo.locator(CANVAS)).toBeVisible({ timeout: 20_000 });
   await expect(loader).toHaveCount(0, { timeout: 20_000 });
-  await expect(demo.getByText("Hızlı İşlemler")).toBeVisible();
+  await expect(demo.getByText("Hızlı Menü Kısayolları")).toBeVisible();
 });
 
 test("the 3D phone starts downloading once the page has loaded, before the demo is reached", async ({ page }) => {
@@ -276,6 +276,6 @@ test("if the 3D phone fails to load, the flat phone appears instead of an endles
   await page.goto("/");
   const demo = page.locator("#demo");
   await demo.locator(".stage-bg").scrollIntoViewIfNeeded();
-  await expect(demo.getByText("Hızlı İşlemler")).toBeVisible({ timeout: 15_000 });
+  await expect(demo.getByText("Hızlı Menü Kısayolları")).toBeVisible({ timeout: 15_000 });
   await expect(demo.getByRole("status", { name: "Demo yükleniyor" })).toHaveCount(0);
 });

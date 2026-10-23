@@ -35,11 +35,7 @@ export const photoCredits: PhotoCredit[] = [
   { src: "/demo/sahne-surulmus-tarla.webp", label: "Sürülmüş tarla", author: "Partonez", license: "CC BY-SA 4.0", licenseUrl: BYSA4, sourceUrl: "https://commons.wikimedia.org/wiki/File:Ploughed_field_near_Aish.jpg" },
   { src: "/demo/sahne-balyalar.webp", label: "Hasattan sonra saman balyaları", author: "foxypar4", license: "CC BY 2.0", licenseUrl: BY2, sourceUrl: "https://commons.wikimedia.org/wiki/File:Round_straw_bales_in_a_field.jpg" },
   { src: "/hero/field-horizon.webp", label: "Ufka uzanan tarla", author: "John Sutton", license: "CC BY-SA 2.0", licenseUrl: BYSA2, sourceUrl: "https://commons.wikimedia.org/wiki/File:Waldringfield,_potato_rows_and_a_cloudless_sky_-_geograph.org.uk_-_7121840.jpg" },
-  { src: "/app/scan-leaf.webp", label: "Buğdayda sarı pas (kırpılmış)", author: "USDA", license: "Kamu malı", sourceUrl: "https://commons.wikimedia.org/wiki/File:Stripe_rust_on_wheat.jpg" },
   { src: "/app/hero-field.webp", label: "Gün batımında tarla", author: "Summer Stock", license: "CC0", licenseUrl: CC0, sourceUrl: "https://commons.wikimedia.org/wiki/File:Sunflower_field_at_sunset.jpg" },
-  { src: "/app/tractor-field.webp", label: "Traktör", author: "U.S. Fish and Wildlife Service", license: "Kamu malı", sourceUrl: "https://commons.wikimedia.org/wiki/File:Tractor_plow_fields_cultivated.jpg" },
-  { src: "/app/field-map.webp", label: "Tarlalar (havadan)", author: "Carol M. Highsmith", license: "Kamu malı", sourceUrl: "https://commons.wikimedia.org/wiki/File:Aerial_view_of_Pennsylvania_farmland_LCCN2011631350_(flipped_%26_removed_vignette).tif" },
-  { src: "/app/seedlings.webp", label: "Çimlenen tohumlar", author: "Aerospectra", license: "CC BY 4.0", licenseUrl: BY4, sourceUrl: "https://commons.wikimedia.org/wiki/File:Sprouting_seeds.jpg" },
   pageHeroPhoto,
 ];
 

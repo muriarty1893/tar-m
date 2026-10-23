@@ -18,17 +18,17 @@ test("headings and text are set in Onest", async ({ page }) => {
   expect(body).toMatch(/^Onest/);
 });
 
-test("the demo phone's app keeps its original look", async ({ page }) => {
+test("the demo phone's app has the mobile app's look", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/#demo");
   const app = page.getByTestId("uygulama-ekrani");
-  await expect(app.getByText("Hızlı İşlemler")).toBeVisible({ timeout: 20_000 });
+  await expect(app.getByText("Hızlı Menü Kısayolları")).toBeVisible({ timeout: 20_000 });
   const look = await app.evaluate((el) => {
     const cs = getComputedStyle(el);
     return { font: cs.fontFamily, primary: cs.getPropertyValue("--primary").trim(), radius: cs.getPropertyValue("--radius").trim() };
   });
-  expect(look.font).toMatch(/^"?DM Sans/);
-  expect(look.primary).toBe("#15803d");
+  expect(look.font).toMatch(/^"?Plus Jakarta Sans/);
+  expect(look.primary).toBe("#047857");
   expect(look.radius).toBe("1.25rem");
 });
 

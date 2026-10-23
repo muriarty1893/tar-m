@@ -6,14 +6,19 @@ import dynamic from "next/dynamic";
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
+  ArrowRightIcon,
+  ArrowSquareOutIcon,
   ArrowUpIcon,
   ArrowsClockwiseIcon,
-  ChatCircleDotsIcon,
   BatteryFullIcon,
+  BellIcon,
+  CalendarBlankIcon,
   CalendarDotsIcon,
-  CameraIcon,
+  CaretDownIcon,
   CaretRightIcon,
   CellSignalFullIcon,
+  ChartLineUpIcon,
+  ChatCircleDotsIcon,
   CheckCircleIcon,
   ClockCounterClockwiseIcon,
   CloudRainIcon,
@@ -26,17 +31,19 @@ import {
   LightningIcon,
   MapPinIcon,
   MapTrifoldIcon,
+  MegaphoneIcon,
   PaperPlaneRightIcon,
   PlantIcon,
   ScanIcon,
   SnowflakeIcon,
+  SprayBottleIcon,
+  StorefrontIcon,
   SunIcon,
   TractorIcon,
-  UserIcon,
   WifiHighIcon,
-  WindIcon,
   XIcon,
 } from "@phosphor-icons/react/dist/ssr";
+import { siteConfig } from "@/config/site";
 import { demoScenarios, type DemoScenario } from "@/data/demo-scenarios";
 import { ANALYSIS_MS, SCREEN } from "@/lib/phone-stage";
 import { AnalyzingImage } from "@/components/ui/analyzing-image";
@@ -106,7 +113,7 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
         ) : tab === "history" ? (
           <HistoryScreen key="history" onOpen={onOpen} />
         ) : (
-          <HomeScreen key="home" onScan={onScan} hint={hint === "scan"} />
+          <HomeScreen key="home" onScan={onScan} onTab={onTab} hint={hint === "scan"} />
         )}
       </div>
 
@@ -145,74 +152,240 @@ const PRICES = [
   { name: "Pamuk", price: "31,20", change: 0.6, line: "0,10 8,11 16,8 24,9 32,6 40,6" },
 ];
 
-function HomeScreen({ onScan, hint }: { onScan: () => void; hint: boolean }) {
+function HomeScreen({ onScan, onTab, hint }: { onScan: () => void; onTab: (tab: AppTab) => void; hint: boolean }) {
   return (
-    <div className={`${scroll} px-3.5 pb-28 pt-[52px] ${enter}`}>
-      <WeatherHero />
-      <PriceStrip />
-      <QuickActions onScan={onScan} hint={hint} />
+    <div className={`flex h-full flex-col ${enter}`}>
+      <AppHeader />
+      <div className={`${scroll} min-h-0 flex-1 space-y-3 px-3.5 pb-28 pt-3.5`}>
+        <SponsorBanner />
+        <AdvertiseBox />
+        <QuickMenu onScan={onScan} onTab={onTab} hint={hint} />
+        <WeatherHero />
+        <WeekOutlook />
+        <PriceStrip />
+      </div>
     </div>
   );
 }
 
+/** The app's top bar: badge logo, name with "Dijital Tarım", the bell and the (demo) profile chip. */
+function AppHeader() {
+  return (
+    <div className="flex items-center gap-2 border-b border-border bg-card px-3.5 pb-2.5 pt-[50px]">
+      <Image src="/brand/logo.webp" alt="" width={40} height={40} className="size-10 shrink-0" />
+      <span className="min-w-0 flex-1">
+        <span className="block truncate font-heading text-[17px] font-extrabold leading-tight tracking-tight">{siteConfig.name}</span>
+        <span className="mt-0.5 inline-block rounded-full bg-secondary px-2 py-px text-[10.5px] font-bold text-primary">Dijital Tarım</span>
+      </span>
+      <span aria-hidden="true" className="relative flex size-9 shrink-0 items-center justify-center rounded-full bg-muted">
+        <BellIcon weight="regular" className="size-5" />
+        <span className="absolute right-2 top-2 size-2 rounded-full bg-orange-500 ring-2 ring-muted" />
+      </span>
+      {/* The phone is narrower than a real one: the profile chip shows only the initials. */}
+      <span role="img" aria-label="Hesap: Ayşe Yılmaz, demo hesap" className="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-secondary bg-primary text-[11.5px] font-bold text-white">
+        AY
+      </span>
+    </div>
+  );
+}
+
+/** Sample sponsor banner (the app's ad spaces carry sample content for now). */
+function SponsorBanner() {
+  return (
+    <div className="flex items-center gap-2.5 rounded-[22px] bg-[linear-gradient(135deg,#1d4ed8_0%,#0f766e_55%,#047857_100%)] p-3 text-white shadow-soft">
+      <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-white/30 bg-white/15">
+        <DropIcon weight="duotone" className="size-5" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-1.5">
+          <span className="truncate font-heading text-[13.5px] font-extrabold">Örnek Firma</span>
+          <span className="shrink-0 rounded-full bg-amber-400 px-1.5 py-px text-[9px] font-bold tracking-wider text-stone-900">ÖRNEK</span>
+        </span>
+        <span className="block text-[11.5px] leading-snug text-white/95">Damla sulama setlerinde sezon indirimi</span>
+      </span>
+      <span className="flex shrink-0 items-center gap-0.5 rounded-full border border-white/40 bg-white/15 px-2 py-1.5 text-[11px] font-bold">
+        İncele
+        <ArrowSquareOutIcon aria-hidden="true" weight="bold" className="size-3.5" />
+      </span>
+    </div>
+  );
+}
+
+function AdvertiseBox() {
+  return (
+    <div className="flex items-center gap-2.5 rounded-[22px] border-2 border-dashed border-amber-300 bg-amber-50 px-3 py-2.5">
+      <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
+        <MegaphoneIcon weight="duotone" className="size-5" />
+      </span>
+      <span className="min-w-0 flex-1 text-[13px] font-bold text-amber-900">Reklam Vermek İçin Dokun</span>
+      <span className="flex shrink-0 items-center gap-0.5 rounded-full bg-amber-200 px-2 py-1 text-[11px] font-bold text-amber-900">
+        İletişim
+        <ArrowRightIcon aria-hidden="true" weight="bold" className="size-3" />
+      </span>
+    </div>
+  );
+}
+
+const TILE = {
+  emerald: "bg-emerald-50 border-emerald-200 [--solid:#059669]",
+  sky: "bg-sky-50 border-sky-200 [--solid:#0ea5e9]",
+  indigo: "bg-indigo-50 border-indigo-200 [--solid:#4f46e5]",
+  amber: "bg-amber-50 border-amber-200 [--solid:#f59e0b]",
+  teal: "bg-teal-50 border-teal-200 [--solid:#0d9488]",
+  purple: "bg-purple-50 border-purple-200 [--solid:#9333ea]",
+  rose: "bg-rose-50 border-rose-200 [--solid:#e11d48]",
+  orange: "bg-orange-50 border-orange-200 [--solid:#f97316]",
+} as const;
+
+type MenuItem = { label: string; Icon: typeof EyeIcon; tone: keyof typeof TILE; go?: () => void };
+
+/** "Hızlı Menü Kısayolları": bright icon tiles in two rows that scroll sideways, as in the app. */
+function QuickMenu({ onScan, onTab, hint }: { onScan: () => void; onTab: (tab: AppTab) => void; hint: boolean }) {
+  // In columns of two, read top to bottom; three columns fit, the fourth scrolls in.
+  const items: MenuItem[] = [
+    { label: "Hastalık Tara", Icon: ScanIcon, tone: "emerald", go: onScan },
+    { label: "Tarlalarım", Icon: TractorIcon, tone: "amber" },
+    { label: "Hava Durumu", Icon: CloudSunIcon, tone: "sky", go: () => onTab("weather") },
+    { label: "Tarla Haritası", Icon: MapTrifoldIcon, tone: "teal" },
+    { label: "Tarım Takvimi", Icon: CalendarDotsIcon, tone: "indigo", go: () => onTab("calendar") },
+    { label: "Fiyatlar", Icon: ChartLineUpIcon, tone: "purple" },
+    { label: "Pazar", Icon: StorefrontIcon, tone: "rose" },
+    { label: "İlan Ver", Icon: MegaphoneIcon, tone: "orange" },
+  ];
+  return (
+    <div className="rounded-[24px] border border-border bg-card py-3.5">
+      <div className="flex items-center justify-between px-3.5">
+        <p className="text-[11.5px] font-bold uppercase tracking-[0.1em] text-foreground/80">Hızlı Menü Kısayolları</p>
+        <span aria-hidden="true" className="flex items-center gap-0.5 text-[11.5px] font-semibold text-muted-foreground">
+          Kaydırın
+          <ArrowRightIcon weight="bold" className="size-3" />
+        </span>
+      </div>
+      <ul aria-label="Kısayollar" className="mt-2.5 grid snap-x auto-cols-[84px] grid-flow-col grid-rows-2 gap-2 overflow-x-auto px-3.5 [scrollbar-width:none]">
+        {items.map(({ label, Icon, tone, go }) => {
+          const inner = (
+            <>
+              <span aria-hidden="true" className="flex size-10 items-center justify-center rounded-[14px] bg-[var(--solid)] text-white shadow-[0_6px_14px_-6px_var(--solid)]">
+                <Icon weight="bold" className="size-5" />
+              </span>
+              <span className="flex min-h-[2lh] w-full items-center justify-center text-center text-[11px] font-bold leading-tight">{label}</span>
+            </>
+          );
+          const tile = `flex h-full w-full flex-col items-center gap-1 rounded-[18px] border px-1 pb-2 pt-2.5 ${TILE[tone]}`;
+          return (
+            <li key={label} className="relative snap-start">
+              {go ? (
+                <button
+                  type="button"
+                  onClick={go}
+                  className={`${tile} cursor-pointer transition-transform duration-150 active:scale-[0.97] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:active:scale-100`}
+                >
+                  {inner}
+                </button>
+              ) : (
+                <div className={tile}>{inner}</div>
+              )}
+              {hint && go === onScan && <TapHint label="Taramayı başlatın" className="left-1/2 top-[48%]" />}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+/** "Tarla Konumu": the app's dark green weather card, with sample values (the app shows live weather). */
 function WeatherHero() {
   return (
-    <div className="relative h-[238px] rounded-[26px] text-white shadow-lift">
-      {/* Photo layers clipped with clip-path, not just overflow + radius: the blurred bottom bar would
-          otherwise paint square corners past the rounded ones. The shadow stays on the outer box. */}
-      <div data-testid="hava-karti-foto" className="absolute inset-0 overflow-hidden rounded-[26px] [clip-path:inset(0_round_26px)]">
-        <Image src="/app/hero-field.webp" alt="" fill sizes="320px" className="object-cover" />
-        <div aria-hidden="true" className={`${scrim} bg-[linear-gradient(180deg,rgb(0_0_0/0.5)_0%,rgb(0_0_0/0.05)_42%,rgb(0_0_0/0.65)_100%)]`} />
-        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[42px] bg-black/30 backdrop-blur-sm" />
-      </div>
-      <div className="relative flex items-start justify-between gap-2 p-3.5">
-        <span className="flex min-w-0 items-center gap-2">
-          <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/25 ring-1 ring-white/40 backdrop-blur">
-            <UserIcon weight="bold" className="size-5" />
-          </span>
-          <span className="min-w-0">
-            <span className="block truncate font-heading text-[16px] font-bold leading-tight">Ayşe Yılmaz</span>
-            <span className="block truncate text-[11.5px] opacity-90">3 tarla (42 dönüm) · Durum iyi</span>
+    <div data-testid="hava-karti" className="rounded-[24px] bg-[linear-gradient(135deg,#047857_0%,#065f46_35%,#0b3b30_75%,#0f2a2a_100%)] p-3.5 text-white shadow-lift">
+      <div className="flex items-center gap-2">
+        <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-emerald-300">
+          <MapPinIcon weight="duotone" className="size-5" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[10.5px] font-bold uppercase tracking-[0.08em] text-emerald-300">Tarla konumu</span>
+          <span className="flex items-center gap-1 font-heading text-[18px] font-extrabold leading-tight">
+            Konya
+            <CaretDownIcon aria-hidden="true" weight="bold" className="size-3.5" />
           </span>
         </span>
-        <span className="flex shrink-0 items-center gap-1 rounded-full bg-white/95 px-2.5 py-1.5 text-[11.5px] font-semibold text-primary">
-          <MapPinIcon aria-hidden="true" weight="fill" className="size-3.5" />
-          Konya
+        <span className="flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-400/50 bg-emerald-500/20 px-2.5 py-1.5 text-[11px] font-bold">
+          <span aria-hidden="true" className="size-1.5 rounded-full bg-emerald-400" />
+          Canlı Hava
         </span>
       </div>
-      <div className="relative px-4 pt-1">
-        <p className="flex items-center gap-2.5">
-          <span className="font-heading text-[44px] font-bold leading-none tracking-tight">18,5°C</span>
-          <span className="flex items-center gap-1 text-[14px] font-semibold">
-            <SunIcon aria-hidden="true" weight="fill" className="size-6 text-[#fde047]" />
+      <div aria-hidden="true" className="my-3 h-px bg-white/15" />
+      <p className="flex items-center gap-2.5">
+        <span className="font-heading text-[38px] font-extrabold leading-none tracking-tight">18,5°C</span>
+        <span>
+          <span className="flex items-center gap-1 text-[13.5px] font-bold">
+            <SunIcon aria-hidden="true" weight="fill" className="size-5 text-[#fde047]" />
             Güneşli
           </span>
-        </p>
-        <p className="mt-1.5 text-[13px] opacity-95">Tarım havası ve iklim durumu</p>
+          <span className="block text-[11.5px] text-white/80">Nem %42</span>
+        </span>
+      </p>
+      <dl className="mt-3 grid grid-cols-3 gap-2">
+        {[
+          ["Yağış", "%5"],
+          ["Rüzgâr", "8 km/s"],
+          ["Gün doğumu", "07:04"],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-[16px] border border-white/15 bg-white/10 px-1 py-2.5 text-center">
+            <dt className="text-[11px] text-white/80">{label}</dt>
+            <dd className="font-heading text-[17px] font-extrabold">{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <div className="mt-3 flex items-center gap-2.5 rounded-[18px] border-l-4 border-emerald-400 bg-card py-2.5 pl-2.5 pr-3 text-foreground">
+        <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary">
+          <SprayBottleIcon weight="duotone" className="size-5" />
+        </span>
+        <span className="min-w-0">
+          <span className="block text-[10.5px] font-bold uppercase tracking-[0.08em] text-primary">Bugün tarlada</span>
+          <span className="block text-[13.5px] font-bold leading-snug">İlaçlama için uygun bir gün.</span>
+        </span>
       </div>
-      <div className="absolute inset-x-0 bottom-0 flex h-[42px] items-center justify-between gap-1 px-3.5 text-[11.5px] font-medium">
-        <span className="flex items-center gap-1">
-          <DropIcon aria-hidden="true" weight="fill" className="size-4 text-sky-300" />
-          Nem: %42
-        </span>
-        <span className="flex items-center gap-1">
-          <CloudRainIcon aria-hidden="true" weight="fill" className="size-4 text-sky-200" />
-          Yağış: %5
-        </span>
-        <span className="flex items-center gap-1">
-          <WindIcon aria-hidden="true" weight="bold" className="size-4" />
-          Rüzgâr: 8 km/s
-        </span>
-      </div>
+    </div>
+  );
+}
+
+const OUTLOOK = [
+  { title: "İlaçlamaya uygun", text: "Bugün", Icon: SprayBottleIcon, tone: "border-emerald-200 bg-emerald-50 text-emerald-700" },
+  { title: "Don riski", text: "Cuma", Icon: SnowflakeIcon, tone: "border-sky-200 bg-sky-50 text-sky-700" },
+  { title: "Yoğun yağış", text: "Çarşamba", Icon: CloudRainIcon, tone: "border-indigo-200 bg-indigo-50 text-indigo-700" },
+];
+
+/** "Bu Hafta Tarlada": the forecast's spraying days, frost and heavy rain. */
+function WeekOutlook() {
+  return (
+    <div className="rounded-[24px] border border-border bg-card p-3.5">
+      <p className="mb-2.5 flex items-center gap-2 font-heading text-[16px] font-extrabold">
+        <CalendarBlankIcon aria-hidden="true" weight="bold" className="size-5 text-primary" />
+        Bu Hafta Tarlada
+      </p>
+      <ul className="space-y-2">
+        {OUTLOOK.map(({ title, text, Icon, tone }) => (
+          <li key={title} className={`flex items-center gap-2.5 rounded-[18px] border px-2.5 py-2 ${tone}`}>
+            <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/80">
+              <Icon weight="duotone" className="size-5" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[13.5px] font-bold text-foreground">{title}</span>
+              <span className="block text-[12px] text-muted-foreground">{text}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
 function PriceStrip() {
   return (
-    <div className="mt-4">
+    <div className="pt-1">
       <div className="flex items-center justify-between">
-        <p className="flex items-center gap-2 font-heading text-[16px] font-bold">
+        <p className="flex items-center gap-2 font-heading text-[16px] font-extrabold">
           <span aria-hidden="true" className="size-2 rounded-full bg-primary" />
           Tarım Borsası Fiyatları
         </p>
@@ -233,7 +406,7 @@ function PriceStrip() {
                 </svg>
               </span>
               <span className="mt-1 block">
-                <span className="font-heading text-[19px] font-bold">{p.price} ₺</span>
+                <span className="font-heading text-[19px] font-extrabold">{p.price} ₺</span>
                 <span className="text-[11px] text-muted-foreground"> /kg</span>
               </span>
               <span className="mt-1.5 flex items-center gap-1.5">
@@ -247,56 +420,6 @@ function PriceStrip() {
           );
         })}
       </ul>
-    </div>
-  );
-}
-
-function ActionCard({ img, icon: Icon, title, sub, badge }: { img: string; icon: typeof EyeIcon; title: string; sub: string; badge?: string }) {
-  return (
-    <>
-      <Image src={img} alt="" fill sizes="160px" className="object-cover" />
-      <span aria-hidden="true" className={`${scrim} bg-[linear-gradient(0deg,rgb(0_0_0/0.72)_0%,rgb(0_0_0/0.15)_55%,transparent_100%)]`} />
-      <span aria-hidden="true" className="absolute left-2.5 top-2.5 flex size-9 items-center justify-center rounded-full bg-white/95 text-primary shadow-soft">
-        <Icon weight="duotone" className="size-5" />
-      </span>
-      {badge && <span className="absolute right-2.5 top-2.5 rounded-full bg-gold px-2 py-0.5 text-[11px] font-bold text-gold-foreground">{badge}</span>}
-      <span className="absolute inset-x-2.5 bottom-2.5 flex items-end justify-between gap-1 text-left text-white">
-        <span className="min-w-0">
-          <span className="block font-heading text-[15px] font-bold leading-tight">{title}</span>
-          <span className="block truncate text-[11px] opacity-90">{sub}</span>
-        </span>
-        <CaretRightIcon aria-hidden="true" weight="bold" className="size-4 shrink-0" />
-      </span>
-    </>
-  );
-}
-
-function QuickActions({ onScan, hint }: { onScan: () => void; hint: boolean }) {
-  const card = "group relative h-[128px] overflow-hidden rounded-[20px] shadow-soft";
-  return (
-    <div className="mt-4">
-      <p className="font-heading text-[16px] font-bold">Hızlı İşlemler</p>
-      <div className="mt-2 grid grid-cols-2 gap-2.5">
-        <div className="relative">
-          <button
-            type="button"
-            onClick={onScan}
-            className={`${card} w-full cursor-pointer ring-2 ring-gold ring-offset-2 ring-offset-background transition-transform duration-150 active:scale-[0.97] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-primary motion-reduce:active:scale-100`}
-          >
-            <ActionCard img="/app/scan-leaf.webp" icon={CameraIcon} title="Hastalık Tara" sub="Kamerayla yaprak teşhisi" badge="Dene" />
-          </button>
-          {hint && <TapHint label="Taramayı başlatın" className="left-1/2 top-[48%]" />}
-        </div>
-        <div className={card}>
-          <ActionCard img="/app/tractor-field.webp" icon={TractorIcon} title="Tarlalarım" sub="3 tarla ve harcamalar" />
-        </div>
-        <div className={card}>
-          <ActionCard img="/app/field-map.webp" icon={MapTrifoldIcon} title="Tarla Haritası" sub="Uydu ile izleme" />
-        </div>
-        <div className={card}>
-          <ActionCard img="/app/seedlings.webp" icon={CalendarDotsIcon} title="Tarım Takvimi" sub="Ekim ve ilaçlama" />
-        </div>
-      </div>
     </div>
   );
 }

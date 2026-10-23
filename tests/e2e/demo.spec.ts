@@ -64,7 +64,7 @@ test("picking a field photo scrolls the phone into view", async ({ page }) => {
 test("the large button next to the phone also takes the photo", async ({ page }) => {
   await page.goto("/#demo");
   // The phone shows the loader until it is ready; wait for the app on its screen.
-  await expect(page.locator("#demo").getByText("Hızlı İşlemler")).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator("#demo").getByText("Hızlı Menü Kısayolları")).toBeVisible({ timeout: 20_000 });
   await page.getByRole("button", { name: /Mısır tarlası/ }).click();
   await page.getByRole("button", { name: "Fotoğrafı çek ve analiz et" }).click();
   await expect(page.getByText("Analiz ediliyor…")).toBeVisible();
