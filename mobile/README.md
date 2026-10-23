@@ -78,6 +78,7 @@ Scans, ticks, favourites, your listings, the chats, the chosen province and the 
   In Expo Go, these run in `react-native-webview`, not Expo's default web view (`@expo/dom-webview`): Expo Go 57 doesn't include the default one, and mounting one crashed the app. On Android, `src/components/dom/use-dom-height.ts` also works around a startup race in that web view that left the components blank.
 - **Other components.** Ready-made [React Native Reusables](https://reactnativereusables.com) (shadcn/ui for React Native) in `src/components/ui/`, styled with [Uniwind](https://uniwind.dev) (Tailwind 4).
 - **Keep the copies in step with the website.** If one of the website's components changes, copy the file over again: they are meant to stay identical.
+- **The website's demo phone copies the app's sample data the other way:** `data/demo-market.ts`, `demo-chat.ts`, `demo-prices.ts` and `demo-fields.ts` on the website are copies of `src/domain/market.ts`, `chat.ts`, `prices.ts` and `fields.ts` (with web photo paths). Change both when the sample data or the chat script changes.
 - **Routes** live in `src/app/` (Expo Router):
   - `(tabs)/` holds the five tabs;
   - `hava` is the forecast;

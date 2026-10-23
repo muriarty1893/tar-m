@@ -406,6 +406,8 @@ html.cine :is([data-cine="line2"], [data-cine="phone"], [data-cine="badge"]) {
   --site-heading: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   font-family: var(--site-sans);
   color: var(--foreground);
+  /* On the 3D phone the screen is warped by a matrix3d; hinted glyphs then drift apart ("Çif tçi"). */
+  text-rendering: geometricPrecision;
 }
 /* Demo camera: the shutter flash when a photo is taken. */
 @keyframes shutter-flash {

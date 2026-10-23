@@ -51,7 +51,7 @@ export function Hero() {
       footnote="Ücretsiz kayıt · Tamamen Türkçe · KVKK'ya uygun"
       phone={{
         src: "/hero/phone.webp",
-        alt: `${siteConfig.name} mobil uygulamasının ana ekranı: tarla hava durumu, ürün fiyatları ve hızlı işlemler`,
+        alt: `${siteConfig.name} mobil uygulamasının ana ekranı: hızlı menü kısayolları ve tarla hava durumu`,
         width: 760,
         height: 1512,
       }}

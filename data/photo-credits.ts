@@ -4,12 +4,14 @@ export type PhotoCredit = {
   /** Short Turkish label shown in the credit line. */
   label: string;
   author: string;
-  license: "Kamu malı" | "CC0" | "CC BY 2.0" | "CC BY 4.0" | "CC BY-SA 2.0" | "CC BY-SA 3.0" | "CC BY-SA 4.0";
+  license: "Kamu malı" | "CC0" | "CC BY 2.0" | "CC BY 3.0" | "CC BY 3.0 DE" | "CC BY 4.0" | "CC BY-SA 2.0" | "CC BY-SA 3.0" | "CC BY-SA 4.0";
   licenseUrl?: string;
   sourceUrl: string;
 };
 
 const BY2 = "https://creativecommons.org/licenses/by/2.0/";
+const BY3 = "https://creativecommons.org/licenses/by/3.0/";
+const BY3DE = "https://creativecommons.org/licenses/by/3.0/de/";
 const BY4 = "https://creativecommons.org/licenses/by/4.0/";
 const BYSA2 = "https://creativecommons.org/licenses/by-sa/2.0/";
 const BYSA3 = "https://creativecommons.org/licenses/by-sa/3.0/";
@@ -36,6 +38,24 @@ export const photoCredits: PhotoCredit[] = [
   { src: "/demo/sahne-balyalar.webp", label: "Hasattan sonra saman balyaları", author: "foxypar4", license: "CC BY 2.0", licenseUrl: BY2, sourceUrl: "https://commons.wikimedia.org/wiki/File:Round_straw_bales_in_a_field.jpg" },
   { src: "/hero/field-horizon.webp", label: "Ufka uzanan tarla", author: "John Sutton", license: "CC BY-SA 2.0", licenseUrl: BYSA2, sourceUrl: "https://commons.wikimedia.org/wiki/File:Waldringfield,_potato_rows_and_a_cloudless_sky_-_geograph.org.uk_-_7121840.jpg" },
   { src: "/app/hero-field.webp", label: "Gün batımında tarla", author: "Summer Stock", license: "CC0", licenseUrl: CC0, sourceUrl: "https://commons.wikimedia.org/wiki/File:Sunflower_field_at_sunset.jpg" },
+  // The demo phone's Tarlalarım, Tarla Haritası and Pazar screens (the mobile app's photos).
+  { src: "/app/tractor-field.webp", label: "Traktör", author: "U.S. Fish and Wildlife Service", license: "Kamu malı", sourceUrl: "https://commons.wikimedia.org/wiki/File:Tractor_plow_fields_cultivated.jpg" },
+  { src: "/app/harita-uydu.webp", label: "Tarlalar, tepeden (harita)", author: "Bhullargraphic", license: "CC BY-SA 4.0", licenseUrl: BYSA4, sourceUrl: "https://commons.wikimedia.org/wiki/File:Aerial_view_of_agricultural_fields_in_Punjab,_India.jpg" },
+  { src: "/market/ilan-traktor.webp", label: "Traktör (Massey Ferguson 3085)", author: "Chris Sampson", license: "CC BY 2.0", licenseUrl: BY2, sourceUrl: "https://commons.wikimedia.org/wiki/File:Massey_Ferguson_3085.jpg" },
+  { src: "/market/ilan-bicerdover.webp", label: "Biçerdöver", author: "Dan Kollmann", license: "CC BY-SA 3.0", licenseUrl: BYSA3, sourceUrl: "https://commons.wikimedia.org/wiki/File:Combine_in_wheat_field.jpg" },
+  { src: "/market/ilan-saman-balya.webp", label: "Rulo saman balyası", author: "High Contrast", license: "CC BY 3.0 DE", licenseUrl: BY3DE, sourceUrl: "https://commons.wikimedia.org/wiki/File:Round_straw_bales_in_Bavaria_-01.jpg" },
+  { src: "/market/ilan-domates.webp", label: "Domates kasaları", author: "Hoypiwoo Summ", license: "CC BY-SA 4.0", licenseUrl: BYSA4, sourceUrl: "https://commons.wikimedia.org/wiki/File:HK_ALC_%E9%B4%A8%E8%84%B7%E6%B4%B2_Ap_Lei_Chau_%E5%88%A9%E6%9D%B1%E9%82%A8_Lei_Tung_Estate_%E8%A1%97%E5%B8%82_Market_January_2021_SS2_12.jpg" },
+  { src: "/market/ilan-pulverizator.webp", label: "Asılır pulverizatör", author: "bdk", license: "CC BY-SA 3.0", licenseUrl: BYSA3, sourceUrl: "https://commons.wikimedia.org/wiki/File:Hardi_Master_mounted_field_sprayer.jpg" },
+  { src: "/market/ilan-damla-sulama.webp", label: "Damla sulama", author: "Himvkpack007", license: "CC BY-SA 4.0", licenseUrl: BYSA4, sourceUrl: "https://commons.wikimedia.org/wiki/File:Vk_rain_pipe.jpg" },
+  { src: "/market/ilan-mibzer.webp", label: "Mibzer", author: "Kowloonese", license: "CC BY 3.0", licenseUrl: BY3, sourceUrl: "https://commons.wikimedia.org/wiki/File:John_Deere_Planter_with_Case_IH_Tractor.JPG" },
+  { src: "/market/ilan-el-aletleri.webp", label: "Budama aletleri takımı", author: "Ragesoss", license: "CC BY-SA 3.0", licenseUrl: BYSA3, sourceUrl: "https://commons.wikimedia.org/wiki/File:Bonsai_tools.jpg" },
+  { src: "/market/ilan-romork.webp", label: "Tarım römorku", author: "Oleg Yunakov", license: "CC BY-SA 4.0", licenseUrl: BYSA4, sourceUrl: "https://commons.wikimedia.org/wiki/File:1970s%E2%80%931980s_IFA_Fortschritt_HW_60.11_twin-axle_agricultural_tipping_trailer.jpg" },
+  { src: "/market/ilan-sirt-pompasi.webp", label: "Sırt pompası", author: "Safapalanadan94", license: "CC BY-SA 4.0", licenseUrl: BYSA4, sourceUrl: "https://commons.wikimedia.org/wiki/File:Knapsack_sprayer.jpg" },
+  { src: "/market/ilan-motorlu-tirpan.webp", label: "Motorlu tırpan", author: "Feťour", license: "Kamu malı", sourceUrl: "https://commons.wikimedia.org/wiki/File:Brush_cutter_02.JPG" },
+  { src: "/market/ilan-bugday.webp", label: "Buğday taneleri", author: "Peer Schilperoord", license: "CC BY-SA 4.0", licenseUrl: BYSA4, sourceUrl: "https://commons.wikimedia.org/wiki/File:Triticum_aestivum_naked_wheat_kernels.jpg" },
+  { src: "/market/ilan-bugday-tohumu.webp", label: "Makarnalık buğday taneleri", author: "Zerohund", license: "CC BY-SA 3.0", licenseUrl: BYSA3, sourceUrl: "https://commons.wikimedia.org/wiki/File:Triticum_durum_grains_on_porcelain_plate_(cropped).JPG" },
+  { src: "/market/ilan-aycicegi-tohumu.webp", label: "Ayçiçeği tohumu", author: "Dmitry Makeev", license: "CC BY-SA 4.0", licenseUrl: BYSA4, sourceUrl: "https://commons.wikimedia.org/wiki/File:Sunflower_seeds._img_012.jpg" },
+  { src: "/market/ilan-nohut.webp", label: "Nohut", author: "Fumikas Sagisavas", license: "CC0", licenseUrl: CC0, sourceUrl: "https://commons.wikimedia.org/wiki/File:Chickpeas%F0%9F%AB%98.jpg" },
   pageHeroPhoto,
 ];
 

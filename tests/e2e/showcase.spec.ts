@@ -158,9 +158,14 @@ test("the phone's bottom bar switches screens and opens past scans", async ({ pa
   const app = demo.getByTestId("uygulama-ekrani");
   const nav = app.getByRole("navigation", { name: "Uygulama menüsü" });
 
-  await nav.getByRole("button", { name: "Hava" }).click();
+  await nav.getByRole("button", { name: "Pazar" }).click();
+  await expect(app.getByRole("list", { name: "İlanlar" })).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Pazar" })).toHaveAttribute("aria-current", "page");
+
+  // The weather moved off the bar, as in the app: it opens from the home screen's shortcut.
+  await nav.getByRole("button", { name: "Ana sayfa" }).click();
+  await app.getByRole("button", { name: "Hava Durumu" }).click();
   await expect(app.getByText("5 günlük tarım tahmini")).toBeVisible();
-  await expect(nav.getByRole("button", { name: "Hava" })).toHaveAttribute("aria-current", "page");
 
   await nav.getByRole("button", { name: "Geçmiş" }).click();
   await app.getByRole("button", { name: /Domates bahçesi/ }).click();
@@ -190,19 +195,21 @@ test("the picked field becomes the scene behind the phone, live in its camera", 
   await expect(stage).not.toHaveAttribute("data-scene");
 });
 
-test("each app tab sets its own scene behind the phone: grass, then photos of sky, ploughed field, straw bales", async ({ page }) => {
+test("each app screen sets its own scene behind the phone: grass, then photos of sky, ploughed field, straw bales", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/#demo");
   const demo = page.locator("#demo");
   await expect(demo.locator(CANVAS)).toBeVisible({ timeout: 20_000 });
   const stage = demo.locator(".stage-bg");
-  const nav = demo.getByTestId("uygulama-ekrani").getByRole("navigation", { name: "Uygulama menüsü" });
+  const app = demo.getByTestId("uygulama-ekrani");
+  const nav = app.getByRole("navigation", { name: "Uygulama menüsü" });
   await expect(stage).toHaveAttribute("data-backdrop", "meadow");
-  // Real photographs behind the weather, calendar and history tabs; home keeps the 3D meadow.
+  // Real photographs behind the weather, calendar, history and market screens; home keeps the 3D meadow.
   const photos = { sky: /sahne-gokyuzu/, furrows: /sahne-surulmus-tarla/, harvest: /sahne-balyalar/ } as const;
   await expect(stage.locator("[data-scene-layer] img")).toHaveCount(0);
-  for (const [tab, backdrop] of [["Hava", "sky"], ["Takvim", "furrows"], ["Geçmiş", "harvest"], ["Ana sayfa", "meadow"]] as const) {
-    await nav.getByRole("button", { name: tab }).click();
+  for (const [tab, backdrop] of [["Hava Durumu", "sky"], ["Takvim", "furrows"], ["Geçmiş", "harvest"], ["Pazar", "harvest"], ["Ana sayfa", "meadow"]] as const) {
+    // The weather opens from the home screen's shortcut; the rest are on the bottom bar.
+    await (tab === "Hava Durumu" ? app : nav).getByRole("button", { name: tab, exact: true }).click();
     await expect(stage).toHaveAttribute("data-backdrop", backdrop);
     const layer = stage.locator(`[data-scene-layer="${backdrop}"]`);
     await expect(layer).toHaveCSS("opacity", "1");

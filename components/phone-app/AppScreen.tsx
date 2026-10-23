@@ -4,11 +4,9 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import {
-  ArrowDownIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
   ArrowSquareOutIcon,
-  ArrowUpIcon,
   ArrowsClockwiseIcon,
   BatteryFullIcon,
   BellIcon,
@@ -50,6 +48,15 @@ import { AnalyzingImage } from "@/components/ui/analyzing-image";
 import { SuccessGauge } from "../SuccessGauge";
 import { TapHint } from "./TapHint";
 import { CalendarScreen } from "./CalendarScreen";
+import { FieldScreen, FieldsScreen, MapScreen, PricesScreen } from "./FieldScreens";
+import { ListingScreen, MarketScreen, NewListingScreen } from "./MarketScreens";
+import { ChatScreen, InboxScreen } from "./MessageScreens";
+import type { Nav, Page } from "./nav";
+import { ChangePill, ListingCard, Sparkline, enter, focusRing, scroll } from "./parts";
+import { useDemoMarket, type DemoMarket } from "./use-demo-market";
+import { LISTINGS, filterListings } from "@/data/demo-market";
+import { PRICES } from "@/data/demo-prices";
+import { demoNow } from "@/lib/demo-clock";
 
 // React Bits SpringCheck (motion) loads with the first result, alongside the gauge's number ticker.
 const SpringCheck = dynamic(() => import("@/components/ui/spring-check").then((m) => m.SpringCheck), {
@@ -58,7 +65,7 @@ const SpringCheck = dynamic(() => import("@/components/ui/spring-check").then((m
 });
 
 export type AppPhase = "idle" | "camera" | "analyzing" | "done";
-export type AppTab = "home" | "weather" | "calendar" | "history";
+export type AppTab = "home" | "market" | "weather" | "calendar" | "history";
 /** Demo coach marks, in order: start a scan, take the photo, open the chat, pick a question. */
 export type GuideStep = "scan" | "shoot" | "ask" | "question";
 
@@ -89,6 +96,25 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
   const result = phase === "done" && scenario;
   const chat = result && asking;
   const clip = `inset(0 round ${SCREEN.radius}px)`;
+  const market = useDemoMarket();
+  // Screens opened over the tab (a listing, a chat, the fields…), like the app's stack. A scan or a tab
+  // change from outside the phone (the field picker, the tour) closes them.
+  const [stack, setStack] = useState<Page[]>([]);
+  const [shown, setShown] = useState({ phase, tab });
+  if (shown.phase !== phase || shown.tab !== tab) {
+    setShown({ phase, tab });
+    setStack([]);
+  }
+  const page = stack[stack.length - 1];
+  const nav: Nav = {
+    push: (p) => setStack((st) => [...st, p]),
+    replace: (p) => setStack((st) => [...st.slice(0, -1), p]),
+    back: () => setStack((st) => st.slice(0, -1)),
+    tab: (t) => {
+      setStack([]);
+      onTab(t);
+    },
+  };
   return (
     <div
       data-testid="uygulama-ekrani"
@@ -96,7 +122,7 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
       // clip-path (not just border-radius) so blurred layers can't bleed past the display's rounded corners.
       style={{ width: SCREEN.width, height: SCREEN.height, borderRadius: SCREEN.radius, clipPath: clip }}
     >
-      <StatusBar dark={!!camera || (!!result && !chat)} />
+      <StatusBar dark={!!camera || (!!result && !chat) || (!camera && !result && (page?.name === "listing" || page?.name === "field"))} />
       <div aria-hidden="true" className="absolute left-1/2 top-[13px] z-30 h-[30px] w-[100px] -translate-x-1/2 rounded-full bg-black" />
 
       <div aria-live="polite" className="h-full">
@@ -106,6 +132,10 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
           <AskScreen key={`ask-${scenario.id}`} s={scenario} onBack={() => onAsk(false)} hint={hint === "question"} onQuestion={onQuestion} />
         ) : result ? (
           <ResultScreen key={`done-${scenario.id}`} s={scenario} onReset={onReset} onAsk={() => onAsk(true)} hint={hint === "ask"} />
+        ) : page ? (
+          <PageScreen key={stack.length} page={page} market={market} nav={nav} onScan={onScan} />
+        ) : tab === "market" ? (
+          <MarketScreen key="market" market={market} nav={nav} />
         ) : tab === "weather" ? (
           <WeatherScreen key="weather" />
         ) : tab === "calendar" ? (
@@ -113,11 +143,11 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
         ) : tab === "history" ? (
           <HistoryScreen key="history" onOpen={onOpen} />
         ) : (
-          <HomeScreen key="home" onScan={onScan} onTab={onTab} hint={hint === "scan"} />
+          <HomeScreen key="home" onScan={onScan} market={market} nav={nav} hint={hint === "scan"} />
         )}
       </div>
 
-      {!camera && !chat && <TabBar active={result ? "scan" : tab} onHome={onReset} onScan={onScan} onTab={onTab} />}
+      {!camera && !chat && !page && <TabBar active={result ? "scan" : tab} onHome={onReset} onScan={onScan} onTab={onTab} />}
       <div aria-hidden="true" className={`absolute bottom-2 left-1/2 z-30 h-[5px] w-32 -translate-x-1/2 rounded-full ${camera ? "bg-white/80" : "bg-foreground/80"}`} />
       {/* Cover-glass sheen so the flat DOM reads as lit glass on the 3D phone. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-40 bg-[linear-gradient(115deg,rgb(255_255_255/0.16)_0%,transparent_32%,transparent_70%,rgb(255_255_255/0.06)_100%)]" />
@@ -141,35 +171,49 @@ function StatusBar({ dark }: { dark: boolean }) {
   );
 }
 
-const enter = "motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-500";
-const scroll = "h-full overflow-y-auto overscroll-contain [scrollbar-width:none]";
+/** The screen on top of the stack. */
+function PageScreen({ page, market, nav, onScan }: { page: Page; market: DemoMarket; nav: Nav; onScan: () => void }) {
+  switch (page.name) {
+    case "listing":
+      return <ListingScreen id={page.id} fresh={page.fresh} market={market} nav={nav} />;
+    case "new-listing":
+      return <NewListingScreen market={market} nav={nav} />;
+    case "inbox":
+      return <InboxScreen market={market} nav={nav} />;
+    case "chat":
+      return <ChatScreen id={page.id} market={market} nav={nav} />;
+    case "fields":
+      return <FieldsScreen nav={nav} />;
+    case "field":
+      return <FieldScreen id={page.id} nav={nav} onScan={onScan} />;
+    case "map":
+      return <MapScreen nav={nav} />;
+    case "prices":
+      return <PricesScreen nav={nav} />;
+  }
+}
+
 const scrim = "pointer-events-none absolute inset-0";
 
-const PRICES = [
-  { name: "Buğday", price: "9,85", change: 2.1, line: "0,14 8,12 16,13 24,8 32,9 40,3" },
-  { name: "Fındık", price: "165,00", change: 3.1, line: "0,13 8,11 16,12 24,7 32,6 40,2" },
-  { name: "Mısır", price: "8,40", change: -0.8, line: "0,4 8,6 16,5 24,9 32,8 40,12" },
-  { name: "Pamuk", price: "31,20", change: 0.6, line: "0,10 8,11 16,8 24,9 32,6 40,6" },
-];
-
-function HomeScreen({ onScan, onTab, hint }: { onScan: () => void; onTab: (tab: AppTab) => void; hint: boolean }) {
+function HomeScreen({ onScan, market, nav, hint }: { onScan: () => void; market: DemoMarket; nav: Nav; hint: boolean }) {
   return (
     <div className={`flex h-full flex-col ${enter}`}>
-      <AppHeader />
+      <AppHeader unread={market.unreadChats} onInbox={() => nav.push({ name: "inbox" })} />
       <div className={`${scroll} min-h-0 flex-1 space-y-3 px-3.5 pb-28 pt-3.5`}>
         <SponsorBanner />
         <AdvertiseBox />
-        <QuickMenu onScan={onScan} onTab={onTab} hint={hint} />
-        <WeatherHero />
+        <QuickMenu onScan={onScan} nav={nav} hint={hint} />
+        <WeatherHero onForecast={() => nav.tab("weather")} />
         <WeekOutlook />
-        <PriceStrip />
+        <PriceStrip onSeeAll={() => nav.push({ name: "prices" })} />
+        <MarketStrip market={market} nav={nav} />
       </div>
     </div>
   );
 }
 
 /** The app's top bar: badge logo, name with "Dijital Tarım", the bell and the (demo) profile chip. */
-function AppHeader() {
+function AppHeader({ unread, onInbox }: { unread: number; onInbox: () => void }) {
   return (
     <div className="flex items-center gap-2 border-b border-border bg-card px-3.5 pb-2.5 pt-[50px]">
       <Image src="/brand/logo.webp" alt="" width={40} height={40} className="size-10 shrink-0" />
@@ -177,10 +221,15 @@ function AppHeader() {
         <span className="block truncate font-heading text-[17px] font-extrabold leading-tight tracking-tight">{siteConfig.name}</span>
         <span className="mt-0.5 inline-block rounded-full bg-secondary px-2 py-px text-[10.5px] font-bold text-primary">Dijital Tarım</span>
       </span>
-      <span aria-hidden="true" className="relative flex size-9 shrink-0 items-center justify-center rounded-full bg-muted">
-        <BellIcon weight="regular" className="size-5" />
-        <span className="absolute right-2 top-2 size-2 rounded-full bg-orange-500 ring-2 ring-muted" />
-      </span>
+      <button
+        type="button"
+        onClick={onInbox}
+        aria-label={unread ? `Bildirimler: ${unread} okunmamış sohbet` : "Bildirimler"}
+        className={`relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-muted transition-colors duration-150 hover:bg-border ${focusRing}`}
+      >
+        <BellIcon aria-hidden="true" weight="regular" className="size-5" />
+        {unread > 0 && <span aria-hidden="true" className="absolute right-2 top-2 size-2 rounded-full bg-orange-500 ring-2 ring-muted" />}
+      </button>
       {/* The phone is narrower than a real one: the profile chip shows only the initials. */}
       <span role="img" aria-label="Hesap: Ayşe Yılmaz, demo hesap" className="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-secondary bg-primary text-[11.5px] font-bold text-white">
         AY
@@ -192,18 +241,18 @@ function AppHeader() {
 /** Sample sponsor banner (the app's ad spaces carry sample content for now). */
 function SponsorBanner() {
   return (
-    <div className="flex items-center gap-2.5 rounded-[22px] bg-[linear-gradient(135deg,#1d4ed8_0%,#0f766e_55%,#047857_100%)] p-3 text-white shadow-soft">
-      <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-white/30 bg-white/15">
+    <div className="flex items-center gap-2 rounded-[22px] bg-[linear-gradient(135deg,#1d4ed8_0%,#0f766e_55%,#047857_100%)] p-3 text-white shadow-soft">
+      <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-white/30 bg-white/15">
         <DropIcon weight="duotone" className="size-5" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-1.5">
-          <span className="truncate font-heading text-[13.5px] font-extrabold">sukocu.com</span>
-          <span className="shrink-0 rounded-full bg-amber-400 px-1.5 py-px text-[9px] font-bold tracking-wider text-stone-900">ÖRNEK</span>
+          <span className="truncate font-heading text-[13px] font-extrabold">sukocu.com</span>
+          <span className="shrink-0 rounded-full bg-amber-400 px-1 py-px text-[8.5px] font-bold tracking-wider text-stone-900">ÖRNEK</span>
         </span>
         <span className="block text-[11.5px] leading-snug text-white/95">Yakıtsız, elektriksiz su pompası</span>
       </span>
-      <span className="flex shrink-0 items-center gap-0.5 rounded-full border border-white/40 bg-white/15 px-2 py-1.5 text-[11px] font-bold">
+      <span className="flex shrink-0 items-center gap-0.5 rounded-full border border-white/40 bg-white/15 px-1.5 py-1.5 text-[10.5px] font-bold">
         İncele
         <ArrowSquareOutIcon aria-hidden="true" weight="bold" className="size-3.5" />
       </span>
@@ -213,12 +262,12 @@ function SponsorBanner() {
 
 function AdvertiseBox() {
   return (
-    <div className="flex items-center gap-2.5 rounded-[22px] border-2 border-dashed border-amber-300 bg-amber-50 px-3 py-2.5">
-      <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
+    <div className="flex items-center gap-2 rounded-[22px] border-2 border-dashed border-amber-300 bg-amber-50 px-2.5 py-2.5">
+      <span aria-hidden="true" className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
         <MegaphoneIcon weight="duotone" className="size-5" />
       </span>
-      <span className="min-w-0 flex-1 text-[13px] font-bold text-amber-900">Reklam Vermek İçin Dokun</span>
-      <span className="flex shrink-0 items-center gap-0.5 rounded-full bg-amber-200 px-2 py-1 text-[11px] font-bold text-amber-900">
+      <span className="min-w-0 flex-1 text-[11.5px] font-bold leading-tight text-amber-900">Reklam Vermek İçin Dokun</span>
+      <span className="flex shrink-0 items-center gap-0.5 rounded-full bg-amber-200 px-1.5 py-1 text-[10.5px] font-bold text-amber-900">
         İletişim
         <ArrowRightIcon aria-hidden="true" weight="bold" className="size-3" />
       </span>
@@ -237,20 +286,20 @@ const TILE = {
   orange: "bg-orange-50 border-orange-200 [--solid:#f97316]",
 } as const;
 
-type MenuItem = { label: string; Icon: typeof EyeIcon; tone: keyof typeof TILE; go?: () => void };
+type MenuItem = { label: string; Icon: typeof EyeIcon; tone: keyof typeof TILE; go: () => void };
 
 /** "Hızlı Menü Kısayolları": bright icon tiles in two rows that scroll sideways, as in the app. */
-function QuickMenu({ onScan, onTab, hint }: { onScan: () => void; onTab: (tab: AppTab) => void; hint: boolean }) {
+function QuickMenu({ onScan, nav, hint }: { onScan: () => void; nav: Nav; hint: boolean }) {
   // In columns of two, read top to bottom; three columns fit, the fourth scrolls in.
   const items: MenuItem[] = [
     { label: "Hastalık Tara", Icon: ScanIcon, tone: "emerald", go: onScan },
-    { label: "Tarlalarım", Icon: TractorIcon, tone: "amber" },
-    { label: "Hava Durumu", Icon: CloudSunIcon, tone: "sky", go: () => onTab("weather") },
-    { label: "Tarla Haritası", Icon: MapTrifoldIcon, tone: "teal" },
-    { label: "Tarım Takvimi", Icon: CalendarDotsIcon, tone: "indigo", go: () => onTab("calendar") },
-    { label: "Fiyatlar", Icon: ChartLineUpIcon, tone: "purple" },
-    { label: "Pazar", Icon: StorefrontIcon, tone: "rose" },
-    { label: "İlan Ver", Icon: MegaphoneIcon, tone: "orange" },
+    { label: "Tarlalarım", Icon: TractorIcon, tone: "amber", go: () => nav.push({ name: "fields" }) },
+    { label: "Hava Durumu", Icon: CloudSunIcon, tone: "sky", go: () => nav.tab("weather") },
+    { label: "Tarla Haritası", Icon: MapTrifoldIcon, tone: "teal", go: () => nav.push({ name: "map" }) },
+    { label: "Tarım Takvimi", Icon: CalendarDotsIcon, tone: "indigo", go: () => nav.tab("calendar") },
+    { label: "Fiyatlar", Icon: ChartLineUpIcon, tone: "purple", go: () => nav.push({ name: "prices" }) },
+    { label: "Pazar", Icon: StorefrontIcon, tone: "rose", go: () => nav.tab("market") },
+    { label: "İlan Ver", Icon: MegaphoneIcon, tone: "orange", go: () => nav.push({ name: "new-listing" }) },
   ];
   return (
     <div className="rounded-[24px] border border-border bg-card py-3.5">
@@ -261,7 +310,7 @@ function QuickMenu({ onScan, onTab, hint }: { onScan: () => void; onTab: (tab: A
           <ArrowRightIcon weight="bold" className="size-3" />
         </span>
       </div>
-      <ul aria-label="Kısayollar" className="mt-2.5 grid snap-x auto-cols-[84px] grid-flow-col grid-rows-2 gap-2 overflow-x-auto px-3.5 [scrollbar-width:none]">
+      <ul aria-label="Kısayollar" className="mt-2.5 grid snap-x auto-cols-[88px] grid-flow-col grid-rows-2 gap-2 overflow-x-auto px-3.5 [scrollbar-width:none]">
         {items.map(({ label, Icon, tone, go }) => {
           const inner = (
             <>
@@ -271,20 +320,16 @@ function QuickMenu({ onScan, onTab, hint }: { onScan: () => void; onTab: (tab: A
               <span className="flex min-h-[2lh] w-full items-center justify-center text-center text-[11px] font-bold leading-tight">{label}</span>
             </>
           );
-          const tile = `flex h-full w-full flex-col items-center gap-1 rounded-[18px] border px-1 pb-2 pt-2.5 ${TILE[tone]}`;
+          const tile = `flex h-full w-full flex-col items-center gap-1 rounded-[18px] border px-0.5 pb-2 pt-2.5 ${TILE[tone]}`;
           return (
             <li key={label} className="relative snap-start">
-              {go ? (
-                <button
-                  type="button"
-                  onClick={go}
-                  className={`${tile} cursor-pointer transition-transform duration-150 active:scale-[0.97] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:active:scale-100`}
-                >
-                  {inner}
-                </button>
-              ) : (
-                <div className={tile}>{inner}</div>
-              )}
+              <button
+                type="button"
+                onClick={go}
+                className={`${tile} cursor-pointer transition-transform duration-150 active:scale-[0.97] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:active:scale-100`}
+              >
+                {inner}
+              </button>
               {hint && go === onScan && <TapHint label="Taramayı başlatın" className="left-1/2 top-[48%]" />}
             </li>
           );
@@ -295,7 +340,7 @@ function QuickMenu({ onScan, onTab, hint }: { onScan: () => void; onTab: (tab: A
 }
 
 /** "Tarla Konumu": the app's dark green weather card, with sample values (the app shows live weather). */
-function WeatherHero() {
+function WeatherHero({ onForecast }: { onForecast?: () => void }) {
   return (
     <div data-testid="hava-karti" className="rounded-[24px] bg-[linear-gradient(135deg,#047857_0%,#065f46_35%,#0b3b30_75%,#0f2a2a_100%)] p-3.5 text-white shadow-lift">
       <div className="flex items-center gap-2">
@@ -337,15 +382,28 @@ function WeatherHero() {
           </div>
         ))}
       </dl>
-      <div className="mt-3 flex items-center gap-2.5 rounded-[18px] border-l-4 border-emerald-400 bg-card py-2.5 pl-2.5 pr-3 text-foreground">
-        <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary">
-          <SprayBottleIcon weight="duotone" className="size-5" />
-        </span>
-        <span className="min-w-0">
-          <span className="block text-[10.5px] font-bold uppercase tracking-[0.08em] text-primary">Bugün tarlada</span>
-          <span className="block text-[13.5px] font-bold leading-snug">İlaçlama için uygun bir gün.</span>
-        </span>
-      </div>
+      {(() => {
+        const hint = (
+          <>
+            <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary">
+              <SprayBottleIcon weight="duotone" className="size-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[10.5px] font-bold uppercase tracking-[0.08em] text-primary">Bugün tarlada</span>
+              <span className="block text-[13.5px] font-bold leading-snug">İlaçlama için uygun bir gün.</span>
+            </span>
+          </>
+        );
+        const card = "mt-3 flex w-full items-center gap-2.5 rounded-[18px] border-l-4 border-emerald-400 bg-card py-2.5 pl-2.5 pr-3 text-left text-foreground";
+        return onForecast ? (
+          <button type="button" onClick={onForecast} aria-label="Bugün tarlada: İlaçlama için uygun bir gün. 5 günlük tahmini aç" className={`${card} cursor-pointer ${focusRing}`}>
+            {hint}
+            <CaretRightIcon aria-hidden="true" weight="bold" className="size-4 shrink-0 text-muted-foreground" />
+          </button>
+        ) : (
+          <div className={card}>{hint}</div>
+        );
+      })()}
     </div>
   );
 }
@@ -381,7 +439,7 @@ function WeekOutlook() {
   );
 }
 
-function PriceStrip() {
+function PriceStrip({ onSeeAll }: { onSeeAll: () => void }) {
   return (
     <div className="pt-1">
       <div className="flex items-center justify-between">
@@ -389,36 +447,55 @@ function PriceStrip() {
           <span aria-hidden="true" className="size-2 rounded-full bg-primary" />
           Tarım Borsası Fiyatları
         </p>
-        <span className="flex items-center text-[12px] font-semibold text-primary">
+        <button type="button" onClick={onSeeAll} aria-label="Tüm fiyatları gör" className={`flex cursor-pointer items-center text-[12px] font-semibold text-primary ${focusRing}`}>
           Tümünü gör
           <CaretRightIcon aria-hidden="true" weight="bold" className="size-3.5" />
-        </span>
+        </button>
       </div>
       <ul tabIndex={0} aria-label="Ürün fiyatları" className="-mx-3.5 mt-2 flex snap-x gap-2.5 overflow-x-auto px-3.5 pb-1 [scrollbar-width:none]">
-        {PRICES.map((p) => {
-          const up = p.change >= 0;
-          return (
-            <li key={p.name} className="w-[138px] shrink-0 snap-start rounded-[18px] border border-border bg-card p-3">
-              <span className="flex items-center justify-between">
-                <span className="text-[13.5px] font-bold">{p.name}</span>
-                <svg viewBox="0 0 40 16" aria-hidden="true" className={`h-4 w-10 ${up ? "text-primary" : "text-destructive"}`}>
-                  <polyline points={p.line} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
-              <span className="mt-1 block">
-                <span className="font-heading text-[19px] font-extrabold">{p.price} ₺</span>
-                <span className="text-[11px] text-muted-foreground"> /kg</span>
-              </span>
-              <span className="mt-1.5 flex items-center gap-1.5">
-                <span className={`flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-bold ${up ? "bg-secondary text-primary" : "bg-destructive/10 text-destructive"}`}>
-                  {up ? <ArrowUpIcon aria-hidden="true" weight="bold" className="size-3" /> : <ArrowDownIcon aria-hidden="true" weight="bold" className="size-3" />}
-                  {up ? "+" : "−"}%{Math.abs(p.change).toLocaleString("tr-TR")}
-                </span>
-                <span className="truncate text-[10.5px] text-muted-foreground">Türkiye geneli</span>
-              </span>
-            </li>
-          );
-        })}
+        {PRICES.slice(0, 4).map((p) => (
+          <li key={p.name} className="w-[138px] shrink-0 snap-start rounded-[18px] border border-border bg-card p-3">
+            <span className="flex items-center justify-between">
+              <span className="text-[13.5px] font-bold">{p.name}</span>
+              <Sparkline line={p.line} change={p.change} />
+            </span>
+            <span className="mt-1 block">
+              <span className="font-heading text-[19px] font-extrabold">{p.price.toFixed(2).replace(".", ",")} ₺</span>
+              <span className="text-[11px] text-muted-foreground"> /kg</span>
+            </span>
+            <span className="mt-1.5 flex items-center gap-1.5">
+              <ChangePill change={p.change} />
+              <span className="truncate text-[10.5px] text-muted-foreground">Türkiye geneli</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** "Pazarda yeni": the latest listings, sideways, with a way into Pazar. */
+function MarketStrip({ market, nav }: { market: DemoMarket; nav: Nav }) {
+  const latest = filterListings(LISTINGS, { query: "", category: "tumu", view: "kesfet", favorites: market.favorites, status: market.listingStatus }).slice(0, 5);
+  const now = demoNow();
+  return (
+    <div className="pt-1">
+      <div className="flex items-center justify-between">
+        <p className="flex items-center gap-2 font-heading text-[16px] font-extrabold">
+          <span aria-hidden="true" className="size-2 rounded-full bg-gold" />
+          Pazarda yeni
+        </p>
+        <button type="button" onClick={() => nav.tab("market")} aria-label="Pazar’daki tüm ilanlar" className={`flex cursor-pointer items-center text-[12px] font-semibold text-primary ${focusRing}`}>
+          Tümünü gör
+          <CaretRightIcon aria-hidden="true" weight="bold" className="size-3.5" />
+        </button>
+      </div>
+      <ul aria-label="Yeni ilanlar" className="-mx-3.5 mt-2 flex snap-x gap-2.5 overflow-x-auto px-3.5 pb-2 [scrollbar-width:none]">
+        {latest.map((l) => (
+          <li key={l.id} className="w-[150px] shrink-0 snap-start">
+            <ListingCard listing={l} favorite={market.favorites.includes(l.id)} now={now} onOpen={() => nav.push({ name: "listing", id: l.id })} onFavorite={() => market.toggleFavorite(l.id)} />
+          </li>
+        ))}
       </ul>
     </div>
   );
@@ -766,7 +843,7 @@ function TabBar({
   const items = [
     { id: "home", label: "Ana sayfa", Icon: HouseIcon, go: onHome },
     { id: "scan", label: "Taramalar", Icon: ScanIcon, go: onScan },
-    { id: "weather", label: "Hava", Icon: CloudSunIcon, go: () => onTab("weather") },
+    { id: "market", label: "Pazar", Icon: StorefrontIcon, go: () => onTab("market") },
     { id: "calendar", label: "Takvim", Icon: CalendarDotsIcon, go: () => onTab("calendar") },
     { id: "history", label: "Geçmiş", Icon: ClockCounterClockwiseIcon, go: () => onTab("history") },
   ] as const;
