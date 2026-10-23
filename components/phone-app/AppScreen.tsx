@@ -198,10 +198,10 @@ function SponsorBanner() {
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-1.5">
-          <span className="truncate font-heading text-[13.5px] font-extrabold">Örnek Firma</span>
+          <span className="truncate font-heading text-[13.5px] font-extrabold">sukocu.com</span>
           <span className="shrink-0 rounded-full bg-amber-400 px-1.5 py-px text-[9px] font-bold tracking-wider text-stone-900">ÖRNEK</span>
         </span>
-        <span className="block text-[11.5px] leading-snug text-white/95">Damla sulama setlerinde sezon indirimi</span>
+        <span className="block text-[11.5px] leading-snug text-white/95">Yakıtsız, elektriksiz su pompası</span>
       </span>
       <span className="flex shrink-0 items-center gap-0.5 rounded-full border border-white/40 bg-white/15 px-2 py-1.5 text-[11px] font-bold">
         İncele

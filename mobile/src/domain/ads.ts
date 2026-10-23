@@ -7,7 +7,7 @@
  */
 export type Sponsor = { name: string; tagline: string; sample: boolean };
 
-export const SPONSOR: Sponsor = { name: 'Örnek Firma', tagline: 'Damla sulama setlerinde sezon indirimi', sample: true };
+export const SPONSOR: Sponsor = { name: 'sukocu.com', tagline: 'Yakıtsız, elektriksiz su pompası', sample: true };
 
 /** What the ad spaces explain when tapped, while there is no sponsor page or contact link yet. */
 export const AD_INFO = {
