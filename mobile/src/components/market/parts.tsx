@@ -1,13 +1,12 @@
-import { router } from 'expo-router';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 
-import { ChatsCircleIcon, GrainsIcon, PlantIcon, SealCheckIcon, ShieldCheckIcon, ShovelIcon, StarIcon, StorefrontIcon, TractorIcon, WrenchIcon, type PhosphorIcon } from '@/components/icons';
+import { GrainsIcon, PlantIcon, SealCheckIcon, ShieldCheckIcon, ShovelIcon, StarIcon, StorefrontIcon, TractorIcon, WrenchIcon, type PhosphorIcon } from '@/components/icons';
 import { Text } from '@/components/ui/text';
 import { unreadCount } from '@/domain/chat';
 import type { CategoryId, Seller } from '@/domain/market';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/state/store';
-import { AVATAR_TONES, COLORS, SHADOW } from '@/theme/tokens';
+import { AVATAR_TONES, COLORS } from '@/theme/tokens';
 
 export const CATEGORY_ICONS: Record<CategoryId, PhosphorIcon> = {
   tumu: StorefrontIcon,
@@ -21,27 +20,6 @@ export const CATEGORY_ICONS: Record<CategoryId, PhosphorIcon> = {
 /** How many chats have unread messages. */
 export function useUnreadChats() {
   return useAppStore((s) => s.conversations.filter((c) => unreadCount(c) > 0).length);
-}
-
-/** The messages button with its unread badge: white on a photo, or outlined on a page. */
-export function InboxButton({ onPhoto = false }: { onPhoto?: boolean }) {
-  const unread = useUnreadChats();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={unread ? `Mesajlar, ${unread} okunmamış sohbet` : 'Mesajlar'}
-      onPress={() => router.push('/mesajlar')}
-      hitSlop={4}
-      className={cn('size-11 items-center justify-center rounded-full active:opacity-80', onPhoto ? 'bg-white/95' : 'border border-border bg-card')}
-      style={onPhoto ? undefined : { boxShadow: SHADOW.soft }}>
-      <ChatsCircleIcon size={23} weight="duotone" color={COLORS.primary} />
-      {unread ? (
-        <View className="absolute -right-1 -top-1 min-w-5 items-center justify-center rounded-full border-2 border-white bg-destructive px-1" importantForAccessibility="no-hide-descendants">
-          <Text className="font-sans-bold text-[11px] leading-4 text-white">{unread}</Text>
-        </View>
-      ) : null}
-    </Pressable>
-  );
 }
 
 /** A person's initials in a tinted circle (no photos of real people). */

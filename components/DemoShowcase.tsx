@@ -8,7 +8,7 @@ import { PhoneStage, usePrefersReducedMotion } from "./phone-app/PhoneStage";
 import type { Backdrop } from "./phone-app/StageBackdrop";
 
 /** The scene behind the phone for each app tab: grass at home, sky for the weather, and so on. */
-const BACKDROPS: Record<AppTab, Backdrop> = { home: "meadow", market: "harvest", weather: "sky", calendar: "furrows", history: "harvest" };
+const BACKDROPS: Record<AppTab, Backdrop> = { home: "meadow", market: "harvest", weather: "sky", calendar: "furrows" };
 import { ANALYSIS_MS } from "@/lib/phone-stage";
 import { CtaLink } from "./CtaLink";
 import { Button } from "./ui/button";

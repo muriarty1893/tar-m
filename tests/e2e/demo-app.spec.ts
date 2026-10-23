@@ -67,14 +67,18 @@ test("İlan ver: errors are listed before publishing, then the new listing opens
   await expect(app.getByRole("list", { name: "İlanlar" }).getByRole("button", { name: /Az kullanılmış römork/ })).toBeVisible();
 });
 
-test("the bell opens Mesajlar with the unread chats", async ({ page }) => {
+test("the bell opens Pazar on its Mesajlar side, with the unread chats", async ({ page }) => {
   const app = await openApp(page);
   await app.getByRole("button", { name: /^Bildirimler: 2 okunmamış/ }).click();
-  await expect(app.getByText("2 okunmamış sohbet")).toBeVisible();
+  await expect(app.getByRole("radio", { name: "Mesajlar, 2 okunmamış" })).toHaveAttribute("aria-checked", "true");
   await app.getByRole("button", { name: /Hüseyin Öztürk/ }).click();
   await expect(app.getByRole("log", { name: "Sohbet" }).getByText("Selam, pompa hâlâ duruyor mu?")).toBeVisible();
   await app.getByRole("button", { name: "Geri" }).click();
-  await expect(app.getByText("1 okunmamış sohbet")).toBeVisible();
+  await expect(app.getByRole("radio", { name: "Mesajlar, 1 okunmamış" })).toHaveAttribute("aria-checked", "true");
+
+  // İlanlar and Mesajlar are the two sides of the same Pazar page.
+  await app.getByRole("radio", { name: "İlanlar" }).click();
+  await expect(app.getByRole("list", { name: "İlanlar" })).toBeVisible();
 });
 
 test("Tarlalarım, a field, the field map and the prices open from the home screen", async ({ page }) => {

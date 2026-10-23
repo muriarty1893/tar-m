@@ -4,7 +4,7 @@ import type { BottomTabBarProps } from 'expo-router/js-tabs';
 import { Platform, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { CalendarDotsIcon, ClockCounterClockwiseIcon, HouseIcon, ScanIcon, StorefrontIcon, type PhosphorIcon } from '@/components/icons';
+import { CalendarDotsIcon, HouseIcon, ScanIcon, StorefrontIcon, type PhosphorIcon } from '@/components/icons';
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import { COLORS } from '@/theme/tokens';
@@ -17,14 +17,13 @@ const TABS: Record<string, { label: string; Icon: PhosphorIcon }> = {
   [SCAN_TAB]: { label: 'Taramalar', Icon: ScanIcon },
   pazar: { label: 'Pazar', Icon: StorefrontIcon },
   takvim: { label: 'Takvim', Icon: CalendarDotsIcon },
-  gecmis: { label: 'Geçmiş', Icon: ClockCounterClockwiseIcon },
 };
 
 const tap = () => {
   if (Platform.OS !== 'web') Haptics.selectionAsync();
 };
 
-/** The bottom bar: five tabs on white, the active one green in a pale-green pill. "Taramalar" opens the camera. */
+/** The bottom bar: four tabs on white, the active one green in a pale-green pill. "Taramalar" opens the camera. */
 export function TabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   return (

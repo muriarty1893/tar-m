@@ -150,7 +150,7 @@ test("no credit lines under the demo; they live on the image sources page, linke
   for (const author of ["Rasbak", "CraneStation", "Maurice Flesier", "John Sutton"]) await expect(page.getByText(author, { exact: false }).first()).toBeVisible();
 });
 
-test("the phone's bottom bar switches screens and opens past scans", async ({ page }) => {
+test("the phone's bottom bar switches screens, and past scans open from under the calendar", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/#demo");
   const demo = page.locator("#demo");
@@ -167,7 +167,9 @@ test("the phone's bottom bar switches screens and opens past scans", async ({ pa
   await app.getByRole("button", { name: "Hava Durumu" }).click();
   await expect(app.getByText("5 günlük tarım tahmini")).toBeVisible();
 
-  await nav.getByRole("button", { name: "Geçmiş" }).click();
+  await expect(nav.getByRole("button")).toHaveText(["Ana sayfa", "Taramalar", "Pazar", "Takvim"]);
+  await nav.getByRole("button", { name: "Takvim" }).click();
+  await expect(app.getByText("Geçmiş taramalar")).toBeVisible();
   await app.getByRole("button", { name: /Domates bahçesi/ }).click();
   await expect(app.getByTestId("demo-cevap")).toBeVisible();
   await expect(app.getByRole("meter")).toHaveAttribute("aria-valuenow", "48");
@@ -204,10 +206,10 @@ test("each app screen sets its own scene behind the phone: grass, then photos of
   const app = demo.getByTestId("uygulama-ekrani");
   const nav = app.getByRole("navigation", { name: "Uygulama menüsü" });
   await expect(stage).toHaveAttribute("data-backdrop", "meadow");
-  // Real photographs behind the weather, calendar, history and market screens; home keeps the 3D meadow.
+  // Real photographs behind the weather, calendar and market screens; home keeps the 3D meadow.
   const photos = { sky: /sahne-gokyuzu/, furrows: /sahne-surulmus-tarla/, harvest: /sahne-balyalar/ } as const;
   await expect(stage.locator("[data-scene-layer] img")).toHaveCount(0);
-  for (const [tab, backdrop] of [["Hava Durumu", "sky"], ["Takvim", "furrows"], ["Geçmiş", "harvest"], ["Pazar", "harvest"], ["Ana sayfa", "meadow"]] as const) {
+  for (const [tab, backdrop] of [["Hava Durumu", "sky"], ["Takvim", "furrows"], ["Pazar", "harvest"], ["Ana sayfa", "meadow"]] as const) {
     // The weather opens from the home screen's shortcut; the rest are on the bottom bar.
     await (tab === "Hava Durumu" ? app : nav).getByRole("button", { name: tab, exact: true }).click();
     await expect(stage).toHaveAttribute("data-backdrop", backdrop);

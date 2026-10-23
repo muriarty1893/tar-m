@@ -9,7 +9,6 @@ export default function TabsLayout() {
       <Tabs.Screen name={SCAN_TAB} options={{ title: 'Taramalar' }} />
       <Tabs.Screen name="pazar" options={{ title: 'Pazar' }} />
       <Tabs.Screen name="takvim" options={{ title: 'Takvim' }} />
-      <Tabs.Screen name="gecmis" options={{ title: 'Geçmiş' }} />
     </Tabs>
   );
 }

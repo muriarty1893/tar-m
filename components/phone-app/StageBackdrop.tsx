@@ -6,7 +6,7 @@ import { useState } from "react";
 /**
  * The scene behind the demo phone, one per app tab: the meadow (home: the stage colour, with the
  * grass drawn in 3D under the phone), and real photographs for the weather (sky), calendar
- * (ploughed field) and history (straw bales after the harvest) tabs. A photo loads the first time
+ * (ploughed field) and Pazar (straw bales after the harvest) screens. A photo loads the first time
  * its tab opens and then stays mounted, so switching tabs cross-fades instead of popping.
  * Credits: data/photo-credits.ts (shown on /kaynaklar).
  */

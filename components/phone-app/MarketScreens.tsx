@@ -5,7 +5,6 @@ import Image from "next/image";
 import {
   ArrowLeftIcon,
   ChatCircleDotsIcon,
-  ChatsCircleIcon,
   CheckCircleIcon,
   ClockIcon,
   HandshakeIcon,
@@ -49,7 +48,8 @@ import {
 } from "@/data/demo-market";
 import { agoLabel, demoNow, fromYear } from "@/lib/demo-clock";
 import type { DemoMarket } from "./use-demo-market";
-import type { Nav } from "./nav";
+import { InboxList } from "./MessageScreens";
+import type { MarketSection, Nav } from "./nav";
 import { Avatar, CATEGORY_ICONS, ListingCard, Rating, SafetyStrip, Segmented, Sheet, enter, focusRing, scroll } from "./parts";
 
 const VIEWS: { id: MarketView; label: string }[] = [
@@ -61,8 +61,41 @@ const VIEWS: { id: MarketView; label: string }[] = [
 const chip = (on: boolean) =>
   `flex min-h-9 cursor-pointer items-center gap-1 rounded-full border px-2.5 text-[12.5px] font-semibold transition-colors duration-150 ${focusRing} ${on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:bg-secondary"}`;
 
-/** "Pazar": search, Keşfet / Favoriler / İlanlarım, categories, then the listings; "İlan ver" is always one tap away. */
-export function MarketScreen({ market, nav }: { market: DemoMarket; nav: Nav }) {
+/**
+ * "Pazar": the farmers' market in one place, "İlanlar" (search, Keşfet / Favoriler / İlanlarım, categories,
+ * the listings; "İlan ver" one tap away) and "Mesajlar" (the listing chats).
+ */
+export function MarketScreen({ market, nav, section, onSection }: { market: DemoMarket; nav: Nav; section: MarketSection; onSection: (s: MarketSection) => void }) {
+  const top = (
+    <div className="space-y-2.5 px-3.5 pb-2.5 pt-[54px]">
+      <p className="font-heading text-[24px] font-extrabold tracking-tight">Pazar</p>
+      <Segmented
+        label="Pazar bölümleri"
+        value={section}
+        onChange={onSection}
+        options={[
+          { id: "ilanlar", label: "İlanlar" },
+          { id: "mesajlar", label: "Mesajlar", badge: market.unreadChats },
+        ]}
+      />
+    </div>
+  );
+  if (section === "mesajlar")
+    return (
+      <div className={`flex h-full flex-col ${enter}`}>
+        {top}
+        <InboxList market={market} nav={nav} onBrowse={() => onSection("ilanlar")} />
+      </div>
+    );
+  return (
+    <div className={`flex h-full flex-col ${enter}`}>
+      {top}
+      <Listings market={market} nav={nav} />
+    </div>
+  );
+}
+
+function Listings({ market, nav }: { market: DemoMarket; nav: Nav }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<CategoryId>("tumu");
   const [view, setView] = useState<MarketView>("kesfet");
@@ -76,12 +109,8 @@ export function MarketScreen({ market, nav }: { market: DemoMarket; nav: Nav }) 
       : { title: "Henüz ilanınız yok", body: "Ürününüzü, aletinizi ya da aracınızı birkaç adımda satışa çıkarın.", action: "İlan ver", go: () => nav.push({ name: "new-listing" }) };
 
   return (
-    <div className={`relative h-full ${enter}`}>
-      <div className={`${scroll} space-y-2.5 px-3.5 pb-28 pt-[54px]`}>
-        <div className="flex items-center justify-between">
-          <p className="font-heading text-[24px] font-extrabold tracking-tight">Pazar</p>
-          <InboxButton unread={market.unreadChats} onOpen={() => nav.push({ name: "inbox" })} />
-        </div>
+    <div className="relative min-h-0 flex-1">
+      <div className={`${scroll} space-y-2.5 px-3.5 pb-28`}>
         <label className="flex h-10 items-center gap-2 rounded-full border border-input bg-card pl-3 pr-1 shadow-soft focus-within:border-primary">
           <MagnifyingGlassIcon aria-hidden="true" weight="bold" className="size-4 shrink-0 text-muted-foreground" />
           <span className="sr-only">Pazarda ara</span>
@@ -143,25 +172,6 @@ export function MarketScreen({ market, nav }: { market: DemoMarket; nav: Nav }) 
         İlan ver
       </button>
     </div>
-  );
-}
-
-/** The messages button with its unread badge. */
-export function InboxButton({ unread, onOpen }: { unread: number; onOpen: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onOpen}
-      aria-label={unread ? `Mesajlar, ${unread} okunmamış sohbet` : "Mesajlar"}
-      className={`relative flex size-10 cursor-pointer items-center justify-center rounded-full border border-border bg-card shadow-soft transition-colors duration-150 hover:bg-secondary ${focusRing}`}
-    >
-      <ChatsCircleIcon aria-hidden="true" weight="duotone" className="size-5 text-primary" />
-      {unread > 0 && (
-        <span aria-hidden="true" className="absolute -right-1 -top-1 flex min-w-5 items-center justify-center rounded-full border-2 border-white bg-destructive px-1 text-[10.5px] font-bold leading-4 text-white">
-          {unread}
-        </span>
-      )}
-    </button>
   );
 }
 

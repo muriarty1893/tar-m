@@ -57,7 +57,6 @@ export default function RootLayout() {
             <Stack.Screen name="kaynaklar" />
             <Stack.Screen name="ilan/[id]" />
             <Stack.Screen name="ilan/yeni" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
-            <Stack.Screen name="mesajlar/index" />
             <Stack.Screen name="mesajlar/[id]" />
           </Stack>
           <PortalHost />

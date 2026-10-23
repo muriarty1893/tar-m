@@ -29,7 +29,7 @@ export function AppHeader() {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={unread ? `Bildirimler: ${unread} okunmamış sohbet` : 'Bildirimler'}
-        onPress={() => router.push('/mesajlar')}
+        onPress={() => router.navigate({ pathname: '/pazar', params: { bolum: 'mesajlar' } })}
         className="size-11 items-center justify-center rounded-full bg-muted active:bg-border">
         <BellIcon size={22} weight="regular" color={COLORS.foreground} />
         {unread ? <View className="absolute right-2.5 top-2.5 size-2.5 rounded-full border-2 border-muted bg-orange-500" /> : null}

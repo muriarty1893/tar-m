@@ -22,9 +22,8 @@ The Çiftçi Destek app for Android and iOS, built with Expo SDK 57 (React Nativ
 | --- | --- |
 | **Ana sayfa** | A top bar (logo, "Dijital Tarım", the notifications bell for new messages, the demo profile), a sample sponsor banner and a "Reklam Vermek İçin Dokun" box, "Hızlı Menü Kısayolları" (eight tiles in two rows that scroll sideways), the "Tarla Konumu" weather card (province, temperature, rain, wind, sunrise and today's farming hint, which opens the 7-day forecast), "Bu Hafta Tarlada" (spraying days, frost, heavy rain), "Tarım Borsası Fiyatları" price cards and "Pazarda yeni" listings. |
 | **Taramalar** | Opens the camera. |
-| **Pazar** | The farmers' market: search, Keşfet / Favoriler / İlanlarım, categories (Ürün, Tohum & Gübre, Alet, Ekipman, Araç) and the listings. "İlan ver" posts one. |
-| **Takvim** | "Tarım takvimi": the month with task dots, the day's tasks with coloured kind tiles. Tasks can be ticked. |
-| **Geçmiş** | "Geçmiş taramalar": past scans with their success percentage. Each one opens its result. |
+| **Pazar** | The farmers' market and its chats, switched at the top. "İlanlar": search, Keşfet / Favoriler / İlanlarım, categories (Ürün, Tohum & Gübre, Alet, Ekipman, Araç) and the listings; "İlan ver" posts one. "Mesajlar" (with the unread count): the listing chats. The home screen's bell opens it on Mesajlar (`/pazar?bolum=mesajlar`). |
+| **Takvim** | "Tarım takvimi": the month with task dots, the day's tasks with coloured kind tiles (tasks can be ticked), then "Geçmiş taramalar": past scans with their success percentage, each opening its result. |
 
 Screens that open from Ana sayfa:
 - **Hava durumu** (`hava`): live weather and a 7-day forecast from [Open-Meteo](https://open-meteo.com), each day with a farming hint (frost, heavy rain, a spraying window). Pull down to refresh.
@@ -44,7 +43,7 @@ Screens that open from Ana sayfa:
 **The market (Pazar) and messages:**
 1. **A listing.** Photo, price (with unit for produce), facts, specs, description, the seller (rating, reply time, verified phone) and safety tips. "Mesaj gönder" opens a chat; "Teklif ver" sends an offer. On your own listing: "Satıldı olarak işaretle" and remove.
 2. **İlan ver.** Photos (gallery or camera; without one, the category's photo is used and marked "Temsilî görsel"), title, category, condition, price and unit, quantity, location, description, "Pazarlık payı var". Checked on blur and on submit, with a summary of what to fix.
-3. **Mesajlar.** Every listing chat (Tümü / Alıyorum / Satıyorum), unread ones in bold with a count; the count also shows on the home card and in Pazar.
+3. **Mesajlar** (Pazar's second side). Every listing chat (Tümü / Alıyorum / Satıyorum), unread ones in bold with a count; the count also shows on the bell and on the Mesajlar switch.
 4. **A chat.** The listing pinned on top, quick replies, offers and counter-offers you can accept or turn down, and a typing indicator.
 
 The design follows the ui-ux-pro-max marketplace pattern (search first, categories in view, trust cues, "list your item" always at hand) in the app's own look: see `docs/superpowers/specs/2026-10-17-pazar-mesajlar-design.md`.
@@ -80,14 +79,14 @@ Scans, ticks, favourites, your listings, the chats, the chosen province and the 
 - **Keep the copies in step with the website.** If one of the website's components changes, copy the file over again: they are meant to stay identical.
 - **The website's demo phone copies the app's sample data the other way:** `data/demo-market.ts`, `demo-chat.ts`, `demo-prices.ts` and `demo-fields.ts` on the website are copies of `src/domain/market.ts`, `chat.ts`, `prices.ts` and `fields.ts` (with web photo paths). Change both when the sample data or the chat script changes.
 - **Routes** live in `src/app/` (Expo Router):
-  - `(tabs)/` holds the five tabs;
+  - `(tabs)/` holds the four tabs (Ana sayfa, Taramalar, Pazar, Takvim);
   - `hava` is the forecast;
   - `fiyatlar` is the price list;
   - `tarlalar/` and `tarlalar/[id]` are the fields and a field;
   - `harita` is the field map;
   - `kaynaklar` is the credits;
   - `ilan/[id]` and `ilan/yeni` are a listing and the new-listing form;
-  - `mesajlar/` and `mesajlar/[id]` are the inbox and a chat;
+  - `mesajlar/[id]` is a chat (the inbox is Pazar's Mesajlar side);
   - `tara` is the camera and analysis;
   - `sonuc/[id]` is the result;
   - `soru/[id]` is the chat.

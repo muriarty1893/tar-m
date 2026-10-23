@@ -1,11 +1,13 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Segmented } from '@/components/app/segmented';
 import { MagnifyingGlassIcon, PlusIcon, XCircleIcon } from '@/components/icons';
 import { ListingCard } from '@/components/market/listing-card';
-import { CATEGORY_ICONS, InboxButton, SafetyStrip } from '@/components/market/parts';
+import { InboxList } from '@/components/market/inbox-list';
+import { CATEGORY_ICONS, SafetyStrip, useUnreadChats } from '@/components/market/parts';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -21,9 +23,24 @@ const VIEWS: { id: MarketView; label: string }[] = [
   { id: 'ilanlarim', label: 'İlanlarım' },
 ];
 
-/** "Pazar": farmers' listings. Search first, categories in view, then the listings; "İlan ver" is always one tap away. */
+type Section = 'ilanlar' | 'mesajlar';
+
+/**
+ * "Pazar": the farmers' market in one place, "İlanlar" (search, categories, the listings; "İlan ver" one tap
+ * away) and "Mesajlar" (the listing chats). The bell on the home screen opens it on Mesajlar (?bolum=mesajlar).
+ */
 export default function Market() {
   const insets = useSafeAreaInsets();
+  const { bolum } = useLocalSearchParams<{ bolum?: string }>();
+  const asked: Section = bolum === 'mesajlar' ? 'mesajlar' : 'ilanlar';
+  const [section, setSection] = useState<Section>(asked);
+  // Opening Pazar again with a section (the bell) switches to it, even when the tab is already open.
+  const [lastAsked, setLastAsked] = useState(bolum);
+  if (bolum !== lastAsked) {
+    setLastAsked(bolum);
+    if (bolum) setSection(asked);
+  }
+  const unread = useUnreadChats();
   const { width } = useWindowDimensions();
   const cardWidth = (Math.min(width, 640) - 16 * 2 - 10) / 2;
   const now = useNow();
@@ -45,13 +62,6 @@ export default function Market() {
 
   const header = (
     <View className="gap-3 pb-3">
-      <View className="flex-row items-center justify-between">
-        <Text role="heading" className="font-heading text-[24px]">
-          Pazar
-        </Text>
-        <InboxButton />
-      </View>
-
       <View className="h-12 flex-row items-center gap-2 rounded-full border border-input bg-card pl-4 pr-1" style={{ boxShadow: SHADOW.soft }}>
         <MagnifyingGlassIcon size={20} weight="bold" color={COLORS.mutedForeground} />
         <TextInput
@@ -110,8 +120,35 @@ export default function Market() {
     </View>
   );
 
+  const top = (
+    <View className="gap-3 px-4 pb-3" style={{ paddingTop: insets.top + 8 }}>
+      <Text role="heading" className="font-heading text-[26px] tracking-tight">
+        Pazar
+      </Text>
+      <Segmented
+        label="Pazar bölümleri"
+        value={section}
+        onChange={setSection}
+        options={[
+          { id: 'ilanlar', label: 'İlanlar' },
+          { id: 'mesajlar', label: 'Mesajlar', badge: unread },
+        ]}
+      />
+    </View>
+  );
+
+  if (section === 'mesajlar') {
+    return (
+      <View className="flex-1 bg-background">
+        {top}
+        <InboxList onBrowse={() => setSection('ilanlar')} bottomInset={24} />
+      </View>
+    );
+  }
+
   return (
     <View className="flex-1 bg-background">
+      {top}
       <FlatList<Listing>
         data={listings}
         keyExtractor={(l) => l.id}
@@ -119,7 +156,7 @@ export default function Market() {
         ListHeaderComponent={header}
         ListEmptyComponent={<Empty view={view} filtered={filtered} query={query} onClear={clear} onBrowse={() => setView('kesfet')} />}
         columnWrapperStyle={{ gap: 10 }}
-        contentContainerStyle={{ paddingTop: insets.top + 8, paddingHorizontal: 16, paddingBottom: 96, gap: 10, width: '100%', maxWidth: 640, alignSelf: 'center' }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96, gap: 10, width: '100%', maxWidth: 640, alignSelf: 'center' }}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}

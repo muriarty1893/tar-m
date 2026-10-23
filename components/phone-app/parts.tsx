@@ -191,7 +191,7 @@ export function ChangePill({ change }: { change: number }) {
 }
 
 /** A segmented switch ("Keşfet / Favoriler / İlanlarım"). */
-export function Segmented<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: { id: T; label: string }[]; onChange: (v: T) => void }) {
+export function Segmented<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: { id: T; label: string; badge?: number }[]; onChange: (v: T) => void }) {
   return (
     <div role="radiogroup" aria-label={label} className="flex rounded-full bg-muted p-1">
       {options.map((o) => (
@@ -200,10 +200,16 @@ export function Segmented<T extends string>({ label, value, options, onChange }:
           type="button"
           role="radio"
           aria-checked={value === o.id}
+          aria-label={o.badge ? `${o.label}, ${o.badge} okunmamış` : undefined}
           onClick={() => onChange(o.id)}
-          className={`h-8 flex-1 cursor-pointer rounded-full text-[12.5px] font-semibold transition-colors duration-150 ${focusRing} ${value === o.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          className={`flex h-8 flex-1 cursor-pointer items-center justify-center gap-1 rounded-full text-[12.5px] font-semibold transition-colors duration-150 ${focusRing} ${value === o.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
         >
           {o.label}
+          {o.badge ? (
+            <span aria-hidden="true" className={`min-w-4 rounded-full px-1 text-[10px] font-bold leading-4 ${value === o.id ? "bg-white text-primary" : "bg-destructive text-white"}`}>
+              {o.badge}
+            </span>
+          ) : null}
         </button>
       ))}
     </div>

@@ -46,7 +46,7 @@ export default function Chat() {
 
   const listing = chat && listingById(chat.listingId, myListings);
   const peer = chat && sellerById(chat.peerId);
-  const back = () => (router.canGoBack() ? router.back() : router.replace('/mesajlar'));
+  const back = () => (router.canGoBack() ? router.back() : router.replace({ pathname: '/pazar', params: { bolum: 'mesajlar' } }));
   if (!chat || !listing || !peer) {
     return (
       <View className="flex-1 items-center justify-center gap-3 bg-background px-8">

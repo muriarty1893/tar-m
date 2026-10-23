@@ -18,7 +18,6 @@ import {
   ChartLineUpIcon,
   ChatCircleDotsIcon,
   CheckCircleIcon,
-  ClockCounterClockwiseIcon,
   CloudRainIcon,
   CloudSunIcon,
   DropIcon,
@@ -50,8 +49,8 @@ import { TapHint } from "./TapHint";
 import { CalendarScreen } from "./CalendarScreen";
 import { FieldScreen, FieldsScreen, MapScreen, PricesScreen } from "./FieldScreens";
 import { ListingScreen, MarketScreen, NewListingScreen } from "./MarketScreens";
-import { ChatScreen, InboxScreen } from "./MessageScreens";
-import type { Nav, Page } from "./nav";
+import { ChatScreen } from "./MessageScreens";
+import type { MarketSection, Nav, Page } from "./nav";
 import { ChangePill, ListingCard, Sparkline, enter, focusRing, scroll } from "./parts";
 import { useDemoMarket, type DemoMarket } from "./use-demo-market";
 import { LISTINGS, filterListings } from "@/data/demo-market";
@@ -65,7 +64,7 @@ const SpringCheck = dynamic(() => import("@/components/ui/spring-check").then((m
 });
 
 export type AppPhase = "idle" | "camera" | "analyzing" | "done";
-export type AppTab = "home" | "market" | "weather" | "calendar" | "history";
+export type AppTab = "home" | "market" | "weather" | "calendar";
 /** Demo coach marks, in order: start a scan, take the photo, open the chat, pick a question. */
 export type GuideStep = "scan" | "shoot" | "ask" | "question";
 
@@ -77,7 +76,7 @@ type Props = {
   onScan: () => void;
   onReset: () => void;
   onTab: (tab: AppTab) => void;
-  /** Open a past scan's result straight away (history list). */
+  /** Open a past scan's result straight away (the history list under the calendar). */
   onOpen: (s: DemoScenario) => void;
   /** Shutter on the live camera: take the photo and start the analysis. */
   onShutter: () => void;
@@ -100,6 +99,7 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
   // Screens opened over the tab (a listing, a chat, the fields…), like the app's stack. A scan or a tab
   // change from outside the phone (the field picker, the tour) closes them.
   const [stack, setStack] = useState<Page[]>([]);
+  const [marketSection, setMarketSection] = useState<MarketSection>("ilanlar");
   const [shown, setShown] = useState({ phase, tab });
   if (shown.phase !== phase || shown.tab !== tab) {
     setShown({ phase, tab });
@@ -112,7 +112,13 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
     back: () => setStack((st) => st.slice(0, -1)),
     tab: (t) => {
       setStack([]);
+      if (t === "market") setMarketSection("ilanlar");
       onTab(t);
+    },
+    messages: () => {
+      setStack([]);
+      setMarketSection("mesajlar");
+      onTab("market");
     },
   };
   return (
@@ -135,13 +141,14 @@ export function AppScreen({ phase, scenario, tab, onScan, onReset, onTab, onOpen
         ) : page ? (
           <PageScreen key={stack.length} page={page} market={market} nav={nav} onScan={onScan} />
         ) : tab === "market" ? (
-          <MarketScreen key="market" market={market} nav={nav} />
+          <MarketScreen key="market" market={market} nav={nav} section={marketSection} onSection={setMarketSection} />
         ) : tab === "weather" ? (
           <WeatherScreen key="weather" />
         ) : tab === "calendar" ? (
-          <CalendarScreen key="calendar" className={`${scroll} px-3.5 pb-28 pt-[56px] ${enter}`} />
-        ) : tab === "history" ? (
-          <HistoryScreen key="history" onOpen={onOpen} />
+          <div key="calendar" className={`${scroll} px-3.5 pb-28 pt-[56px] ${enter}`}>
+            <CalendarScreen className="" />
+            <ScanHistory onOpen={onOpen} />
+          </div>
         ) : (
           <HomeScreen key="home" onScan={onScan} market={market} nav={nav} hint={hint === "scan"} />
         )}
@@ -178,8 +185,6 @@ function PageScreen({ page, market, nav, onScan }: { page: Page; market: DemoMar
       return <ListingScreen id={page.id} fresh={page.fresh} market={market} nav={nav} />;
     case "new-listing":
       return <NewListingScreen market={market} nav={nav} />;
-    case "inbox":
-      return <InboxScreen market={market} nav={nav} />;
     case "chat":
       return <ChatScreen id={page.id} market={market} nav={nav} />;
     case "fields":
@@ -198,7 +203,7 @@ const scrim = "pointer-events-none absolute inset-0";
 function HomeScreen({ onScan, market, nav, hint }: { onScan: () => void; market: DemoMarket; nav: Nav; hint: boolean }) {
   return (
     <div className={`flex h-full flex-col ${enter}`}>
-      <AppHeader unread={market.unreadChats} onInbox={() => nav.push({ name: "inbox" })} />
+      <AppHeader unread={market.unreadChats} onInbox={nav.messages} />
       <div className={`${scroll} min-h-0 flex-1 space-y-3 px-3.5 pb-28 pt-3.5`}>
         <SponsorBanner />
         <AdvertiseBox />
@@ -845,7 +850,6 @@ function TabBar({
     { id: "scan", label: "Taramalar", Icon: ScanIcon, go: onScan },
     { id: "market", label: "Pazar", Icon: StorefrontIcon, go: () => onTab("market") },
     { id: "calendar", label: "Takvim", Icon: CalendarDotsIcon, go: () => onTab("calendar") },
-    { id: "history", label: "Geçmiş", Icon: ClockCounterClockwiseIcon, go: () => onTab("history") },
   ] as const;
   return (
     <nav aria-label="Uygulama menüsü" className="absolute inset-x-0 bottom-0 z-20 flex h-[86px] items-start justify-around border-t border-border bg-card px-2 pt-1.5">
@@ -911,10 +915,11 @@ function WeatherScreen() {
 
 const HISTORY_DATES = ["Bugün, 08:12", "Dün, 17:40", "3 gün önce", "1 hafta önce"];
 
-function HistoryScreen({ onOpen }: { onOpen: (s: DemoScenario) => void }) {
+/** "Geçmiş taramalar", under the calendar: the demo's past scans; each opens its result again. */
+function ScanHistory({ onOpen }: { onOpen: (s: DemoScenario) => void }) {
   return (
-    <div className={`${scroll} px-3.5 pb-28 pt-[56px] ${enter}`}>
-      <ScreenTitle>Geçmiş taramalar</ScreenTitle>
+    <div className="mt-5">
+      <p className="mb-2 font-heading text-[16px] font-bold">Geçmiş taramalar</p>
       <ul className="space-y-2.5">
         {demoScenarios.map((s, i) => (
           <li key={s.id}>
@@ -931,7 +936,7 @@ function HistoryScreen({ onOpen }: { onOpen: (s: DemoScenario) => void }) {
                 <span className="block truncate text-[12px] text-muted-foreground">{s.diagnosis}</span>
                 <span className="block text-[11px] text-muted-foreground">{HISTORY_DATES[i]}</span>
               </span>
-              <span className={`rounded-full px-2.5 py-1 text-[12.5px] font-bold ${s.successRate >= 75 ? "bg-secondary text-primary" : s.successRate >= 60 ? "bg-gold-soft text-gold-foreground" : "bg-destructive/10 text-destructive"}`}>
+              <span className={`rounded-full px-2.5 py-1 text-[12.5px] font-bold ${s.successRate >= 75 ? "bg-secondary text-primary" : s.successRate >= 50 ? "bg-gold-soft text-gold" : "bg-destructive/10 text-destructive"}`}>
                 %{s.successRate}
               </span>
             </button>

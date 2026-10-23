@@ -9,7 +9,7 @@ import { addDays, agoLabel, clock, dayKey, dayTitle, demoNow } from "@/lib/demo-
 import type { DemoMarket } from "./use-demo-market";
 import type { Nav } from "./nav";
 import { OfferSheet } from "./MarketScreens";
-import { Avatar, BackBar, Segmented, enter, focusRing, scroll } from "./parts";
+import { Avatar, Segmented, enter, focusRing, scroll } from "./parts";
 
 type Filter = "tumu" | "buyer" | "seller";
 const FILTERS: { id: Filter; label: string }[] = [
@@ -18,18 +18,17 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: "seller", label: "Satıyorum" },
 ];
 
-/** "Mesajlar": every listing chat, newest first, unread ones in bold with a count. */
-export function InboxScreen({ market, nav }: { market: DemoMarket; nav: Nav }) {
+/** Pazar's "Mesajlar": every listing chat, newest first, unread ones in bold with a count. */
+export function InboxList({ market, nav, onBrowse }: { market: DemoMarket; nav: Nav; onBrowse: () => void }) {
   const [filter, setFilter] = useState<Filter>("tumu");
   const rows = market.conversations.filter((c) => c.messages.length && (filter === "tumu" || c.role === filter)).sort((a, b) => lastAt(b).localeCompare(lastAt(a)));
   const now = demoNow();
   return (
-    <div className={`flex h-full flex-col bg-background ${enter}`}>
-      <div className="space-y-2.5 border-b border-border px-3.5 pb-2.5 pt-[52px]">
-        <BackBar title="Mesajlar" subtitle={market.unreadChats ? `${market.unreadChats} okunmamış sohbet` : "Hepsi okundu"} onBack={nav.back} />
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="border-b border-border px-3.5 pb-2.5">
         <Segmented label="Sohbetler" value={filter} options={FILTERS} onChange={setFilter} />
       </div>
-      <ul aria-label="Sohbetler" className={`${scroll} min-h-0 flex-1 pb-8`}>
+      <ul aria-label="Sohbetler" className={`${scroll} min-h-0 flex-1 pb-28`}>
         {rows.map((c) => (
           <Row key={c.id} chat={c} now={now} myListings={market.myListings} onOpen={() => nav.push({ name: "chat", id: c.id })} />
         ))}
@@ -39,6 +38,9 @@ export function InboxScreen({ market, nav }: { market: DemoMarket; nav: Nav }) {
             <p className="mt-1 text-[12.5px] leading-snug text-muted-foreground">
               {filter === "seller" ? "Alıcılar ilanlarınıza yazınca burada görünecek." : "Bir ilanda “Mesaj gönder”e dokunarak satıcıyla konuşun."}
             </p>
+            <button type="button" onClick={onBrowse} className={`mt-2 min-h-9 cursor-pointer rounded-full bg-primary px-4 text-[12.5px] font-semibold text-primary-foreground ${focusRing}`}>
+              İlanlara göz at
+            </button>
           </li>
         )}
       </ul>

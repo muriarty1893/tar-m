@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
-import { ScreenTitle, TabScreen } from '@/components/app/screen';
+import { ScanHistory } from '@/components/app/scan-history';
+import { ScreenTitle, SectionTitle, TabScreen } from '@/components/app/screen';
 import CalendarTasksDom from '@/components/dom/calendar-tasks-dom';
 import { useDomHeight, useDomStart } from '@/components/dom/use-dom-height';
 import { Text } from '@/components/ui/text';
@@ -12,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { useAppStore } from '@/state/store';
 import { COLORS, KIND_COLORS } from '@/theme/tokens';
 
-/** "Tarım takvimi", as in the website demo: the month's farm tasks, a day at a time, tickable. */
+/** "Tarım takvimi": the month's farm tasks, a day at a time, tickable; past scans ("Geçmiş taramalar") below. */
 export default function Calendar() {
   const now = useNow();
   const done = useAppStore((s) => s.doneTasks);
@@ -102,6 +103,9 @@ export default function Calendar() {
           dom={list.dom}
         />
       </View>
+
+      <SectionTitle className="mb-2 mt-6">Geçmiş taramalar</SectionTitle>
+      <ScanHistory now={now} />
     </TabScreen>
   );
 }
