@@ -2,22 +2,25 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getAllArticles, getArticle, shareImage } from "@/lib/news";
+import { Suspense } from "react";
+import { AdminNewsLink } from "@/components/admin/AdminNewsLink";
+import { shareImage } from "@/lib/news";
+import { getPublished, listPublished } from "@/lib/news-data";
 import { formatTrDate } from "@/lib/format";
 import { siteConfig } from "@/config/site";
 import { ArrowLeftIcon, CalendarBlankIcon } from "@phosphor-icons/react/dist/ssr";
 
-// Cache Components rejects an empty list, so a site with no articles yet
-// still builds; the placeholder slug simply resolves to notFound().
+// Cache Components rejects an empty list, so a site with no articles yet still builds; the
+// placeholder slug simply resolves to notFound(). Articles published later render on first visit.
 const PLACEHOLDER = "henuz-haber-yok";
 
 export async function generateStaticParams() {
-  const articles = await getAllArticles();
+  const articles = await listPublished();
   return articles.length ? articles.map((a) => ({ slug: a.slug })) : [{ slug: PLACEHOLDER }];
 }
 
 export async function generateMetadata({ params }: PageProps<"/haberler/[slug]">): Promise<Metadata> {
-  const article = await getArticle((await params).slug);
+  const article = await getPublished((await params).slug);
   if (!article) return { title: "Haber bulunamadı" };
   // A page-level openGraph object replaces the root one entirely, so repeat the shared fields
   // and fall back to the site share image when the article has no cover (WhatsApp previews).
@@ -37,8 +40,27 @@ export async function generateMetadata({ params }: PageProps<"/haberler/[slug]">
   };
 }
 
-export default async function ArticlePage({ params }: PageProps<"/haberler/[slug]">) {
-  const article = await getArticle((await params).slug);
+export default function ArticlePage({ params }: PageProps<"/haberler/[slug]">) {
+  // Articles known at build time prerender in full; one published later streams into the placeholder.
+  return (
+    <Suspense fallback={<ArticleSkeleton />}>
+      <ArticleBody params={params} />
+    </Suspense>
+  );
+}
+
+function ArticleSkeleton() {
+  return (
+    <div aria-hidden="true" className="mx-auto max-w-3xl space-y-6 px-4 py-14">
+      <div className="h-12 w-3/4 rounded-xl bg-muted motion-safe:animate-pulse" />
+      <div className="h-6 w-40 rounded-lg bg-muted" />
+      <div className="aspect-[16/9] rounded-3xl bg-muted" />
+    </div>
+  );
+}
+
+async function ArticleBody({ params }: { params: PageProps<"/haberler/[slug]">["params"] }) {
+  const article = await getPublished((await params).slug);
   if (!article) notFound();
 
   return (
@@ -57,10 +79,15 @@ export default async function ArticlePage({ params }: PageProps<"/haberler/[slug
             <CalendarBlankIcon aria-hidden="true" weight="duotone" className="size-5" />
             {formatTrDate(article.date)}
           </time>
+          <Suspense>
+            <div className="mt-5 empty:hidden">
+              <AdminNewsLink slug={article.slug} />
+            </div>
+          </Suspense>
         </div>
       </header>
       <div className="mx-auto max-w-3xl px-4 py-12">
-        {article.cover?.startsWith("/") && (
+        {article.cover && (
           <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-3xl shadow-soft">
             <Image src={article.cover} alt="" fill priority sizes="(min-width: 768px) 768px, 100vw" className="object-cover" />
           </div>

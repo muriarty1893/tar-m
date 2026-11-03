@@ -1,5 +1,5 @@
 import "server-only";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { iso, sql, str } from "./db";
 import { signInHref } from "./sign-in-href";
@@ -55,12 +55,29 @@ export async function requireProfile(returnTo: string): Promise<Profile> {
   return profile;
 }
 
-/** Moderators: Clerk user ids in ADMIN_USER_IDS, comma separated. */
-export function isAdmin(userId: string | null): boolean {
-  if (!userId) return false;
-  return (process.env.ADMIN_USER_IDS ?? "")
+const listEnv = (name: string) =>
+  (process.env[name] ?? "")
     .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .includes(userId);
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+
+/**
+ * Admins (news, reports): Clerk user ids in ADMIN_USER_IDS, or verified e-mail addresses in
+ * ADMIN_EMAILS, both comma separated.
+ */
+export async function isAdmin(userId: string | null): Promise<boolean> {
+  if (!userId) return false;
+  if (listEnv("ADMIN_USER_IDS").includes(userId.toLowerCase())) return true;
+  const emails = listEnv("ADMIN_EMAILS");
+  if (!emails.length) return false;
+  const user = await currentUser();
+  if (!user || user.id !== userId) return false;
+  return user.emailAddresses.some((e) => e.verification?.status === "verified" && emails.includes(e.emailAddress.toLowerCase()));
+}
+
+/** For /yonetim: the admin's user id; anyone else gets sign-in (signed out) or a 404 (signed in). */
+export async function requireAdmin(returnTo: string): Promise<string> {
+  const userId = await requireUserId(returnTo);
+  if (!(await isAdmin(userId))) notFound();
+  return userId;
 }

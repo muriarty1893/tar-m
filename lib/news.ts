@@ -1,9 +1,13 @@
-import fs from "node:fs";
-import path from "node:path";
-import matter from "gray-matter";
 import { remark } from "remark";
 import html from "remark-html";
+import { fold } from "@/data/demo-market";
 
+/**
+ * Haberler: written on /yonetim/haberler and kept in the database (lib/news-data.ts). These are the
+ * rules shared by the editor (in the browser) and the server actions that save an article.
+ */
+
+/** A published article as the site shows it. */
 export type Article = {
   slug: string;
   title: string;
@@ -13,73 +17,81 @@ export type Article = {
   html: string;
 };
 
-const DEFAULT_DIR = path.join(process.cwd(), "content", "haberler");
+/** An article in a list (no body). */
+export type ArticleSummary = Omit<Article, "html">;
+
+export type ArticleStatus = "draft" | "published";
+
+/** What the editor sends. */
+export type ArticleInput = {
+  title: string;
+  slug: string;
+  summary: string;
+  body: string;
+  cover: string;
+  date: string;
+  status: ArticleStatus;
+};
+
+export type ArticleField = keyof ArticleInput;
+export type ArticleErrors = Partial<Record<ArticleField, string>>;
+
+export const TITLE_MIN = 5;
+export const TITLE_MAX = 140;
+export const SUMMARY_MIN = 10;
+export const SUMMARY_MAX = 300;
+export const BODY_MAX = 50_000;
+export const SLUG_MAX = 80;
+
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-/**
- * YAML turns `2026-13-45` into a rolled-over Date, so validate the raw
- * front-matter text: it must be a real calendar day in YYYY-MM-DD form.
- */
-function normaliseDate(rawFrontMatter: string): string | null {
-  const value = /^date:\s*["']?([^"'\n]*?)["']?\s*$/m.exec(rawFrontMatter)?.[1];
-  if (!value || !ISO_DATE_RE.test(value)) return null;
+export const isSlug = (s: string) => SLUG_RE.test(s) && s.length <= SLUG_MAX;
+
+/** "Buğday hasadı başladı!" → "bugday-hasadi-basladi"; "Konya'da" → "konyada" (the apostrophe before a suffix goes). */
+export function slugify(title: string) {
+  return fold(title)
+    .replace(/['’`]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, SLUG_MAX)
+    .replace(/-+$/, "");
+}
+
+/** A real calendar day in YYYY-MM-DD form. */
+export function isDay(value: string) {
+  if (!ISO_DATE_RE.test(value)) return false;
   const d = new Date(`${value}T00:00:00Z`);
-  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === value ? value : null;
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === value;
 }
 
-function nonEmpty(value: unknown): string | null {
-  return typeof value === "string" && value.trim() ? value.trim() : null;
+/** A cover is one of our own uploads (Vercel Blob, haberler/) or a picture already on the site ("/demo/…"). */
+export const isCover = (url: string) =>
+  /^\/[\w./-]+\.(webp|jpe?g|png|avif)$/i.test(url) || /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/haberler\/[\w./-]+$/i.test(url);
+
+export function validateArticle(a: ArticleInput): ArticleErrors {
+  const e: ArticleErrors = {};
+  const title = a.title.trim();
+  if (title.length < TITLE_MIN) e.title = `Başlık en az ${TITLE_MIN} karakter olmalı.`;
+  else if (title.length > TITLE_MAX) e.title = `Başlık en fazla ${TITLE_MAX} karakter olabilir.`;
+  if (!isSlug(a.slug)) e.slug = "Adres yalnızca küçük harf, rakam ve tire içermeli (ör. bugday-hasadi-basladi).";
+  const summary = a.summary.trim();
+  if (summary.length < SUMMARY_MIN) e.summary = `Özeti yazın (en az ${SUMMARY_MIN} karakter); listede ve paylaşım önizlemesinde görünür.`;
+  else if (summary.length > SUMMARY_MAX) e.summary = `Özet en fazla ${SUMMARY_MAX} karakter olabilir.`;
+  if (a.status === "published" && !a.body.trim()) e.body = "Yayınlamadan önce haberin metnini yazın.";
+  if (a.body.length > BODY_MAX) e.body = "Metin çok uzun.";
+  if (a.cover && !isCover(a.cover)) e.cover = "Kapak fotoğrafı yüklenemedi; kaldırıp yeniden ekleyin.";
+  if (!isDay(a.date)) e.date = "Tarihi seçin.";
+  if (a.status !== "draft" && a.status !== "published") e.status = "Durumu seçin.";
+  return e;
 }
 
-// Reads are synchronous on purpose: with Cache Components, sync fs access is
-// prerendered at build time, so news pages stay fully static.
-function readArticle(file: string): Article {
-  const name = path.basename(file);
-  const slug = name.replace(/\.md$/, "");
-  const fail = (what: string) => {
-    throw new Error(`Haber dosyası geçersiz: ${name} — ${what}`);
-  };
-  if (!SLUG_RE.test(slug)) {
-    fail("dosya adı yalnızca küçük harf, rakam ve tire içermeli (ör. bugday-hasadi.md)");
-  }
+/** The editor's order, for the error summary. */
+export const ARTICLE_FIELD_ORDER: ArticleField[] = ["title", "slug", "summary", "date", "cover", "body", "status"];
 
-  // Passing options bypasses gray-matter's cache, whose hits drop `.matter`.
-  const parsed = matter(fs.readFileSync(file, "utf8"), {});
-  const { data, content } = parsed;
-  const title = nonEmpty(data.title) ?? fail("'title' alanı eksik");
-  const date = normaliseDate(parsed.matter) ?? fail("'date' alanı eksik veya YYYY-MM-DD biçiminde değil");
-  const summary = nonEmpty(data.summary) ?? fail("'summary' alanı eksik");
-  const cover = nonEmpty(data.cover) ?? undefined;
-
-  return {
-    slug,
-    title: title as string,
-    date: date as string,
-    summary: summary as string,
-    cover,
-    html: String(remark().use(html).processSync(content)),
-  };
-}
-
-function listFiles(dir: string): string[] {
-  if (!fs.existsSync(dir)) return [];
-  return fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith(".md"))
-    .map((f) => path.join(dir, f));
-}
-
-export async function getAllArticles(dir: string = DEFAULT_DIR): Promise<Article[]> {
-  return listFiles(dir)
-    .map(readArticle)
-    .sort((a, b) => (a.date === b.date ? a.slug.localeCompare(b.slug) : a.date < b.date ? 1 : -1));
-}
-
-export async function getArticle(slug: string, dir: string = DEFAULT_DIR): Promise<Article | null> {
-  if (!SLUG_RE.test(slug)) return null;
-  const file = path.join(dir, `${slug}.md`);
-  return fs.existsSync(file) ? readArticle(file) : null;
+/** Markdown to HTML. remark-html sanitizes, so raw HTML or scripts in the text are dropped. */
+export function renderMarkdown(markdown: string) {
+  return String(remark().use(html).processSync(markdown));
 }
 
 /** The article's share (Open Graph) image: its cover, or the site share image for WhatsApp previews. */

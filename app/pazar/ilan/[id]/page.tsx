@@ -46,7 +46,7 @@ async function Listing({ params, searchParams }: Pick<PageProps<"/pazar/ilan/[id
   const userId = await getUserId();
   const l = await getListing(id, userId);
   const mine = Boolean(userId && l?.sellerId === userId);
-  if (!l || (l.status === "removed" && !mine && !isAdmin(userId))) notFound();
+  if (!l || (l.status === "removed" && !mine && !(await isAdmin(userId)))) notFound();
   const now = await requestNow();
   const condition = conditionLabel((l.condition ?? undefined) as Condition | undefined);
 

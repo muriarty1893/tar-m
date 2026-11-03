@@ -18,7 +18,9 @@ phone on the home page stays a scripted demo, and the copy calls the scan "yakı
 | `/tarlalarim`, `/tarlalarim/[id]` | Fields (crop, stage, area, place, expected yield), season totals, expenses by kind, cost per dönüm, the field's tasks | yes |
 | `/hava` | Unchanged: 7-day forecast, farming hints, "Konumumu kullan" | no |
 | `/hesabim` | Name shown to others, home province, Clerk's e-mail/password settings, sign out, **delete account** (deletes everything, KVKK) | yes |
-| `/yonetim` | Moderators only: reported listings, remove or dismiss | admin |
+| `/yonetim` | Admin dashboard: overview (news, drafts, reports, listings, people) | admin |
+| `/yonetim/haberler` | News: list, new, edit, delete. Draft / published, date, cover photo (uploaded to Blob under `haberler/`), Markdown text with a toolbar (heading, bold, italic, lists, quote, link) and a preview. Saving refreshes /haberler and the home page at once | admin |
+| `/yonetim/sikayetler` | Reported listings: remove the listing or dismiss the reports | admin |
 | `/giris`, `/kayit` | Clerk sign-in and sign-up, in Turkish | – |
 
 Offers: the buyer offers; the seller accepts, turns down or counters; the buyer answers a counter the
@@ -52,12 +54,23 @@ tests in `tests/unit/market.test.ts` and `tests/unit/farm.test.ts`.
 Limits against abuse: 10 listings a day, 60 messages per 10 minutes, 20 reports a day per person;
 photos only from our own Blob store, images only, 8 MB at most.
 
-## Moderators
+## Admins
 
-Set `ADMIN_USER_IDS` in Vercel (Settings → Environment Variables, Production and Preview) to the
-Clerk user ids of the moderators, comma separated (`user_…`; find yours in the Clerk dashboard under
-Users, after signing up on the site). Redeploy. Moderators see "Yönetim: şikâyetler" on /hesabim and
-can remove any listing.
+Admins run /yonetim (news and reports) and can remove any listing. Two ways to name them, both in
+Vercel (Settings → Environment Variables, Production and Preview), comma separated, then redeploy:
+
+- `ADMIN_EMAILS`: e-mail addresses. Only a verified address on the signed-in account counts.
+- `ADMIN_USER_IDS`: Clerk user ids (`user_…`, in the Clerk dashboard under Users).
+
+Admins see "Yönetim paneli" on /hesabim, "Haber ekle" on /haberler and "Bu haberi düzenle" on each
+article.
+
+## News
+
+News live in the `articles` table (Markdown text). The three original Markdown files were imported
+with `npm run news:import`, which still imports any `content/haberler/*.md` (front matter: title,
+date, summary, cover) as published articles, skipping addresses that already exist. Public reads
+are cached (`lib/news-data.ts`, tag `news`) and refreshed whenever an article is saved or deleted.
 
 ## Before a real launch
 

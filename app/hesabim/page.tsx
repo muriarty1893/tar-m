@@ -63,10 +63,10 @@ async function Account({ searchParams }: { searchParams: PageProps<"/hesabim">["
               </Link>
             </li>
           ))}
-          {isAdmin(userId) && (
+          {(await isAdmin(userId)) && (
             <li>
               <Link href="/yonetim" className="flex min-h-16 items-center gap-3 rounded-2xl border border-border px-4 font-semibold hover:bg-secondary">
-                Yönetim: şikâyetler
+                Yönetim paneli: haberler ve şikâyetler
               </Link>
             </li>
           )}

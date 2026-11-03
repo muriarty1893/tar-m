@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { AdminNewsLink } from "@/components/admin/AdminNewsLink";
 import { siteConfig } from "@/config/site";
-import { getAllArticles } from "@/lib/news";
+import { listPublished } from "@/lib/news-data";
 import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
 
@@ -10,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function NewsPage() {
-  const articles = await getAllArticles();
+  const articles = await listPublished();
 
   return (
     <>
@@ -19,6 +21,11 @@ export default async function NewsPage() {
         intro={<>Tarım dünyasından haberler, mevsimlik öneriler ve {siteConfig.name} duyuruları.</>}
       />
       <section className="mx-auto max-w-6xl px-4 py-14">
+        <Suspense>
+          <div className="mb-8 empty:hidden">
+            <AdminNewsLink />
+          </div>
+        </Suspense>
         {articles.length === 0 ? (
           <p className="text-lg">Henüz haber yok.</p>
         ) : (

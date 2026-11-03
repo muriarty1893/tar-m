@@ -2,16 +2,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { CalendarBlankIcon, NewspaperIcon } from "@phosphor-icons/react/dist/ssr";
 import { ArrowUpRight } from "@/components/ui/arrow-up-right";
-import type { Article } from "@/lib/news";
+import type { ArticleSummary } from "@/lib/news";
 import { formatTrDate } from "@/lib/format";
 
 /** News card: cover with date, title, summary and a "read more" button. */
-export function NewsCard({ article, headingLevel = 3 }: { article: Article; headingLevel?: 2 | 3 }) {
+export function NewsCard({ article, headingLevel = 3 }: { article: ArticleSummary; headingLevel?: 2 | 3 }) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
       <article className="relative flex h-full flex-col rounded-2xl border border-border bg-card p-3 shadow-soft">
         <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-secondary">
-          {article.cover?.startsWith("/") ? (
+          {article.cover ? (
             <Image src={article.cover} alt="" fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" />
           ) : (
             <NewspaperIcon aria-hidden="true" weight="duotone" className="absolute left-5 top-5 size-10 text-primary" />

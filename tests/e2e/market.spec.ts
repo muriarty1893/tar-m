@@ -62,3 +62,16 @@ test("the home page shows what works today, and marks the AI scan as coming", as
   await expect(page.locator("#ozellikler").getByText("Yakında, uygulamada").first()).toBeVisible();
   await expect(page.locator("#demo")).toContainText("yapay zekâ taraması yakında");
 });
+
+test("the admin dashboard asks signed-out visitors to sign in", async ({ page }) => {
+  for (const path of ["/yonetim", "/yonetim/haberler/yeni"]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(new RegExp(`/giris\\?redirect_url=${encodeURIComponent(path)}`));
+  }
+});
+
+test("news come from the dashboard: published articles are listed, without admin links for visitors", async ({ page }) => {
+  await page.goto("/haberler");
+  await expect(page.locator("main article").first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Haber ekle" })).toHaveCount(0);
+});

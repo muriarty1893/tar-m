@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { upload } from "@vercel/blob/client";
+import { randomName, shrinkImage } from "@/lib/shrink-image";
 import { CameraIcon, StarIcon, TrashIcon, WarningCircleIcon } from "@phosphor-icons/react/dist/ssr";
 import { provinces } from "@/data/provinces";
 import { saveListing } from "@/app/pazar/actions";
@@ -45,25 +46,6 @@ const FIELD_IDS: Record<ListingField, string> = {
   description: "ilan-aciklama",
 };
 
-/** Shrinks a photo to at most 1600 px on its long side (WebP, or JPEG where WebP can't be made), so it uploads fast on mobile data. */
-async function shrink(file: File): Promise<Blob> {
-  const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-  const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  const encode = (type: string, quality: number) => new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, quality));
-  const webp = await encode("image/webp", 0.82);
-  if (webp && webp.type === "image/webp") return webp;
-  const jpeg = await encode("image/jpeg", 0.85);
-  if (!jpeg) throw new Error("Fotoğraf işlenemedi.");
-  return jpeg;
-}
-
-const randomName = () => (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`).replace(/[^\w-]/g, "");
-
 /** The İlan ver form, also used to edit a listing (`listingId`). */
 export function ListingForm({ initial, listingId, defaultProvince = "" }: { initial: ListingInput; listingId?: string; defaultProvince?: string }) {
   const [values, setValues] = useState<ListingInput>({ ...initial, province: initial.province || defaultProvince });
@@ -103,7 +85,7 @@ export function ListingForm({ initial, listingId, defaultProvince = "" }: { init
       const preview = URL.createObjectURL(file);
       setPhotos((ps) => [...ps, { key, preview, state: "uploading" }]);
       try {
-        const blob = await shrink(file);
+        const blob = await shrinkImage(file);
         const ext = blob.type === "image/webp" ? "webp" : "jpg";
         const result = await upload(`ilanlar/${randomName()}.${ext}`, blob, { access: "public", handleUploadUrl: "/api/pazar/foto", contentType: blob.type });
         setPhotos((ps) => ps.map((p) => (p.key === key ? { ...p, url: result.url, state: "done" } : p)));

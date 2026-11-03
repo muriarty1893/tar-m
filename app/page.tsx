@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
-import { getAllArticles } from "@/lib/news";
+import { listPublished } from "@/lib/news-data";
 import { Hero } from "@/components/Hero";
 import { HowItWorks } from "@/components/HowItWorks";
 import { HomeTools } from "@/components/HomeTools";
@@ -16,7 +16,7 @@ import { QuestionSection } from "@/components/QuestionSection";
 import { BlurFade } from "@/components/magicui/blur-fade";
 
 export default async function Home() {
-  const latest = (await getAllArticles()).slice(0, 3);
+  const latest = (await listPublished()).slice(0, 3);
 
   return (
     <>

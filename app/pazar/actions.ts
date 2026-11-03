@@ -80,7 +80,7 @@ export async function saveListing(raw: ListingInput, id?: string): Promise<SaveL
 export async function setListingStatus(id: string, status: "active" | "sold" | "removed") {
   const userId = await getUserId();
   if (!userId || !isUuid(id) || !["active", "sold", "removed"].includes(status)) return;
-  if (status === "removed" && isAdmin(userId)) {
+  if (status === "removed" && (await isAdmin(userId))) {
     await sql()`update listings set status = 'removed', updated_at = now() where id = ${id}`;
   } else {
     await sql()`update listings set status = ${status}, updated_at = now() where id = ${id} and seller_id = ${userId} and status <> 'removed'`;

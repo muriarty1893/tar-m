@@ -128,3 +128,20 @@ create table if not exists tasks (
   created_at timestamptz not null default now()
 );
 create index if not exists tasks_user_date_idx on tasks (user_id, due_date);
+
+-- Haberler: news written on /yonetim/haberler. Markdown body, shown on /haberler once published.
+create table if not exists articles (
+  id           uuid primary key default gen_random_uuid(),
+  slug         text not null unique check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$' and char_length(slug) <= 80),
+  title        text not null check (char_length(title) between 5 and 140),
+  summary      text not null check (char_length(summary) between 10 and 300),
+  body         text not null default '' check (char_length(body) <= 50000),
+  -- A Vercel Blob URL (haberler/…) or a path under public/ ("/demo/…"); null = no cover.
+  cover        text,
+  published_on date not null,
+  status       text not null default 'draft' check (status in ('draft', 'published')),
+  author_id    text,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+create index if not exists articles_published_idx on articles (status, published_on desc);

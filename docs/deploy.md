@@ -58,7 +58,7 @@ What keeps the home page fast: the scroll-reveal is CSS (no animation library on
 - [ ] **KVKK legal review** of `/gizlilik`: fill in the data controller, retention period, and the basis for transferring data abroad (Google Sheets); then remove the "Taslak" note.
 - [ ] **Name check**: trademark search for "Çiftçi Destek" (TÜRKPATENT) and domain availability.
 - [ ] **Replace placeholders**: see [placeholders.md](placeholders.md) (logo, demo images, contact e-mail, favicon).
-- [ ] **Replace sample news** in `content/haberler/` with real posts (or delete them; the site handles zero articles).
+- [ ] **Replace sample news** (marked "Örnek haber") with real posts on `/yonetim/haberler`, or delete them; the site handles zero articles.
 - [ ] **Forms**: submit both forms on the live site and confirm rows appear in the sheet.
 - [ ] **Real-phone test**: open the live URL on an actual Android phone (and an iPhone if possible) over mobile data; try the menu, demo, weather, and the waitlist form.
 - [ ] **Share preview**: paste the live URL into WhatsApp and check the preview image and title.
