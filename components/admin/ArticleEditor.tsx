@@ -143,12 +143,25 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
     setSubmitted(true);
     setMessage("");
     if (uploading) return setMessage("Kapak fotoğrafı yükleniyor; birkaç saniye bekleyin.");
-    if (Object.keys(validateArticle(v)).length) {
+    const clientErrors = validateArticle(v);
+    if (Object.keys(clientErrors).length) {
+      // The text box is hidden while previewing: bring it back if the text is what needs fixing.
+      if (clientErrors.body) setTab("yaz");
       requestAnimationFrame(() => summaryRef.current?.focus());
       return;
     }
     start(async () => {
-      const r = await saveArticle(v, articleId);
+      let r: Awaited<ReturnType<typeof saveArticle>> | undefined;
+      try {
+        r = await saveArticle(v, articleId);
+      } catch (err) {
+        // A redirect after a new article is saved is not a failure.
+        if (err && typeof err === "object" && "digest" in err && String((err as { digest: unknown }).digest).startsWith("NEXT_REDIRECT")) throw err;
+        console.error("saveArticle", err);
+        setMessage("Kaydedilemedi: bağlantı ya da sunucu hatası. Sayfayı yenilemeden yeniden deneyin; sorun sürerse metni bir yere kopyalayın.");
+        requestAnimationFrame(() => summaryRef.current?.focus());
+        return;
+      }
       // A new article opens in the editor (the action redirects); an edit stays here.
       if (!r) return;
       setErrors(r.errors);
@@ -157,15 +170,34 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
         setSaved(v);
         setSubmitted(false);
         setSavedAt(`Kaydedildi, ${new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}.`);
-      } else requestAnimationFrame(() => summaryRef.current?.focus());
+      } else {
+        if (r.errors.body) setTab("yaz");
+        requestAnimationFrame(() => summaryRef.current?.focus());
+      }
     });
   }
 
-  const showPreview = () =>
-    start(async () => {
-      setTab("onizleme");
-      setPreview(await previewMarkdown(v.body));
+  /** An error in the summary: go to its field (back in the writing view for the text). */
+  const goTo = (f: ArticleField) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (f === "body") setTab("yaz");
+    requestAnimationFrame(() => {
+      const el = document.getElementById(IDS[f]);
+      el?.scrollIntoView({ block: "center" });
+      el?.focus();
     });
+  };
+
+  const showPreview = () => {
+    setTab("onizleme");
+    start(async () => {
+      try {
+        setPreview(await previewMarkdown(v.body));
+      } catch {
+        setPreview("<p>Önizleme yüklenemedi; yeniden deneyin.</p>");
+      }
+    });
+  };
 
   const slugChangedLive = Boolean(articleId) && initial.status === "published" && v.slug !== initial.slug;
 
@@ -182,7 +214,7 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
               <ul className="mt-2 list-disc space-y-1 pl-10">
                 {summaryList.map((f) => (
                   <li key={f}>
-                    <a href={`#${IDS[f]}`} className="font-semibold underline underline-offset-4">
+                    <a href={`#${IDS[f]}`} onClick={goTo(f)} className="font-semibold underline underline-offset-4">
                       {LABELS[f]}: {shown[f]}
                     </a>
                   </li>
@@ -280,6 +312,12 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
             </>
           ) : (
             <div className="min-h-64 rounded-2xl border-2 border-input p-6">
+              <p className="mb-4 text-sm text-muted-foreground">
+                Önizleme: haber sitede böyle görünecek.{" "}
+                <button type="button" onClick={() => setTab("yaz")} className="cursor-pointer font-semibold text-primary underline underline-offset-4">
+                  Yazmaya dön
+                </button>
+              </p>
               {pending && !preview ? (
                 <p className="text-muted-foreground">Önizleme hazırlanıyor…</p>
               ) : preview ? (
@@ -363,6 +401,14 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
           <Button type="submit" size="lg" disabled={pending || uploading} className="w-full">
             {pending && tab === "yaz" ? "Kaydediliyor…" : articleId ? "Kaydet" : v.status === "published" ? "Yayınla" : "Taslak olarak kaydet"}
           </Button>
+          {(summaryList.length > 0 || message) && (
+            <p className="flex items-start gap-2 rounded-xl bg-destructive/10 px-3 py-2 text-sm font-semibold text-destructive">
+              <WarningCircleIcon aria-hidden="true" weight="fill" className="mt-0.5 size-5 shrink-0" />
+              <span>
+                {summaryList.length > 0 ? `Kaydedilmedi: ${summaryList.length} alanı düzeltin (${summaryList.map((f) => LABELS[f]).join(", ")}).` : message}
+              </span>
+            </p>
+          )}
           <p role="status" className="min-h-6 text-center font-semibold text-primary">
             {savedAt ? (
               <span className="inline-flex items-center gap-1.5">
