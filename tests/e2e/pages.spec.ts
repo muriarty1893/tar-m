@@ -1,7 +1,8 @@
 import { test, expect } from "@playwright/test";
 
 const LANDING_SECTIONS = [
-  "Nasıl çalışır?",
+  "Sitede bugün açık olanlar",
+  "Nasıl çalışacak?",
   "Neler yapabilir?",
   "Uygulamayı deneyin",
   "Bugün tarlanızda hava nasıl?",
@@ -24,7 +25,7 @@ test("landing sections are visible without JavaScript (reveal animation is an en
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto("/");
-  for (const name of ["Nasıl çalışır?", "Neler yapabilir?", "Birlikte büyüyelim"]) {
+  for (const name of ["Sitede bugün açık olanlar", "Nasıl çalışacak?", "Neler yapabilir?", "Birlikte büyüyelim"]) {
     const heading = page.getByRole("heading", { level: 2, name });
     await heading.scrollIntoViewIfNeeded();
     const opacity = await heading.evaluate((el) => {
@@ -84,7 +85,7 @@ test("FAQ has at least 6 questions that expand", async ({ page }) => {
   await expect(first).toHaveAttribute("aria-expanded", "false");
   await first.click();
   await expect(first).toHaveAttribute("aria-expanded", "true");
-  await expect(page.getByText("Türkçe bir mobil uygulamadır.", { exact: false })).toBeVisible();
+  await expect(page.getByText("Türkçe bir dijital tarım rehberi", { exact: false })).toBeVisible();
 });
 
 test("privacy page is a KVKK draft with the legal-review note", async ({ page }) => {

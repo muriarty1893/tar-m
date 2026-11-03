@@ -247,7 +247,7 @@ test("the calendar tab lists the month's farm tasks by day, and tasks can be tic
 
 test("the demo section's intro no longer mentions the pointing finger", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("#demo")).toContainText("Telefondaki uygulamayı kendiniz kullanın");
+  await expect(page.locator("#demo")).toContainText("Mobil uygulamanın nasıl olacağını telefonda deneyin");
   await expect(page.locator("#demo")).not.toContainText("Parmak işareti");
 });
 

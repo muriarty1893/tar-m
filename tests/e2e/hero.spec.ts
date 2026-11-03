@@ -11,7 +11,7 @@ test("the cinematic intro plays by itself and rests with the card, phone and CTA
   await expect(page.locator("html")).toHaveAttribute("data-cine-run", "1");
   const hero = page.locator("main section").first();
   await expect(hero.getByRole("link", { name: "Erken erişim için kaydol" })).toHaveAttribute("href", "/#kayit");
-  await expect(hero.getByRole("link", { name: "Demoyu deneyin" })).toHaveAttribute("href", "/#demo");
+  await expect(hero.getByRole("link", { name: "Pazar’a göz atın" })).toHaveAttribute("href", "/pazar");
   await expect(hero.getByRole("img", { name: /mobil uygulamasının ana ekranı/ })).toBeVisible();
   // No scroll-jacking: the page scrolls right away. (Phone emulation divides a synthetic wheel's
   // delta by the pixel ratio, 2.625 on the Pixel 7, so 900 arrives as ~343 there.)

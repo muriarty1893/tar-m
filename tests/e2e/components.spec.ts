@@ -9,7 +9,7 @@ test.describe("PillNav (desktop navigation)", () => {
     const nav = page.getByRole("navigation", { name: "Ana menü" });
     await expect(nav.getByRole("link", { name: "Haberler", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(nav.locator(".pill-nav__circle")).toHaveCount(0);
-    const pill = nav.getByRole("link", { name: "Demo", exact: true });
+    const pill = nav.getByRole("link", { name: "Pazar", exact: true });
     const label = pill.locator(".pill-nav__label").first();
     const look = () => Promise.all([label.evaluate((el) => getComputedStyle(el).transform), pill.evaluate((el) => getComputedStyle(el).backgroundColor)]);
     const [restLabel, restBg] = await look();
@@ -75,7 +75,7 @@ test("every sign-up button carries the diagonal arrow, which turns to point ahea
   const n = await signups.count();
   expect(n).toBeGreaterThan(2);
   for (let i = 0; i < n; i++) await expect(signups.nth(i).locator(".btn-arrow svg"), `sign-up button ${i}`).toHaveCount(1);
-  await expect(page.locator("main section").first().getByRole("link", { name: "Demoyu deneyin" }).locator(".btn-arrow")).toHaveCount(1);
+  await expect(page.locator("main section").first().getByRole("link", { name: "Pazar’a göz atın" }).locator(".btn-arrow")).toHaveCount(1);
   test.skip(isMobile, "hover is a pointer interaction");
 
   const cta = page.locator("[data-cine='card']").getByRole("link", { name: /Erken erişim/ });

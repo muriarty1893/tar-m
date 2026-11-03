@@ -36,6 +36,17 @@ export default function PrivacyPage() {
             Hava durumu bölümü: &quot;Konumumu kullan&quot; seçeneğini kullanırsanız konumunuz yalnızca tarayıcınızda en
             yakın ili bulmak için kullanılır; sunucularımıza gönderilmez ve saklanmaz.
           </li>
+          <li>
+            Hesap: e-posta adresiniz (ya da Google ile girişte Google hesabınızın adı ve e-postası) ve şifreniz; giriş
+            hizmetini sağlayan Clerk tarafından tutulur. Şifreniz bize ulaşmaz.
+          </li>
+          <li>Profil: diğer kullanıcıların gördüğü adınız ve isteğe bağlı iliniz.</li>
+          <li>
+            Pazar: ilanlarınız (başlık, fiyat, açıklama, il ve ilçe, fotoğraflar), favorileriniz, şikâyetleriniz ve
+            alıcı ya da satıcılarla mesajlarınız ve teklifleriniz. İlanlar ve satıcı adı herkese açıktır; mesajlar
+            yalnızca sohbetin iki tarafına görünür. E-posta adresiniz ve telefonunuz ilanlarda gösterilmez.
+          </li>
+          <li>Tarlalarım ve Tarım takvimi: tarla bilgileriniz, masraflarınız ve takvim işleriniz; yalnızca size görünür.</li>
           <li>Teknik veriler: güvenlik amacıyla, form gönderimlerinde IP adresi geçici olarak kullanılır ve saklanmaz.</li>
         </ul>
 
@@ -43,6 +54,8 @@ export default function PrivacyPage() {
         <ul>
           <li>Uygulama hazır olduğunda sizi bilgilendirmek ve erken erişim daveti göndermek,</li>
           <li>İş birliği taleplerinize dönüş yapmak,</li>
+          <li>Hesabınızı, ilanlarınızı, mesajlarınızı, tarla ve takvim kayıtlarınızı size sunmak,</li>
+          <li>Pazar kurallarına aykırı ilanları ve dolandırıcılığı önlemek,</li>
           <li>Kötüye kullanım ve istenmeyen gönderimleri (spam) önlemek.</li>
         </ul>
 
@@ -55,14 +68,18 @@ export default function PrivacyPage() {
         <h2>5. Aktarım</h2>
         <p>
           Form verileri, kayıt amacıyla Google LLC tarafından sağlanan Google E-Tablolar hizmetinde saklanır. Bu hizmetin
-          sunucuları yurt dışında bulunabilir. [Yurt dışına aktarım için KVKK madde 9 kapsamındaki dayanak ve gerekli
-          bildirimler hukuki inceleme ile netleştirilecektir.] Web sitesi Vercel Inc. altyapısında barındırılmaktadır.
+          sunucuları yurt dışında bulunabilir. Hesap bilgileri Clerk Inc. (ABD) tarafından; ilan, mesaj, tarla ve takvim
+          kayıtları Neon (veritabanı) ve ilan fotoğrafları Vercel Blob hizmetinde, Frankfurt (Almanya, AB) bölgesinde
+          saklanır. [Yurt dışına aktarım için KVKK madde 9 kapsamındaki dayanak ve gerekli bildirimler hukuki inceleme ile
+          netleştirilecektir.] Web sitesi Vercel Inc. altyapısında barındırılmaktadır.
         </p>
 
         <h2>6. Saklama süresi</h2>
         <p>
           Verileriniz, işleme amacı sona erene kadar veya rızanızı geri çekene kadar saklanır; ardından silinir ya da
-          anonim hâle getirilir. [Kesin süre belirlenecektir.]
+          anonim hâle getirilir. [Kesin süre belirlenecektir.] Hesabınızı{" "}
+          <a href="/hesabim">Hesabım</a> sayfasından istediğiniz an silebilirsiniz: ilanlarınız, fotoğraflarınız,
+          mesajlarınız, tarla ve takvim kayıtlarınız da kalıcı olarak silinir.
         </p>
 
         <h2>7. Haklarınız</h2>
@@ -82,7 +99,7 @@ export default function PrivacyPage() {
           adresine iletebilirsiniz. Başvurunuz en geç 30 gün içinde ücretsiz olarak sonuçlandırılır.
         </p>
 
-        <p className="text-base text-muted-foreground">Son güncelleme: 12 Ekim 2026</p>
+        <p className="text-base text-muted-foreground">Son güncelleme: 3 Kasım 2026</p>
       </div>
     </article>
   );

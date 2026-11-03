@@ -23,9 +23,10 @@ const blocks = [
     title: "Çözümümüz",
     icon: LightbulbIcon,
     points: [
-      "Telefonla çekilen bir fotoğraftan hastalık, zararlı ve stres belirtilerini tanıyan yapay zekâ.",
+      "Telefonla çekilen bir fotoğraftan hastalık, zararlı ve stres belirtilerini tanıyacak yapay zekâ (geliştiriliyor).",
       "Sade Türkçe öneriler, hasat başarı tahmini ve ile özel hava uyarıları tek uygulamada.",
       "Uzman desteğinin yerini almak değil, çiftçiyi doğru zamanda doğru uzmana yönlendirmek.",
+      "Bugünden sitede açık: çiftçiden çiftçiye pazar ve mesajlaşma, ile özel hava uyarıları, tarım takvimi, tarla ve masraf takibi.",
     ],
   },
   {

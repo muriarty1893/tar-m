@@ -52,6 +52,8 @@ What keeps the home page fast: the scroll-reveal is CSS (no animation library on
 
 ## Pre-launch checklist
 
+- [ ] **Accounts and Pazar**: see [accounts-and-market.md](accounts-and-market.md): Clerk production instance (needs your own domain), sign-up name fields, `ADMIN_USER_IDS`.
+
 - [ ] **Agronomist review** of the demo answers (`data/demo-scenarios.ts`), weather hint thresholds (`lib/weather.ts` → `farmingHint`), sample news, and FAQ answers.
 - [ ] **KVKK legal review** of `/gizlilik`: fill in the data controller, retention period, and the basis for transferring data abroad (Google Sheets); then remove the "Taslak" note.
 - [ ] **Name check**: trademark search for "Çiftçi Destek" (TÜRKPATENT) and domain availability.

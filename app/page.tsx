@@ -3,6 +3,7 @@ import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { getAllArticles } from "@/lib/news";
 import { Hero } from "@/components/Hero";
 import { HowItWorks } from "@/components/HowItWorks";
+import { HomeTools } from "@/components/HomeTools";
 import { Features } from "@/components/Features";
 import { Section } from "@/components/Section";
 import { DemoShowcase } from "@/components/DemoShowcase";
@@ -22,6 +23,8 @@ export default async function Home() {
       {/* Above the fold renders without animation so it paints immediately. */}
       <Hero />
 
+      <HomeTools />
+
       <BlurFade>
         <HowItWorks />
       </BlurFade>
@@ -34,7 +37,7 @@ export default async function Home() {
         id="demo"
         eyebrow="Canlı demo"
         title="Uygulamayı deneyin"
-        intro="Telefondaki uygulamayı kendiniz kullanın: taramayı başlatın, fotoğrafı çekin ve yapay zekânın yanıtını görün."
+        intro="Mobil uygulamanın nasıl olacağını telefonda deneyin: taramayı başlatın, fotoğrafı çekin, yanıtı görün. Bu bir demo; yanıtlar örnektir, yapay zekâ taraması yakında."
         className="bg-surface"
       >
         <DemoShowcase />

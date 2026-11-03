@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { PageHero } from "@/components/PageHero";
 
@@ -16,6 +17,13 @@ export default function WeatherPage() {
       />
       <section className="mx-auto max-w-5xl px-4 py-12">
         <WeatherWidget headingLevel={2} />
+        <p className="mt-8 text-lg text-muted-foreground">
+          İlaçlamaya uygun günü ya da don uyarısını unutmayın:{" "}
+          <Link href="/takvim" className="font-semibold text-primary underline underline-offset-4">
+            tarım takviminize iş ekleyin
+          </Link>
+          .
+        </p>
       </section>
     </>
   );

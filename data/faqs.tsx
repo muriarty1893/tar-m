@@ -6,7 +6,23 @@ import { siteConfig } from "@/config/site";
 export const faqs: { q: string; a: ReactNode }[] = [
   {
     q: `${siteConfig.name} nedir?`,
-    a: "Tarlanızın ya da bitkinizin fotoğrafını gönderdiğinizde, yapay zekâ ile hastalık ve zararlı belirtilerini tanıyan, öneriler sunan ve hasat başarı tahmini veren Türkçe bir mobil uygulamadır.",
+    a: "Çiftçiler için Türkçe bir dijital tarım rehberi. Sitede şimdiden çiftçi pazarı ve mesajlaşma, hava durumu, tarım takvimi, tarla ve masraf takibi var. Geliştirdiğimiz mobil uygulama ise tarlanızın fotoğrafından yapay zekâ ile hastalık ve zararlı belirtilerini tanıyacak, öneriler sunacak ve hasat başarı tahmini verecek.",
+  },
+  {
+    q: "Sitede şimdi neleri kullanabilirim?",
+    a: (
+      <>
+        Ücretsiz bir hesapla <Link href="/pazar" className="font-semibold text-primary underline underline-offset-4">Pazar</Link>’da ilan verebilir, alıcı ve satıcılarla
+        mesajlaşıp teklif verebilir; <Link href="/takvim" className="font-semibold text-primary underline underline-offset-4">tarım takviminizi</Link> ve{" "}
+        <Link href="/tarlalarim" className="font-semibold text-primary underline underline-offset-4">tarlalarınızı</Link> kaydedebilirsiniz.{" "}
+        <Link href="/hava" className="font-semibold text-primary underline underline-offset-4">Hava durumu</Link> ve borsa fiyatları için hesap gerekmez. Fotoğraftan
+        yapay zekâ taraması henüz yok; ana sayfadaki demo yalnızca nasıl olacağını gösterir.
+      </>
+    ),
+  },
+  {
+    q: "Pazar’da ödemeyi site mi alıyor?",
+    a: `Hayır. ${siteConfig.name} alıcı ile satıcıyı buluşturur; ödeme ve teslim yüz yüze, ürünü görerek yapılır. Ürünü görmeden kapora ya da ödeme göndermeyin. Kurallara uymayan ilanları ilan sayfasından şikâyet edebilirsiniz.`,
   },
   {
     q: "Uygulama ne zaman çıkacak?",

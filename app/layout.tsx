@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
+import { clerkLocalization } from "@/lib/clerk-localization";
 import { Onest, Plus_Jakarta_Sans, Sofia_Sans_Condensed, Spline_Sans_Mono } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import { siteUrl } from "@/lib/site-url";
@@ -41,6 +43,19 @@ export const metadata: Metadata = {
 // allowed. If the hero hasn't started within 4 s (slow or failed JS), the content simply shows.
 const cineScript = `(function(){var d=document.documentElement;if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("cine");setTimeout(function(){if(!d.dataset.cineRun)d.classList.remove("cine")},4000)})()`;
 
+const clerkAppearance = {
+  variables: {
+    colorPrimary: "#0b7a3b",
+    colorForeground: "#0f2e1d",
+    colorMutedForeground: "#4b5a51",
+    colorDanger: "#b91c1c",
+    colorBackground: "#ffffff",
+    fontFamily: "var(--site-sans)",
+    fontSize: "1rem",
+    borderRadius: "0.75rem",
+  },
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="tr" className={`${fonts} h-full antialiased`} suppressHydrationWarning>
@@ -48,19 +63,22 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: cineScript }} />
       </head>
       <body className="flex min-h-full flex-col font-sans">
-        <a
-          href="#icerik"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[60] focus:rounded-2xl focus:bg-card focus:px-4 focus:py-3 focus:font-semibold focus:shadow-lift"
-        >
-          İçeriğe geç
-        </a>
-        <Header />
-        <main id="icerik" className="flex-1 overflow-x-clip">
-          {children}
-        </main>
-        <Footer />
-        <WelcomeGate />
-        <SmoothScroll />
+        {/* Sign-in (Clerk), in Turkish and the site's green. Inside <body>, as Cache Components needs. */}
+        <ClerkProvider localization={clerkLocalization} signInUrl="/giris" signUpUrl="/kayit" afterSignOutUrl="/" appearance={clerkAppearance}>
+          <a
+            href="#icerik"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[60] focus:rounded-2xl focus:bg-card focus:px-4 focus:py-3 focus:font-semibold focus:shadow-lift"
+          >
+            İçeriğe geç
+          </a>
+          <Header />
+          <main id="icerik" className="flex-1 overflow-x-clip">
+            {children}
+          </main>
+          <Footer />
+          <WelcomeGate />
+          <SmoothScroll />
+        </ClerkProvider>
       </body>
     </html>
   );

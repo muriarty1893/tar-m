@@ -23,32 +23,33 @@ export function Hero() {
       eyebrow={
         <Badge variant="secondary" className="max-w-full shrink whitespace-normal text-primary shadow-soft">
           <SparkleIcon aria-hidden="true" weight="fill" />
-          Çiftçiler için yapay zekâ destekli tarla asistanı
+          Pazar, hava ve takvim şimdi açık · Yapay zekâ taraması yakında
         </Badge>
       }
       cardHeading="Ziraat uzmanınız cebinizde."
       cardDescription={
         <>
-          <span className="hero-fg font-semibold">{siteConfig.name}</span>, tarlanızın fotoğrafından hastalık ve
-          zararlı belirtilerini tanır, sade Türkçe öneriler sunar ve hasat başarı tahmini verir.
+          <span className="hero-fg font-semibold">{siteConfig.name}</span> ile bugünden çiftçi pazarında alıp satın,
+          hava durumunu ve tarım takviminizi takip edin. Yakında mobil uygulama, tarlanızın fotoğrafından hastalık ve
+          zararlı belirtilerini tanıyacak.
         </>
       }
       actions={
         <>
           <CtaLink variant="gold" />
           <Link
-            href="/#demo"
+            href="/pazar"
             className={buttonVariants({
               variant: "outline",
               className: "hero-outline",
             })}
           >
-            Demoyu deneyin
+            Pazar’a göz atın
             <ArrowUpRight />
           </Link>
         </>
       }
-      footnote="Ücretsiz kayıt · Tamamen Türkçe · KVKK'ya uygun"
+      footnote="Ücretsiz hesap · Tamamen Türkçe · KVKK'ya uygun"
       phone={{
         src: "/hero/phone.webp",
         alt: `${siteConfig.name} mobil uygulamasının ana ekranı: hızlı menü kısayolları ve tarla hava durumu`,

@@ -36,7 +36,8 @@ const features = [
   {
     icon: <BugIcon weight="duotone" />,
     name: "Hastalık ve zararlı tespiti",
-    description: "Pas, mildiyö, kurumcuk gibi hastalıkların ve zararlıların belirtilerini fotoğraftan tanır.",
+    description: "Pas, mildiyö, kurumcuk gibi hastalıkların ve zararlıların belirtilerini fotoğraftan tanıyacak.",
+    status: { label: "Yakında, uygulamada", tone: "soon" as const },
     className: "lg:col-span-2 min-h-[22rem] sm:min-h-[17rem]",
     contentClassName: "sm:max-w-[54%]",
     background: <RustPhoto />,
@@ -44,24 +45,28 @@ const features = [
   {
     icon: <ChartLineUpIcon weight="duotone" />,
     name: "Hasat başarı tahmini",
-    description: "Tarlanızın durumuna göre hasat başarısını yüzde olarak tahmin eder, gidişatı takip etmenizi sağlar.",
+    description: "Tarlanızın durumuna göre hasat başarısını yüzde olarak tahmin edecek, gidişatı takip etmenizi sağlayacak.",
+    status: { label: "Yakında, uygulamada", tone: "soon" as const },
     className: "min-h-[17rem]",
     background: <GrowthBars />,
   },
   {
     icon: <DropIcon weight="duotone" />,
     name: "Ekim ve sulama önerileri",
-    description: "Ürününüze, bölgenize ve hava durumuna göre ne zaman ekip ne zaman sulayacağınızı önerir.",
+    description: "Ürününüze, bölgenize ve hava durumuna göre ne zaman ekip ne zaman sulayacağınızı önerecek.",
+    status: { label: "Yakında, uygulamada", tone: "soon" as const },
   },
   {
     icon: <CalendarDotsIcon weight="duotone" />,
     name: "Tarım takvimi",
-    description: "Bu ay tarlanızda yapmanız gerekenleri hatırlatır; ilaçlama, gübreleme ve hasat zamanlarını kaçırmazsınız.",
+    description: "Tarlanızdaki işleri gün gün planlayın; ilaçlama, gübreleme ve hasat zamanlarını kaçırmayın.",
+    status: { label: "Sitede açık", tone: "live" as const, href: "/takvim" },
   },
   {
     icon: <CloudSunIcon weight="duotone" />,
     name: "Çiftçiye özel hava uyarıları",
     description: "Don, yoğun yağış ve ilaçlama için uygun günler hakkında ilinize göre uyarılar verir.",
+    status: { label: "Sitede açık", tone: "live" as const, href: "/hava" },
   },
   {
     icon: <TranslateIcon weight="duotone" />,
@@ -77,7 +82,7 @@ export function Features() {
       id="ozellikler"
       eyebrow="Özellikler"
       title="Neler yapabilir?"
-      intro={`${siteConfig.name}, tarlanızdaki sorunları erkenden fark etmenize ve doğru kararı vermenize yardım eder.`}
+      intro={`${siteConfig.name}, tarlanızdaki sorunları erkenden fark etmenize ve doğru kararı vermenize yardım eder. Hava durumu ve takvim sitede şimdi açık; fotoğraftan yapay zekâ ile tespit mobil uygulamayla gelecek.`}
     >
       <BentoGrid>
         {features.map((f) => (

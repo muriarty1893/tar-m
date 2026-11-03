@@ -10,7 +10,7 @@ const steps = [
   {
     icon: ScanIcon,
     title: "Yapay zekâ incelesin",
-    text: "Yapay zekâ yaprak, renk ve gelişim belirtilerini saniyeler içinde analiz eder.",
+    text: "Yapay zekâ yaprak, renk ve gelişim belirtilerini saniyeler içinde analiz edecek.",
   },
   {
     icon: PlantIcon,
@@ -23,12 +23,10 @@ export function HowItWorks() {
   return (
     <Section
       id="nasil-calisir"
-      eyebrow="3 adımda"
-      title="Nasıl çalışır?"
-      intro="Karmaşık menüler yok. Çek, gönder, öğren."
+      eyebrow="Yakında, mobil uygulamada"
+      title="Nasıl çalışacak?"
+      intro="Karmaşık menüler yok. Çek, gönder, öğren. Fotoğraftan tespit geliştiriliyor; aşağıdaki demoda nasıl olacağını görebilirsiniz."
       align="center"
-      // No top rule: the hero's field photo fades out across this section's top padding.
-      className="border-t-0!"
     >
       <ol className="grid gap-5 md:grid-cols-3">
         {steps.map(({ icon: Icon, title, text }, i) => (

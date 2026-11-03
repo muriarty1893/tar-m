@@ -6,14 +6,16 @@ import { CtaLink } from "./CtaLink";
 import { FooterClock } from "./FooterClock";
 
 const pages = [
+  { label: "Pazar", href: "/pazar" },
+  { label: "Hava Durumu", href: "/hava" },
+  { label: "Haberler", href: "/haberler" },
   { label: "Hakkımızda", href: "/hakkimizda" },
   { label: "İş Birliği", href: "/is-birligi" },
-  { label: "Haberler", href: "/haberler" },
-  { label: "Hava Durumu", href: "/hava" },
 ];
 
 const more = [
   { label: "SSS", href: "/sss" },
+  { label: "Pazar kuralları", href: "/pazar/kurallar" },
   { label: "Gizlilik ve KVKK", href: "/gizlilik" },
   { label: "Görsel kaynakları", href: "/kaynaklar" },
 ];
