@@ -64,6 +64,19 @@ const TOOLS: { label: string; Icon: typeof TextBIcon; wrap?: [string, string]; l
   { label: "Bağlantı", Icon: LinkSimpleIcon, wrap: ["[", "](https://)"], placeholder: "bağlantı metni" },
 ];
 
+/** Writes what happened to the server log, so a failed save can be traced (admins only). */
+function report(event: string, data: Record<string, unknown> = {}) {
+  try {
+    const body = JSON.stringify({ event, ...data, ua: navigator.userAgent.slice(0, 120) });
+    if (!navigator.sendBeacon?.("/api/yonetim/tani", body)) void fetch("/api/yonetim/tani", { method: "POST", body, keepalive: true });
+  } catch {
+    // Diagnostics must never break the editor.
+  }
+}
+
+/** How long a cover upload may take before it's given up. */
+const UPLOAD_TIMEOUT_MS = 60_000;
+
 /** The news editor on /yonetim/haberler: new (no `articleId`) or editing one. */
 export function ArticleEditor({ initial, articleId, justSaved = false }: { initial: ArticleInput; articleId?: string; justSaved?: boolean }) {
   const [v, setV] = useState(initial);
@@ -125,14 +138,25 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
     if (!file) return;
     setUploading(true);
     setErrors((e) => ({ ...e, cover: undefined }));
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), UPLOAD_TIMEOUT_MS);
+    report("upload-start", { type: file.type, size: file.size });
     try {
       const blob = await shrinkImage(file, 1600);
       const ext = blob.type === "image/webp" ? "webp" : "jpg";
-      const result = await upload(`haberler/${randomName()}.${ext}`, blob, { access: "public", handleUploadUrl: "/api/yonetim/kapak", contentType: blob.type });
+      const result = await upload(`haberler/${randomName()}.${ext}`, blob, {
+        access: "public",
+        handleUploadUrl: "/api/yonetim/kapak",
+        contentType: blob.type,
+        abortSignal: abort.signal,
+      });
       set("cover", result.url);
-    } catch {
-      setErrors((e) => ({ ...e, cover: "Fotoğraf yüklenemedi; yeniden deneyin." }));
+      report("upload-done");
+    } catch (err) {
+      report("upload-error", { error: String(err).slice(0, 300) });
+      setErrors((e) => ({ ...e, cover: abort.signal.aborted ? "Yükleme çok uzun sürdü; yeniden deneyin." : "Fotoğraf yüklenemedi; yeniden deneyin." }));
     } finally {
+      clearTimeout(timer);
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
     }
@@ -142,8 +166,10 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
     e.preventDefault();
     setSubmitted(true);
     setMessage("");
-    if (uploading) return setMessage("Kapak fotoğrafı yükleniyor; birkaç saniye bekleyin.");
     const clientErrors = validateArticle(v);
+    report("submit", { status: v.status, tab, uploading, pending, errors: Object.keys(clientErrors), lengths: [v.title.length, v.summary.length, v.body.length], cover: Boolean(v.cover) });
+    if (pending) return setMessage("Bir önceki işlem sürüyor; birkaç saniye bekleyip yeniden basın.");
+    if (uploading) return setMessage("Kapak fotoğrafı yükleniyor; birkaç saniye bekleyin.");
     if (Object.keys(clientErrors).length) {
       // The text box is hidden while previewing: bring it back if the text is what needs fixing.
       if (clientErrors.body) setTab("yaz");
@@ -158,10 +184,12 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
         // A redirect after a new article is saved is not a failure.
         if (err && typeof err === "object" && "digest" in err && String((err as { digest: unknown }).digest).startsWith("NEXT_REDIRECT")) throw err;
         console.error("saveArticle", err);
+        report("save-error", { error: String(err).slice(0, 300) });
         setMessage("Kaydedilemedi: bağlantı ya da sunucu hatası. Sayfayı yenilemeden yeniden deneyin; sorun sürerse metni bir yere kopyalayın.");
         requestAnimationFrame(() => summaryRef.current?.focus());
         return;
       }
+      report("save-result", { saved: Boolean(r?.saved), errors: r ? Object.keys(r.errors) : null, message: r?.message ?? null });
       // A new article opens in the editor (the action redirects); an edit stays here.
       if (!r) return;
       setErrors(r.errors);
@@ -398,8 +426,9 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
         </div>
 
         <div className="space-y-3 border-t border-border pt-6">
-          <Button type="submit" size="lg" disabled={pending || uploading} className="w-full">
-            {pending && tab === "yaz" ? "Kaydediliyor…" : articleId ? "Kaydet" : v.status === "published" ? "Yayınla" : "Taslak olarak kaydet"}
+          {/* Never disabled: a click always answers, even while something is still in progress. */}
+          <Button type="submit" size="lg" aria-busy={pending || uploading} className="w-full">
+            {pending ? "Kaydediliyor…" : uploading ? "Fotoğraf yükleniyor…" : articleId ? "Kaydet" : v.status === "published" ? "Yayınla" : "Taslak olarak kaydet"}
           </Button>
           {(summaryList.length > 0 || message) && (
             <p className="flex items-start gap-2 rounded-xl bg-destructive/10 px-3 py-2 text-sm font-semibold text-destructive">
