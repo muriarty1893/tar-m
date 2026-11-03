@@ -29,12 +29,13 @@ test("how-it-works, feature and news cards have no hover effect", async ({ page 
 test("hovering a demo field card does not blur or shrink the others", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/#demo");
-  const cards = page.locator("#demo").getByRole("button", { pressed: false });
-  const second = cards.filter({ hasText: "Mısır" });
+  // The field picker's cards, by their titles: the 3D phone, once loaded, has its own "Buğday" buttons.
+  const demo = page.locator("#demo");
+  const second = demo.getByRole("button", { name: /Mısır tarlası/, pressed: false });
   await second.scrollIntoViewIfNeeded();
   await page.mouse.move(0, 0);
   const before = await look(second);
-  await cards.filter({ hasText: "Buğday" }).hover();
+  await demo.getByRole("button", { name: /Buğday tarlası/, pressed: false }).hover();
   await page.waitForTimeout(450);
   expect(await look(second)).toBe(before);
 });
