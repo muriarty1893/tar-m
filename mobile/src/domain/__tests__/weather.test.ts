@@ -1,4 +1,4 @@
-import { dayLabel, describeWeather, farmingHint, fetchForecast, forecastUrl, parseForecast, tempLabel, weatherIcon, weekOutlook, type DailyForecast } from '../weather';
+import { dayLabel, describeWeather, shortDayLabel, farmingHint, fetchForecast, forecastUrl, parseForecast, tempLabel, weatherIcon, weekOutlook, type DailyForecast } from '../weather';
 
 const day = (over: Partial<DailyForecast> = {}): DailyForecast => ({ date: '2026-10-20', min: 8, max: 20, rainProb: 50, rainMm: 2, windMax: 20, ...over });
 
@@ -114,6 +114,15 @@ describe('labels', () => {
     expect(dayLabel('2026-10-20', today)).toBe('Bugün');
     expect(dayLabel('2026-10-21', today)).toBe('Yarın');
     expect(dayLabel('2026-10-22', today)).toBe('Perşembe');
+  });
+
+  test('short day names for the 7-day strip', () => {
+    const today = new Date(2026, 9, 20, 15);
+    expect(shortDayLabel('2026-10-20', today)).toBe('Bugün');
+    expect(shortDayLabel('2026-10-21', today)).toBe('Yarın');
+    expect(shortDayLabel('2026-10-22', today)).toBe('Per');
+    expect(shortDayLabel('2026-10-25', today)).toBe('Paz');
+    expect(shortDayLabel('2026-10-26', today)).toBe('Pzt');
   });
 });
 

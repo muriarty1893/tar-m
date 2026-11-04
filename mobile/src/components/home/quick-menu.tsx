@@ -6,7 +6,6 @@ import {
   CalendarDotsIcon,
   ChartLineUpIcon,
   ChatsTeardropIcon,
-  CloudSunIcon,
   MapTrifoldIcon,
   MegaphoneIcon,
   NewspaperIcon,
@@ -25,14 +24,13 @@ type Item = { label: string; Icon: PhosphorIcon; tone: TileTone; href: Href; tab
 const ITEMS: Item[] = [
   { label: 'Hastalık Tara', Icon: ScanIcon, tone: 'emerald', href: '/tara' },
   { label: 'Tarlalarım', Icon: TractorIcon, tone: 'amber', href: '/tarlalar' },
-  { label: 'Hava Durumu', Icon: CloudSunIcon, tone: 'sky', href: '/hava' },
+  { label: 'Takvim ve Hava', Icon: CalendarDotsIcon, tone: 'indigo', href: '/takvim', tab: true },
   { label: 'Tarla Haritası', Icon: MapTrifoldIcon, tone: 'teal', href: '/harita' },
-  { label: 'Tarım Takvimi', Icon: CalendarDotsIcon, tone: 'indigo', href: '/takvim', tab: true },
-  { label: 'Fiyatlar', Icon: ChartLineUpIcon, tone: 'purple', href: '/fiyatlar' },
   { label: 'Pazar', Icon: StorefrontIcon, tone: 'rose', href: '/pazar', tab: true },
+  { label: 'Fiyatlar', Icon: ChartLineUpIcon, tone: 'purple', href: { pathname: '/pazar', params: { bolum: 'fiyatlar' } }, tab: true },
   { label: 'İlan Ver', Icon: MegaphoneIcon, tone: 'orange', href: '/ilan/yeni' },
+  { label: 'Forum', Icon: ChatsTeardropIcon, tone: 'sky', href: '/forum' },
   { label: 'Haberler', Icon: NewspaperIcon, tone: 'sky', href: '/haberler' },
-  { label: 'Forum', Icon: ChatsTeardropIcon, tone: 'teal', href: '/forum' },
   { label: 'Hesabım', Icon: UserCircleIcon, tone: 'emerald', href: '/hesap' },
 ];
 

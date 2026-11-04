@@ -158,3 +158,11 @@ export function dayLabel(date: string, today: Date) {
   if (date === dayKey(addDays(today, 1))) return 'Yarın';
   return WEEKDAYS[fromDayKey(date).getDay()];
 }
+
+const WEEKDAYS_SHORT = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+
+/** For the 7-day strip, where a column is ~48 px wide: "Bugün", "Yarın", then "Pzt", "Sal"… */
+export function shortDayLabel(date: string, today: Date) {
+  const long = dayLabel(date, today);
+  return long === 'Bugün' || long === 'Yarın' ? long : WEEKDAYS_SHORT[fromDayKey(date).getDay()];
+}

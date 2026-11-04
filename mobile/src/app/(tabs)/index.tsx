@@ -25,10 +25,10 @@ export default function Home() {
         <QuickMenu />
         <NewsCard />
         <ForumBlock />
-        <WeatherHero onForecast={() => router.push('/hava')} />
+        <WeatherHero onForecast={() => router.navigate('/takvim')} />
         <WeekOutlook />
       </View>
-      <PriceStrip onSeeAll={() => router.push('/fiyatlar')} />
+      <PriceStrip onSeeAll={() => router.navigate({ pathname: '/pazar', params: { bolum: 'fiyatlar' } })} />
       <MarketStrip />
       <Pressable accessibilityRole="link" onPress={() => router.push('/kaynaklar')} hitSlop={8} className="mt-6 min-h-11 items-center justify-center self-center px-3 active:opacity-60">
         <Text className="text-[13px] text-muted-foreground underline">Görsel kaynakları</Text>

@@ -14,12 +14,21 @@ import { WeatherIcon } from './weather-icon';
 
 export const HINT_ICONS: Record<FarmingHint['kind'], PhosphorIcon> = { spray: SprayBottleIcon, frost: SnowflakeIcon, rain: CloudRainIcon, normal: PlantIcon };
 
+/** Each tone keeps 4.5:1 contrast on white; the words carry the meaning, the colour only helps. */
+export const HINT_TONE: Record<FarmingHint['kind'], string> = {
+  frost: COLORS.destructive,
+  rain: '#0369a1',
+  spray: COLORS.primary,
+  normal: COLORS.mutedForeground,
+};
+
 /**
  * "Tarla Konumu": live weather (Open-Meteo) for the chosen province on a dark green card: the place
  * (tap to change) with a live/offline badge, the temperature, rain, wind and sunrise tiles, and
- * today's farming hint on a white card. With `onForecast`, the hint opens the 7-day forecast.
+ * today's farming hint on a white card. With `onForecast`, the hint opens the 7-day forecast;
+ * `hint={false}` leaves it out (Takvim shows each day's hint under the calendar).
  */
-export function WeatherHero({ onForecast }: { onForecast?: () => void }) {
+export function WeatherHero({ onForecast, hint: showHint = true }: { onForecast?: () => void; hint?: boolean }) {
   const { province, forecast, status, retry } = useWeather();
   const now = forecast?.data.current;
   const today = forecast?.data.daily[0];
@@ -107,15 +116,17 @@ export function WeatherHero({ onForecast }: { onForecast?: () => void }) {
           <Stat label="Gün doğumu" value={today?.sunrise ?? '–'} />
         </View>
 
-        <View className="mt-3.5">
-          {onForecast ? (
-            <Pressable accessibilityRole="button" accessibilityLabel={`Bugün tarlada: ${hint?.text ?? 'tahmin yok'}. 7 günlük tahmini aç`} onPress={onForecast} className="active:opacity-90">
-              {hintCard}
-            </Pressable>
-          ) : (
-            hintCard
-          )}
-        </View>
+        {showHint ? (
+          <View className="mt-3.5">
+            {onForecast ? (
+              <Pressable accessibilityRole="button" accessibilityLabel={`Bugün tarlada: ${hint?.text ?? 'tahmin yok'}. 7 günlük tahmini aç`} onPress={onForecast} className="active:opacity-90">
+                {hintCard}
+              </Pressable>
+            ) : (
+              hintCard
+            )}
+          </View>
+        ) : null}
       </LinearGradient>
     </View>
   );

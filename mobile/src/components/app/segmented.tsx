@@ -19,8 +19,8 @@ export function Segmented<T extends string>({ label, value, options, onChange }:
             isFirst={i === 0}
             isLast={i === options.length - 1}
             accessibilityLabel={o.badge ? `${o.label}, ${o.badge} okunmamış` : o.label}
-            className={cn('h-10 flex-1 flex-row gap-1.5 rounded-full', on ? 'bg-primary' : 'bg-transparent')}>
-            <Text className={cn('font-sans-semibold text-[14px]', on ? 'text-primary-foreground' : 'text-muted-foreground')}>{o.label}</Text>
+            className={cn('h-10 flex-1 flex-row gap-1.5 rounded-full', on ? 'bg-primary web:hover:bg-primary' : 'bg-transparent')}>
+            <Text className={cn('font-sans-semibold text-[14px]', on ? 'text-primary-foreground web:group-hover:text-primary-foreground' : 'text-muted-foreground')}>{o.label}</Text>
             {o.badge ? (
               <View className={cn('min-w-5 items-center rounded-full px-1.5', on ? 'bg-white' : 'bg-destructive')}>
                 <Text className={cn('font-sans-bold text-[11px] leading-4', on ? 'text-primary' : 'text-white')}>{o.badge}</Text>

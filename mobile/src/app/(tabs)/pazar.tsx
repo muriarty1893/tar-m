@@ -12,6 +12,7 @@ import { ProvinceChip } from '@/components/form/province-select';
 import { ArrowsDownUpIcon, CheckIcon, MagnifyingGlassIcon, PlusIcon, StorefrontIcon, XCircleIcon } from '@/components/icons';
 import { InboxList } from '@/components/market/inbox-list';
 import { ListingCard } from '@/components/market/listing-card';
+import { PriceList } from '@/components/market/price-list';
 import { CATEGORY_ICONS, SafetyStrip } from '@/components/market/parts';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Text } from '@/components/ui/text';
@@ -27,17 +28,19 @@ const VIEWS: { id: MarketView; label: string }[] = [
   { id: 'ilanlarim', label: 'İlanlarım' },
 ];
 
-type Section = 'ilanlar' | 'mesajlar';
+type Section = 'ilanlar' | 'fiyatlar' | 'mesajlar';
+const SECTIONS: Section[] = ['ilanlar', 'fiyatlar', 'mesajlar'];
 
 /**
  * "Pazar": the farmers' market in one place, "İlanlar" (search, categories, province, sorting, the
- * listings; "İlan ver" one tap away) and "Mesajlar" (the listing chats). The same listings as the
- * website's Pazar. The bell on the home screen opens it on Mesajlar (?bolum=mesajlar).
+ * listings; "İlan ver" one tap away), "Fiyatlar" (crop prices per kilo) and "Mesajlar" (the listing
+ * chats). The same listings as the website's Pazar. ?bolum=fiyatlar or ?bolum=mesajlar opens that
+ * part (the home screen's price strip, the bell).
  */
 export default function Market() {
   const insets = useSafeAreaInsets();
   const { bolum } = useLocalSearchParams<{ bolum?: string }>();
-  const asked: Section = bolum === 'mesajlar' ? 'mesajlar' : 'ilanlar';
+  const asked: Section = SECTIONS.includes(bolum as Section) ? (bolum as Section) : 'ilanlar';
   const [section, setSection] = useState<Section>(asked);
   // Opening Pazar again with a section (the bell) switches to it, even when the tab is already open.
   const [lastAsked, setLastAsked] = useState(bolum);
@@ -58,6 +61,7 @@ export default function Market() {
         onChange={setSection}
         options={[
           { id: 'ilanlar', label: 'İlanlar' },
+          { id: 'fiyatlar', label: 'Fiyatlar' },
           { id: 'mesajlar', label: 'Mesajlar', badge: unread },
         ]}
       />
@@ -67,7 +71,7 @@ export default function Market() {
   return (
     <View className="flex-1 bg-background">
       {top}
-      {section === 'mesajlar' ? <InboxList onBrowse={() => setSection('ilanlar')} bottomInset={24} /> : <Listings />}
+      {section === 'mesajlar' ? <InboxList onBrowse={() => setSection('ilanlar')} bottomInset={24} /> : section === 'fiyatlar' ? <PriceList /> : <Listings />}
     </View>
   );
 }
