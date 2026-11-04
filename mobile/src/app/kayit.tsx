@@ -10,7 +10,7 @@ import { TextField } from '@/components/form/field';
 import { FormScreen } from '@/components/form/form-screen';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { clerkField, clerkMessage } from '@/lib/clerk-errors';
+import { PROTECT_CODES, clerkCode, clerkField, clerkMessage } from '@/lib/clerk-errors';
 import { siteUrl } from '@/lib/config';
 import { COLORS } from '@/theme/tokens';
 
@@ -33,19 +33,24 @@ export default function SignUp() {
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
 
+  const [protect, setProtect] = useState(false);
+
   const run = async (fn: () => Promise<{ error: unknown } | void>) => {
     setBusy(true);
     setErrors({});
+    setProtect(false);
     try {
       const res = await fn();
       if (res && res.error) {
         const field = clerkField(res.error);
         setErrors(field ? { [field]: clerkMessage(res.error) } : { form: clerkMessage(res.error) });
+        setProtect(PROTECT_CODES.has(clerkCode(res.error)));
         return false;
       }
       return true;
     } catch (err) {
       setErrors({ form: clerkMessage(err) });
+      setProtect(PROTECT_CODES.has(clerkCode(err)));
       return false;
     } finally {
       setBusy(false);
@@ -63,6 +68,8 @@ export default function SignUp() {
     const ok = await run(async () => {
       const created = await signUp.password({ emailAddress: email.trim(), password });
       if (created.error) return created;
+      // Clerk's bot check ("Verify you are human") runs only in a browser: the website can show it, the app can't.
+      if (signUp.protectCheck || signUp.missingFields.includes('protect_check')) return { error: { code: 'protect_check_required' } };
       return signUp.verifications.sendEmailCode();
     });
     if (ok) {
@@ -74,7 +81,13 @@ export default function SignUp() {
   const verify = async () => {
     if (code.length !== 6) return setErrors({ code: 'E-postadaki 6 haneli kodu yazın.' });
     if (!(await run(() => signUp.verifications.verifyEmailCode({ code })))) return;
-    if (signUp.status !== 'complete') return setErrors({ form: 'Hesap açılamadı. Yeniden deneyin.' });
+    if (signUp.status !== 'complete') {
+      if (signUp.protectCheck || signUp.missingFields.includes('protect_check')) {
+        setProtect(true);
+        return setErrors({ form: clerkMessage({ code: 'protect_check_required' }) });
+      }
+      return setErrors({ form: 'Hesap açılamadı. Yeniden deneyin.' });
+    }
     if (!(await run(() => signUp.finalize()))) return;
     // The name other people see on listings and in chats (the website asks for it on Hesabım otherwise).
     try {
@@ -100,6 +113,7 @@ export default function SignUp() {
         <>
           <AuthHeader title="Ücretsiz hesap açın" body="İlan vermek, satıcılara yazmak, takviminizi ve tarlalarınızı tutmak için. Aynı hesapla sitede de giriş yapabilirsiniz." />
           {errors.form ? <Notice tone="error">{errors.form}</Notice> : null}
+          {protect ? <LinkButton label="Hesabı sitede aç" onPress={() => Linking.openURL(siteUrl('/kayit'))} /> : null}
           <TextField
             label="Adınız soyadınız"
             required
@@ -148,6 +162,7 @@ export default function SignUp() {
         <>
           <AuthHeader title="E-postanızı doğrulayın" body="Son adım: e-postanıza gelen kodu yazın." />
           {errors.form ? <Notice tone="error">{errors.form}</Notice> : null}
+          {protect ? <LinkButton label="Hesabı sitede aç" onPress={() => Linking.openURL(siteUrl('/kayit'))} /> : null}
           <CodeField value={code} onChange={setCode} error={errors.code} email={email.trim()} onSubmit={verify} />
           <LinkButton label="Kodu yeniden gönder" onPress={() => run(() => signUp.verifications.sendEmailCode())} />
           <LinkButton label="E-postayı değiştir" onPress={() => setStep('form')} />

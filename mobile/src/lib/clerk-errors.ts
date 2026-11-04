@@ -23,7 +23,26 @@ const MESSAGES: Record<string, string> = {
   identifier_already_signed_in: 'Zaten giriş yaptınız.',
   strategy_for_user_invalid: 'Bu hesap şifreyle değil Google ile açılmış. “Google ile devam et”i ya da e-posta kodunu kullanın.',
   network_error: 'Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edin.',
+  // Clerk's bot check ("Protect"): the app can't show it, the website can.
+  protect_check_required: 'Ek bir güvenlik kontrolü istendi; uygulama bunu gösteremiyor. Google ile devam edin ya da hesabı sitede açın.',
+  protect_check_execution_failed: 'Güvenlik kontrolü tamamlanamadı. Yeniden deneyin ya da Google ile devam edin.',
+  protect_check_unsupported_environment: 'Ek bir güvenlik kontrolü istendi; uygulama bunu gösteremiyor. Google ile devam edin ya da hesabı sitede açın.',
+  captcha_invalid: 'Güvenlik kontrolü geçilemedi. Yeniden deneyin ya da Google ile devam edin.',
+  captcha_unavailable: 'Güvenlik kontrolü yüklenemedi. Google ile devam edin ya da hesabı sitede açın.',
+  captcha_missing_token: 'Güvenlik kontrolü yüklenemedi. Google ile devam edin ya da hesabı sitede açın.',
+  form_password_size_in_bytes_exceeded: 'Şifre çok uzun. Daha kısa bir şifre seçin.',
+  form_param_value_invalid: 'Bilgilerden biri kabul edilmedi. Kontrol edip yeniden deneyin.',
+  sign_up_restricted_waitlist: 'Şu an yeni hesap açılamıyor. Daha sonra yeniden deneyin.',
+  not_allowed_access: 'Bu e-posta ile hesap açılamıyor. Başka bir adres deneyin.',
 };
+
+/** Clerk's codes for its bot check (the app has no screen for it). */
+export const PROTECT_CODES = new Set(['protect_check_required', 'protect_check_unsupported_environment', 'protect_check_execution_failed', 'captcha_unavailable', 'captcha_missing_token', 'captcha_invalid']);
+
+export function clerkCode(err: unknown): string {
+  const e = (err ?? {}) as ClerkLikeError;
+  return e.errors?.[0]?.code ?? e.code ?? '';
+}
 
 export function clerkMessage(err: unknown): string {
   const e = (err ?? {}) as ClerkLikeError;
@@ -35,7 +54,8 @@ export function clerkMessage(err: unknown): string {
   }
   if (MESSAGES[code]) return MESSAGES[code];
   if (/network|fetch|offline/i.test(e.message ?? '')) return MESSAGES.network_error;
-  return 'İşlem tamamlanamadı. Bilgileri kontrol edip yeniden deneyin.';
+  // The code helps when someone reports the problem ("kod: …").
+  return `İşlem tamamlanamadı. Bilgileri kontrol edip yeniden deneyin.${code ? ` (kod: ${code})` : ''}`;
 }
 
 /** Which field an error is about, to show it under that field. */

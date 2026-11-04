@@ -65,6 +65,9 @@ export default function SignIn() {
         setInfo('Bu telefondan ilk kez giriş yapıyorsunuz: güvenliğiniz için e-postanıza bir kod gönderdik.');
         setStep('second');
       }
+    } else if (signIn.status === 'needs_protect_check' || signIn.protectCheck) {
+      // Clerk's bot check runs only in a browser; Google sign-in or the website get past it.
+      setErrors({ form: 'Ek bir güvenlik kontrolü istendi; uygulama bunu gösteremiyor. Google ile devam edin ya da sitede giriş yapın.' });
     } else {
       setErrors({ form: 'Giriş tamamlanamadı. Yeniden deneyin ya da e-postanıza kod isteyin.' });
     }
