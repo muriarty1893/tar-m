@@ -9,6 +9,7 @@ import type {
   Article,
   ArticleSummary,
   CalendarMonth,
+  ForumQuery,
   FieldDetail,
   FieldSummary,
   InboxRow,
@@ -17,7 +18,10 @@ import type {
   MarketQuery,
   Me,
   ReportedListing,
+  ReportedPost,
   Thread,
+  TopicDetail,
+  TopicPage,
 } from './types';
 
 /** The app's cache of the website's data. Lists are fresh for 30 s; a failed call is retried once (never for 4xx). */
@@ -52,6 +56,8 @@ export const keys = {
   news: ['news'] as const,
   article: (slug: string) => ['article', slug] as const,
   admin: ['admin'] as const,
+  forum: ['forum'] as const,
+  topic: (id: string) => ['topic', id] as const,
 };
 
 /** Refreshes these parts of the cache (after a change). */
@@ -156,4 +162,33 @@ export function useAdminArticle(id: string) {
 
 export function useReports(enabled: boolean) {
   return useQuery({ queryKey: [...keys.admin, 'reports'], queryFn: () => api<{ items: ReportedListing[] }>('/yonetim/sikayetler'), enabled, select: (d) => d.items });
+}
+
+const forumParams = (q: ForumQuery, page: number) => {
+  const p = new URLSearchParams();
+  if (q.q.trim()) p.set('q', q.q.trim());
+  if (q.kategori !== 'tumu') p.set('kategori', q.kategori);
+  if (q.sirala !== 'yeni') p.set('sirala', q.sirala);
+  if (page > 1) p.set('sayfa', String(page));
+  const s = p.toString();
+  return s ? `?${s}` : '';
+};
+
+/** The forum's topics, 20 at a time (the same as the website's /forum). Public. */
+export function useTopics(q: ForumQuery) {
+  return useInfiniteQuery({
+    queryKey: [...keys.forum, q],
+    queryFn: ({ pageParam }) => api<TopicPage>(`/forum${forumParams(q, pageParam)}`),
+    initialPageParam: 1,
+    getNextPageParam: (last) => (last.page * last.pageSize < last.total && last.page < 100 ? last.page + 1 : undefined),
+  });
+}
+
+/** A topic with its replies; checked every 20 s while open. */
+export function useTopic(id: string) {
+  return useQuery({ queryKey: keys.topic(id), queryFn: () => api<{ topic: TopicDetail; admin: boolean }>(`/forum/${id}`), enabled: !!id, refetchInterval: 20_000 });
+}
+
+export function useForumReports(enabled: boolean) {
+  return useQuery({ queryKey: [...keys.admin, 'forum'], queryFn: () => api<{ items: ReportedPost[] }>('/yonetim/forum'), enabled, select: (d) => d.items });
 }

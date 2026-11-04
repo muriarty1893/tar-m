@@ -23,6 +23,7 @@ export { ChartBarIcon } from 'phosphor-react-native/src/icons/ChartBar';
 export { ChartLineUpIcon } from 'phosphor-react-native/src/icons/ChartLineUp';
 export { ChatCircleDotsIcon } from 'phosphor-react-native/src/icons/ChatCircleDots';
 export { ChatsCircleIcon } from 'phosphor-react-native/src/icons/ChatsCircle';
+export { ChatsTeardropIcon } from 'phosphor-react-native/src/icons/ChatsTeardrop';
 export { CheckCircleIcon } from 'phosphor-react-native/src/icons/CheckCircle';
 export { CheckIcon } from 'phosphor-react-native/src/icons/Check';
 export { ChecksIcon } from 'phosphor-react-native/src/icons/Checks';

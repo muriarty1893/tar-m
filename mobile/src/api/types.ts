@@ -135,8 +135,29 @@ export type ArticleStatus = 'draft' | 'published';
 export type AdminArticle = ArticleSummary & { id: string; body: string; status: ArticleStatus; updatedAt: string };
 export type ArticleInput = { title: string; slug: string; summary: string; body: string; cover: string; date: string; status: ArticleStatus };
 
-export type AdminCounts = { published: number; drafts: number; reports: number; listings: number; people: number };
+export type AdminCounts = { published: number; drafts: number; reports: number; forumReports: number; listings: number; people: number };
 export type ReportedListing = { id: string; title: string; status: string; sellerName: string; count: number; lastAt: string; reasons: string[]; notes: string[] };
 
 /** A form's messages under each field. */
 export type FieldErrors<T> = Partial<Record<keyof T, string>>;
+
+export type ForumCategory = 'bitki' | 'hayvan' | 'makine' | 'destek' | 'pazar' | 'genel';
+export type ForumSort = 'yeni' | 'aktif' | 'populer';
+export type ForumQuery = { q: string; kategori: ForumCategory | 'tumu'; sirala: ForumSort };
+
+export type TopicCard = {
+  id: string;
+  title: string;
+  category: ForumCategory;
+  excerpt: string;
+  authorId: string;
+  authorName: string;
+  createdAt: string;
+  replyCount: number;
+  lastReplyAt: string | null;
+};
+export type TopicPage = { items: TopicCard[]; total: number; page: number; pageSize: number };
+export type ForumReply = { id: string; body: string; authorId: string; authorName: string; createdAt: string; mine: boolean; reported: boolean };
+export type TopicDetail = TopicCard & { body: string; mine: boolean; reported: boolean; replies: ForumReply[] };
+export type TopicInput = { category: string; title: string; body: string };
+export type ReportedPost = { topicId: string; replyId: string | null; topicTitle: string; text: string; authorName: string; count: number; lastAt: string; reasons: string[]; notes: string[] };

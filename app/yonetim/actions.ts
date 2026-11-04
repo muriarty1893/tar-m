@@ -8,6 +8,7 @@ import { LISTINGS_TAG } from "@/lib/market-data";
 import { NEWS_TAG } from "@/lib/news-data";
 import { renderMarkdown, type ArticleErrors, type ArticleInput } from "@/lib/news";
 import { deleteArticleFor, moderateFor, saveArticleFor } from "@/lib/services/admin";
+import { moderateForumFor } from "@/lib/services/forum";
 
 /** Every action re-checks the admin itself: a server action can be called directly. */
 async function adminId() {
@@ -19,6 +20,14 @@ async function adminId() {
 export async function moderate(listingId: string, action: "remove" | "dismiss") {
   if (!(await adminId())) return;
   if (await moderateFor(listingId, action)) updateTag(LISTINGS_TAG);
+  refresh();
+}
+
+/** A moderator removes a reported forum topic or reply, or closes its reports. */
+export async function moderateForum(topicId: string, replyId: string | null, action: "remove" | "dismiss") {
+  const userId = await adminId();
+  if (!userId) return;
+  await moderateForumFor(userId, { topicId, replyId, action });
   refresh();
 }
 

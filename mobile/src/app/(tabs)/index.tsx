@@ -6,6 +6,8 @@ import { TabScreen } from '@/components/app/screen';
 import { WeatherHero } from '@/components/app/weather-hero';
 import { AdCards } from '@/components/home/ad-cards';
 import { AppHeader } from '@/components/home/app-header';
+import { ForumBlock } from '@/components/home/forum-block';
+import { NewsCard } from '@/components/home/news-card';
 import { QuickMenu } from '@/components/home/quick-menu';
 import { WeekOutlook } from '@/components/home/week-outlook';
 import { MarketStrip } from '@/components/market/market-strip';
@@ -21,6 +23,8 @@ export default function Home() {
       <View className="gap-4">
         <AdCards />
         <QuickMenu />
+        <NewsCard />
+        <ForumBlock />
         <WeatherHero onForecast={() => router.push('/hava')} />
         <WeekOutlook />
       </View>

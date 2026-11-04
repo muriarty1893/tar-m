@@ -8,8 +8,20 @@ import { REPORT_REASONS } from '@/domain/market';
 import { cn } from '@/lib/utils';
 import { COLORS } from '@/theme/tokens';
 
-/** "İlanı şikâyet et": a reason and an optional note, read by the admins. `onReport` resolves to an error, or null. */
-export function ReportDialog({ open, onClose, onReport }: { open: boolean; onClose: () => void; onReport: (reason: string, note: string) => Promise<string | null> }) {
+/** "Şikâyet et" (a listing, a forum post): a reason and an optional note, read by the admins. `onReport` resolves to an error, or null. */
+export function ReportDialog({
+  open,
+  onClose,
+  onReport,
+  title = 'İlanı şikâyet et',
+  reasons = REPORT_REASONS,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onReport: (reason: string, note: string) => Promise<string | null>;
+  title?: string;
+  reasons?: readonly { id: string; label: string }[];
+}) {
   const [reason, setReason] = useState('');
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -25,11 +37,11 @@ export function ReportDialog({ open, onClose, onReport }: { open: boolean; onClo
     <Dialog open={open} onOpenChange={(o) => !o && !busy && onClose()}>
       <DialogContent className="mx-4 rounded-[24px] border-border bg-background">
         <DialogHeader>
-          <DialogTitle className="font-heading text-[21px]">İlanı şikâyet et</DialogTitle>
-          <DialogDescription className="font-sans text-[14.5px] leading-5 text-muted-foreground">Şikâyetinizi yöneticiler inceler. Satıcıya kim olduğunuz söylenmez.</DialogDescription>
+          <DialogTitle className="font-heading text-[21px]">{title}</DialogTitle>
+          <DialogDescription className="font-sans text-[14.5px] leading-5 text-muted-foreground">Şikâyetinizi yöneticiler inceler. Kim olduğunuz yazana söylenmez.</DialogDescription>
         </DialogHeader>
         <View accessibilityRole="radiogroup" accessibilityLabel="Neden" className="gap-1.5">
-          {REPORT_REASONS.map((r) => {
+          {reasons.map((r) => {
             const on = r.id === reason;
             return (
               <Pressable

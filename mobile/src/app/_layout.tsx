@@ -83,6 +83,9 @@ export default function RootLayout() {
                 <Stack.Screen name="kaynaklar" />
                 <Stack.Screen name="haberler/index" />
                 <Stack.Screen name="haberler/[slug]" />
+                <Stack.Screen name="forum/index" />
+                <Stack.Screen name="forum/[id]" />
+                <Stack.Screen name="forum/yeni" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
                 <Stack.Screen name="ilan/[id]" />
                 <Stack.Screen name="ilan/yeni" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
                 <Stack.Screen name="mesajlar/[id]" />

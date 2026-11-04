@@ -77,7 +77,7 @@ export async function deleteArticleFor(id: string): Promise<boolean> {
   return rows.length > 0;
 }
 
-export type AdminCounts = { published: number; drafts: number; reports: number; listings: number; people: number };
+export type AdminCounts = { published: number; drafts: number; reports: number; forumReports: number; listings: number; people: number };
 
 /** The dashboard's numbers. */
 export async function adminCounts(): Promise<AdminCounts> {
@@ -86,9 +86,10 @@ export async function adminCounts(): Promise<AdminCounts> {
       (select count(*) from articles where status = 'published') as published,
       (select count(*) from articles where status = 'draft') as drafts,
       (select count(distinct listing_id) from reports where resolved_at is null) as reports,
+      (select count(distinct (topic_id, reply_id)) from forum_reports where resolved_at is null) as forum_reports,
       (select count(*) from listings where status = 'active') as listings,
       (select count(*) from profiles) as people`;
-  return { published: Number(c.published), drafts: Number(c.drafts), reports: Number(c.reports), listings: Number(c.listings), people: Number(c.people) };
+  return { published: Number(c.published), drafts: Number(c.drafts), reports: Number(c.reports), forumReports: Number(c.forum_reports), listings: Number(c.listings), people: Number(c.people) };
 }
 
 export type ReportedListing = {

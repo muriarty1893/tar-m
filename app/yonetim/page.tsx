@@ -40,6 +40,7 @@ async function Overview() {
     { label: "Yayındaki haber", value: counts.published, href: "/yonetim/haberler", Icon: NewspaperIcon },
     { label: "Taslak", value: counts.drafts, href: "/yonetim/haberler", Icon: NewspaperIcon },
     { label: "Şikâyet edilen ilan", value: counts.reports, href: "/yonetim/sikayetler", Icon: FlagIcon },
+    { label: "Şikâyet edilen forum yazısı", value: counts.forumReports, href: "/yonetim/sikayetler#forum", Icon: FlagIcon },
     { label: "Yayındaki ilan", value: counts.listings, href: "/pazar", Icon: StorefrontIcon },
     { label: "Kayıtlı kullanıcı", value: counts.people, Icon: UsersIcon },
   ];

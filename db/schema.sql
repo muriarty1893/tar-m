@@ -147,3 +147,43 @@ create table if not exists articles (
   updated_at   timestamptz not null default now()
 );
 create index if not exists articles_published_idx on articles (status, published_on desc);
+
+-- Forum: farmers' topics and replies (/forum and the app's Topluluk). Readable by everyone; writing
+-- needs an account with a name. Authors delete their own posts; admins remove reported ones.
+create table if not exists forum_topics (
+  id            uuid primary key default gen_random_uuid(),
+  author_id     text not null references profiles(user_id) on delete cascade,
+  category      text not null check (category in ('bitki', 'hayvan', 'makine', 'destek', 'pazar', 'genel')),
+  title         text not null check (char_length(title) between 5 and 120),
+  body          text not null check (char_length(body) between 10 and 5000),
+  reply_count   integer not null default 0,
+  last_reply_at timestamptz,
+  -- Folded (lower case, Turkish letters to plain ones) title and text, for search.
+  search_text   text not null default '',
+  created_at    timestamptz not null default now()
+);
+create index if not exists forum_topics_new_idx on forum_topics (created_at desc);
+create index if not exists forum_topics_author_idx on forum_topics (author_id, created_at desc);
+
+create table if not exists forum_replies (
+  id         uuid primary key default gen_random_uuid(),
+  topic_id   uuid not null references forum_topics(id) on delete cascade,
+  author_id  text not null references profiles(user_id) on delete cascade,
+  body       text not null check (char_length(body) between 2 and 3000),
+  created_at timestamptz not null default now()
+);
+create index if not exists forum_replies_topic_idx on forum_replies (topic_id, created_at);
+create index if not exists forum_replies_author_idx on forum_replies (author_id, created_at desc);
+
+-- "Şikâyet et" on a topic or a reply; reviewed on /yonetim/sikayetler.
+create table if not exists forum_reports (
+  id          uuid primary key default gen_random_uuid(),
+  topic_id    uuid not null references forum_topics(id) on delete cascade,
+  reply_id    uuid references forum_replies(id) on delete cascade,
+  reporter_id text not null references profiles(user_id) on delete cascade,
+  reason      text not null check (reason in ('spam', 'hakaret', 'yaniltici', 'uygunsuz', 'diger')),
+  note        text not null default '' check (char_length(note) <= 500),
+  created_at  timestamptz not null default now(),
+  resolved_at timestamptz
+);
+create unique index if not exists forum_reports_once_idx on forum_reports (reporter_id, topic_id, coalesce(reply_id, '00000000-0000-0000-0000-000000000000'::uuid));
