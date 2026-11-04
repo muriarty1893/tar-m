@@ -11,6 +11,7 @@ import { ConfirmDialog } from '@/components/app/confirm-dialog';
 import { ErrorState, Loading, SignInPrompt } from '@/components/app/states';
 import { TabScreen } from '@/components/app/screen';
 import { TextField } from '@/components/form/field';
+import { cleanHandle, validateHandle } from '@/domain/forum';
 import { ProvinceSelect } from '@/components/form/province-select';
 import { ArrowSquareOutIcon, CaretRightIcon, CheckCircleIcon, ShieldCheckIcon, SignOutIcon, TrashIcon, WarningCircleIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
@@ -53,21 +54,24 @@ function AccountForm({ me }: { me: Me }) {
   const { ad } = useLocalSearchParams<{ ad?: string }>();
   const [name, setName] = useState(me.name);
   const [province, setProvince] = useState(me.province);
-  const [errors, setErrors] = useState<{ name?: string; province?: string }>({});
+  const [handle, setHandle] = useState(me.handle ?? '');
+  const [errors, setErrors] = useState<{ name?: string; province?: string; handle?: string }>({});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
-  const changed = name.trim() !== me.name || province !== me.province;
+  const changed = name.trim() !== me.name || province !== me.province || handle !== (me.handle ?? '');
 
   const save = async () => {
     setSaving(true);
     setErrors({});
     setFormError(null);
     try {
-      await api('/ben', { method: 'PATCH', body: { name, province } });
+      const local = handle && handle !== me.handle ? validateHandle(handle) : null;
+      if (local) return setErrors({ handle: local });
+      await api('/ben', { method: 'PATCH', body: { name, province, ...(handle && handle !== me.handle ? { handle } : {}) } });
       await refresh(keys.me);
       setSaved(true);
       // Asked for the name by another screen: back to it.
@@ -121,6 +125,22 @@ function AccountForm({ me }: { me: Me }) {
           setSaved(false);
         }}
         error={errors.province} hint="İlan ve tarla eklerken öntanımlı il olur." allowEmpty />
+      <TextField
+        label="Kullanıcı adı"
+        value={handle}
+        onChangeText={(t) => {
+          setHandle(cleanHandle(t).replace(/[^a-z0-9_]/g, ''));
+          setSaved(false);
+          setErrors((e) => ({ ...e, handle: undefined }));
+        }}
+        error={errors.handle}
+        hint={`Forumda sizden bahsetmek için yazılır: @${handle || 'kullaniciadi'}. Küçük harf, rakam ve alt çizgi; 3–20 karakter.`}
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="username"
+        maxLength={20}
+        placeholder={me.handle ? undefined : 'Adınızdan yapılır'}
+      />
       {formError ? (
         <Text role="alert" className="text-[14px] text-destructive">
           {formError}

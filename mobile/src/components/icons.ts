@@ -115,3 +115,6 @@ export { WrenchIcon } from 'phosphor-react-native/src/icons/Wrench';
 export { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
 export { XIcon } from 'phosphor-react-native/src/icons/X';
 export type { Icon as PhosphorIcon } from 'phosphor-react-native';
+export { ArrowBendDownRightIcon } from 'phosphor-react-native/src/icons/ArrowBendDownRight';
+export { ArrowBendUpLeftIcon } from 'phosphor-react-native/src/icons/ArrowBendUpLeft';
+export { AtIcon } from 'phosphor-react-native/src/icons/At';

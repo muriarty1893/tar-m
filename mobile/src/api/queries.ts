@@ -20,8 +20,12 @@ import type {
   ReportedListing,
   ReportedPost,
   Thread,
+  TopicCard,
   TopicDetail,
   TopicPage,
+  AppNotification,
+  ForumProfile,
+  MentionSuggestion,
 } from './types';
 
 /** The app's cache of the website's data. Lists are fresh for 30 s; a failed call is retried once (never for 4xx). */
@@ -58,6 +62,8 @@ export const keys = {
   admin: ['admin'] as const,
   forum: ['forum'] as const,
   topic: (id: string) => ['topic', id] as const,
+  person: (handle: string) => ['person', handle] as const,
+  notifications: ['notifications'] as const,
 };
 
 /** Refreshes these parts of the cache (after a change). */
@@ -79,11 +85,38 @@ export function useMe() {
   });
 }
 
-/** Chats with unread messages, for the bell and the Mesajlar switch; checked every 30 s. */
-export function useUnread() {
+/** Unread chats (`messages`) and unseen notifications, for the bell and the Mesajlar switch; checked every 30 s. */
+export function useUnreadCounts() {
   const { signedIn } = useSignedIn();
-  const q = useQuery({ queryKey: keys.unread, queryFn: () => api<{ count: number }>('/okunmamis'), enabled: signedIn, refetchInterval: 30_000 });
-  return signedIn ? (q.data?.count ?? 0) : 0;
+  const q = useQuery({ queryKey: keys.unread, queryFn: () => api<{ count: number; notifications?: number }>('/okunmamis'), enabled: signedIn, refetchInterval: 30_000 });
+  return signedIn ? { messages: q.data?.count ?? 0, notifications: q.data?.notifications ?? 0 } : { messages: 0, notifications: 0 };
+}
+
+/** Chats with unread messages. */
+export const useUnread = () => useUnreadCounts().messages;
+
+/** "Bildirimler": answers to your topics and replies, and mentions of you. */
+export function useNotifications() {
+  const { signedIn } = useSignedIn();
+  return useQuery({ queryKey: keys.notifications, queryFn: () => api<{ items: AppNotification[] }>('/bildirimler'), enabled: signedIn, select: (d) => d.items });
+}
+
+/** @ahmet's forum page: who they are and their latest topics. */
+export function useForumProfile(handle: string) {
+  return useQuery({ queryKey: keys.person(handle), queryFn: () => api<{ profile: ForumProfile; topics: TopicCard[] }>(`/forum/kisi/${encodeURIComponent(handle)}`), enabled: !!handle });
+}
+
+/** People to mention for "@ah…" (the topic's own first); null while not typing a mention. */
+export function useMentionSuggestions(query: string | null, topicId?: string) {
+  const { signedIn } = useSignedIn();
+  return useQuery({
+    queryKey: ['mention', query, topicId ?? ''],
+    queryFn: () => api<{ items: MentionSuggestion[] }>(`/forum/kisiler?q=${encodeURIComponent(query ?? '')}${topicId ? `&konu=${topicId}` : ''}`),
+    enabled: signedIn && query !== null,
+    select: (d) => d.items,
+    staleTime: 60_000,
+    placeholderData: (prev) => prev,
+  });
 }
 
 const marketParams = (q: MarketQuery, page: number) => {

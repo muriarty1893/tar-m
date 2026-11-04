@@ -9,7 +9,8 @@ export type { ListingCategory };
 export type ListingStatus = 'active' | 'sold' | 'removed';
 export type Condition = 'sifir' | 'ikinci-el';
 
-export type Me = { id: string; name: string; province: string; email: string; memberSince: string; admin: boolean };
+/** `handle`: the username for forum mentions ("ahmet"); null until the person has a name. */
+export type Me = { id: string; name: string; province: string; handle: string | null; email: string; memberSince: string; admin: boolean };
 
 export type ListingCard = {
   id: string;
@@ -152,12 +153,50 @@ export type TopicCard = {
   excerpt: string;
   authorId: string;
   authorName: string;
+  authorHandle: string | null;
   createdAt: string;
   replyCount: number;
+  likeCount: number;
   lastReplyAt: string | null;
+  /** The first photo, for the list. */
+  photo: string | null;
+  photoCount: number;
 };
 export type TopicPage = { items: TopicCard[]; total: number; page: number; pageSize: number };
-export type ForumReply = { id: string; body: string; authorId: string; authorName: string; createdAt: string; mine: boolean; reported: boolean };
-export type TopicDetail = TopicCard & { body: string; mine: boolean; reported: boolean; replies: ForumReply[] };
+export type ForumReply = {
+  id: string;
+  /** The reply this one answers; null when it answers the topic. */
+  parentId: string | null;
+  body: string;
+  photos: string[];
+  authorId: string;
+  authorName: string;
+  authorHandle: string | null;
+  createdAt: string;
+  likeCount: number;
+  liked: boolean;
+  mine: boolean;
+  reported: boolean;
+  /** "Bu yanıt silindi": kept because others answered it; no text, photos or author. */
+  deleted: boolean;
+};
+export type TopicDetail = TopicCard & { body: string; photos: string[]; liked: boolean; mine: boolean; reported: boolean; replies: ForumReply[] };
 export type TopicInput = { category: string; title: string; body: string };
+
+export type MentionSuggestion = { handle: string; name: string };
+export type ForumProfile = { handle: string; name: string; memberSince: string; topicCount: number; replyCount: number };
+
+export type NotificationKind = 'reply' | 'mention';
+export type AppNotification = {
+  id: string;
+  kind: NotificationKind;
+  actorName: string;
+  actorHandle: string | null;
+  topicId: string;
+  topicTitle: string;
+  replyId: string | null;
+  excerpt: string;
+  createdAt: string;
+  read: boolean;
+};
 export type ReportedPost = { topicId: string; replyId: string | null; topicTitle: string; text: string; authorName: string; count: number; lastAt: string; reasons: string[]; notes: string[] };

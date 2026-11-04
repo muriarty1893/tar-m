@@ -7,9 +7,9 @@ const MAX_SIDE = 1600;
 
 /**
  * Shrinks a picked photo to at most 1600 px (JPEG) and uploads it to the website, which keeps it in
- * Vercel Blob. Returns its address. `folder`: "ilanlar" (listing photos) or "haberler" (news covers, admins).
+ * Vercel Blob. Returns its address. `folder`: "ilanlar" (listing photos), "forum" (forum photos) or "haberler" (news covers, admins).
  */
-export async function uploadPhoto(photo: { uri: string; width?: number; height?: number }, folder: 'ilanlar' | 'haberler'): Promise<string> {
+export async function uploadPhoto(photo: { uri: string; width?: number; height?: number }, folder: 'ilanlar' | 'forum' | 'haberler'): Promise<string> {
   const context = ImageManipulator.manipulate(photo.uri);
   const { width = MAX_SIDE + 1, height = MAX_SIDE + 1 } = photo;
   if (Math.max(width, height) > MAX_SIDE) context.resize(width >= height ? { width: MAX_SIDE } : { height: MAX_SIDE });

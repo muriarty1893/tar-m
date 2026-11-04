@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useMe, useSignedIn, useUnread } from '@/api/queries';
+import { useMe, useSignedIn, useUnreadCounts } from '@/api/queries';
 import { BellIcon, SignInIcon } from '@/components/icons';
 import { Text } from '@/components/ui/text';
 import { COLORS } from '@/theme/tokens';
@@ -19,11 +19,11 @@ const initials = (name: string) =>
 
 /**
  * The home screen's top bar: the round badge logo, the name with a "Dijital Tarım" tag, the
- * notifications bell (new messages, with a dot) and the account chip (Hesabım), or "Giriş yap".
+ * bell (Bildirimler: forum answers and mentions, and new messages, with a count) and the account chip (Hesabım), or "Giriş yap".
  */
 export function AppHeader() {
   const insets = useSafeAreaInsets();
-  const unread = useUnread();
+  const unread = useUnreadCounts();
   const { loaded, signedIn } = useSignedIn();
   const me = useMe();
   const name = me.data?.name ?? '';
@@ -42,11 +42,15 @@ export function AppHeader() {
       {signedIn ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={unread ? `Mesajlar: ${unread} okunmamış sohbet` : 'Mesajlar'}
-          onPress={() => router.navigate({ pathname: '/pazar', params: { bolum: 'mesajlar' } })}
+          accessibilityLabel={`Bildirimler${unread.notifications ? `, ${unread.notifications} yeni` : ''}${unread.messages ? `; ${unread.messages} okunmamış sohbet` : ''}`}
+          onPress={() => router.push('/bildirimler')}
           className="size-12 items-center justify-center rounded-full bg-muted active:bg-border">
           <BellIcon size={22} weight="regular" color={COLORS.foreground} />
-          {unread ? <View className="absolute right-3 top-3 size-2.5 rounded-full border-2 border-muted bg-orange-500" /> : null}
+          {unread.notifications + unread.messages > 0 ? (
+            <View className="absolute -right-0.5 -top-0.5 min-w-5 items-center rounded-full border-2 border-card bg-destructive px-1">
+              <Text className="font-sans-bold text-[11px] leading-4 text-white">{Math.min(unread.notifications + unread.messages, 9)}{unread.notifications + unread.messages > 9 ? '+' : ''}</Text>
+            </View>
+          ) : null}
         </Pressable>
       ) : null}
       {!loaded ? null : signedIn ? (

@@ -1,12 +1,14 @@
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
-import { ActivityIndicator, Alert, type ScrollView, type TextInput } from 'react-native';
+import { ActivityIndicator, Alert, View, type ScrollView, type TextInput } from 'react-native';
 
 import { ApiError, api } from '@/api/client';
 import { keys, refresh, useSignedIn } from '@/api/queries';
 import type { TopicInput } from '@/api/types';
 import { SignInPrompt } from '@/components/app/states';
 import { Choices, ErrorSummary, Field, TextField } from '@/components/form/field';
+import { MentionSuggestions, type Selection } from '@/components/forum/mention-suggestions';
+import { PhotoButtons, PhotoThumbs, usePhotoUploads } from '@/components/forum/photo-picker';
 import { FormScreen } from '@/components/form/form-screen';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
@@ -18,7 +20,7 @@ import { COLORS } from '@/theme/tokens';
 const NAMES: Record<keyof TopicInput, string> = { category: 'Konu türü', title: 'Başlık', body: 'Metin' };
 const ORDER: (keyof TopicInput)[] = ['category', 'title', 'body'];
 
-/** "Konu aç": the kind of topic, a title and the text (the website's form and checks). */
+/** "Konu aç": the kind of topic, a title, the text (with @mentions) and up to 4 photos (the website's form and checks). */
 export default function NewTopic() {
   const { signedIn } = useSignedIn();
   const [t, setT] = useState<TopicInput>({ category: '', title: '', body: '' });
@@ -26,6 +28,8 @@ export default function NewTopic() {
   const [server, setServer] = useState<Partial<Record<keyof TopicInput, string>>>({});
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [selection, setSelection] = useState<Selection>({ start: 0, end: 0 });
+  const photos = usePhotoUploads();
   const scroll = useRef<ScrollView>(null);
   const titleRef = useRef<TextInput>(null);
   const bodyRef = useRef<TextInput>(null);
@@ -54,10 +58,11 @@ export default function NewTopic() {
   const publish = async () => {
     setSubmitted(true);
     setMessage(null);
+    if (photos.uploading) return setMessage('Fotoğraflar yükleniyor; bitince yeniden dokunun.');
     if (hasErrors(errors)) return scroll.current?.scrollTo({ y: 0, animated: true });
     setBusy(true);
     try {
-      const { id } = await api<{ id: string }>('/forum', { method: 'POST', body: t });
+      const { id } = await api<{ id: string }>('/forum', { method: 'POST', body: { ...t, photos: photos.urls } });
       await refresh(keys.forum);
       dirty.current = false;
       router.replace({ pathname: '/forum/[id]', params: { id, yeni: '1' } });
@@ -73,7 +78,7 @@ export default function NewTopic() {
 
   const close = () => {
     const leave = () => (router.canGoBack() ? router.back() : router.replace('/forum'));
-    if (!dirty.current) return leave();
+    if (!dirty.current && !photos.items.length) return leave();
     Alert.alert('Konu kaydedilmedi', 'Çıkarsanız yazdıklarınız silinir.', [
       { text: 'Yazmaya devam et', style: 'cancel' },
       { text: 'Çık', style: 'destructive', onPress: leave },
@@ -104,13 +109,29 @@ export default function NewTopic() {
         required
         value={t.body}
         onChangeText={(v) => set('body', v)}
+        onSelectionChange={(e) => setSelection(e.nativeEvent.selection)}
         error={shown('body')}
         multiline
         maxLength={TOPIC_BODY_MAX}
         className="h-48"
-        placeholder="Ne ektiniz, nerede, ne zaman? Ne denediniz? Ayrıntı verdikçe yanıtlar daha işe yarar olur."
+        placeholder="Ne ektiniz, nerede, ne zaman? Ne denediniz? Birinden bahsetmek için @ yazın."
         hint={`${t.body.length}/${TOPIC_BODY_MAX}`}
       />
+      <MentionSuggestions
+        text={t.body}
+        selection={selection}
+        onPick={(next) => {
+          set('body', next.text);
+          setSelection({ start: next.cursor, end: next.cursor });
+          bodyRef.current?.focus();
+        }}
+      />
+      <Field label="Fotoğraflar" hint="İsteğe bağlı, en fazla 4. Hastalıklı yaprak, arızalı parça… Fotoğraf sorunu en kolay anlatır.">
+        <View className="gap-2.5">
+          <PhotoThumbs uploads={photos} />
+          <PhotoButtons uploads={photos} />
+        </View>
+      </Field>
       <Text className="text-[13.5px] leading-5 text-muted-foreground">Kişisel bilgilerinizi (telefon, adres) paylaşmayın. Hakaret ve reklam içeren konular kaldırılır.</Text>
     </FormScreen>
   );
