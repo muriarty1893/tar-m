@@ -6,7 +6,7 @@ import { AdminGate, ArticleRow } from '@/components/admin/admin-gate';
 import { BackHeader } from '@/components/app/back-header';
 import { TabScreen } from '@/components/app/screen';
 import { ErrorState, Loading } from '@/components/app/states';
-import { CaretRightIcon, FlagIcon, NewspaperIcon, NotePencilIcon, PlusIcon, StorefrontIcon, UsersIcon, type PhosphorIcon } from '@/components/icons';
+import { CaretRightIcon, ChatsTeardropIcon, FlagIcon, NewspaperIcon, NotePencilIcon, PlusIcon, StorefrontIcon, UsersIcon, type PhosphorIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { COLORS } from '@/theme/tokens';
@@ -34,6 +34,7 @@ export default function AdminHome() {
                 <Stat Icon={NewspaperIcon} value={overview.data.counts.published} label="Yayındaki haber" onPress={() => router.push('/yonetim/haberler')} />
                 <Stat Icon={NotePencilIcon} value={overview.data.counts.drafts} label="Taslak" onPress={() => router.push('/yonetim/haberler')} />
                 <Stat Icon={FlagIcon} value={overview.data.counts.reports} label="Şikâyet edilen ilan" onPress={() => router.push('/yonetim/sikayetler')} alert={overview.data.counts.reports > 0} />
+                <Stat Icon={ChatsTeardropIcon} value={overview.data.counts.forumReports} label="Forum şikâyeti" onPress={() => router.push({ pathname: '/yonetim/sikayetler', params: { bolum: 'forum' } })} alert={overview.data.counts.forumReports > 0} />
                 <Stat Icon={StorefrontIcon} value={overview.data.counts.listings} label="Yayındaki ilan" onPress={() => router.navigate('/pazar')} />
                 <Stat Icon={UsersIcon} value={overview.data.counts.people} label="Kayıtlı kullanıcı" />
               </View>

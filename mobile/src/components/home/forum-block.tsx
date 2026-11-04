@@ -34,8 +34,9 @@ export function ForumBlock() {
 
   return (
     <View className="gap-3 rounded-[28px] border border-border bg-card p-4">
-      <Text role="heading" className="font-sans-bold text-[13.5px] uppercase tracking-[1.2px] text-foreground/80">
-        Çiftçi forumu
+      {/* Written in capitals: CSS-style uppercasing turns "i" into "I", not the Turkish "İ". */}
+      <Text role="heading" className="font-sans-bold text-[13.5px] tracking-[1.2px] text-foreground/80">
+        ÇİFTÇİ FORUMU
       </Text>
       <Pressable
         accessibilityRole="button"

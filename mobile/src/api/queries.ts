@@ -98,19 +98,25 @@ const marketParams = (q: MarketQuery, page: number) => {
   return s ? `?${s}` : '';
 };
 
-/** Pazar's listings, a page (24) at a time. */
+/**
+ * Pazar's listings, a page (24) at a time. Public, but they carry the person's hearts, so they wait
+ * for sign-in to load: a call made before it would go out without the account.
+ */
 export function useListings(q: MarketQuery, enabled = true) {
+  const { loaded } = useSignedIn();
   return useInfiniteQuery({
     queryKey: [...keys.listings, q],
     queryFn: ({ pageParam }) => api<ListingPage>(`/ilanlar${marketParams(q, pageParam)}`),
     initialPageParam: 1,
     getNextPageParam: (last) => (last.page * last.pageSize < last.total && last.page < 100 ? last.page + 1 : undefined),
-    enabled,
+    enabled: enabled && loaded,
   });
 }
 
+/** A listing; public, but "mine", the heart and the report mark need the account (see useListings). */
 export function useListing(id: string) {
-  return useQuery({ queryKey: keys.listing(id), queryFn: () => api<{ listing: ListingDetail; admin: boolean }>(`/ilanlar/${id}`), enabled: !!id });
+  const { loaded } = useSignedIn();
+  return useQuery({ queryKey: keys.listing(id), queryFn: () => api<{ listing: ListingDetail; admin: boolean }>(`/ilanlar/${id}`), enabled: loaded && !!id });
 }
 
 export function useInbox(role: 'all' | 'buyer' | 'seller') {
@@ -184,9 +190,10 @@ export function useTopics(q: ForumQuery) {
   });
 }
 
-/** A topic with its replies; checked every 20 s while open. */
+/** A topic with its replies; checked every 20 s while open. Waits for sign-in to load ("siz", "Sil", reports). */
 export function useTopic(id: string) {
-  return useQuery({ queryKey: keys.topic(id), queryFn: () => api<{ topic: TopicDetail; admin: boolean }>(`/forum/${id}`), enabled: !!id, refetchInterval: 20_000 });
+  const { loaded } = useSignedIn();
+  return useQuery({ queryKey: keys.topic(id), queryFn: () => api<{ topic: TopicDetail; admin: boolean }>(`/forum/${id}`), enabled: loaded && !!id, refetchInterval: 20_000 });
 }
 
 export function useForumReports(enabled: boolean) {

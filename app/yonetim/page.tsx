@@ -17,7 +17,7 @@ export default function AdminHome() {
     <AdminShell
       section="genel"
       title="Genel bakış"
-      intro="Haberleri yazın ve yayınlayın, şikâyet edilen ilanları inceleyin."
+      intro="Haberleri yazın ve yayınlayın, şikâyet edilen ilanları ve forum yazılarını inceleyin."
       actions={
         <Link href="/yonetim/haberler/yeni" className={buttonVariants({ size: "lg" })}>
           <PlusIcon aria-hidden="true" weight="bold" />

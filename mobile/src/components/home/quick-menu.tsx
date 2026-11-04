@@ -5,6 +5,7 @@ import {
   ArrowRightIcon,
   CalendarDotsIcon,
   ChartLineUpIcon,
+  ChatsTeardropIcon,
   CloudSunIcon,
   MapTrifoldIcon,
   MegaphoneIcon,
@@ -31,6 +32,7 @@ const ITEMS: Item[] = [
   { label: 'Pazar', Icon: StorefrontIcon, tone: 'rose', href: '/pazar', tab: true },
   { label: 'İlan Ver', Icon: MegaphoneIcon, tone: 'orange', href: '/ilan/yeni' },
   { label: 'Haberler', Icon: NewspaperIcon, tone: 'sky', href: '/haberler' },
+  { label: 'Forum', Icon: ChatsTeardropIcon, tone: 'teal', href: '/forum' },
   { label: 'Hesabım', Icon: UserCircleIcon, tone: 'emerald', href: '/hesap' },
 ];
 
