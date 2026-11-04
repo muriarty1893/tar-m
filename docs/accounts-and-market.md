@@ -54,6 +54,44 @@ tests in `tests/unit/market.test.ts` and `tests/unit/farm.test.ts`.
 Limits against abuse: 10 listings a day, 60 messages per 10 minutes, 20 reports a day per person;
 photos only from our own Blob store, images only, 8 MB at most.
 
+## The mobile app's API
+
+The mobile app (`mobile/`) uses the same accounts and data through JSON route handlers under
+`/api/app/…` (`app/api/app/`). The reads are the pages' own (`lib/*-data.ts`); the writes are shared
+with the server actions (`lib/services/market.ts`, `chat.ts`, `farm.ts`, `account.ts`, `admin.ts`), so
+the rules, limits and offer logic are the same everywhere. `lib/app-api.ts` has the helpers.
+
+- **Who:** the Clerk session token in `Authorization: Bearer …`, which `clerkMiddleware` reads. Cookies
+  alone never sign in here (no CSRF), so any origin may call it (CORS `*`; `proxy.ts` answers the
+  preflight). 401 `sign_in` signed out; 409 `name_required` before the first listing or message
+  without a name (the app opens Hesabım); 403 `not_admin` on `/api/app/yonetim/…` for non-admins.
+- **Answers:** JSON, `Cache-Control: no-store`; a form's errors are 422 `{ errors, message }` with the
+  same Turkish messages as the site. Photo paths under `public/` come back as full addresses.
+- **Caches:** changes refresh the same tags as the site (`listings`, `news`) with
+  `revalidateTag(tag, { expire: 0 })` (route handlers can't use `updateTag`).
+- **Photos:** `POST /api/app/foto?klasor=ilanlar|haberler` with the image's bytes (the app shrinks it
+  to 1600 px JPEG first): images only (checked by their first bytes), at most 4 MB, stored in Blob
+  under `ilanlar/` or (admins) `haberler/`.
+
+| Address | Methods |
+| --- | --- |
+| `ben` | GET who am I (profile, admin, unread), PATCH name/province, DELETE the account (`{ confirm: true }`) |
+| `okunmamis` | GET unread chats |
+| `ilanlar`, `ilanlar/[id]` | GET a page (as /pazar's filters), POST a listing; GET, PUT (owner), PATCH `{ status }` |
+| `ilanlar/[id]/favori`, `…/sikayet`, `…/mesaj` | POST: heart, report, first message or offer |
+| `mesajlar`, `mesajlar/[id]`, `teklifler/[id]` | GET inbox (`?rol=`); GET a chat, POST `{ text }` or `{ offer }`; POST an answer to an offer |
+| `takvim`, `takvim/[id]` | GET a month (`?ay=2026-11`) with the fields, POST a task; PATCH `{ done }`, DELETE |
+| `tarlalar`, `tarlalar/[id]`, `…/sinir`, `…/masraf`, `masraflar/[id]` | fields (GET, POST, PUT, DELETE), the map outline (PUT), expenses (POST, DELETE) |
+| `haberler`, `haberler/[slug]` | GET published news (an article as sanitized HTML) |
+| `yonetim`, `yonetim/haberler`, `…/[id]`, `yonetim/onizleme`, `yonetim/sikayetler`, `…/[id]` | admin: overview, articles (GET, POST, PUT, DELETE), Markdown preview, reports and moderation |
+
+**Field outlines.** `fields.boundary` (jsonb, `[[lat, lng], …]`, 3 to 60 corners, checked by `lib/geo.ts`)
+is drawn on the app's "Tarla Haritası"; the website doesn't show it yet.
+
+`tests/unit/geo.test.ts` covers the outline rules. The whole API was checked end to end against a
+local server with two Clerk test users (`…+clerk_test@example.com`, code 424242), who then deleted
+their accounts through it.
+
 ## Admins
 
 Admins run /yonetim (news and reports) and can remove any listing. Two ways to name them, both in

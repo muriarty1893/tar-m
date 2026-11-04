@@ -1,7 +1,8 @@
 /**
  * The demo phone's "Pazar": farmers' listings (produce, seed, tools, equipment, vehicles), on sample data.
- * A copy of the mobile app's mobile/src/domain/market.ts with web photo paths (public/market) and the
- * demo's clock (lib/demo-clock.ts); keep the two in step.
+ * It began as the mobile app's sample market; the app now uses the real one (the API), so this is the
+ * demo's own. The categories, units, price format and folding are shared with the app's
+ * mobile/src/domain/market.ts and the website's lib/market.ts: keep those in step.
  */
 import { DEMO_START } from "@/lib/demo-clock";
 

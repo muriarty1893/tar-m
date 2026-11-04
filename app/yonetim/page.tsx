@@ -6,8 +6,8 @@ import { AdminShell, AdminSkeleton } from "@/components/admin/AdminShell";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { buttonVariants } from "@/components/ui/button";
 import { requireAdmin } from "@/lib/auth";
-import { sql } from "@/lib/db";
 import { listAllArticles } from "@/lib/news-data";
+import { adminCounts } from "@/lib/services/admin";
 import { formatTrDate } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Yönetim paneli", robots: { index: false } };
@@ -34,13 +34,7 @@ export default function AdminHome() {
 
 async function Overview() {
   await requireAdmin("/yonetim");
-  const [counts] = await sql()`
-    select
-      (select count(*) from articles where status = 'published') as published,
-      (select count(*) from articles where status = 'draft') as drafts,
-      (select count(distinct listing_id) from reports where resolved_at is null) as reports,
-      (select count(*) from listings where status = 'active') as listings,
-      (select count(*) from profiles) as people`;
+  const counts = await adminCounts();
   const articles = (await listAllArticles()).slice(0, 5);
   const stats = [
     { label: "Yayındaki haber", value: counts.published, href: "/yonetim/haberler", Icon: NewspaperIcon },

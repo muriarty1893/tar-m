@@ -1,6 +1,6 @@
 /**
  * The demo phone's "Mesajlar": listing chats, offers and the other side's scripted replies (no server).
- * A copy of the mobile app's mobile/src/domain/chat.ts; keep the two in step.
+ * The demo's own script: the mobile app's chats are real now (Mesajlar on the website's API).
  */
 
 import { fold, formatPrice, type Listing } from "./demo-market";

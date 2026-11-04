@@ -2,8 +2,8 @@ import { demoScenarios } from "@/data/demo-scenarios";
 import { CALENDAR_MONTH, farmTasks, type FarmTask } from "@/data/farm-calendar";
 
 /**
- * The demo phone's "Tarlalarım" and "Tarla Haritası": Ayşe's four fields, sample data copied from the
- * mobile app (mobile/src/domain/fields.ts) with web photo paths. The names are the calendar's, so each
+ * The demo phone's "Tarlalarım" and "Tarla Haritası": Ayşe's four fields, the demo's own sample data
+ * (the mobile app shows the farmer's real fields, drawn on a real map). The names are the calendar's, so each
  * field lists its own tasks; each one's last scan is a demo scenario, and that scan sets its health.
  */
 export type Health = "saglikli" | "izlenmeli" | "riskli";

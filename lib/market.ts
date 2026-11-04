@@ -1,7 +1,8 @@
 /**
  * Pazar (the farmers' market) on the website: the rules shared by the listing form (in the browser)
  * and the server actions that save it, plus the offer rules for chats. The categories, units,
- * price format and search folding are the mobile app's (data/demo-market.ts).
+ * price format and search folding are shared with the mobile app (data/demo-market.ts,
+ * mobile/src/domain/market.ts), whose listing form repeats these checks.
  */
 import { provinces } from "@/data/provinces";
 import {

@@ -1,12 +1,17 @@
 import { test, expect } from "@playwright/test";
 
-test("news list shows sample articles newest first and opens one", async ({ page }) => {
+test("news list shows the articles newest first and opens one", async ({ page }) => {
   await page.goto("/haberler");
   await expect(page.getByRole("heading", { level: 1, name: "Haberler" })).toBeVisible();
 
+  // Admins publish news live (also from the app), so only the first three articles are known: they are
+  // listed, newest first.
   const titles = page.locator("article h2");
-  await expect(titles).toHaveCount(3);
-  await expect(titles.first()).toHaveText("Çiftçi Destek erken erişim listesi açıldı");
+  await expect(titles.first()).toBeVisible();
+  const all = await titles.allTextContents();
+  const order = ["Çiftçi Destek erken erişim listesi açıldı", "Buğdayda sarı pas hastalığına karşı erken uyarı işaretleri", "Kış öncesi toprak hazırlığında 5 öneri"].map((t) => all.indexOf(t));
+  expect(order.every((i) => i >= 0)).toBe(true);
+  expect(order).toEqual([...order].sort((x, y) => x - y));
 
   await page.getByRole("link", { name: "Buğdayda sarı pas hastalığına karşı erken uyarı işaretleri" }).click();
   await expect(page).toHaveURL(/\/haberler\/bugdayda-pas-hastaligi$/);

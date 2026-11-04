@@ -102,6 +102,8 @@ create table if not exists fields (
   updated_at        timestamptz not null default now()
 );
 create index if not exists fields_user_idx on fields (user_id, created_at);
+-- The field's outline, drawn on the mobile app's map: [[lat, lng], …] (lib/geo.ts). Null = not drawn.
+alter table fields add column if not exists boundary jsonb;
 
 create table if not exists expenses (
   id         uuid primary key default gen_random_uuid(),

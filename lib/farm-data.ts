@@ -1,6 +1,7 @@
 import "server-only";
 import { day, isUuid, num, sql, str, type Row } from "./db";
 import type { ExpenseKind, TaskKind } from "./farm";
+import { parseBoundary, type LatLng } from "./geo";
 
 /** Reads for Tarlalarım and Tarım takvimi. Every query is scoped to the signed-in person. */
 
@@ -59,6 +60,8 @@ export type FieldSummary = {
   notes: string;
   expenses: number;
   nextTask: { title: string; date: string } | null;
+  /** The outline drawn on the app's map, or null. */
+  boundary: LatLng[] | null;
 };
 
 const toField = (r: Row): FieldSummary => ({
@@ -73,6 +76,7 @@ const toField = (r: Row): FieldSummary => ({
   notes: str(r.notes),
   expenses: num(r.expenses) ?? 0,
   nextTask: r.next_title ? { title: str(r.next_title), date: day(r.next_date) } : null,
+  boundary: parseBoundary(r.boundary),
 });
 
 export async function listFields(userId: string, today: string, onlyId: string | null = null): Promise<FieldSummary[]> {
