@@ -63,7 +63,7 @@ export const PasswordField = forwardRef<TextInput, TextInputProps & { label: str
 /** The 6-digit code from the e-mail, in one box: typing, pasting and the keyboard's suggestion all work. */
 export function CodeField({ value, onChange, error, email, onSubmit }: { value: string; onChange: (v: string) => void; error?: string; email: string; onSubmit: () => void }) {
   return (
-    <Field label="E-postadaki kod" required error={error} hint={`${email} adresine 6 haneli bir kod gönderdik. Gelen kutusunda yoksa “Gereksiz” klasörüne bakın.`}>
+    <Field label="E-postadaki kod" required error={error} hint={`${email} adresine 6 haneli bir kod gönderdik. Gelen kutusunda yoksa “Spam” ya da “Gereksiz” klasörüne bakın (gönderen: notifications@accounts.dev).`}>
       <Input
         value={value}
         onChangeText={(t) => onChange(t.replace(/\D/g, '').slice(0, 6))}

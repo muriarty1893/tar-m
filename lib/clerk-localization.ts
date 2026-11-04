@@ -21,11 +21,26 @@ const protectCheck = {
   retryButton: "Yeniden dene",
 };
 
+/**
+ * Under the 6-digit code box. The codes come from Clerk's shared sender (the site has no domain of
+ * its own yet), and Gmail sometimes files them under Spam.
+ */
+const codeHint = "Kod gelmediyse Spam klasörüne bakın. Gönderen: notifications@accounts.dev";
+
 export const clerkLocalization = {
   ...withSiteName(trTR),
   formFieldInputPlaceholder__signUpPassword: "Bir şifre belirleyin",
-  signUp: { ...withSiteName(trTR.signUp), protectCheck },
-  signIn: { ...withSiteName(trTR.signIn), protectCheck },
+  signUp: {
+    ...withSiteName(trTR.signUp),
+    protectCheck,
+    emailCode: { ...withSiteName(trTR.signUp?.emailCode), subtitle: codeHint },
+  },
+  signIn: {
+    ...withSiteName(trTR.signIn),
+    protectCheck,
+    emailCode: { ...withSiteName(trTR.signIn?.emailCode), subtitle: codeHint },
+    emailCodeMfa: { ...withSiteName(trTR.signIn?.emailCodeMfa), subtitle: codeHint },
+  },
   unstable__errors: {
     ...trTR.unstable__errors,
     protect_check_execution_failed: "Doğrulama tamamlanamadı. “Yeniden dene”ye basın ya da Google ile devam edin.",
