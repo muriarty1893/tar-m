@@ -4,14 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { RefObject } from "react";
 import { useAuth, useClerk } from "@clerk/nextjs";
-import { CaretRightIcon, ChatsCircleIcon, EnvelopeSimpleIcon, SignOutIcon, UserCircleIcon } from "@phosphor-icons/react/dist/ssr";
+import { BellIcon, CaretRightIcon, ChatsCircleIcon, EnvelopeSimpleIcon, SignOutIcon, UserCircleIcon } from "@phosphor-icons/react/dist/ssr";
 import { siteConfig } from "@/config/site";
 import { buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { CtaLink } from "./CtaLink";
 import { Logo } from "./Logo";
 import { navExtras } from "./nav-items";
-import { useUnreadCount } from "./account/HeaderAccount";
+import { useUnreadCounts } from "./account/HeaderAccount";
 
 /**
  * Full-screen menu (Base UI Dialog via the shadcn Sheet: focus trap, Escape, focus return).
@@ -31,7 +31,7 @@ export default function MobileMenu({
   const pathname = usePathname();
   const { isSignedIn } = useAuth();
   const clerk = useClerk();
-  const unread = useUnreadCount();
+  const { messages: unread, notifications } = useUnreadCounts();
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -98,11 +98,18 @@ export default function MobileMenu({
         <div className="mt-6 grid gap-3 motion-safe:animate-in motion-safe:fade-in motion-safe:fill-mode-both motion-safe:duration-500" style={{ animationDelay: "340ms" }}>
           {isSignedIn ? (
             <>
-              <Link href="/mesajlar" onClick={close} className={buttonVariants({ size: "lg", className: "w-full" })}>
-                <ChatsCircleIcon aria-hidden="true" weight="duotone" />
-                Mesajlar
-                {unread > 0 && <span className="rounded-full bg-white px-2 text-sm font-bold text-primary">{unread} yeni</span>}
-              </Link>
+              <div className="grid grid-cols-2 gap-3">
+                <Link href="/mesajlar" onClick={close} className={buttonVariants({ size: "lg", className: "w-full" })}>
+                  <ChatsCircleIcon aria-hidden="true" weight="duotone" />
+                  Mesajlar
+                  {unread > 0 && <span className="rounded-full bg-white px-2 text-sm font-bold text-primary">{unread}</span>}
+                </Link>
+                <Link href="/bildirimler" onClick={close} className={buttonVariants({ size: "lg", variant: "outline", className: "w-full" })}>
+                  <BellIcon aria-hidden="true" weight="duotone" />
+                  Bildirimler
+                  {notifications > 0 && <span className="rounded-full bg-destructive px-2 text-sm font-bold text-white">{notifications}</span>}
+                </Link>
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <Link href="/hesabim" onClick={close} className={buttonVariants({ variant: "outline", className: "w-full" })}>
                   <UserCircleIcon aria-hidden="true" weight="duotone" />

@@ -12,7 +12,7 @@ export const GET = handler(async (req) => {
   return json({ items, total, page: query.sayfa, pageSize: FORUM_PAGE_SIZE });
 });
 
-/** "Konu aç": { category, title, body }. */
+/** "Konu aç": { category, title, body, photos } (photos: up to 4 addresses from /api/app/foto?klasor=forum). */
 export const POST = handler(async (req) => {
   const profile = await requireNamedProfile(req);
   const created = await createTopicFor(profile.userId, await body(req));

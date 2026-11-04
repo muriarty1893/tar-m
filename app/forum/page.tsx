@@ -3,15 +3,13 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { ChatsTeardropIcon, CheckCircleIcon, ListIcon, MagnifyingGlassIcon, NotePencilIcon } from "@phosphor-icons/react/dist/ssr";
 import { ToolHeader } from "@/components/tool/ToolHeader";
-import { Avatar } from "@/components/market/Avatar";
-import { CategoryChip, repliesLabel } from "@/components/forum/parts";
+import { TopicList } from "@/components/forum/TopicList";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getUserId, signInHref } from "@/lib/auth";
 import { FORUM_CATEGORIES, FORUM_PAGE_SIZE, FORUM_SORTS, forumHref, parseForumQuery, type ForumQuery } from "@/lib/forum";
 import { listTopics } from "@/lib/forum-data";
 import { requestNow } from "@/lib/now";
-import { agoLabel } from "@/lib/tr-time";
 
 export const metadata: Metadata = {
   title: "Forum",
@@ -122,28 +120,7 @@ async function Topics({ searchParams }: { searchParams: PageProps<"/forum">["sea
         {items.length === 0 ? (
           <EmptyState query={query} />
         ) : (
-          <ul className="divide-y divide-border bg-card">
-            {items.map((t) => (
-              <li key={t.id}>
-                <Link href={`/forum/${t.id}`} className="flex gap-3 px-4 py-4 transition-colors hover:bg-secondary focus-visible:outline-offset-[-3px]">
-                  <Avatar id={t.authorId} name={t.authorName} size={44} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-lg font-semibold leading-snug">{t.title}</span>
-                    <span className="mt-1 line-clamp-2 block text-muted-foreground">{t.excerpt}</span>
-                    <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-                      <CategoryChip category={t.category} />
-                      <span>{t.authorName}</span>
-                      <span>{agoLabel(new Date(t.createdAt), now)}</span>
-                      <span className="inline-flex items-center gap-1 font-semibold text-foreground">
-                        <ChatsTeardropIcon aria-hidden="true" weight="duotone" className="size-4 text-primary" />
-                        {repliesLabel(t.replyCount)}
-                      </span>
-                    </span>
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <TopicList items={items} now={now} framed={false} />
         )}
       </section>
 

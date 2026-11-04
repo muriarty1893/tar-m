@@ -5,7 +5,7 @@ import { checkRateLimit } from "@/lib/rateLimit";
 
 /**
  * Photo uploads from the app: the phone shrinks the photo (about 1600 px, JPEG) and sends its bytes;
- * we store it in Vercel Blob. ?klasor=ilanlar for listing photos (anyone signed in), haberler for news
+ * we store it in Vercel Blob. ?klasor=ilanlar for listing photos and forum for forum photos (anyone signed in), haberler for news
  * covers (admins). Images only, checked by their first bytes, at most 4 MB (Vercel's limit is 4.5).
  */
 const MAX_BYTES = 4 * 1024 * 1024;
@@ -20,7 +20,7 @@ function imageType(bytes: Uint8Array): { type: string; ext: string } | null {
 
 export const POST = handler(async (req) => {
   const folder = new URL(req.url).searchParams.get("klasor");
-  if (folder !== "ilanlar" && folder !== "haberler") throw new ApiError(400, "Geçersiz klasör.");
+  if (folder !== "ilanlar" && folder !== "haberler" && folder !== "forum") throw new ApiError(400, "Geçersiz klasör.");
   const userId = folder === "haberler" ? await requireAppAdmin(req) : await requireAppUser(req);
   if (!checkRateLimit(`app-foto:${userId}`, 60)) throw new ApiError(429, "Çok fazla fotoğraf yüklediniz; biraz sonra yeniden deneyin.");
 

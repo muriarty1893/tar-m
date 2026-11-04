@@ -47,7 +47,7 @@ async function Account({ searchParams }: { searchParams: PageProps<"/hesabim">["
           Profil
         </h2>
         <div className="mt-5">
-          <ProfileForm name={profile.name} province={profile.province} next={next} />
+          <ProfileForm name={profile.name} province={profile.province} handle={profile.handle ?? ""} next={next} />
         </div>
       </section>
 

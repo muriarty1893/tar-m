@@ -9,7 +9,7 @@ import { deleteAccountFor, updateProfileFor } from "@/lib/services/account";
 async function me(userId: string) {
   const [profile, admin, unread, user] = await Promise.all([ensureProfile(userId), isAdmin(userId), unreadConversations(userId), currentUser()]);
   const email = user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses[0]?.emailAddress ?? "";
-  return { user: { id: userId, name: profile.name, province: profile.province, email, memberSince: profile.createdAt, admin }, unread };
+  return { user: { id: userId, name: profile.name, province: profile.province, handle: profile.handle, email, memberSince: profile.createdAt, admin }, unread };
 }
 
 export const GET = handler(async (req) => {
@@ -17,11 +17,11 @@ export const GET = handler(async (req) => {
   return json(userId ? await me(userId) : { user: null, unread: 0 });
 });
 
-/** Hesabım: the name other people see, and the home province. */
+/** Hesabım: the name other people see, the home province and (when sent) the username for mentions. */
 export const PATCH = handler(async (req) => {
   const userId = await requireAppUser(req);
   const b = await body(req);
-  const { errors } = await updateProfileFor(userId, b.name, b.province);
+  const { errors } = await updateProfileFor(userId, b.name, b.province, typeof b.handle === "string" ? b.handle : undefined);
   if (Object.keys(errors).length) return invalid({ errors });
   expireTag(LISTINGS_TAG);
   return json(await me(userId));

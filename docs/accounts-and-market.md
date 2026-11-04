@@ -17,10 +17,13 @@ phone on the home page stays a scripted demo, and the copy calls the scan "yakı
 | `/takvim` | Month view, the day's tasks (tick, delete), add a task (kind, date, time, field), upcoming tasks | yes |
 | `/tarlalarim`, `/tarlalarim/[id]` | Fields (crop, stage, area, place, expected yield), season totals, expenses by kind, cost per dönüm, the field's tasks | yes |
 | `/hava` | Unchanged: 7-day forecast, farming hints, "Konumumu kullan" | no |
-| `/hesabim` | Name shown to others, home province, Clerk's e-mail/password settings, sign out, **delete account** (deletes everything, KVKK) | yes |
+| `/forum`, `/forum/[id]`, `/forum/yeni` | The forum, X-style: topics with up to 4 photos, answers to the topic or to a reply (shown as a thread, "@ahmet kişisine yanıt"), @mentions with suggestions while typing, ♥ likes, report, delete (a reply others answered stays as "Bu yanıt silindi") | to write, like |
+| `/forum/kisi/[handle]` | A person's forum page (a mention links here): name, @username, member since, their topics | no |
+| `/bildirimler` | Answers to your topics and replies, and mentions of you; the bell in the header counts the new ones | yes |
+| `/hesabim` | Name shown to others, home province, the username for mentions (made from the name, changeable), Clerk's e-mail/password settings, sign out, **delete account** (deletes everything, KVKK) | yes |
 | `/yonetim` | Admin dashboard: overview (news, drafts, reports, listings, people) | admin |
 | `/yonetim/haberler` | News: list, new, edit, delete. Draft / published, date, cover photo (uploaded to Blob under `haberler/`), Markdown text with a toolbar (heading, bold, italic, lists, quote, link) and a preview. Saving refreshes /haberler and the home page at once | admin |
-| `/yonetim/sikayetler` | Reported listings: remove the listing or dismiss the reports | admin |
+| `/yonetim/sikayetler` | Reported listings and forum posts: remove, or dismiss the reports | admin |
 | `/giris`, `/kayit` | Clerk sign-in and sign-up, in Turkish | – |
 
 Offers: the buyer offers; the seller accepts, turns down or counters; the buyer answers a counter the
@@ -69,14 +72,17 @@ the rules, limits and offer logic are the same everywhere. `lib/app-api.ts` has 
   same Turkish messages as the site. Photo paths under `public/` come back as full addresses.
 - **Caches:** changes refresh the same tags as the site (`listings`, `news`) with
   `revalidateTag(tag, { expire: 0 })` (route handlers can't use `updateTag`).
-- **Photos:** `POST /api/app/foto?klasor=ilanlar|haberler` with the image's bytes (the app shrinks it
+- **Photos:** `POST /api/app/foto?klasor=ilanlar|forum|haberler` with the image's bytes (the app shrinks it
   to 1600 px JPEG first): images only (checked by their first bytes), at most 4 MB, stored in Blob
-  under `ilanlar/` or (admins) `haberler/`.
+  under `ilanlar/`, `forum/` or (admins) `haberler/`.
 
 | Address | Methods |
 | --- | --- |
-| `ben` | GET who am I (profile, admin, unread), PATCH name/province, DELETE the account (`{ confirm: true }`) |
-| `okunmamis` | GET unread chats |
+| `ben` | GET who am I (profile with `handle`, admin, unread), PATCH name/province/handle, DELETE the account (`{ confirm: true }`) |
+| `okunmamis` | GET unread chats (`count`) and unseen notifications (`notifications`) |
+| `forum`, `forum/[id]`, `…/yanit`, `forum/yanitlar/[id]` | GET topics (as /forum's filters), POST a topic `{ category, title, body, photos }`; GET a topic with its replies, DELETE; POST a reply `{ body, parentId?, photos? }`; DELETE a reply |
+| `forum/begen`, `forum/kisiler`, `forum/kisi/[handle]`, `forum/sikayet` | POST ♥ `{ topicId, replyId? }`; GET people to mention (`?q=&konu=`); GET a person's page; POST a report |
+| `bildirimler` | GET notifications, POST marks them seen |
 | `ilanlar`, `ilanlar/[id]` | GET a page (as /pazar's filters), POST a listing; GET, PUT (owner), PATCH `{ status }` |
 | `ilanlar/[id]/favori`, `…/sikayet`, `…/mesaj` | POST: heart, report, first message or offer |
 | `mesajlar`, `mesajlar/[id]`, `teklifler/[id]` | GET inbox (`?rol=`); GET a chat, POST `{ text }` or `{ offer }`; POST an answer to an offer |

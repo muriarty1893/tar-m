@@ -187,3 +187,46 @@ create table if not exists forum_reports (
   resolved_at timestamptz
 );
 create unique index if not exists forum_reports_once_idx on forum_reports (reporter_id, topic_id, coalesce(reply_id, '00000000-0000-0000-0000-000000000000'::uuid));
+
+-- Forum, X-style: a username for mentions (@ahmet), replies to replies, up to 4 photos a post, likes,
+-- and notifications ("Bildirimler") for replies and mentions.
+alter table profiles add column if not exists handle text;
+create unique index if not exists profiles_handle_idx on profiles (handle);
+alter table profiles drop constraint if exists profiles_handle_check;
+alter table profiles add constraint profiles_handle_check check (handle is null or handle ~ '^[a-z0-9_]{3,20}$');
+
+alter table forum_topics add column if not exists photos text[] not null default '{}';
+alter table forum_topics add column if not exists like_count integer not null default 0;
+
+-- parent_id: the reply this one answers (null: the topic). A deleted reply that others answered stays
+-- as "Bu yanıt silindi" (deleted_at, text and photos gone), so the conversation under it still reads.
+alter table forum_replies add column if not exists parent_id uuid references forum_replies(id) on delete set null;
+alter table forum_replies add column if not exists photos text[] not null default '{}';
+alter table forum_replies add column if not exists like_count integer not null default 0;
+alter table forum_replies add column if not exists deleted_at timestamptz;
+-- A photo alone is a reply too, and a deleted one keeps no text: the 2-character minimum is the app's.
+alter table forum_replies drop constraint if exists forum_replies_body_check;
+alter table forum_replies add constraint forum_replies_body_check check (char_length(body) <= 3000);
+create index if not exists forum_replies_parent_idx on forum_replies (parent_id);
+
+create table if not exists forum_likes (
+  user_id    text not null references profiles(user_id) on delete cascade,
+  topic_id   uuid not null references forum_topics(id) on delete cascade,
+  reply_id   uuid references forum_replies(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+create unique index if not exists forum_likes_once_idx on forum_likes (user_id, topic_id, coalesce(reply_id, '00000000-0000-0000-0000-000000000000'::uuid));
+
+-- "Bildirimler": someone answered your topic or reply, or mentioned you. One per post and person.
+create table if not exists notifications (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    text not null references profiles(user_id) on delete cascade,
+  actor_id   text not null references profiles(user_id) on delete cascade,
+  kind       text not null check (kind in ('reply', 'mention')),
+  topic_id   uuid not null references forum_topics(id) on delete cascade,
+  reply_id   uuid references forum_replies(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  read_at    timestamptz
+);
+create index if not exists notifications_user_idx on notifications (user_id, created_at desc);
+create unique index if not exists notifications_once_idx on notifications (user_id, topic_id, coalesce(reply_id, '00000000-0000-0000-0000-000000000000'::uuid));

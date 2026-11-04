@@ -8,11 +8,12 @@ import { deleteAccountFor, updateProfileFor, type ProfileErrors } from "@/lib/se
 
 export type ProfileResult = { errors: ProfileErrors; saved?: boolean };
 
-/** The name other people see, and the home province (the default for listings and fields). */
-export async function updateProfile(name: string, province: string, next: string): Promise<ProfileResult> {
+/** The name other people see, the home province (the default for listings and fields) and the username for mentions. */
+export async function updateProfile(name: string, province: string, handle: string, next: string): Promise<ProfileResult> {
   const userId = await getUserId();
   if (!userId) redirect("/giris?redirect_url=%2Fhesabim");
-  const { errors } = await updateProfileFor(userId, name, province);
+  // An empty box keeps (or makes) the one made from the name.
+  const { errors } = await updateProfileFor(userId, name, province, handle.trim() ? handle : undefined);
   if (Object.keys(errors).length) return { errors };
   updateTag(LISTINGS_TAG);
   // Only our own pages: never an address from elsewhere.

@@ -1,7 +1,7 @@
 import { ApiError, appUserId, handler, json, requireAppUser } from "@/lib/app-api";
 import { isAdmin } from "@/lib/auth";
 import { getTopic } from "@/lib/forum-data";
-import { deleteTopicFor } from "@/lib/services/forum";
+import { deleteTopicWithPhotos } from "@/lib/services/forum";
 
 /** A topic with its replies; `admin` says whether the viewer may delete any post. */
 export const GET = handler<{ id: string }>(async (req, { id }) => {
@@ -11,9 +11,9 @@ export const GET = handler<{ id: string }>(async (req, { id }) => {
   return json({ topic, admin: await isAdmin(userId) });
 });
 
-/** The author (or an admin) deletes the topic, with its replies. */
+/** The author (or an admin) deletes the topic, with its replies and photos. */
 export const DELETE = handler<{ id: string }>(async (req, { id }) => {
   const userId = await requireAppUser(req);
-  if (!(await deleteTopicFor(userId, await isAdmin(userId), id))) throw new ApiError(404, "Bu konuyu silemezsiniz.");
+  if (!(await deleteTopicWithPhotos(userId, await isAdmin(userId), id))) throw new ApiError(404, "Bu konuyu silemezsiniz.");
   return json({ ok: true });
 });

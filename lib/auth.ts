@@ -3,13 +3,15 @@ import { notFound, redirect } from "next/navigation";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { iso, sql, str } from "./db";
 import { signInHref } from "./sign-in-href";
+import { assignHandle } from "./services/handles";
 
 /**
  * The data access layer for signed-in people. Sign-in itself is Clerk's; the profile (the name other
  * people see, the home province) is ours, in `profiles`, keyed by the Clerk user id.
  */
 
-export type Profile = { userId: string; name: string; province: string; createdAt: string };
+/** `handle`: the username for mentions ("ahmet"); null until the person has a name. */
+export type Profile = { userId: string; name: string; province: string; handle: string | null; createdAt: string };
 
 export async function getUserId(): Promise<string | null> {
   const { userId } = await auth();
@@ -28,20 +30,27 @@ const toProfile = (r: Record<string, unknown>): Profile => ({
   userId: str(r.user_id),
   name: str(r.name),
   province: str(r.province),
+  handle: r.handle ? str(r.handle) : null,
   createdAt: iso(r.created_at),
 });
 
-/** The person's profile, created on first use from their Clerk name. */
+/** The person's profile, created on first use from their Clerk name, with a username once it has a name. */
 export async function ensureProfile(userId: string): Promise<Profile> {
-  const rows = await sql()`select user_id, name, province, created_at from profiles where user_id = ${userId}`;
-  if (rows[0]) return toProfile(rows[0]);
+  const rows = await sql()`select user_id, name, province, handle, created_at from profiles where user_id = ${userId}`;
+  if (rows[0]) {
+    const profile = toProfile(rows[0]);
+    if (profile.name && !profile.handle) profile.handle = await assignHandle(userId, profile.name);
+    return profile;
+  }
   const user = await currentUser();
   const name = [user?.firstName, user?.lastName].filter(Boolean).join(" ").trim().slice(0, 60);
   const created = await sql()`
     insert into profiles (user_id, name) values (${userId}, ${name})
     on conflict (user_id) do update set user_id = excluded.user_id
-    returning user_id, name, province, created_at`;
-  return toProfile(created[0]);
+    returning user_id, name, province, handle, created_at`;
+  const profile = toProfile(created[0]);
+  if (profile.name && !profile.handle) profile.handle = await assignHandle(userId, profile.name);
+  return profile;
 }
 
 /**

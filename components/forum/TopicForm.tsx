@@ -6,20 +6,22 @@ import { createTopic } from "@/app/forum/actions";
 import { FORUM_CATEGORIES, TOPIC_BODY_MAX, TOPIC_TITLE_MAX, validateTopic, type TopicErrors, type TopicInput } from "@/lib/forum";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { FieldError } from "@/components/forms/fields";
+import { MentionTextarea } from "@/components/forum/MentionTextarea";
+import { PhotoPicker, usePhotoUploads } from "@/components/forum/PhotoPicker";
 
-const NAMES: Record<keyof TopicInput, string> = { category: "Konu türü", title: "Başlık", body: "Metin" };
-const ORDER: (keyof TopicInput)[] = ["category", "title", "body"];
+const NAMES: Record<keyof TopicInput, string> = { category: "Konu türü", title: "Başlık", body: "Metin", photos: "Fotoğraflar" };
+const ORDER: (keyof TopicInput)[] = ["category", "title", "body", "photos"];
 
-/** "Konu aç": the kind of topic, a title and the text; checked as on the server, with a summary of what to fix. */
+/** "Konu aç": the kind of topic, a title, the text (with @mentions) and up to 4 photos; checked as on the server, with a summary of what to fix. */
 export function TopicForm() {
-  const [values, setValues] = useState<TopicInput>({ category: "", title: "", body: "" });
+  const [values, setValues] = useState<Omit<TopicInput, "photos">>({ category: "", title: "", body: "" });
+  const photos = usePhotoUploads();
   const [errors, setErrors] = useState<TopicErrors>({});
   const [message, setMessage] = useState("");
   const [pending, start] = useTransition();
   const summary = useRef<HTMLDivElement>(null);
-  const set = (k: keyof TopicInput, v: string) => {
+  const set = (k: keyof Omit<TopicInput, "photos">, v: string) => {
     setValues((s) => ({ ...s, [k]: v }));
     setErrors((e) => {
       const next = { ...e };
@@ -31,11 +33,16 @@ export function TopicForm() {
 
   const submit = () => {
     setMessage("");
-    const found = validateTopic(values);
+    if (photos.uploading) {
+      setMessage("Fotoğraflar hâlâ yükleniyor; birkaç saniye bekleyin.");
+      return requestAnimationFrame(() => summary.current?.focus());
+    }
+    const input = { ...values, photos: photos.urls };
+    const found = validateTopic(input);
     setErrors(found);
     if (Object.keys(found).length) return requestAnimationFrame(() => summary.current?.focus());
     start(async () => {
-      const r = await createTopic(values);
+      const r = await createTopic(input);
       if (r) {
         setErrors(r.errors);
         setMessage(r.message ?? "");
@@ -110,13 +117,13 @@ export function TopicForm() {
         <label htmlFor="konu-body" className="block text-lg font-semibold">
           Metin
         </label>
-        <Textarea
+        <MentionTextarea
           id="konu-body"
           value={values.body}
-          onChange={(e) => set("body", e.target.value)}
+          onChange={(v) => set("body", v)}
           rows={8}
           maxLength={TOPIC_BODY_MAX}
-          placeholder="Ne ektiniz, nerede, ne zaman? Ne denediniz? Ayrıntı verdikçe yanıtlar daha işe yarar olur."
+          placeholder="Ne ektiniz, nerede, ne zaman? Ne denediniz? Birinden bahsetmek için @ yazın."
           aria-invalid={Boolean(errors.body)}
           aria-describedby={errors.body ? "konu-body-hata" : "konu-body-sayac"}
         />
@@ -127,6 +134,15 @@ export function TopicForm() {
             {values.body.length.toLocaleString("tr-TR")}/{TOPIC_BODY_MAX.toLocaleString("tr-TR")}
           </p>
         )}
+      </div>
+
+      <div id="konu-photos" tabIndex={-1} className="space-y-2">
+        <p className="text-lg font-semibold">
+          Fotoğraflar <span className="font-normal text-muted-foreground">(isteğe bağlı, en fazla 4)</span>
+        </p>
+        <p className="text-muted-foreground">Hastalıklı yaprak, makinedeki arıza… Fotoğraf, sorunuzu anlatmanın en kolay yolu.</p>
+        <PhotoPicker uploads={photos} id="konu-foto" />
+        {errors.photos && <FieldError id="konu-photos-hata">{errors.photos}</FieldError>}
       </div>
 
       <p className="text-muted-foreground">Kişisel bilgilerinizi (telefon, adres) paylaşmayın. Hakaret ve reklam içeren konular kaldırılır.</p>

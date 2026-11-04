@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com", pathname: "/ilanlar/**" },
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com", pathname: "/haberler/**" },
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com", pathname: "/forum/**" },
     ],
   },
   turbopack: {

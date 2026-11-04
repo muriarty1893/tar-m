@@ -29,7 +29,7 @@ export function Header() {
       {/* On wide screens a three-column grid keeps the menu centred: the account button, which
           appears once sign-in has loaded, can't push it sideways. */}
       {/* Phones under 400 px (most iPhones are 390) get a smaller logo and tighter gaps, so the messages and menu buttons fit beside it. */}
-      <div className="mx-auto flex h-18 max-w-6xl items-center justify-between gap-2 px-4 min-[400px]:gap-4 xl:grid xl:grid-cols-[1fr_auto_1fr]">
+      <div className="mx-auto flex h-18 max-w-6xl items-center justify-between gap-2 px-3 min-[375px]:px-4 min-[400px]:gap-4 xl:grid xl:grid-cols-[1fr_auto_1fr]">
         <Link href="/" className="shrink-0 justify-self-start whitespace-nowrap rounded-xl text-lg text-foreground min-[400px]:text-xl">
           <Logo imageClassName="size-10 min-[400px]:size-12" />
         </Link>
@@ -39,7 +39,7 @@ export function Header() {
           <DesktopNav />
         </Suspense>
 
-        <div className="flex items-center gap-2 justify-self-end">
+        <div className="flex items-center gap-1.5 justify-self-end min-[400px]:gap-2">
           <Suspense>
             <MessagesLink />
           </Suspense>
@@ -60,10 +60,10 @@ export function Header() {
               setMenuLoaded(true);
               setOpen(true);
             }}
-            className="group/menu flex min-h-12 min-w-12 cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-primary bg-background pl-3 pr-2.5 font-semibold min-[400px]:gap-2.5 min-[400px]:pl-4 min-[400px]:pr-3 text-primary transition-colors duration-200 hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30 xl:hidden"
+            className="group/menu flex size-11 cursor-pointer items-center justify-center gap-2.5 rounded-full border-2 border-primary bg-background font-semibold min-[400px]:size-12 min-[440px]:h-12 min-[440px]:w-auto min-[440px]:pl-4 min-[440px]:pr-3 text-primary transition-colors duration-200 hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30 xl:hidden"
           >
-            {/* The word goes on the narrowest phones (360 px); the button keeps its label "Menüyü aç". */}
-            <span aria-hidden="true" className="max-[374px]:hidden">
+            {/* The word shows from 440 px; on phones the button is the three bars, its label still "Menüyü aç". */}
+            <span aria-hidden="true" className="max-[439px]:hidden">
               Menü
             </span>
             {/* Three bars that stagger on hover and fold into an X while the menu is open. */}
