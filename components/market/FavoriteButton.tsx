@@ -2,20 +2,29 @@
 
 import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import { HeartIcon } from "@phosphor-icons/react/dist/ssr";
 import { toggleFavorite } from "@/app/pazar/actions";
 
-/** The heart on a listing. Signed out, it goes to sign-in and back. */
+/**
+ * The heart on a listing. Signed out, it goes to sign-in and back. Signed in but not seen by the
+ * server (an out-of-date session token), it renews the token and tries once more first.
+ */
 export function FavoriteButton({ listingId, favorite, variant = "overlay" }: { listingId: string; favorite: boolean; variant?: "overlay" | "inline" }) {
   const router = useRouter();
+  const { isSignedIn, getToken } = useAuth();
   const [pending, start] = useTransition();
   const [shown, setShown] = useOptimistic(favorite);
 
   const onClick = () =>
     start(async () => {
       setShown(!shown);
-      const r = await toggleFavorite(listingId);
-      if ("signIn" in r) router.push(r.signIn);
+      let r = await toggleFavorite(listingId);
+      if ("signIn" in r && isSignedIn) {
+        await getToken({ skipCache: true }).catch(() => null);
+        r = await toggleFavorite(listingId);
+      }
+      if ("signIn" in r) window.location.assign(r.signIn);
       else router.refresh();
     });
 
