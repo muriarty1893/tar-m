@@ -16,7 +16,6 @@ const THUMBS: Record<string, number> = {
   'app/aycicegi-tarlasi.webp': require('@/assets/images/app/aycicegi-tarlasi.webp'),
   'app/domates-mildiyo.webp': require('@/assets/images/app/domates-mildiyo.webp'),
   'app/tractor-field.webp': require('@/assets/images/app/tractor-field.webp'),
-  'app/harita-uydu.webp': require('@/assets/images/app/harita-uydu.webp'),
   'market/ilan-traktor.webp': require('@/assets/images/market/ilan-traktor.webp'),
   'market/ilan-bicerdover.webp': require('@/assets/images/market/ilan-bicerdover.webp'),
   'market/ilan-saman-balya.webp': require('@/assets/images/market/ilan-saman-balya.webp'),

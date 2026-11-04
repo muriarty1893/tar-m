@@ -4,6 +4,7 @@ import '@/global.css';
 import './demo.css';
 
 // Phosphor icons one file each (the package index pulls in every icon).
+import { DotsThreeCircleIcon } from '@phosphor-icons/react/dist/csr/DotsThreeCircle';
 import { DropIcon } from '@phosphor-icons/react/dist/csr/Drop';
 import { FirstAidKitIcon } from '@phosphor-icons/react/dist/csr/FirstAidKit';
 import { FlaskIcon } from '@phosphor-icons/react/dist/csr/Flask';
@@ -12,6 +13,7 @@ import { PlantIcon } from '@phosphor-icons/react/dist/csr/Plant';
 import { ShovelIcon } from '@phosphor-icons/react/dist/csr/Shovel';
 import { SnowflakeIcon } from '@phosphor-icons/react/dist/csr/Snowflake';
 import { TractorIcon } from '@phosphor-icons/react/dist/csr/Tractor';
+import { TrashIcon } from '@phosphor-icons/react/dist/csr/Trash';
 
 import { SpringCheck } from '@/components/ui/spring-check';
 import { TASK_KINDS, type TaskKind } from '@/domain/farm-calendar';
@@ -28,22 +30,27 @@ const KIND_STYLE: Record<TaskKind, { Icon: typeof PlantIcon; tile: string; dot: 
   sulama: { Icon: DropIcon, tile: 'bg-blue-100 text-blue-800', dot: 'bg-blue-600' },
   hasat: { Icon: TractorIcon, tile: 'bg-orange-100 text-orange-900', dot: 'bg-orange-600' },
   uyari: { Icon: SnowflakeIcon, tile: 'bg-destructive/10 text-destructive', dot: 'bg-destructive' },
+  diger: { Icon: DotsThreeCircleIcon, tile: 'bg-muted text-foreground', dot: 'bg-muted-foreground' },
 };
 
 export type DomTask = { id: string; title: string; kind: TaskKind; field: string; time: string; done: boolean };
+
+const detail = (t: DomTask) => [TASK_KINDS[t.kind].label, t.field, t.time].filter(Boolean).join(' · ');
 
 type Props = {
   label: string;
   tasks: DomTask[];
   onToggle: (id: string, checked: boolean) => Promise<void>;
+  /** "Sil" on a row: the native side asks first. */
+  onDelete?: (id: string) => Promise<void>;
   onHeight?: (height: number) => Promise<void>;
   dom?: import('expo/dom').DOMProps;
   /** Native side only: the web view, so the screen can restart it (see use-dom-height). */
   ref?: import('react').Ref<import('./use-dom-height').DomViewRef>;
 };
 
-/** The demo calendar's task list, exactly as in the website demo: kind tiles and React Bits SpringCheck rows. */
-export default function CalendarTasksDom({ label, tasks, onToggle, onHeight }: Props) {
+/** The demo calendar's task list, as in the website demo: kind tiles and React Bits SpringCheck rows, plus "Sil". */
+export default function CalendarTasksDom({ label, tasks, onToggle, onDelete, onHeight }: Props) {
   return (
     <DomRoot onHeight={onHeight}>
       <ul aria-label={label} className="space-y-2">
@@ -68,10 +75,17 @@ export default function CalendarTasksDom({ label, tasks, onToggle, onHeight }: P
                   doneOpacity={0.5}
                   className="w-full items-start [&_.spring-check\_\_press]:mt-[-1px]"
                 />
-                <span className="-mt-2 block pl-[30px] text-[12px] text-muted-foreground">
-                  {TASK_KINDS[t.kind].label} · {t.field} · {t.time}
-                </span>
+                <span className="-mt-2 block pl-[30px] text-[12px] text-muted-foreground">{detail(t)}</span>
               </span>
+              {onDelete ? (
+                <button
+                  type="button"
+                  aria-label={`Sil: ${t.title}`}
+                  onClick={() => void onDelete(t.id)}
+                  className="-mr-1 flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground active:bg-muted">
+                  <TrashIcon aria-hidden="true" weight="duotone" className="size-5" />
+                </button>
+              ) : null}
             </li>
           );
         })}

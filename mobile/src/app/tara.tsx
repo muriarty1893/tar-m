@@ -113,7 +113,7 @@ export default function Scan() {
         </Pressable>
         <View className="flex-row items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5">
           <View className="size-2 rounded-full bg-red-500" />
-          <Text className="font-sans-semibold text-[14px] text-white">{shot ? 'CANLI · Tarama' : 'CANLI · Kamera'}</Text>
+          <Text className="font-sans-semibold text-[14px] text-white">{shot ? 'ÖRNEK · Tarama' : 'ÖRNEK · Kamera'}</Text>
         </View>
         <Pressable accessibilityRole="button" accessibilityLabel={torch ? 'Flaşı kapat' : 'Flaşı aç'} onPress={() => setTorch((t) => !t)} className="size-12 items-center justify-center rounded-full bg-black/40 active:bg-black/70">
           <LightningIcon size={21} weight="fill" color={torch ? COLORS.sun : COLORS.white} />

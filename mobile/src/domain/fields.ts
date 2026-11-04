@@ -1,21 +1,11 @@
-import { FARM_TASKS, type FarmTask } from './farm-calendar';
-import { addDays } from './format';
-import { scenarioById, successTone } from './scenarios';
-
 /**
- * Ayşe's fields ("Tarlalarım" and "Tarla Haritası"): sample data, like the rest of the prototype.
- * The names are the calendar's, so each field shows its own tasks; each one's last scan is one of
- * the demo's scenarios, and that scan sets its health.
+ * Tarlalarım: the farmer's own fields and this season's expenses, kept on the website. The kinds,
+ * stages and form checks are the website's (lib/farm.ts); change both together.
  */
-export type Health = 'saglikli' | 'izlenmeli' | 'riskli';
+import type { ExpenseKind, FieldSummary } from '@/api/types';
 
-export const HEALTH: Record<Health, { label: string; hint: string }> = {
-  saglikli: { label: 'Sağlıklı', hint: 'Bitki gelişimi normal' },
-  izlenmeli: { label: 'İzlenmeli', hint: 'Belirti var, yakından takip edin' },
-  riskli: { label: 'Riskli', hint: 'Hemen müdahale gerekiyor' },
-};
-
-export type ExpenseKind = 'tohum' | 'gubre' | 'ilac' | 'mazot' | 'su' | 'iscilik';
+import { isProvince, parsePrice } from './market';
+import { fold } from './text';
 
 export const EXPENSE_KINDS: Record<ExpenseKind, string> = {
   tohum: 'Tohum ve fide',
@@ -24,150 +14,13 @@ export const EXPENSE_KINDS: Record<ExpenseKind, string> = {
   mazot: 'Mazot',
   su: 'Sulama',
   iscilik: 'İşçilik',
+  diger: 'Diğer',
 };
 
-export type Field = {
-  id: string;
-  /** As in the calendar's tasks ("Buğday tarlası"). */
-  name: string;
-  crop: string;
-  stage: string;
-  areaDonum: number;
-  place: string;
-  photo: number;
-  /** The scenario of the field's last scan. */
-  scenarioId: string;
-  /** Satellite plant-health index, 0-1 (NDVI-like). */
-  ndvi: number;
-  expectedYieldKg: number;
-  /** This season, in liras. */
-  expenses: { kind: ExpenseKind; amount: number }[];
-  /** The field's outline on the map photo, as fractions of its width and height. */
-  outline: [number, number][];
-};
+export const EXPENSE_KIND_IDS = Object.keys(EXPENSE_KINDS) as ExpenseKind[];
 
-export const FIELDS: Field[] = [
-  {
-    id: 'bugday',
-    name: 'Buğday tarlası',
-    crop: 'Ekmeklik buğday',
-    stage: 'Ekim hazırlığı',
-    areaDonum: 45,
-    place: 'Karatay, Konya',
-    photo: require('@/assets/images/app/tractor-field.webp'),
-    scenarioId: 'bugday-pas',
-    ndvi: 0.58,
-    expectedYieldKg: 18_000,
-    expenses: [
-      { kind: 'gubre', amount: 54_000 },
-      { kind: 'tohum', amount: 40_500 },
-      { kind: 'mazot', amount: 31_500 },
-      { kind: 'iscilik', amount: 12_000 },
-      { kind: 'ilac', amount: 9_000 },
-    ],
-    outline: [
-      [0.52, 0.31],
-      [0.78, 0.3],
-      [0.78, 0.49],
-      [0.52, 0.49],
-    ],
-  },
-  {
-    id: 'misir',
-    name: 'Mısır tarlası',
-    crop: 'Dane mısır',
-    stage: 'Hasat zamanı',
-    areaDonum: 30,
-    place: 'Çumra, Konya',
-    photo: require('@/assets/images/app/misir-kuraklik.webp'),
-    scenarioId: 'kuru-misir',
-    ndvi: 0.44,
-    expectedYieldKg: 33_000,
-    expenses: [
-      { kind: 'su', amount: 42_000 },
-      { kind: 'gubre', amount: 36_000 },
-      { kind: 'tohum', amount: 27_000 },
-      { kind: 'mazot', amount: 24_000 },
-      { kind: 'iscilik', amount: 15_000 },
-      { kind: 'ilac', amount: 6_000 },
-    ],
-    outline: [
-      [0.35, 0.44],
-      [0.43, 0.44],
-      [0.43, 0.72],
-      [0.35, 0.72],
-    ],
-  },
-  {
-    id: 'domates',
-    name: 'Domates serası',
-    crop: 'Sofralık domates',
-    stage: 'Hasat sürüyor',
-    areaDonum: 3,
-    place: 'Meram, Konya',
-    photo: require('@/assets/images/app/domates-mildiyo.webp'),
-    scenarioId: 'domates-mildiyo',
-    ndvi: 0.36,
-    expectedYieldKg: 42_000,
-    expenses: [
-      { kind: 'tohum', amount: 30_000 },
-      { kind: 'iscilik', amount: 28_000 },
-      { kind: 'ilac', amount: 14_500 },
-      { kind: 'gubre', amount: 12_000 },
-      { kind: 'su', amount: 9_000 },
-    ],
-    outline: [
-      [0.44, 0.2],
-      [0.51, 0.2],
-      [0.51, 0.29],
-      [0.44, 0.29],
-    ],
-  },
-  {
-    id: 'aycicegi',
-    name: 'Ayçiçeği tarlası',
-    crop: 'Yağlık ayçiçeği',
-    stage: 'Hasada hazır',
-    areaDonum: 25,
-    place: 'Karatay, Konya',
-    photo: require('@/assets/images/app/aycicegi-tarlasi.webp'),
-    scenarioId: 'aycicegi',
-    ndvi: 0.74,
-    expectedYieldKg: 7_000,
-    expenses: [
-      { kind: 'gubre', amount: 22_500 },
-      { kind: 'tohum', amount: 20_000 },
-      { kind: 'mazot', amount: 17_500 },
-      { kind: 'iscilik', amount: 8_000 },
-      { kind: 'ilac', amount: 4_000 },
-    ],
-    outline: [
-      [0.8, 0.31],
-      [0.93, 0.31],
-      [0.93, 0.49],
-      [0.8, 0.49],
-    ],
-  },
-];
-
-export const fieldById = (id: string) => FIELDS.find((f) => f.id === id);
-
-/** From the last scan's harvest-success estimate, on the same scale as its gauge. */
-export function healthOf(field: Field): Health {
-  const scan = scenarioById(field.scenarioId);
-  const tone = successTone(scan?.successRate ?? 0);
-  return tone === 'primary' ? 'saglikli' : tone === 'gold' ? 'izlenmeli' : 'riskli';
-}
-
-export const totalExpenses = (field: Field) => field.expenses.reduce((n, e) => n + e.amount, 0);
-
-export function seasonSummary(fields: Field[]) {
-  return {
-    areaDonum: fields.reduce((n, f) => n + f.areaDonum, 0),
-    expenses: fields.reduce((n, f) => n + totalExpenses(f), 0),
-    yieldKg: fields.reduce((n, f) => n + f.expectedYieldKg, 0),
-  };
-}
+/** Suggestions for a field's stage (free text is fine too). */
+export const STAGES = ['Ekim hazırlığı', 'Ekildi', 'Çimlendi', 'Gelişme dönemi', 'Çiçeklenme', 'Hasat zamanı', 'Hasat edildi', 'Nadasta'];
 
 /** "18 ton", "7,5 ton" */
 export function tonsLabel(kg: number) {
@@ -175,10 +28,70 @@ export function tonsLabel(kg: number) {
   return `${Number.isInteger(t) ? t : t.toFixed(1).replace('.', ',')} ton`;
 }
 
-/** The calendar's tasks for this field, from today on, soonest first. */
-export function upcomingTasks(field: Field, today: Date, limit = Infinity): { date: Date; task: FarmTask }[] {
-  return FARM_TASKS.filter((t) => t.field === field.name && t.offset >= 0)
-    .sort((a, b) => a.offset - b.offset || a.time.localeCompare(b.time))
-    .slice(0, limit)
-    .map((task) => ({ task, date: addDays(today, task.offset) }));
+/** "45", "45,5" */
+export const donumLabel = (n: number) => `${String(Math.round(n * 10) / 10).replace('.', ',')} dönüm`;
+
+export type FieldDraft = { name: string; crop: string; stage: string; area: string; province: string; district: string; expectedYield: string; notes: string };
+export const EMPTY_FIELD: FieldDraft = { name: '', crop: '', stage: '', area: '', province: '', district: '', expectedYield: '', notes: '' };
+
+/** The field form's checks: the website's validateField. */
+export function validateField(f: FieldDraft): Partial<Record<keyof FieldDraft, string>> {
+  const e: Partial<Record<keyof FieldDraft, string>> = {};
+  const name = f.name.trim();
+  if (name.length < 2) e.name = 'Tarlaya bir ad verin (ör. Buğday tarlası).';
+  else if (name.length > 40) e.name = 'Ad en fazla 40 karakter olabilir.';
+  if (f.crop.trim().length > 40) e.crop = 'Ürün en fazla 40 karakter olabilir.';
+  if (f.stage.trim().length > 40) e.stage = 'Dönem en fazla 40 karakter olabilir.';
+  const area = parsePrice(f.area);
+  if (!(area > 0)) e.area = 'Alanı dönüm olarak yazın (ör. 45).';
+  else if (area > 1_000_000) e.area = 'Alan çok büyük görünüyor.';
+  if (f.province && !isProvince(f.province)) e.province = 'Listeden bir il seçin.';
+  if (f.district.trim().length > 40) e.district = 'İlçe en fazla 40 karakter olabilir.';
+  if (f.expectedYield.trim() && !(parsePrice(f.expectedYield) >= 0)) e.expectedYield = 'Beklenen verimi kilogram olarak yazın (ör. 18.000).';
+  if (f.notes.length > 500) e.notes = 'Not en fazla 500 karakter olabilir.';
+  return e;
+}
+
+export type ExpenseDraft = { kind: string; amount: string; date: string; note: string };
+
+/** The expense form's checks: the website's validateExpense. `today` is "2026-11-04". */
+export function validateExpense(x: ExpenseDraft, today: string): Partial<Record<keyof ExpenseDraft, string>> {
+  const e: Partial<Record<keyof ExpenseDraft, string>> = {};
+  if (!(x.kind in EXPENSE_KINDS)) e.kind = 'Masraf türünü seçin.';
+  const amount = parsePrice(x.amount);
+  if (!(amount > 0)) e.amount = 'Tutarı yazın (ör. 12.500).';
+  else if (amount > 100_000_000) e.amount = 'Tutar çok yüksek görünüyor.';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(x.date)) e.date = 'Tarihi seçin.';
+  else if (x.date > today) e.date = 'Gelecek bir tarih olamaz.';
+  if (x.note.trim().length > 120) e.note = 'Not en fazla 120 karakter olabilir.';
+  return e;
+}
+
+/** Totals by kind, largest first. */
+export function expensesByKind(expenses: { kind: ExpenseKind; amount: number }[]) {
+  const totals = new Map<ExpenseKind, number>();
+  for (const x of expenses) totals.set(x.kind, (totals.get(x.kind) ?? 0) + x.amount);
+  return [...totals].map(([kind, amount]) => ({ kind, amount })).sort((a, b) => b.amount - a.amount);
+}
+
+export function seasonSummary(fields: Pick<FieldSummary, 'areaDonum' | 'expenses' | 'expectedYieldKg'>[]) {
+  return {
+    areaDonum: fields.reduce((n, f) => n + f.areaDonum, 0),
+    expenses: fields.reduce((n, f) => n + f.expenses, 0),
+    yieldKg: fields.reduce((n, f) => n + (f.expectedYieldKg ?? 0), 0),
+  };
+}
+
+const CROP_PHOTOS: [words: string[], photo: number][] = [
+  [['bugday', 'arpa', 'tritikale', 'cavdar', 'yulaf'], require('@/assets/images/app/tractor-field.webp')],
+  [['misir'], require('@/assets/images/app/misir-kuraklik.webp')],
+  [['domates', 'biber', 'sera', 'salatalik'], require('@/assets/images/app/domates-mildiyo.webp')],
+  [['aycicegi'], require('@/assets/images/app/aycicegi-tarlasi.webp')],
+];
+const DEFAULT_FIELD_PHOTO = require('@/assets/images/app/tractor-field.webp');
+
+/** A picture for the field's card, by its crop (real fields have no photo of their own). */
+export function cropPhoto(crop: string, name = ''): number {
+  const t = fold(`${crop} ${name}`);
+  return CROP_PHOTOS.find(([words]) => words.some((w) => t.includes(w)))?.[1] ?? DEFAULT_FIELD_PHOTO;
 }

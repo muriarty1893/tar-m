@@ -85,3 +85,9 @@ export function fromYear(year: number) {
   const hard = 'fstkçşhp'.includes(word[word.length - 1]);
   return `${year}’${hard ? 't' : 'd'}${'aıou'.includes(vowel) ? 'an' : 'en'}`;
 }
+
+/** "3 Kasım 2026" from "2026-11-03". */
+export function longDate(key: string) {
+  const [y, m, d] = key.split('-').map(Number);
+  return `${d} ${MONTHS[m - 1]} ${y}`;
+}

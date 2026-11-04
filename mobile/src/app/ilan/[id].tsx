@@ -2,77 +2,175 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { Pressable, ScrollView, Share, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, Share, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useToggleFavorite } from '@/api/actions';
+import { api } from '@/api/client';
+import { keys, refresh, useListing, useSignedIn } from '@/api/queries';
+import type { ListingDetail } from '@/api/types';
 import { Block } from '@/components/app/block';
-import { ArrowLeftIcon, ChatCircleDotsIcon, CheckCircleIcon, ClockIcon, HandshakeIcon, HeartIcon, InfoIcon, ListIcon, MapPinIcon, PackageIcon, ShareNetworkIcon, ShieldCheckIcon, TagIcon, TrashIcon } from '@/components/icons';
+import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { ErrorState, Loading } from '@/components/app/states';
+import {
+  ArrowLeftIcon,
+  ChatCircleDotsIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  FlagIcon,
+  HandshakeIcon,
+  HeartIcon,
+  InfoIcon,
+  MapPinIcon,
+  PackageIcon,
+  PencilSimpleIcon,
+  ShareNetworkIcon,
+  ShieldCheckIcon,
+  StorefrontIcon,
+  TagIcon,
+  TrashIcon,
+} from '@/components/icons';
+import { MessageDialog } from '@/components/market/message-dialog';
 import { OfferDialog } from '@/components/market/offer-dialog';
-import { Avatar, CATEGORY_ICONS, Rating, VerifiedMark } from '@/components/market/parts';
+import { Avatar, CATEGORY_ICONS } from '@/components/market/parts';
+import { ReportDialog } from '@/components/market/report-dialog';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Text } from '@/components/ui/text';
-import { categoryLabel, conditionLabel, formatPrice, listingById, ME, sellerById, type Listing } from '@/domain/market';
-import { fromYear } from '@/domain/format';
+import { STOCK_PHOTOS, categoryLabel, conditionLabel, formatPrice, placeLabel } from '@/domain/market';
 import { agoLabel } from '@/domain/when';
 import { useNow } from '@/hooks/use-now';
-import { scheduleReply } from '@/state/replies';
-import { useAppStore } from '@/state/store';
+import { errorMessage, redirectForError } from '@/lib/api-errors';
+import { siteUrl } from '@/lib/config';
 import { COLORS, SHADOW } from '@/theme/tokens';
 
 const SAFETY_TIPS = ['Ürünü yerinde görmeden kapora göndermeyin.', 'Araç ve makinelerde ruhsat ve fatura isteyin.', 'Görüşmeleri uygulama içi mesajlarda tutun.'];
+const MONTHS = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+const monthYear = (iso: string) => {
+  const d = new Date(iso);
+  return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+};
 
-/** One listing: photo, price, facts, specs, description, the seller, safety tips; message or offer at the bottom. */
+const back = () => (router.canGoBack() ? router.back() : router.replace('/pazar'));
+
+/** One listing: photos, price, facts, description, the seller, safety tips; message or offer at the bottom. */
 export default function ListingScreen() {
   const insets = useSafeAreaInsets();
-  const now = useNow();
   const { id, yeni } = useLocalSearchParams<{ id: string; yeni?: string }>();
-  const myListings = useAppStore((s) => s.myListings);
-  const status = useAppStore((s) => s.listingStatus[id]);
-  const favorite = useAppStore((s) => s.favorites.includes(id));
-  const toggleFavorite = useAppStore((s) => s.toggleFavorite);
-  const setListingStatus = useAppStore((s) => s.setListingStatus);
-  const openConversation = useAppStore((s) => s.openConversation);
-  const sendOffer = useAppStore((s) => s.sendOffer);
-  const [offering, setOffering] = useState(false);
-  const [removing, setRemoving] = useState(false);
+  const q = useListing(id);
 
-  const l = listingById(id, myListings);
-  const seller = l && sellerById(l.sellerId);
-  const back = () => (router.canGoBack() ? router.back() : router.replace('/pazar'));
-
-  if (!l || !seller || status === 'removed') {
+  if (q.isPending) {
     return (
-      <View className="flex-1 items-center justify-center gap-3 bg-background px-8">
-        <Text className="font-heading text-[20px]">İlan bulunamadı</Text>
-        <Text className="text-center text-[15px] text-muted-foreground">Bu ilan kaldırılmış ya da artık yayında değil.</Text>
-        <Button className="rounded-full" onPress={back}>
+      <View className="flex-1 justify-center bg-background" style={{ paddingTop: insets.top }}>
+        <Loading label="İlan yükleniyor…" />
+      </View>
+    );
+  }
+  if (q.isError) {
+    const gone = (q.error as { status?: number }).status === 404;
+    return (
+      <View className="flex-1 justify-center gap-3 bg-background px-6" style={{ paddingTop: insets.top }}>
+        {gone ? (
+          <View className="items-center gap-3">
+            <Text className="font-heading text-[20px]">İlan bulunamadı</Text>
+            <Text className="text-center text-[15px] text-muted-foreground">Bu ilan kaldırılmış ya da artık yayında değil.</Text>
+          </View>
+        ) : (
+          <ErrorState error={q.error} onRetry={() => q.refetch()} />
+        )}
+        <Button className="h-12 rounded-full" onPress={back}>
           <Text>Pazara dön</Text>
         </Button>
       </View>
     );
   }
+  return <Listing l={q.data.listing} admin={q.data.admin} isNew={!!yeni} />;
+}
 
-  const mine = l.sellerId === ME.id;
-  const sold = status === 'sold';
+function Listing({ l, admin, isNew }: { l: ListingDetail; admin: boolean; isNew: boolean }) {
+  const insets = useSafeAreaInsets();
+  const now = useNow();
+  const { width } = useWindowDimensions();
+  const { signedIn } = useSignedIn();
+  const toggleFavorite = useToggleFavorite();
+  const [dialog, setDialog] = useState<'offer' | 'message' | 'report' | 'remove' | null>(null);
+  const [photo, setPhoto] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [reported, setReported] = useState(l.reported);
+
+  const sold = l.status === 'sold';
+  const removed = l.status === 'removed';
   const CategoryIcon = CATEGORY_ICONS[l.category];
   const condition = conditionLabel(l.condition);
-  const chat = () => router.push({ pathname: '/mesajlar/[id]', params: { id: openConversation(l.id) } });
-  const offer = (amount: number) => {
-    setOffering(false);
-    const chatId = openConversation(l.id);
-    sendOffer(chatId, amount);
-    scheduleReply(chatId);
-    router.push({ pathname: '/mesajlar/[id]', params: { id: chatId } });
+  const photos = l.stockPhoto ? [STOCK_PHOTOS[l.category]] : l.photos.map((uri) => ({ uri }));
+  const place = placeLabel(l.province, l.district);
+
+  const needAccount = () => {
+    if (signedIn) return false;
+    router.push('/giris');
+    return true;
   };
-  const share = () => Share.share({ message: `${l.title}: ${formatPrice(l.price)}${l.unit ? ` / ${l.unit}` : ''}, ${l.location}. Çiftçi Destek Pazar'da.` });
+
+  /** Opens the chat (an existing one, or after the first message or offer). */
+  const openChat = (conversationId: string) => router.push({ pathname: '/mesajlar/[id]', params: { id: conversationId } });
+  const start = async (body: { text?: string; offer?: string }): Promise<string | null> => {
+    try {
+      const { conversationId } = await api<{ conversationId: string }>(`/ilanlar/${l.id}/mesaj`, { method: 'POST', body });
+      setDialog(null);
+      void refresh(keys.listing(l.id), keys.inbox);
+      openChat(conversationId);
+      return null;
+    } catch (err) {
+      if (redirectForError(err)) {
+        setDialog(null);
+        return null;
+      }
+      return errorMessage(err);
+    }
+  };
+
+  const setStatus = async (status: 'active' | 'sold' | 'removed') => {
+    setBusy(true);
+    try {
+      await api(`/ilanlar/${l.id}`, { method: 'PATCH', body: { status } });
+      await refresh(keys.listings, keys.listing(l.id));
+      if (status === 'removed') {
+        setDialog(null);
+        back();
+      }
+    } catch (err) {
+      Alert.alert('Kaydedilemedi', errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const report = async (reason: string, note: string) => {
+    try {
+      await api(`/ilanlar/${l.id}/sikayet`, { method: 'POST', body: { reason, note } });
+      setReported(true);
+      setDialog(null);
+      return null;
+    } catch (err) {
+      if (redirectForError(err)) {
+        setDialog(null);
+        return null;
+      }
+      return errorMessage(err);
+    }
+  };
+
+  const share = () => Share.share({ message: `${l.title}: ${formatPrice(l.price)}${l.unit ? ` / ${l.unit}` : ''}, ${place}. Çiftçi Destek Pazar’da: ${siteUrl(`/pazar/ilan/${l.id}`)}` });
 
   return (
     <View className="flex-1 bg-background">
-      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 110 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 120 }} showsVerticalScrollIndicator={false}>
         <View className="h-[300px] overflow-hidden bg-muted">
-          <Image source={l.photos[0]} style={{ position: 'absolute', inset: 0 }} contentFit="cover" accessibilityLabel={l.stockPhoto ? `${l.title}: temsilî görsel` : `${l.title} fotoğrafı`} />
-          <LinearGradient colors={['rgba(0,0,0,0.4)', 'transparent']} locations={[0, 0.4]} style={{ position: 'absolute', inset: 0 }} />
+          <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} onMomentumScrollEnd={(e) => setPhoto(Math.round(e.nativeEvent.contentOffset.x / width))}>
+            {photos.map((src, i) => (
+              <Image key={i} source={src} style={{ width, height: 300 }} contentFit="cover" accessibilityLabel={l.stockPhoto ? `${l.title}: temsilî görsel` : `${l.title}, fotoğraf ${i + 1} / ${photos.length}`} />
+            ))}
+          </ScrollView>
+          <LinearGradient colors={['rgba(0,0,0,0.4)', 'transparent']} locations={[0, 0.4]} style={{ position: 'absolute', inset: 0 }} pointerEvents="none" />
           <View className="absolute inset-x-4 flex-row items-center justify-between" style={{ top: insets.top + 8 }}>
             <RoundButton label="Geri" onPress={back}>
               <ArrowLeftIcon size={21} weight="bold" color={COLORS.foreground} />
@@ -81,32 +179,39 @@ export default function ListingScreen() {
               <RoundButton label="Paylaş" onPress={share}>
                 <ShareNetworkIcon size={21} weight="bold" color={COLORS.foreground} />
               </RoundButton>
-              {!mine ? (
-                <RoundButton label={favorite ? 'Favorilerden çıkar' : 'Favorilere ekle'} selected={favorite} onPress={() => toggleFavorite(l.id)}>
-                  <HeartIcon size={21} weight={favorite ? 'fill' : 'bold'} color={favorite ? COLORS.destructive : COLORS.foreground} />
+              {!l.mine ? (
+                <RoundButton label={l.favorite ? 'Favorilerden çıkar' : 'Favorilere ekle'} selected={l.favorite} onPress={() => toggleFavorite(l)}>
+                  <HeartIcon size={21} weight={l.favorite ? 'fill' : 'bold'} color={l.favorite ? COLORS.destructive : COLORS.foreground} />
                 </RoundButton>
               ) : null}
             </View>
           </View>
+          {photos.length > 1 ? (
+            <View className="absolute bottom-7 right-4 rounded-full bg-black/55 px-2.5 py-1">
+              <Text className="font-sans-semibold text-[12px] text-white">
+                {photo + 1} / {photos.length}
+              </Text>
+            </View>
+          ) : null}
           {l.stockPhoto ? (
             <View className="absolute bottom-7 left-4 rounded-full bg-black/55 px-2.5 py-1">
               <Text className="font-sans-medium text-[12px] text-white">Temsilî görsel</Text>
             </View>
           ) : null}
-          {sold ? (
-            <View className="absolute inset-x-0 bottom-6 items-center">
+          {sold || removed ? (
+            <View className="absolute inset-x-0 bottom-6 items-center" pointerEvents="none">
               <View className="rounded-full bg-black/70 px-4 py-1.5">
-                <Text className="font-heading text-[15px] tracking-[2px] text-white">SATILDI</Text>
+                <Text className="font-heading text-[15px] tracking-[2px] text-white">{sold ? 'SATILDI' : 'KALDIRILDI'}</Text>
               </View>
             </View>
           ) : null}
         </View>
 
         <View className="-mt-4 gap-3 rounded-t-[26px] bg-background px-4 pt-4">
-          {yeni && !sold ? (
+          {isNew && l.status === 'active' ? (
             <View className="flex-row items-center gap-2.5 rounded-[16px] bg-secondary px-3.5 py-3" accessibilityRole="alert">
               <CheckCircleIcon size={22} weight="fill" color={COLORS.primary} />
-              <Text className="flex-1 font-sans-semibold text-[14.5px] text-primary">İlanınız yayında. Gelen mesajlar Mesajlar’a düşecek.</Text>
+              <Text className="flex-1 font-sans-semibold text-[14.5px] text-primary">İlanınız yayında; sitede de görünüyor. Gelen mesajlar Mesajlar’a düşecek.</Text>
             </View>
           ) : null}
 
@@ -139,23 +244,10 @@ export default function ListingScreen() {
           </View>
 
           <View className="flex-row gap-2">
-            <Fact Icon={MapPinIcon} label="Konum" value={l.km ? `${l.location.split(',')[0]} · ${l.km} km` : l.location.split(',')[0]} />
-            <Fact Icon={ClockIcon} label="İlan tarihi" value={agoLabel(new Date(l.postedAt), now)} />
+            <Fact Icon={MapPinIcon} label="Konum" value={place} />
+            <Fact Icon={ClockIcon} label="İlan tarihi" value={agoLabel(new Date(l.createdAt), now)} />
             {l.quantity ? <Fact Icon={PackageIcon} label="Miktar" value={l.quantity} /> : <Fact Icon={InfoIcon} label="Durum" value={condition ?? '—'} />}
           </View>
-
-          {l.specs.length ? (
-            <Block Icon={ListIcon} label="ÖZELLİKLER">
-              <View className="mt-1">
-                {l.specs.map(([k, v], i) => (
-                  <View key={k} className={i ? 'flex-row justify-between gap-3 border-t border-border py-2' : 'flex-row justify-between gap-3 py-2'}>
-                    <Text className="text-[14.5px] text-muted-foreground">{k}</Text>
-                    <Text className="flex-shrink text-right font-sans-semibold text-[14.5px]">{v}</Text>
-                  </View>
-                ))}
-              </View>
-            </Block>
-          ) : null}
 
           {l.description ? (
             <Block Icon={TagIcon} label="AÇIKLAMA">
@@ -163,25 +255,15 @@ export default function ListingScreen() {
             </Block>
           ) : null}
 
-          <View className="gap-3 rounded-[20px] border border-border bg-card p-3.5">
-            <View className="flex-row items-center gap-3">
-              <Avatar seller={seller} size={52} />
-              <View className="min-w-0 flex-1">
-                <Text className="font-heading text-[17px]">{mine ? `${seller.name} (siz)` : seller.name}</Text>
-                <Text className="text-[13.5px] text-muted-foreground">
-                  {seller.place} · {fromYear(seller.memberSince)} beri üye
-                </Text>
-                <View className="mt-0.5">
-                  <Rating seller={seller} />
-                </View>
+          <View className="flex-row items-center gap-3 rounded-[20px] border border-border bg-card p-3.5">
+            <Avatar name={l.seller.name} size={52} />
+            <View className="min-w-0 flex-1">
+              <Text className="font-heading text-[17px]">{l.mine ? `${l.seller.name} (siz)` : l.seller.name}</Text>
+              <Text className="text-[13.5px] text-muted-foreground">Üyelik: {monthYear(l.seller.memberSince)}</Text>
+              <View className="mt-0.5 flex-row items-center gap-1">
+                <StorefrontIcon size={14} weight="duotone" color={COLORS.primary} />
+                <Text className="text-[13.5px] text-muted-foreground">{l.seller.activeListings} yayında ilan</Text>
               </View>
-            </View>
-            <View className="gap-1.5 border-t border-border pt-3">
-              <View className="flex-row items-center gap-1.5">
-                <ClockIcon size={15} weight="bold" color={COLORS.mutedForeground} />
-                <Text className="text-[13.5px] text-muted-foreground">Genelde {seller.replies} yanıt verir</Text>
-              </View>
-              <VerifiedMark seller={seller} />
             </View>
           </View>
 
@@ -197,48 +279,73 @@ export default function ListingScreen() {
               </View>
             ))}
           </View>
+
+          {!l.mine && signedIn ? (
+            reported ? (
+              <Text className="py-2 text-center text-[14px] text-muted-foreground">Şikâyetiniz alındı; yöneticiler inceleyecek.</Text>
+            ) : (
+              <Pressable accessibilityRole="button" onPress={() => setDialog('report')} className="min-h-12 flex-row items-center justify-center gap-2 self-center px-3 active:opacity-60">
+                <FlagIcon size={18} weight="duotone" color={COLORS.mutedForeground} />
+                <Text className="font-sans-semibold text-[14px] text-muted-foreground underline">İlanı şikâyet et</Text>
+              </Pressable>
+            )
+          ) : null}
         </View>
       </ScrollView>
 
       <View className="absolute inset-x-0 bottom-0 flex-row gap-2.5 border-t border-border bg-card px-4 pt-3" style={{ paddingBottom: insets.bottom + 12 }}>
-        {mine ? (
+        {l.mine && !removed ? (
           <>
-            <Button variant="outline" className="flex-1 flex-row gap-2 rounded-full" onPress={() => setListingStatus(l.id, sold ? null : 'sold')}>
-              <CheckCircleIcon size={20} weight="duotone" color={COLORS.primary} />
+            <Button variant="outline" size="icon" className="size-14 rounded-full" accessibilityLabel="İlanı düzenle" onPress={() => router.push({ pathname: '/ilan/yeni', params: { id: l.id } })}>
+              <PencilSimpleIcon size={22} weight="duotone" color={COLORS.primary} />
+            </Button>
+            <Button variant="outline" className="h-14 flex-1 flex-row gap-2 rounded-full" disabled={busy} onPress={() => setStatus(sold ? 'active' : 'sold')}>
+              {busy ? <ActivityIndicator color={COLORS.primary} /> : <CheckCircleIcon size={20} weight="duotone" color={COLORS.primary} />}
               <Text>{sold ? 'Satışa geri al' : 'Satıldı olarak işaretle'}</Text>
             </Button>
-            <Button variant="outline" size="icon" className="size-14 rounded-full border-destructive/50" accessibilityLabel="İlanı kaldır" onPress={() => setRemoving(true)}>
+            <Button variant="outline" size="icon" className="size-14 rounded-full border-destructive/50" accessibilityLabel="İlanı kaldır" onPress={() => setDialog('remove')}>
               <TrashIcon size={22} weight="duotone" color={COLORS.destructive} />
             </Button>
           </>
+        ) : removed ? (
+          <Status>Bu ilan kaldırıldı</Status>
         ) : sold ? (
-          <View className="h-14 flex-1 items-center justify-center rounded-full bg-muted">
-            <Text className="font-sans-semibold text-[15px] text-muted-foreground">Bu ilan satıldı</Text>
-          </View>
+          <Status>Bu ilan satıldı</Status>
+        ) : l.conversationId ? (
+          <Button className="h-14 flex-1 flex-row gap-2 rounded-full" onPress={() => openChat(l.conversationId!)}>
+            <ChatCircleDotsIcon size={21} weight="fill" color={COLORS.white} />
+            <Text>Sohbete git</Text>
+          </Button>
         ) : (
           <>
-            <Button variant="outline" className="flex-1 flex-row gap-2 rounded-full border-primary/50" onPress={() => setOffering(true)}>
+            <Button variant="outline" className="h-14 flex-1 flex-row gap-2 rounded-full border-primary/50" onPress={() => !needAccount() && setDialog('offer')}>
               <TagIcon size={20} weight="duotone" color={COLORS.primary} />
               <Text className="text-primary">Teklif ver</Text>
             </Button>
-            <Button className="flex-[1.3] flex-row gap-2 rounded-full" onPress={chat}>
+            <Button className="h-14 flex-[1.3] flex-row gap-2 rounded-full" onPress={() => !needAccount() && setDialog('message')}>
               <ChatCircleDotsIcon size={21} weight="fill" color={COLORS.white} />
               <Text>Mesaj gönder</Text>
             </Button>
           </>
         )}
+        {admin && !l.mine && !removed ? (
+          <Button variant="outline" size="icon" className="size-14 rounded-full border-destructive/50" accessibilityLabel="İlanı kaldır (yönetici)" onPress={() => setDialog('remove')}>
+            <TrashIcon size={22} weight="duotone" color={COLORS.destructive} />
+          </Button>
+        ) : null}
       </View>
 
-      {!mine ? <OfferDialog listing={l} open={offering} onClose={() => setOffering(false)} onOffer={offer} /> : null}
-      <RemoveDialog
-        listing={l}
-        open={removing}
-        onClose={() => setRemoving(false)}
-        onRemove={() => {
-          setRemoving(false);
-          setListingStatus(l.id, 'removed');
-          back();
-        }}
+      <OfferDialog price={l.price} unit={l.unit} open={dialog === 'offer'} onClose={() => setDialog(null)} onOffer={(offer) => start({ offer })} />
+      <MessageDialog open={dialog === 'message'} sellerName={l.seller.name} onClose={() => setDialog(null)} onSend={(text) => start({ text })} />
+      <ReportDialog open={dialog === 'report'} onClose={() => setDialog(null)} onReport={report} />
+      <ConfirmDialog
+        open={dialog === 'remove'}
+        onClose={() => setDialog(null)}
+        onConfirm={() => setStatus('removed')}
+        busy={busy}
+        title="İlan kaldırılsın mı?"
+        body={`“${l.title}” Pazar’dan kalkar ve alıcılar artık göremez.${l.mine ? '' : ' (Yönetici olarak kaldırıyorsunuz.)'}`}
+        action="Kaldır"
       />
     </View>
   );
@@ -256,6 +363,14 @@ function Chip({ children }: { children: ReactNode }) {
   return <View className="flex-row items-center gap-1 rounded-full bg-secondary px-2.5 py-1">{children}</View>;
 }
 
+function Status({ children }: { children: string }) {
+  return (
+    <View className="h-14 flex-1 items-center justify-center rounded-full bg-muted">
+      <Text className="font-sans-semibold text-[15px] text-muted-foreground">{children}</Text>
+    </View>
+  );
+}
+
 function Fact({ Icon, label, value }: { Icon: typeof MapPinIcon; label: string; value: string }) {
   return (
     <View className="min-w-0 flex-1 gap-1 rounded-[16px] border border-border bg-card px-2.5 py-2.5" accessible accessibilityLabel={`${label}: ${value}`}>
@@ -265,26 +380,5 @@ function Fact({ Icon, label, value }: { Icon: typeof MapPinIcon; label: string; 
         {value}
       </Text>
     </View>
-  );
-}
-
-function RemoveDialog({ listing, open, onClose, onRemove }: { listing: Listing; open: boolean; onClose: () => void; onRemove: () => void }) {
-  return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="mx-4 rounded-[24px] border-border bg-background">
-        <DialogHeader>
-          <DialogTitle className="font-heading text-[21px]">İlan kaldırılsın mı?</DialogTitle>
-          <DialogDescription className="font-sans text-[14.5px] text-muted-foreground">“{listing.title}” Pazar’dan kalkar ve alıcılar artık göremez.</DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="flex-row gap-2">
-          <Button variant="outline" className="flex-1" onPress={onClose}>
-            <Text>Vazgeç</Text>
-          </Button>
-          <Button variant="destructive" className="flex-1" onPress={onRemove}>
-            <Text>Kaldır</Text>
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 }

@@ -107,3 +107,10 @@ export function useDomHeight(initial: number) {
   const dom: DOMProps = { ...DOM_BASE, containerStyle: { width: '100%', height }, style: { height } };
   return { onHeight, dom };
 }
+
+/** The map's web view (Tarla Haritası): fills its parent; pinch-zoom goes to the map, not the page. */
+export const MAP_DOM: DOMProps = { ...DOM_BASE, containerStyle: { flex: 1 }, style: { flex: 1 }, setBuiltInZoomControls: false, setDisplayZoomControls: false };
+
+let focusSeq = 1;
+/** A new key for the map's `focus`: each one moves the map once. */
+export const nextFocusKey = () => ++focusSeq;

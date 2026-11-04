@@ -1,4 +1,4 @@
-import { fold } from './market';
+import { fold } from './text';
 
 /**
  * "Tarım Borsası Fiyatları": sample prices per kilo, like the website demo's. The first four are

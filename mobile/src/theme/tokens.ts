@@ -62,6 +62,7 @@ export const KIND_COLORS = {
   sulama: { tile: '#dbeafe', icon: '#1e40af', dot: '#2563eb' },
   hasat: { tile: '#ffedd5', icon: '#7c2d12', dot: '#ea580c' },
   uyari: { tile: '#fee2e2', icon: '#b91c1c', dot: '#b91c1c' },
+  diger: { tile: '#f1f5f9', icon: '#334155', dot: '#64748b' },
 } as const;
 
 /** Tints for people's initials (avatars), from the same Tailwind palette. */

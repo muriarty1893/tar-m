@@ -43,7 +43,7 @@ export default function Result() {
             </Pressable>
             <View className="flex-row items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5">
               <CheckCircleIcon size={17} weight="fill" color={COLORS.primary} />
-              <Text className="font-sans-semibold text-[13.5px] text-primary">Analiz tamamlandı</Text>
+              <Text className="font-sans-semibold text-[13.5px] text-primary">Örnek sonuç</Text>
             </View>
           </View>
           <View className="absolute inset-x-4 bottom-6">
@@ -58,6 +58,12 @@ export default function Result() {
         </View>
 
         <View className="-mt-3 gap-2.5 rounded-t-[24px] bg-background px-4 pt-4">
+          <View className="rounded-[16px] bg-gold-soft px-3.5 py-2.5" accessibilityRole="text">
+            <Text className="text-[13.5px] leading-5">
+              <Text className="font-sans-bold text-[13.5px]">Yapay zekâ taraması yakında. </Text>
+              Bu, uygulamanın nasıl çalışacağını gösteren örnek bir sonuçtur; gerçek bir teşhis değildir.
+            </Text>
+          </View>
           <SuccessGaugeDom ref={gaugeView} value={s.successRate} onHeight={gauge.onHeight} dom={gauge.dom} />
           <Block Icon={EyeIcon} label="NE GÖRÜYORUM">
             <Text className="text-[15px] leading-6">{s.seen}</Text>

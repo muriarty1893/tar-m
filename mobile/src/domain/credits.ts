@@ -41,7 +41,6 @@ export const PHOTO_CREDITS: PhotoCredit[] = [
   photo('app/aycicegi-tarlasi.webp', 'Ayçiçeği tarlası', 'Audrey from Central Pennsylvania, USA', 'CC BY 2.0', 'Sunflower_Field_(7848177492).jpg'),
   photo('app/domates-mildiyo.webp', 'Domates mildiyösü', 'Natalka Ukraine (baby-bear.org)', 'CC BY 4.0', 'Phytophthora_infestans_on_Solanum_lycopersicum_in_Dnipro_by_baby-bear.org.jpg'),
   photo('app/tractor-field.webp', 'Traktör', 'U.S. Fish and Wildlife Service', 'Kamu malı', 'Tractor_plow_fields_cultivated.jpg'),
-  photo('app/harita-uydu.webp', 'Tarlalar, tepeden (harita)', 'Bhullargraphic', 'CC BY-SA 4.0', 'Aerial_view_of_agricultural_fields_in_Punjab,_India.jpg'),
   photo('market/ilan-traktor.webp', 'Traktör (Massey Ferguson 3085)', 'Chris Sampson', 'CC BY 2.0', 'Massey_Ferguson_3085.jpg'),
   photo('market/ilan-bicerdover.webp', 'Biçerdöver', 'Dan Kollmann', 'CC BY-SA 3.0', 'Combine_in_wheat_field.jpg'),
   photo('market/ilan-saman-balya.webp', 'Rulo saman balyası', 'High Contrast', 'CC BY 3.0 DE', 'Round_straw_bales_in_Bavaria_-01.jpg'),
@@ -69,11 +68,14 @@ export type OtherCredit = { group: 'veri' | 'bilesen' | 'ikon-yazi'; name: strin
 
 export const OTHER_CREDITS: OtherCredit[] = [
   { group: 'veri', name: 'Hava durumu: Open-Meteo.com', license: 'CC BY 4.0', url: 'https://open-meteo.com' },
+  { group: 'veri', name: 'Uydu görüntüsü: Esri World Imagery (Esri, Maxar, Earthstar Geographics)', url: 'https://www.esri.com/en-us/legal/terms/full-master-agreement' },
+  { group: 'veri', name: 'Yer adları: Esri World Boundaries and Places', url: 'https://www.arcgis.com/home/item.html?id=f6ffd5ddf5ef4fe5a5a32af6a3d1bb7b' },
   { group: 'bilesen', name: 'React Bits SpringCheck', license: 'MIT', url: 'https://reactbits.dev' },
   { group: 'bilesen', name: 'Magic UI NumberTicker', license: 'MIT', url: 'https://magicui.design' },
   { group: 'bilesen', name: '21st.dev “Analyzing image” yükleyicisi', url: 'https://21st.dev' },
   { group: 'bilesen', name: 'shadcn/ui grafik ve Recharts', license: 'MIT', url: 'https://ui.shadcn.com' },
   { group: 'bilesen', name: 'React Native Reusables', license: 'MIT', url: 'https://reactnativereusables.com' },
+  { group: 'bilesen', name: 'Leaflet (harita)', license: 'BSD-2-Clause', url: 'https://leafletjs.com' },
   { group: 'ikon-yazi', name: 'Phosphor Icons', license: 'MIT', url: 'https://phosphoricons.com' },
   { group: 'ikon-yazi', name: 'Plus Jakarta Sans', license: 'SIL Open Font License', url: 'https://fonts.google.com/specimen/Plus+Jakarta+Sans' },
 ];

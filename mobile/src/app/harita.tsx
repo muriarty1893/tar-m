@@ -1,149 +1,156 @@
-import { Image } from 'expo-image';
-import { router } from 'expo-router';
-import { useState } from 'react';
-import { Platform, Pressable, View, useWindowDimensions } from 'react-native';
-import Svg, { Polygon } from 'react-native-svg';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useMemo, useState } from 'react';
+import { Pressable, ScrollView, View } from 'react-native';
 
-import { BackHeader } from '@/components/app/back-header';
-import { TabScreen } from '@/components/app/screen';
-import { HEALTH_STYLE, HealthBadge } from '@/components/fields/health-badge';
-import { CaretRightIcon, InfoIcon } from '@/components/icons';
+import { useFields, useMe, useSignedIn } from '@/api/queries';
+import type { FieldSummary, LatLng } from '@/api/types';
+import { ErrorState, Loading, SignInPrompt } from '@/components/app/states';
+import FieldMapDom, { type MapFocus } from '@/components/dom/field-map-dom';
+import { MAP_DOM, nextFocusKey, useDomStart } from '@/components/dom/use-dom-height';
+import { MapSheet, MapTopBar, useMapInset } from '@/components/fields/map-parts';
+import { CaretRightIcon, PlusIcon, PolygonIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Text } from '@/components/ui/text';
-import { FIELDS, HEALTH, healthOf, type Field, type Health } from '@/domain/fields';
-import { cn } from '@/lib/utils';
-import { COLORS, SHADOW } from '@/theme/tokens';
+import { donumLabel } from '@/domain/fields';
+import { areaM2, donumOf } from '@/domain/geo';
+import { formatPrice } from '@/domain/market';
+import { provinceByName } from '@/domain/provinces';
+import { useMyPosition } from '@/hooks/use-my-position';
+import { COLORS } from '@/theme/tokens';
 
-const MAP = require('@/assets/images/app/harita-uydu.webp');
-const MAP_RATIO = 877 / 1200;
-const TAG_WIDTH = 80;
-const TAG_HEIGHT = 28;
-const ORDER: Health[] = ['riskli', 'izlenmeli', 'saglikli'];
-const BAR: Record<Health, string> = { saglikli: 'bg-primary', izlenmeli: 'bg-gold', riskli: 'bg-destructive' };
-
-/** "Tarla Haritası": the fields outlined on a satellite photo, tinted by plant health; tap one for its details. */
+/**
+ * "Tarla Haritası": the farmer's fields outlined on a satellite map, with their names. Tap one for its
+ * details; fields not drawn yet are listed with "Çiz". ?tarla= opens on that field.
+ */
 export default function FieldMap() {
-  const { width } = useWindowDimensions();
-  const w = Math.min(width, 640) - 32;
-  const h = Math.round(w * MAP_RATIO);
-  // Open on the field that most needs a look.
-  const [selectedId, setSelectedId] = useState(() => [...FIELDS].sort((a, b) => ORDER.indexOf(healthOf(a)) - ORDER.indexOf(healthOf(b)))[0].id);
-  const selected = FIELDS.find((f) => f.id === selectedId) ?? FIELDS[0];
+  const { loaded, signedIn } = useSignedIn();
+  const fields = useFields();
+  const me = useMe();
+  const { tarla } = useLocalSearchParams<{ tarla?: string }>();
+  const view = useDomStart();
+  const { inset, onSheetHeight } = useMapInset();
+  const { locate, busy: locating } = useMyPosition();
+  const [selectedId, setSelectedId] = useState<string | null>(tarla ?? null);
+  const [position, setPosition] = useState<LatLng | null>(null);
+  const [focus, setFocus] = useState<MapFocus | null>(null);
+
+  const list = fields.data ?? [];
+  const drawn = list.filter((f): f is FieldSummary & { boundary: LatLng[] } => !!f.boundary);
+  const undrawn = list.filter((f) => !f.boundary);
+  const selected = drawn.find((f) => f.id === selectedId) ?? null;
+  const fieldsLoaded = !!fields.data;
+
+  // First view: the asked field, else all the outlines, else the home province.
+  const initial = useMemo<MapFocus | null>(() => {
+    if (!fields.data) return null;
+    const asked = drawn.find((f) => f.id === tarla);
+    if (asked) return { key: 1, points: asked.boundary };
+    if (drawn.length) return { key: 1, points: drawn.flatMap((f) => f.boundary) };
+    const p = provinceByName(me.data?.province ?? '');
+    return p ? { key: 1, points: [[p.lat, p.lon]], zoom: 11 } : null;
+    // The first view is set once, when the fields arrive.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fieldsLoaded]);
+
+  const goToMe = async () => {
+    const p = await locate();
+    if (!p) return;
+    setPosition(p);
+    setFocus({ key: nextFocusKey(), points: [p], zoom: 15 });
+  };
+  const select = (f: FieldSummary & { boundary: LatLng[] }) => {
+    setSelectedId(f.id);
+    setFocus({ key: nextFocusKey(), points: f.boundary });
+  };
+
+  if (!loaded || (signedIn && fields.isPending)) return <Centered><Loading label="Harita yükleniyor…" /></Centered>;
+  if (!signedIn) return <Centered><SignInPrompt title="Haritanız için giriş yapın" body="Tarlalarınızın sınırlarını uydu görüntüsü üzerinde çizin ve görün." /></Centered>;
+  if (fields.isError) return <Centered><ErrorState error={fields.error} onRetry={() => fields.refetch()} /></Centered>;
 
   return (
-    <TabScreen>
-      <BackHeader title="Tarla Haritası" subtitle="Uydu görüntüsü · bitki sağlığı" />
+    <View className="flex-1 bg-[#1f2937]">
+      <FieldMapDom
+        ref={view}
+        fields={drawn.map((f) => ({ id: f.id, name: f.name, boundary: f.boundary }))}
+        selectedId={selectedId}
+        focus={focus ?? initial}
+        me={position}
+        onSelect={async (id) => setSelectedId(id)}
+        inset={inset} dom={MAP_DOM}
+      />
+      <MapTopBar title="Tarla Haritası" subtitle={`${drawn.length} / ${list.length} tarla haritada`} onLocate={goToMe} locating={locating} />
 
-      <View className="overflow-hidden rounded-[22px] bg-muted" style={{ width: w, height: h, boxShadow: SHADOW.soft }}>
-        <Image source={MAP} style={{ width: w, height: h }} contentFit="cover" accessibilityLabel="Tarlaların uydu görüntüsü" />
-        <Svg width={w} height={h} style={{ position: 'absolute', left: 0, top: 0 }}>
-          {FIELDS.map((f) => {
-            const style = HEALTH_STYLE[healthOf(f)];
-            const on = f.id === selected.id;
-            return (
-              <Polygon
-                key={f.id}
-                points={f.outline.map(([x, y]) => `${x * w},${y * h}`).join(' ')}
-                fill={style.fill}
-                stroke={on ? COLORS.white : style.line}
-                strokeWidth={on ? 3.5 : 2.5}
-                strokeLinejoin="round"
-                // On the web, react-native-svg's touch handling leaks into the DOM; the name tags select there.
-                onPress={Platform.OS === 'web' ? undefined : () => setSelectedId(f.id)}
-              />
-            );
-          })}
-        </Svg>
-        {FIELDS.map((f) => (
-          <MapTag key={f.id} field={f} w={w} h={h} selected={f.id === selected.id} onPress={() => setSelectedId(f.id)} />
-        ))}
-        <View className="absolute bottom-2 left-2 rounded-full bg-black/55 px-2.5 py-1">
-          <Text className="font-sans-medium text-[11.5px] text-white">Örnek uydu görüntüsü</Text>
-        </View>
-      </View>
-
-      <View className="mt-3 flex-row flex-wrap gap-2" accessibilityLabel="Renklerin anlamı">
-        {ORDER.map((k) => {
-          const { Icon, color } = HEALTH_STYLE[k];
-          return (
-            <View key={k} className="flex-row items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1">
-              <View className="size-3 rounded-[4px] border" style={{ backgroundColor: HEALTH_STYLE[k].fill, borderColor: color }} />
-              <Icon size={14} weight="fill" color={color} />
-              <Text className="text-[12.5px]">{HEALTH[k].label}</Text>
+      <MapSheet onHeight={onSheetHeight}>
+        {selected ? (
+          <View className="gap-3" accessibilityLiveRegion="polite">
+            <View className="flex-row items-start gap-3">
+              <View className="min-w-0 flex-1">
+                <Text role="heading" className="font-heading text-[19px]">
+                  {selected.name}
+                </Text>
+                <Text className="text-[13.5px] text-muted-foreground">{[selected.crop, donumLabel(selected.areaDonum), selected.stage].filter(Boolean).join(' · ')}</Text>
+                <Text className="mt-0.5 text-[13px] text-muted-foreground">
+                  Haritaya göre ≈ {donumLabel(donumOf(areaM2(selected.boundary)))} · Masraf {formatPrice(selected.expenses)}
+                </Text>
+              </View>
             </View>
-          );
-        })}
-      </View>
+            <View className="flex-row gap-2">
+              <Button variant="outline" className="h-12 flex-1 rounded-full bg-card" onPress={() => router.push({ pathname: '/sinir/[id]', params: { id: selected.id } })}>
+                <PolygonIcon size={18} weight="duotone" color={COLORS.primary} />
+                <Text className="text-primary">Sınırı düzenle</Text>
+              </Button>
+              <Button className="h-12 flex-1 rounded-full" onPress={() => router.push({ pathname: '/tarlalar/[id]', params: { id: selected.id } })}>
+                <Text>Tarlaya git</Text>
+                <CaretRightIcon size={16} weight="bold" color={COLORS.white} />
+              </Button>
+            </View>
+          </View>
+        ) : list.length === 0 ? (
+          <View className="gap-2">
+            <Text className="font-heading text-[18px]">Henüz tarla yok</Text>
+            <Text className="text-[14px] leading-5 text-muted-foreground">Önce tarlanızı ekleyin, sonra sınırını bu haritada çizin.</Text>
+            <Button className="h-12 rounded-full" onPress={() => router.push('/tarlalar/duzenle')}>
+              <PlusIcon size={18} weight="bold" color={COLORS.white} />
+              <Text>Tarla ekle</Text>
+            </Button>
+          </View>
+        ) : (
+          <Text className="text-[14px] leading-5 text-muted-foreground">{drawn.length ? 'Ayrıntıları görmek için bir tarlaya dokunun.' : 'Tarlalarınızın sınırı henüz çizilmedi. Birini seçip köşelerine dokunarak çizin.'}</Text>
+        )}
 
-      <SelectedCard field={selected} />
+        {drawn.length > 1 || (drawn.length && !selected) ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2" accessibilityLabel="Haritadaki tarlalar">
+            {drawn.map((f) => (
+              <Pressable key={f.id} accessibilityRole="button" accessibilityState={{ selected: f.id === selectedId }} onPress={() => select(f)} className={`min-h-11 justify-center rounded-full border px-3.5 ${f.id === selectedId ? 'border-primary bg-primary' : 'border-border bg-card active:bg-secondary'}`}>
+                <Text className={`font-sans-semibold text-[14px] ${f.id === selectedId ? 'text-primary-foreground' : ''}`}>{f.name}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        ) : null}
 
-      <View className="mt-3 flex-row gap-2 rounded-[18px] bg-muted px-3.5 py-3">
-        <InfoIcon size={18} weight="duotone" color={COLORS.mutedForeground} />
-        <Text className="flex-1 text-[13px] leading-5 text-muted-foreground">
-          Bitki sağlığı, uydudan ölçülen yeşillikle (NDVI) hesaplanır: 1’e yaklaştıkça bitki örtüsü daha canlıdır. Görüntü ve değerler örnektir.
-        </Text>
-      </View>
-    </TabScreen>
+        {undrawn.length ? (
+          <View className="gap-1.5">
+            <Text className="font-sans-semibold text-[13px] text-muted-foreground">Sınırı çizilmemiş</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2">
+              {undrawn.map((f) => (
+                <Pressable key={f.id} accessibilityRole="button" accessibilityLabel={`${f.name}: sınırını çiz`} onPress={() => router.push({ pathname: '/sinir/[id]', params: { id: f.id } })} className="min-h-11 flex-row items-center gap-1.5 rounded-full border border-dashed border-primary/50 bg-secondary/60 px-3.5 active:bg-secondary">
+                  <PolygonIcon size={16} weight="duotone" color={COLORS.primary} />
+                  <Text className="font-sans-semibold text-[14px] text-primary">{f.name}: çiz</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+        ) : null}
+      </MapSheet>
+    </View>
   );
 }
 
-/** A field's name on the map, just above its outline; also the accessible way to pick it. */
-function MapTag({ field, w, h, selected, onPress }: { field: Field; w: number; h: number; selected: boolean; onPress: () => void }) {
-  const health = healthOf(field);
-  const { Icon, color } = HEALTH_STYLE[health];
-  const xs = field.outline.map(([x]) => x * w);
-  const ys = field.outline.map(([, y]) => y * h);
-  const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
-  // Just above the outline, so the tag never hides it; below it when there's no room above.
-  const above = Math.min(...ys) - TAG_HEIGHT - 4;
-  const top = above >= 4 ? above : Math.max(...ys) + 4;
-  const left = Math.min(Math.max(4, cx - TAG_WIDTH / 2), w - TAG_WIDTH - 4);
+function Centered({ children }: { children: React.ReactNode }) {
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      accessibilityLabel={`${field.name}, ${HEALTH[health].label}`}
-      onPress={onPress}
-      hitSlop={8}
-      className={cn('absolute h-7 flex-row items-center justify-center gap-1 rounded-full px-1.5 active:scale-95', selected ? 'bg-foreground' : 'bg-white/95')}
-      style={{ left, top, width: TAG_WIDTH, boxShadow: SHADOW.soft }}>
-      <Icon size={13} weight="fill" color={selected ? COLORS.white : color} />
-      <Text numberOfLines={1} className={cn('font-sans-bold text-[12px]', selected ? 'text-white' : 'text-foreground')}>
-        {field.name.split(' ')[0]}
-      </Text>
-    </Pressable>
-  );
-}
-
-function SelectedCard({ field }: { field: Field }) {
-  const health = healthOf(field);
-  const ndvi = field.ndvi.toFixed(2).replace('.', ',');
-  return (
-    <View className="mt-3 gap-3 rounded-[22px] border border-border bg-card p-3.5" style={{ boxShadow: SHADOW.soft }} accessibilityLiveRegion="polite">
-      <View className="flex-row items-start justify-between gap-2">
-        <View className="min-w-0 flex-1 gap-1">
-          <Text role="heading" className="font-heading text-[19px]">
-            {field.name}
-          </Text>
-          <Text className="text-[13px] text-muted-foreground">
-            {field.crop} · {field.areaDonum} dönüm · {field.stage}
-          </Text>
-        </View>
-        <HealthBadge health={health} />
-      </View>
-      <View className="gap-1.5" accessible accessibilityLabel={`Bitki sağlığı ${ndvi}, ${HEALTH[health].hint}`}>
-        <View className="flex-row justify-between">
-          <Text className="text-[13.5px]">Bitki sağlığı</Text>
-          <Text className="font-heading text-[15px]">{ndvi}</Text>
-        </View>
-        <Progress value={field.ndvi * 100} className="h-2 bg-muted" indicatorClassName={BAR[health]} />
-        <Text className="text-[12.5px] text-muted-foreground">{HEALTH[health].hint}</Text>
-      </View>
-      <Button size="sm" className="rounded-full" onPress={() => router.push({ pathname: '/tarlalar/[id]', params: { id: field.id } })}>
-        <Text>Tarlaya git</Text>
-        <CaretRightIcon size={16} weight="bold" color={COLORS.white} />
-      </Button>
+    <View className="flex-1 justify-center bg-background px-4">
+      <MapTopBar title="Tarla Haritası" />
+      {children}
     </View>
   );
 }

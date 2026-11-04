@@ -1,24 +1,28 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { FlatList, Pressable, TextInput, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useToggleFavorite } from '@/api/actions';
+import { useListings, useMe, useSignedIn, useUnread } from '@/api/queries';
+import type { ListingCard as Listing, MarketQuery, MarketSort, MarketView } from '@/api/types';
 import { Segmented } from '@/components/app/segmented';
-import { MagnifyingGlassIcon, PlusIcon, XCircleIcon } from '@/components/icons';
-import { ListingCard } from '@/components/market/listing-card';
+import { EmptyState, ErrorState, Loading, SignInPrompt } from '@/components/app/states';
+import { ProvinceChip } from '@/components/form/province-select';
+import { ArrowsDownUpIcon, CheckIcon, MagnifyingGlassIcon, PlusIcon, StorefrontIcon, XCircleIcon } from '@/components/icons';
 import { InboxList } from '@/components/market/inbox-list';
-import { CATEGORY_ICONS, SafetyStrip, useUnreadChats } from '@/components/market/parts';
-import { Button } from '@/components/ui/button';
+import { ListingCard } from '@/components/market/listing-card';
+import { CATEGORY_ICONS, SafetyStrip } from '@/components/market/parts';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Text } from '@/components/ui/text';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { CATEGORIES, LISTINGS, filterListings, type CategoryId, type Listing, type MarketView } from '@/domain/market';
+import { CATEGORIES, SORTS, type CategoryId } from '@/domain/market';
+import { useDebounced } from '@/hooks/use-debounced';
 import { useNow } from '@/hooks/use-now';
 import { cn } from '@/lib/utils';
-import { useAppStore } from '@/state/store';
 import { COLORS, SHADOW } from '@/theme/tokens';
 
 const VIEWS: { id: MarketView; label: string }[] = [
-  { id: 'kesfet', label: 'Keşfet' },
+  { id: 'tumu', label: 'Keşfet' },
   { id: 'favoriler', label: 'Favoriler' },
   { id: 'ilanlarim', label: 'İlanlarım' },
 ];
@@ -26,8 +30,9 @@ const VIEWS: { id: MarketView; label: string }[] = [
 type Section = 'ilanlar' | 'mesajlar';
 
 /**
- * "Pazar": the farmers' market in one place, "İlanlar" (search, categories, the listings; "İlan ver" one tap
- * away) and "Mesajlar" (the listing chats). The bell on the home screen opens it on Mesajlar (?bolum=mesajlar).
+ * "Pazar": the farmers' market in one place, "İlanlar" (search, categories, province, sorting, the
+ * listings; "İlan ver" one tap away) and "Mesajlar" (the listing chats). The same listings as the
+ * website's Pazar. The bell on the home screen opens it on Mesajlar (?bolum=mesajlar).
  */
 export default function Market() {
   const insets = useSafeAreaInsets();
@@ -40,85 +45,7 @@ export default function Market() {
     setLastAsked(bolum);
     if (bolum) setSection(asked);
   }
-  const unread = useUnreadChats();
-  const { width } = useWindowDimensions();
-  const cardWidth = (Math.min(width, 640) - 16 * 2 - 10) / 2;
-  const now = useNow();
-  const favorites = useAppStore((s) => s.favorites);
-  const myListings = useAppStore((s) => s.myListings);
-  const status = useAppStore((s) => s.listingStatus);
-  const toggleFavorite = useAppStore((s) => s.toggleFavorite);
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState<CategoryId>('tumu');
-  const [view, setView] = useState<MarketView>('kesfet');
-
-  const listings = useMemo(() => filterListings([...myListings, ...LISTINGS], { query, category, view, favorites, status }), [myListings, query, category, view, favorites, status]);
-  const open = useCallback((id: string) => router.push({ pathname: '/ilan/[id]', params: { id } }), []);
-  const filtered = !!query.trim() || category !== 'tumu';
-  const clear = () => {
-    setQuery('');
-    setCategory('tumu');
-  };
-
-  const header = (
-    <View className="gap-3 pb-3">
-      <View className="h-12 flex-row items-center gap-2 rounded-full border border-input bg-card pl-4 pr-1" style={{ boxShadow: SHADOW.soft }}>
-        <MagnifyingGlassIcon size={20} weight="bold" color={COLORS.mutedForeground} />
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Traktör, buğday, pulverizatör…"
-          placeholderTextColorClassName="accent-muted-foreground"
-          accessibilityLabel="Pazarda ara"
-          returnKeyType="search"
-          className="h-full flex-1 font-sans text-[15px] text-foreground"
-        />
-        {query ? (
-          <Pressable accessibilityRole="button" accessibilityLabel="Aramayı temizle" onPress={() => setQuery('')} className="size-11 items-center justify-center rounded-full active:bg-secondary">
-            <XCircleIcon size={22} weight="fill" color={COLORS.mutedForeground} />
-          </Pressable>
-        ) : null}
-      </View>
-
-      <ToggleGroup type="single" value={view} onValueChange={(v) => v && setView(v as MarketView)} className="rounded-full bg-muted p-1">
-        {VIEWS.map((v, i) => (
-          <ToggleGroupItem
-            key={v.id}
-            value={v.id}
-            isFirst={i === 0}
-            isLast={i === VIEWS.length - 1}
-            accessibilityLabel={v.label}
-            className={cn('h-10 flex-1 rounded-full', view === v.id ? 'bg-primary' : 'bg-transparent')}>
-            <Text className={cn('font-sans-semibold text-[14px]', view === v.id ? 'text-primary-foreground' : 'text-muted-foreground')}>{v.label}</Text>
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
-
-      <View className="flex-row flex-wrap gap-2" accessibilityRole="tablist" accessibilityLabel="Kategoriler">
-        {CATEGORIES.map((c) => {
-          const on = c.id === category;
-          const Icon = CATEGORY_ICONS[c.id];
-          return (
-            <Pressable
-              key={c.id}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: on }}
-              onPress={() => setCategory(c.id)}
-              className={cn('min-h-11 flex-row items-center gap-1.5 rounded-full border px-3.5', on ? 'border-primary bg-primary' : 'border-border bg-card active:bg-secondary')}>
-              <Icon size={18} weight="duotone" color={on ? COLORS.white : COLORS.primary} />
-              <Text className={cn('font-sans-semibold text-[14px]', on ? 'text-primary-foreground' : 'text-foreground')}>{c.label}</Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      {view === 'kesfet' ? <SafetyStrip /> : null}
-
-      <Text className="text-[13px] text-muted-foreground" accessibilityLiveRegion="polite">
-        {listings.length} ilan{view === 'kesfet' ? ' · Konya ve çevresi' : ''}
-      </Text>
-    </View>
-  );
+  const unread = useUnread();
 
   const top = (
     <View className="gap-3 px-4 pb-3" style={{ paddingTop: insets.top + 8 }}>
@@ -137,24 +64,128 @@ export default function Market() {
     </View>
   );
 
-  if (section === 'mesajlar') {
-    return (
-      <View className="flex-1 bg-background">
-        {top}
-        <InboxList onBrowse={() => setSection('ilanlar')} bottomInset={24} />
-      </View>
-    );
-  }
-
   return (
     <View className="flex-1 bg-background">
       {top}
+      {section === 'mesajlar' ? <InboxList onBrowse={() => setSection('ilanlar')} bottomInset={24} /> : <Listings />}
+    </View>
+  );
+}
+
+function Listings() {
+  const { width } = useWindowDimensions();
+  const cardWidth = (Math.min(width, 640) - 16 * 2 - 10) / 2;
+  const now = useNow();
+  const { signedIn } = useSignedIn();
+  const me = useMe();
+  const toggleFavorite = useToggleFavorite();
+  const [text, setText] = useState('');
+  const q = useDebounced(text);
+  const [kategori, setKategori] = useState<CategoryId>('tumu');
+  const [il, setIl] = useState('');
+  const [sirala, setSirala] = useState<MarketSort>('yeni');
+  const [gorunum, setGorunum] = useState<MarketView>('tumu');
+  const [sorting, setSorting] = useState(false);
+  const query: MarketQuery = useMemo(() => ({ q, kategori, il, sirala, gorunum }), [q, kategori, il, sirala, gorunum]);
+  const needsAccount = gorunum !== 'tumu' && !signedIn;
+  const listings = useListings(query, !needsAccount);
+  const items = useMemo(() => listings.data?.pages.flatMap((p) => p.items) ?? [], [listings.data]);
+  const total = listings.data?.pages[0]?.total ?? 0;
+  const open = useCallback((id: string) => router.push({ pathname: '/ilan/[id]', params: { id } }), []);
+  const filtered = !!q.trim() || kategori !== 'tumu' || !!il;
+  const clear = () => {
+    setText('');
+    setKategori('tumu');
+    setIl('');
+  };
+  const sortLabel = SORTS.find((s) => s.id === sirala)?.label ?? '';
+
+  const header = (
+    <View className="gap-3 pb-3">
+      <View className="h-12 flex-row items-center gap-2 rounded-full border border-input bg-card pl-4 pr-1" style={{ boxShadow: SHADOW.soft }}>
+        <MagnifyingGlassIcon size={20} weight="bold" color={COLORS.mutedForeground} />
+        <TextInput
+          value={text}
+          onChangeText={setText}
+          placeholder="Traktör, buğday, pulverizatör…"
+          placeholderTextColorClassName="accent-muted-foreground"
+          accessibilityLabel="Pazarda ara"
+          returnKeyType="search"
+          className="h-full flex-1 font-sans text-[15px] text-foreground"
+        />
+        {text ? (
+          <Pressable accessibilityRole="button" accessibilityLabel="Aramayı temizle" onPress={() => setText('')} className="size-11 items-center justify-center rounded-full active:bg-secondary">
+            <XCircleIcon size={22} weight="fill" color={COLORS.mutedForeground} />
+          </Pressable>
+        ) : null}
+      </View>
+
+      <Segmented label="Görünüm" value={gorunum} options={VIEWS} onChange={setGorunum} />
+
+      <View className="flex-row flex-wrap gap-2" accessibilityRole="tablist" accessibilityLabel="Kategoriler">
+        {CATEGORIES.map((c) => {
+          const on = c.id === kategori;
+          const Icon = CATEGORY_ICONS[c.id];
+          return (
+            <Pressable
+              key={c.id}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: on }}
+              onPress={() => setKategori(c.id)}
+              className={cn('min-h-11 flex-row items-center gap-1.5 rounded-full border px-3.5', on ? 'border-primary bg-primary' : 'border-border bg-card active:bg-secondary')}>
+              <Icon size={18} weight="duotone" color={on ? COLORS.white : COLORS.primary} />
+              <Text className={cn('font-sans-semibold text-[14px]', on ? 'text-primary-foreground' : 'text-foreground')}>{c.label}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <View className="flex-row flex-wrap gap-2">
+        <ProvinceChip value={il} onChange={setIl} />
+        <Pressable accessibilityRole="button" accessibilityLabel={`Sırala: ${sortLabel}`} onPress={() => setSorting(true)} className="min-h-11 flex-row items-center gap-1.5 rounded-full border border-border bg-card px-3.5 active:bg-secondary">
+          <ArrowsDownUpIcon size={17} weight="bold" color={COLORS.primary} />
+          <Text className="font-sans-semibold text-[14px]">{sortLabel}</Text>
+        </Pressable>
+      </View>
+
+      {gorunum === 'tumu' ? <SafetyStrip /> : null}
+
+      {!needsAccount && listings.isSuccess ? (
+        <Text className="text-[13px] text-muted-foreground" accessibilityLiveRegion="polite">
+          {total} ilan{il ? ` · ${il}` : ''}
+        </Text>
+      ) : null}
+    </View>
+  );
+
+  const empty = needsAccount ? (
+    <SignInPrompt title={gorunum === 'favoriler' ? 'Favorileriniz için giriş yapın' : 'İlanlarınız için giriş yapın'} body="Beğendiğiniz ilanları saklamak ve kendi ilanlarınızı yönetmek için giriş yapın." />
+  ) : listings.isPending ? (
+    <Loading label="İlanlar yükleniyor…" />
+  ) : listings.isError ? (
+    <ErrorState error={listings.error} onRetry={() => listings.refetch()} />
+  ) : filtered ? (
+    <EmptyState title="Sonuç bulunamadı" body={q.trim() ? `“${q.trim()}” için ilan yok. Başka bir kelime deneyin ya da filtreleri temizleyin.` : 'Bu filtrelerle ilan yok. Filtreleri temizleyip tüm ilanlara bakın.'} action="Filtreleri temizle" onAction={clear} />
+  ) : gorunum === 'favoriler' ? (
+    <EmptyState title="Henüz favori yok" body="Beğendiğiniz ilanlardaki kalbe dokunun; burada toplansın." action="Pazara göz at" onAction={() => setGorunum('tumu')} />
+  ) : gorunum === 'ilanlarim' ? (
+    <EmptyState title="Henüz ilanınız yok" body="Ürününüzü, aletinizi ya da aracınızı birkaç adımda satışa çıkarın." action="İlan ver" onAction={() => router.push('/ilan/yeni')} />
+  ) : (
+    <EmptyState Icon={StorefrontIcon} title="Pazar henüz boş" body="İlk ilanı siz verin: ürününüzü, aletinizi ya da aracınızı birkaç adımda satışa çıkarın." action="İlan ver" onAction={() => router.push(signedIn ? '/ilan/yeni' : '/giris')} />
+  );
+
+  return (
+    <>
       <FlatList<Listing>
-        data={listings}
+        data={needsAccount ? [] : items}
         keyExtractor={(l) => l.id}
         numColumns={2}
         ListHeaderComponent={header}
-        ListEmptyComponent={<Empty view={view} filtered={filtered} query={query} onClear={clear} onBrowse={() => setView('kesfet')} />}
+        ListEmptyComponent={empty}
+        ListFooterComponent={listings.isFetchingNextPage ? <ActivityIndicator className="py-4" color={COLORS.primary} /> : null}
+        onEndReached={() => listings.hasNextPage && !listings.isFetchingNextPage && listings.fetchNextPage()}
+        onEndReachedThreshold={0.6}
+        refreshControl={<RefreshControl refreshing={listings.isRefetching && !listings.isFetchingNextPage} onRefresh={() => listings.refetch()} tintColor={COLORS.primary} colors={[COLORS.primary]} />}
         columnWrapperStyle={{ gap: 10 }}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96, gap: 10, width: '100%', maxWidth: 640, alignSelf: 'center' }}
         keyboardShouldPersistTaps="handled"
@@ -162,7 +193,7 @@ export default function Market() {
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <View style={{ width: cardWidth }}>
-            <ListingCard listing={item} favorite={favorites.includes(item.id)} status={status[item.id]} now={now} onPress={open} onToggleFavorite={toggleFavorite} />
+            <ListingCard listing={item} now={now} onPress={open} onToggleFavorite={toggleFavorite} mine={item.sellerId === me.data?.id} />
           </View>
         )}
       />
@@ -170,30 +201,39 @@ export default function Market() {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="İlan ver"
-        onPress={() => router.push('/ilan/yeni')}
+        onPress={() => router.push(signedIn ? '/ilan/yeni' : '/giris')}
         className="absolute bottom-4 right-4 h-14 flex-row items-center gap-2 rounded-full bg-primary pl-4 pr-5 active:scale-95"
         style={{ boxShadow: SHADOW.lift }}>
         <PlusIcon size={22} weight="bold" color={COLORS.white} />
         <Text className="font-sans-bold text-[16px] text-primary-foreground">İlan ver</Text>
       </Pressable>
-    </View>
-  );
-}
 
-function Empty({ view, filtered, query, onClear, onBrowse }: { view: MarketView; filtered: boolean; query: string; onClear: () => void; onBrowse: () => void }) {
-  const copy =
-    filtered
-      ? { title: 'Sonuç bulunamadı', body: query.trim() ? `“${query.trim()}” için ilan yok. Başka bir kelime deneyin ya da filtreleri temizleyin.` : 'Bu kategoride ilan yok. Filtreleri temizleyip tüm ilanlara bakın.', action: 'Filtreleri temizle', onPress: onClear }
-      : view === 'favoriler'
-        ? { title: 'Henüz favori yok', body: 'Beğendiğiniz ilanlardaki kalbe dokunun; burada toplansın.', action: 'Pazara göz at', onPress: onBrowse }
-        : { title: 'Henüz ilanınız yok', body: 'Ürününüzü, aletinizi ya da aracınızı birkaç adımda satışa çıkarın.', action: 'İlan ver', onPress: () => router.push('/ilan/yeni') };
-  return (
-    <View className="items-center gap-2 rounded-[22px] border border-dashed border-border px-6 py-8">
-      <Text className="font-heading text-[18px]">{copy.title}</Text>
-      <Text className="text-center text-[14px] leading-5 text-muted-foreground">{copy.body}</Text>
-      <Button size="sm" className="mt-2 rounded-full" onPress={copy.onPress}>
-        <Text>{copy.action}</Text>
-      </Button>
-    </View>
+      <Dialog open={sorting} onOpenChange={setSorting}>
+        <DialogContent className="mx-4 rounded-[24px] border-border bg-background">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-[20px]">Sırala</DialogTitle>
+          </DialogHeader>
+          <View accessibilityRole="radiogroup" className="gap-1">
+            {SORTS.map((s) => {
+              const on = s.id === sirala;
+              return (
+                <Pressable
+                  key={s.id}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: on }}
+                  onPress={() => {
+                    setSirala(s.id);
+                    setSorting(false);
+                  }}
+                  className={cn('min-h-14 flex-row items-center justify-between rounded-[14px] px-4', on ? 'bg-secondary' : 'active:bg-secondary')}>
+                  <Text className={cn('text-[16px]', on && 'font-sans-bold text-primary')}>{s.label}</Text>
+                  {on ? <CheckIcon size={20} weight="bold" color={COLORS.primary} /> : null}
+                </Pressable>
+              );
+            })}
+          </View>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

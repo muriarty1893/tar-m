@@ -61,7 +61,7 @@ export default function Ask() {
           <View className="flex-row items-center gap-1">
             <View className="size-1.5 rounded-full bg-primary" />
             <Text numberOfLines={1} className="text-[13px] text-muted-foreground">
-              Çevrimiçi · {s.title}
+              Örnek sohbet · {s.title}
             </Text>
           </View>
         </View>

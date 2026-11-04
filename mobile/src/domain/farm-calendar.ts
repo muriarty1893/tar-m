@@ -1,28 +1,7 @@
-import { dayKey } from './format';
+import type { TaskKind } from '@/api/types';
 
-/**
- * The website demo's farm calendar (data/farm-calendar.ts). The demo is set on 14 October; here
- * each task keeps its distance from that day, counted from today, so the month always looks lived in.
- */
-export type TaskKind = 'analiz' | 'toprak' | 'gubre' | 'ilac' | 'ekim' | 'sulama' | 'hasat' | 'uyari';
-
-export type FarmTask = { offset: number; kind: TaskKind; title: string; field: string; time: string };
-
-const DEMO_TODAY = 14;
-const t = (day: number, kind: TaskKind, title: string, field: string, time: string): FarmTask => ({ offset: day - DEMO_TODAY, kind, title, field, time });
-
-export const FARM_TASKS: FarmTask[] = [
-  t(6, 'analiz', 'Toprak analizi için numune al', 'Buğday tarlası', '09:00'),
-  t(9, 'toprak', 'Toprağı diskaro ile işle', 'Buğday tarlası', '08:00'),
-  t(14, 'gubre', 'Taban gübresi (DAP) at', 'Buğday tarlası', '08:30'),
-  t(14, 'sulama', 'Damla sulamayı kontrol et', 'Domates serası', '17:00'),
-  t(15, 'ilac', 'Tohumu ilaçla', 'Ambar', '10:00'),
-  t(16, 'ekim', 'Buğday ekimi', 'Buğday tarlası', '07:30'),
-  t(21, 'hasat', 'Mısır hasadı', 'Mısır tarlası', '07:00'),
-  t(21, 'sulama', 'Fideleri sula', 'Domates serası', '18:00'),
-  t(27, 'hasat', 'Zeytin hasadına başla', 'Zeytinlik', '08:00'),
-  t(30, 'uyari', 'Don riski: fideleri ört', 'Domates serası', '16:00'),
-];
+/** Tarım takvimi's kinds of work, as on the website (lib/farm.ts). The tasks themselves live on the website. */
+export type { TaskKind };
 
 export const TASK_KINDS: Record<TaskKind, { label: string }> = {
   analiz: { label: 'Analiz' },
@@ -33,15 +12,31 @@ export const TASK_KINDS: Record<TaskKind, { label: string }> = {
   sulama: { label: 'Sulama' },
   hasat: { label: 'Hasat' },
   uyari: { label: 'Uyarı' },
+  diger: { label: 'Diğer' },
 };
 
-const midnight = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-const daysBetween = (a: Date, b: Date) => Math.round((midnight(b).getTime() - midnight(a).getTime()) / 86_400_000);
+export const TASK_KIND_IDS = Object.keys(TASK_KINDS) as TaskKind[];
 
-export function tasksOn(day: Date, today: Date): FarmTask[] {
-  const offset = daysBetween(today, day);
-  return FARM_TASKS.filter((x) => x.offset === offset);
+const isDayKey = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(`${s}T00:00:00Z`));
+const isTime = (s: string) => /^([01]\d|2[0-3]):[0-5]\d$/.test(s);
+
+export type TaskDraft = { title: string; kind: string; date: string; time: string; fieldId: string };
+
+/** The task form's checks: the website's validateTask. */
+export function validateTask(t: TaskDraft): Partial<Record<keyof TaskDraft, string>> {
+  const e: Partial<Record<keyof TaskDraft, string>> = {};
+  const title = t.title.trim();
+  if (title.length < 2) e.title = 'Yapılacak işi yazın (ör. Taban gübresi at).';
+  else if (title.length > 80) e.title = 'İş en fazla 80 karakter olabilir.';
+  if (!(t.kind in TASK_KINDS)) e.kind = 'İşin türünü seçin.';
+  if (!isDayKey(t.date)) e.date = 'Tarihi seçin.';
+  if (t.time && !isTime(t.time)) e.time = 'Saati SS:DD olarak yazın (ör. 08:30).';
+  return e;
 }
 
-/** A task's id for remembering it was done: its date and title. */
-export const taskId = (day: Date, task: FarmTask) => `${dayKey(day)}:${task.title}`;
+/** "2026-11" moved by `by` months. */
+export function shiftMonthKey(key: string, by: number) {
+  const [y, m] = key.split('-').map(Number);
+  const i = y * 12 + (m - 1) + by;
+  return `${Math.floor(i / 12)}-${String((i % 12) + 1).padStart(2, '0')}`;
+}

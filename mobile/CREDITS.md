@@ -9,7 +9,6 @@ The photos are the website demo's (see `data/photo-credits.ts` and the site's /k
 | `aycicegi-tarlasi.webp` | Ayçiçeği tarlası | Audrey from Central Pennsylvania, USA | CC BY 2.0 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sunflower_Field_(7848177492).jpg) |
 | `domates-mildiyo.webp` | Domates mildiyösü | Natalka Ukraine (baby-bear.org) | CC BY 4.0 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Phytophthora_infestans_on_Solanum_lycopersicum_in_Dnipro_by_baby-bear.org.jpg) |
 | `tractor-field.webp` | Traktör | U.S. Fish and Wildlife Service | Kamu malı | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tractor_plow_fields_cultivated.jpg) |
-| `harita-uydu.webp` | Tarlalar, tepeden (Tarla Haritası) | Bhullargraphic | CC BY-SA 4.0 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Aerial_view_of_agricultural_fields_in_Punjab,_India.jpg), cropped, colours toned down |
 
 Pazar listing photos (`assets/images/market/`), resized to 900 px webp:
 
@@ -34,3 +33,5 @@ Pazar listing photos (`assets/images/market/`), resized to 900 px webp:
 Components, unchanged from the website: React Bits SpringCheck (MIT), Magic UI NumberTicker (MIT), the 21st.dev Loading UI "Analyzing image", shadcn/ui chart with Recharts (MIT).
 
 Icons: [Phosphor Icons](https://phosphoricons.com) (MIT). Font: Plus Jakarta Sans (SIL Open Font License).
+
+Tarla Haritası: the map is drawn with [Leaflet](https://leafletjs.com) (BSD-2-Clause; its stylesheet is copied to `src/components/dom/leaflet.css` without the image rules). Satellite imagery: Esri World Imagery (Esri, Maxar, Earthstar Geographics) with place names from Esri World Boundaries and Places, credited on the map itself. Esri's basemaps are fine for trying the app; a commercial launch needs an ArcGIS account (or another imagery provider) under Esri's terms.

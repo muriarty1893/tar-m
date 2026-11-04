@@ -1,4 +1,4 @@
-import { fold } from './market';
+import { fold } from './text';
 import { trCompare } from './prices';
 
 /** The 81 provinces and their centres, from the website (data/provinces.ts), for the weather. */

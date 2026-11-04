@@ -9,7 +9,7 @@ type Option<T extends string> = { id: T; label: string; badge?: number };
 /** A pill switch between two or three views ("İlanlar | Mesajlar", "Tümü | Alıyorum | Satıyorum"), with an optional count. */
 export function Segmented<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: Option<T>[]; onChange: (v: T) => void }) {
   return (
-    <ToggleGroup type="single" value={value} onValueChange={(v) => v && onChange(v as T)} className="rounded-full bg-muted p-1" accessibilityLabel={label}>
+    <ToggleGroup type="single" value={value} onValueChange={(v) => v && onChange(v as T)} className="w-full rounded-full bg-muted p-1" accessibilityLabel={label}>
       {options.map((o, i) => {
         const on = value === o.id;
         return (

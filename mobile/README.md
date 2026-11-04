@@ -1,6 +1,8 @@
-# Çiftçi Destek: mobile app (prototype)
+# Çiftçi Destek: mobile app
 
-The Çiftçi Destek app for Android and iOS, built with Expo SDK 57 (React Native). It is the **website's demo phone made real**: the same screens, look and features as the demo on the home page, running on your phone. It is a prototype: the diagnosis and chat are scripted (the demo's scenarios), and there is no server, sign-in or payment yet.
+The Çiftçi Destek app for Android and iOS, built with Expo SDK 57 (React Native), in the look of the website's demo phone. It works on **the website's own data**: the same accounts (Clerk), Pazar listings, chats and offers, calendar, fields and news as https://tar-m-flame.vercel.app, through the website's API for the app (`app/api/app/…`, see `docs/accounts-and-market.md` on the website). A listing posted in the app is on the website at once, and the other way round.
+
+The AI scan is still a **demo**: the camera, the diagnosis and the assistant chat run on the website demo's scripted scenarios, and every such screen says "Örnek". Weather is live (Open-Meteo). Prices are sample data, as on the website.
 
 ## Try it on your phone
 
@@ -14,52 +16,38 @@ The Çiftçi Destek app for Android and iOS, built with Expo SDK 57 (React Nativ
    - On Linux with a firewall, open the port first: `sudo ufw allow 8081/tcp`.
    - If they can't share a Wi-Fi, use `npx expo start --tunnel`.
 
-`npx expo start --web` opens the same app in the browser.
+The app talks to the live website by default. To try it against a website running on your computer (`npm run dev` there), start it with `EXPO_PUBLIC_API_URL=http://<your computer's IP>:3000 npx expo start -c`.
+
+`npx expo start --web` opens the same app in the browser (handy for checking screens; pop-up questions such as "Alan güncellensin mi?" only appear on phones, and Clerk's sign-up bot check may block automated browsers).
 
 ## Screens
 
 | Tab | What it shows |
 | --- | --- |
-| **Ana sayfa** | A top bar (logo, "Dijital Tarım", the notifications bell for new messages, the demo profile), a sample sponsor banner and a "Reklam Vermek İçin Dokun" box, "Hızlı Menü Kısayolları" (eight tiles in two rows that scroll sideways), the "Tarla Konumu" weather card (province, temperature, rain, wind, sunrise and today's farming hint, which opens the 7-day forecast), "Bu Hafta Tarlada" (spraying days, frost, heavy rain), "Tarım Borsası Fiyatları" price cards and "Pazarda yeni" listings. |
-| **Taramalar** | Opens the camera. |
-| **Pazar** | The farmers' market and its chats, switched at the top. "İlanlar": search, Keşfet / Favoriler / İlanlarım, categories (Ürün, Tohum & Gübre, Alet, Ekipman, Araç) and the listings; "İlan ver" posts one. "Mesajlar" (with the unread count): the listing chats. The home screen's bell opens it on Mesajlar (`/pazar?bolum=mesajlar`). |
-| **Takvim** | "Tarım takvimi": the month with task dots, the day's tasks with coloured kind tiles (tasks can be ticked), then "Geçmiş taramalar": past scans with their success percentage, each opening its result. |
+| **Ana sayfa** | The top bar (logo, "Dijital Tarım", the bell for unread chats, and the account chip: Hesabım, or "Giriş yap"), a sample sponsor banner and a "Reklam Vermek İçin Dokun" box, "Hızlı Menü Kısayolları" (ten tiles in two rows that scroll sideways, with Haberler and Hesabım), the live "Tarla Konumu" weather card, "Bu Hafta Tarlada", sample "Tarım Borsası Fiyatları" and "Pazarda yeni" (the newest real listings). |
+| **Taramalar** | Opens the demo camera. |
+| **Pazar** | The real market and its chats, switched at the top. "İlanlar": search (Turkish letters folded), Keşfet / Favoriler / İlanlarım, categories, province, sorting, 24 listings a page with more as you scroll; "İlan ver". "Mesajlar" (with the unread count): Tümü / Alıyorum / Satıyorum. The bell opens it on Mesajlar (`/pazar?bolum=mesajlar`). |
+| **Takvim** | "Tarım takvimi": your own tasks by month (‹ › to move), the day's tasks with tick and delete, "İş ekle"; then "Geçmiş taramalar" (the demo scans, marked Örnek). |
 
-Screens that open from Ana sayfa:
-- **Hava durumu** (`hava`): live weather and a 7-day forecast from [Open-Meteo](https://open-meteo.com), each day with a farming hint (frost, heavy rain, a spraying window). Pull down to refresh.
-- **Hava durumu konumu** (`konum`): the place chip on the weather card opens it. Pick one of the 81 provinces, or "Konumumu kullan" for the nearest one; location permission is asked only then, and only approximate location.
-- **Borsa fiyatları** (`fiyatlar`): every crop's price per kilo, from "Tümünü gör" on the price cards. It has search (by crop or exchange), groups (Tahıl, Baklagil, Yağlı tohum, Meyve & sebze, Sanayi bitkisi), and sorting A–Z or by largest change.
-- **Tarlalarım** (`tarlalar`): this season's area, expenses and expected yield, then each field with its health, last scan and next calendar task. A field's page shows its expenses by kind, its upcoming tasks and a link to its last scan.
-- **Tarla Haritası** (`harita`): the fields outlined on a top-down photo, tinted and labelled by plant health (Sağlıklı, İzlenmeli, Riskli). Tap a field or its name for its plant-health index.
-- **Görsel kaynakları** (`kaynaklar`): the credits for every photo, component, icon and font, linked from the bottom of Ana sayfa.
+Other screens:
+- **Giriş yap / Hesap aç** (`giris`, `kayit`): the website's accounts. E-mail and password, or a 6-digit code by e-mail instead of the password, or Google. "Şifremi unuttum" sets a new password with an e-mailed code. Signing in from a new phone may ask for one more e-mailed code (Clerk's device check). Signing up asks the name other people see, the e-mail and a password (at least 15 characters: the Clerk setting), then the code.
+- **Hesabım** (`hesap`): the name and home province, "Yönetim paneli" for admins, the website's e-mail and password settings, sign out, and deleting the account with everything in it (a box to tick first).
+- **İlan** (`ilan/[id]`): photos (swipe), price, facts, description, the seller (member since, listings), safety tips. "Mesaj gönder" (ready questions or your own) and "Teklif ver" open the chat; once you have one, "Sohbete git". On your own listing: edit, mark sold / back on sale, remove. "İlanı şikâyet et". Admins can remove any listing.
+- **İlan ver / İlanı düzenle** (`ilan/yeni`, `?id=` to edit): the website's form and checks, word for word. Photos (gallery or camera) are shrunk to 1600 px and uploaded as soon as they're picked; without one, the category's photo is shown as "Temsilî görsel".
+- **Sohbet** (`mesajlar/[id]`): messages, offers, counter-offers, accept / turn down, "Görüldü"; checked for news every 4 s while open, the unread badge every 30 s.
+- **Tarlalarım** (`tarlalar`), **a field** (`tarlalar/[id]`) and **Tarla ekle / düzenle** (`tarlalar/duzenle`): the season's area, expenses and expected yield; each field with its crop, stage, expenses (add, delete, cost per dönüm), upcoming tasks and its map outline.
+- **Tarla Haritası** (`harita`): the fields outlined on a real satellite map (Esri World Imagery, with place names), named on the map; tap one for its card. Fields not drawn yet are listed with "çiz".
+- **Sınır çiz** (`sinir/[id]`): tap the field's corners in order on the satellite map; the area is worked out as you go ("≈ 12,4 dönüm"), with "Son köşeyi sil" and "Temizle". After saving, the app offers to use the map's area as the field's. "Konumuma git" asks for approximate location only.
+- **İş ekle** (`gorev`): what, which kind, the day (and time), and the field.
+- **Haberler** (`haberler`, `haberler/[slug]`): the website's published news.
+- **Yönetim paneli** (`yonetim`, admins only, as on /yonetim): the numbers; **Haberler** (`yonetim/haberler`, drafts first) and the **editor** (`yonetim/haber`, `?id=` to edit): title, address (from the title), summary, date, cover photo, Markdown text with a toolbar (heading, bold, italic, lists, quote, link) and "Önizleme", Taslak / Yayında, delete; **Şikâyetler** (`yonetim/sikayetler`): remove a reported listing or close its reports. The server checks the admin on every call.
+- Unchanged: **Hava durumu** (`hava`), **Hava durumu konumu** (`konum`), **Borsa fiyatları** (`fiyatlar`, sample data), **Görsel kaynakları** (`kaynaklar`).
 
-**The scan flow:**
-1. **Camera.** The live camera (CANLI · Kamera), with framing brackets, flash and flip.
-2. **Sample photos.** The thumbnail opens the four demo fields, or the phone's gallery.
-3. **Analysis.** "Analiz ediliyor…" with the demo's loader and checklist.
-4. **Result.** The diagnosis, then the "Hasat başarı tahmini" gauge, "Ne görüyorum", and "Öneriler" that can be ticked.
-5. **"Soru sor".** A chat with the agronomist assistant, with suggested questions.
+**The demo scan** (camera → sample photos → "Analiz ediliyor…" → result → "Soru sor"): as before, on the website demo's four scenarios (`src/domain/scenarios.ts`), now labelled "ÖRNEK" on the camera, "Örnek sonuç" with a note on the result, and "Örnek sohbet" in the assistant chat. These scans and their ticks are the only things kept on the phone (`src/state/store.ts`).
 
-**The market (Pazar) and messages:**
-1. **A listing.** Photo, price (with unit for produce), facts, specs, description, the seller (rating, reply time, verified phone) and safety tips. "Mesaj gönder" opens a chat; "Teklif ver" sends an offer. On your own listing: "Satıldı olarak işaretle" and remove.
-2. **İlan ver.** Photos (gallery or camera; without one, the category's photo is used and marked "Temsilî görsel"), title, category, condition, price and unit, quantity, location, description, "Pazarlık payı var". Checked on blur and on submit, with a summary of what to fix.
-3. **Mesajlar** (Pazar's second side). Every listing chat (Tümü / Alıyorum / Satıyorum), unread ones in bold with a count; the count also shows on the bell and on the Mesajlar switch.
-4. **A chat.** The listing pinned on top, quick replies, offers and counter-offers you can accept or turn down, and a typing indicator.
+**What's live:** everything but the scan and prices comes from the website. The weather comes straight from Open-Meteo (free, no key; a forecast under 30 minutes old is reused, offline the last one is shown). Open-Meteo's free API and Esri's basemaps are for non-commercial use: a commercial launch needs their paid plans (or other providers).
 
-The design follows the ui-ux-pro-max marketplace pattern (search first, categories in view, trust cues, "list your item" always at hand) in the app's own look: see `docs/superpowers/specs/2026-10-17-pazar-mesajlar-design.md`.
-
-**What's simulated:**
-- **The result.** A photo is matched to one of the demo's four scenarios (`src/domain/scenarios.ts`), always the same one for the same photo. Without camera permission, the shutter uses the chosen sample.
-- **The calendar.** It is the demo month, placed around today.
-- **The fields.** Ayşe's four fields, their expenses and their plant-health index are sample data (`src/domain/fields.ts`). A field's health comes from its last scan's harvest-success estimate, on the gauge's scale. The map is an example photo, not Konya.
-- **Prices.** The 14 crops' prices and trends are sample data (`src/domain/prices.ts`).
-- **The market.** The 15 listings and their sellers are sample data (`src/domain/market.ts`). The other side of a chat answers by script (`src/domain/chat.ts`): by topic for questions; offers at 92 % of the price or more are accepted, under 60 % turned down, and the rest countered halfway.
-
-Scans, ticks, favourites, your listings, the chats, the chosen province and the last forecast are saved on the phone.
-
-**What's live:** the weather. Open-Meteo is free and needs no key or server, so the phone calls it directly (`src/domain/weather.ts`, `src/state/weather.ts`). A forecast under 30 minutes old is reused; offline, the last one is shown with its time. The farming hints use the website's thresholds and still need an agronomist's review. Open-Meteo's free API is for non-commercial use: a commercial launch needs one of its paid plans.
-
-**Ads.** The sponsor banner and the "advertise here" box show sample content (`src/domain/ads.ts`); tapping them explains the space. An app that shows ads counts as commercial for Open-Meteo, so real ads need a paid weather plan first.
+**Ads.** The sponsor banner and the "advertise here" box show sample content (`src/domain/ads.ts`).
 
 ## Design and code
 
@@ -77,34 +65,35 @@ Scans, ticks, favourites, your listings, the chats, the chosen province and the 
   In Expo Go, these run in `react-native-webview`, not Expo's default web view (`@expo/dom-webview`): Expo Go 57 doesn't include the default one, and mounting one crashed the app. On Android, `src/components/dom/use-dom-height.ts` also works around a startup race in that web view that left the components blank.
 - **Other components.** Ready-made [React Native Reusables](https://reactnativereusables.com) (shadcn/ui for React Native) in `src/components/ui/`, styled with [Uniwind](https://uniwind.dev) (Tailwind 4).
 - **Keep the copies in step with the website.** If one of the website's components changes, copy the file over again: they are meant to stay identical.
-- **The website's demo phone copies the app's sample data the other way:** `data/demo-market.ts`, `demo-chat.ts`, `demo-prices.ts` and `demo-fields.ts` on the website are copies of `src/domain/market.ts`, `chat.ts`, `prices.ts` and `fields.ts` (with web photo paths). Change both when the sample data or the chat script changes.
+- **The data: the website's API.** `src/api/client.ts` calls `/api/app/…` on the website (`src/lib/config.ts`: `SITE_URL`, override with `EXPO_PUBLIC_API_URL`) with the Clerk session token; `src/api/queries.ts` holds the TanStack Query hooks and cache keys (lists stay fresh 30 s; chats poll every 4 s; polling pauses in the background), `src/api/actions.ts` the shared favourite toggle, `src/api/upload.ts` the photo upload. `src/api/types.ts` mirrors the website's types: change both together. A 409 `name_required` sends the person to Hesabım first, a 401 to Giriş (`src/lib/api-errors.ts`).
+- **Sign-in.** `@clerk/expo` with the website's Clerk instance (the publishable key is in `src/lib/config.ts`, override with `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY`); the session token is kept in the phone's secure store. The forms are the app's own (`src/app/giris.tsx`, `kayit.tsx`, `src/components/auth/`), with Clerk's errors in Turkish (`src/lib/clerk-errors.ts`). The cache is cleared when the person changes.
+- **The same rules as the website.** The forms check exactly what the server checks: `src/domain/market.ts` (listings), `fields.ts` (fields, expenses), `farm-calendar.ts` (tasks), `news.ts` (articles), `geo.ts` (outlines and area). The website's versions are `lib/market.ts`, `lib/farm.ts`, `lib/news.ts`, `lib/geo.ts`: change both together. `src/lib/form-errors.ts` merges the form's checks with the server's without counting cleared ones.
+- **The map.** `src/components/dom/field-map-dom.tsx` is Leaflet in a DOM component, with Esri's satellite tiles. Its stylesheet is Leaflet's, minus the image rules (`leaflet.css`). The screens tell it how much their bars cover (`inset`), so the zoom buttons, the credits and fitted views stay clear of them.
+- **The website's demo phone** (`components/phone-app/`, `data/demo-*.ts`) began as a copy of this app's sample data and is now its own: the app no longer has sample listings, chats or fields.
 - **Routes** live in `src/app/` (Expo Router):
-  - `(tabs)/` holds the four tabs (Ana sayfa, Taramalar, Pazar, Takvim);
-  - `hava` is the forecast;
-  - `fiyatlar` is the price list;
-  - `tarlalar/` and `tarlalar/[id]` are the fields and a field;
-  - `harita` is the field map;
-  - `kaynaklar` is the credits;
-  - `ilan/[id]` and `ilan/yeni` are a listing and the new-listing form;
-  - `mesajlar/[id]` is a chat (the inbox is Pazar's Mesajlar side);
-  - `tara` is the camera and analysis;
-  - `sonuc/[id]` is the result;
-  - `soru/[id]` is the chat.
-- **State.** One Zustand store (`src/state/store.ts`) holds it all, saved with AsyncStorage.
+  - `(tabs)/`: Ana sayfa, Taramalar, Pazar, Takvim;
+  - `giris`, `kayit`, `hesap`: accounts;
+  - `ilan/[id]`, `ilan/yeni`, `mesajlar/[id]`: the market;
+  - `tarlalar/`, `tarlalar/[id]`, `tarlalar/duzenle`, `harita`, `sinir/[id]`, `gorev`: fields, the map and tasks;
+  - `haberler/`, `haberler/[slug]`: news;
+  - `yonetim/`, `yonetim/haberler`, `yonetim/haber`, `yonetim/sikayetler`: the admin panel;
+  - `hava`, `konum`, `fiyatlar`, `kaynaklar`: weather, prices, credits;
+  - `tara`, `sonuc/[id]`, `soru/[id]`: the demo scan.
+- **State on the phone.** One Zustand store (`src/state/store.ts`, saved with AsyncStorage) for the demo scans; the weather store for the province and the last forecast.
 
 ## Checks
 
 ```bash
-npm test             # Jest: scenarios, calendar and forecast, dates, market, chat, store, fields, prices, credits
+npm test             # Jest: the forms' rules (market, fields, tasks, news, outlines), Clerk errors, scenarios, weather, dates, prices, credits
 npm run typecheck
 npx expo lint
 npx expo-doctor
 ```
 
-## Next steps toward a real app
+## Next steps
 
-1. **A real market.** Listings, photos and chats on a server with sign-in, push notifications for messages, and moderation and reporting. The screens keep their shape (`Listing`, `Conversation`).
-2. **A real model.** Send the photo to a plant-disease model, served by our own API, and return the same shape as `Scenario`. The screens stay the same.
-3. **Real market prices.** A source for the exchanges' daily prices (likely collected by our server).
-4. **Accounts and real fields.** Sign-in, fields drawn on a real map, satellite plant-health data, and expenses the farmer enters.
+1. **The AI scan.** Send the photo to a plant-disease model on our server and return the same shape as `Scenario`; the screens stay the same.
+2. **Push notifications** for new messages and offers (Expo Notifications), instead of the badge.
+3. **Real market prices** from the exchanges.
+4. **A Clerk production instance** once the website has its own domain (`docs/accounts-and-market.md`): then set `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` (or change the default in `src/lib/config.ts`).
 5. **Release builds.** Build with EAS (`npx eas-cli build`). Publishing needs Google Play and Apple developer accounts.

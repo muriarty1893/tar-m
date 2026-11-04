@@ -8,9 +8,11 @@ import {
   CloudSunIcon,
   MapTrifoldIcon,
   MegaphoneIcon,
+  NewspaperIcon,
   ScanIcon,
   StorefrontIcon,
   TractorIcon,
+  UserCircleIcon,
   type PhosphorIcon,
 } from '@/components/icons';
 import { Text } from '@/components/ui/text';
@@ -28,6 +30,8 @@ const ITEMS: Item[] = [
   { label: 'Fiyatlar', Icon: ChartLineUpIcon, tone: 'purple', href: '/fiyatlar' },
   { label: 'Pazar', Icon: StorefrontIcon, tone: 'rose', href: '/pazar', tab: true },
   { label: 'İlan Ver', Icon: MegaphoneIcon, tone: 'orange', href: '/ilan/yeni' },
+  { label: 'Haberler', Icon: NewspaperIcon, tone: 'sky', href: '/haberler' },
+  { label: 'Hesabım', Icon: UserCircleIcon, tone: 'emerald', href: '/hesap' },
 ];
 
 const COLUMNS = Array.from({ length: Math.ceil(ITEMS.length / 2) }, (_, i) => ITEMS.slice(i * 2, i * 2 + 2));
