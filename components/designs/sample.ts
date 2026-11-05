@@ -51,4 +51,23 @@ export const TOPICS: SampleTopic[] = [
   { title: "Satılık: 2015 model 75 beygir traktör, bakımlı", section: "Fiyat ve pazar", sectionId: "pazar", author: "Kemal Aydın", initials: "KA", ago: "3 gün önce", replies: 3, likes: 2, views: 980, photo: "/market/ilan-traktor.webp", tag: { label: "SATIŞ", tone: "green" }, excerpt: "Tek sahibinden, 4200 saatte. Fiyat ve fotoğraflar Pazar'daki ilanda.", lastBy: "Ali Ç." },
 ];
 
+/** Sample crop prices (₺/kg) for the price-led designs; the change is the day's, in per cent. */
+export const PRICES: { name: string; price: string; change: number; week: number[] }[] = [
+  { name: "Buğday", price: "12,35", change: 1.2, week: [11.9, 12.0, 11.95, 12.1, 12.05, 12.2, 12.35] },
+  { name: "Arpa", price: "9,80", change: 0.6, week: [9.6, 9.7, 9.65, 9.7, 9.75, 9.74, 9.8] },
+  { name: "Mısır", price: "10,90", change: -0.8, week: [11.2, 11.1, 11.15, 11.0, 11.05, 10.99, 10.9] },
+  { name: "Ayçiçeği", price: "24,50", change: 2.1, week: [23.6, 23.8, 23.7, 23.9, 24.0, 24.0, 24.5] },
+  { name: "Nohut", price: "38,00", change: -1.4, week: [38.9, 38.8, 38.6, 38.7, 38.5, 38.54, 38.0] },
+  { name: "Mercimek", price: "31,20", change: 0, week: [31.1, 31.2, 31.15, 31.2, 31.25, 31.2, 31.2] },
+];
+
+/** A sample five-day forecast for the weather-led designs. */
+export const FORECAST: { day: string; sky: "sun" | "cloudSun" | "cloud" | "rain"; max: number; min: number }[] = [
+  { day: "Bugün", sky: "sun", max: 19, min: 7 },
+  { day: "Cum", sky: "cloudSun", max: 17, min: 6 },
+  { day: "Cmt", sky: "rain", max: 13, min: 5 },
+  { day: "Paz", sky: "cloud", max: 14, min: 4 },
+  { day: "Pzt", sky: "sun", max: 16, min: 5 },
+];
+
 export const NAV = ["Ana sayfa", "Pazar", "Takvim & Hava", "Hızlı menü"] as const;

@@ -5,7 +5,7 @@ import { DESIGNS } from "@/components/designs";
 export const metadata: Metadata = { title: "Tasarım seçenekleri", robots: { index: false, follow: false } };
 
 /**
- * Temporary: the home page in 11 designs, as phone-sized previews to scroll and compare. Goes once one
+ * Temporary: the home page in several designs, as phone-sized previews to scroll and compare. Goes once one
  * is chosen.
  */
 export default function DesignsPage() {
