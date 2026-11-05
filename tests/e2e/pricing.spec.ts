@@ -3,6 +3,9 @@ import { test, expect, type Page } from "@playwright/test";
 // The "Planlar" section on the home page: three plans, the middle one the most popular, with a
 // monthly / yearly switch whose prices roll to the new figures (NumberFlow).
 
+// The plans are on the wide-screen home; phones get the portal home.
+test.beforeEach(({ isMobile }) => test.skip(isMobile, "phones get the portal home, without the plans"));
+
 const plansOf = (page: Page) => {
   const section = page.locator("#planlar");
   const plans = section.getByRole("listitem").filter({ has: page.getByRole("heading", { level: 3 }) });
@@ -23,10 +26,10 @@ test("the home page shows three plans with prices, the middle one marked most po
   await expect(pro).toContainText("En popüler");
   await expect(corp.getByRole("heading", { level: 3 })).toHaveText("Kurumsal");
   await expect(corp).toContainText("Size özel");
-  for (const plan of [solo, pro, corp]) expect(await plan.getByRole("listitem").count()).toBeGreaterThanOrEqual(4);
+  for (const plan of [solo, pro, corp]) expect(await plan.getByRole("listitem").count()).toBeGreaterThanOrEqual(3);
 
-  await expect(solo.getByRole("link", { name: "Ücretsiz dene: Bireysel" })).toHaveAttribute("href", "/#kayit");
-  await expect(pro.getByRole("link", { name: "Ücretsiz dene: Profesyonel" })).toHaveAttribute("href", "/#kayit");
+  await expect(solo.getByRole("link", { name: "Ücretsiz dene: Bireysel" })).toHaveAttribute("href", "/kayit");
+  await expect(pro.getByRole("link", { name: "Ücretsiz dene: Profesyonel" })).toHaveAttribute("href", "/kayit");
   await expect(corp.getByRole("link", { name: "Teklif alın" })).toHaveAttribute("href", "/is-birligi");
   await expect(section).toContainText("Fiyatlar güncellenebilir; kesin tutar kayıt ve ödeme adımında gösterilir.");
 });
@@ -66,11 +69,11 @@ test("with reduced motion, switching to yearly sends no confetti", async ({ page
   await expect(page.locator("body > canvas")).toHaveCount(canvases);
 });
 
-test("a plan's trial button takes you to the sign-up form", async ({ page }) => {
+test("a plan's trial button takes you to account sign-up", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const btn = page.locator("#planlar").getByRole("link", { name: "Ücretsiz dene: Profesyonel" });
   await btn.scrollIntoViewIfNeeded();
   await btn.click();
-  await expect(page.locator("#kayit").getByLabel("Ad soyad")).toBeInViewport();
+  await expect(page).toHaveURL(/\/kayit$/);
 });

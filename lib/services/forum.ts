@@ -15,6 +15,7 @@ import {
   type TopicInput,
 } from "@/lib/forum";
 import { notify, usersByHandle } from "@/lib/services/notifications";
+import { forumCategories } from "@/lib/forum-categories";
 
 /**
  * The forum's writes, shared by the website's server actions (app/forum/actions.ts) and the mobile
@@ -37,14 +38,22 @@ async function dropPhotos(urls: string[]) {
 
 export type CreateTopicOutcome = { ok: true; id: string } | { ok: false; errors: TopicErrors; message?: string };
 
+const cleanTopic = (raw: Partial<Record<keyof TopicInput, unknown>>): TopicInput => ({
+  category: s(raw.category),
+  title: s(raw.title).trim().replace(/\s+/g, " "),
+  body: s(raw.body).replace(/\r\n/g, "\n").trim(),
+  photos: photoList(raw.photos),
+});
+
+/** The topic's checks, with its category looked up in the forum's list. */
+async function topicErrors(t: TopicInput): Promise<TopicErrors> {
+  const cats = await forumCategories();
+  return validateTopic(t, (id) => id in cats.byId);
+}
+
 export async function createTopicFor(userId: string, raw: Partial<Record<keyof TopicInput, unknown>>): Promise<CreateTopicOutcome> {
-  const t: TopicInput = {
-    category: s(raw.category),
-    title: s(raw.title).trim().replace(/\s+/g, " "),
-    body: s(raw.body).replace(/\r\n/g, "\n").trim(),
-    photos: photoList(raw.photos),
-  };
-  const errors = validateTopic(t);
+  const t = cleanTopic(raw);
+  const errors = await topicErrors(t);
   if (Object.keys(errors).length) return { ok: false, errors };
   const recent = await sql()`select count(*) as n from forum_topics where author_id = ${userId} and created_at > now() - interval '24 hours'`;
   if (Number(recent[0].n) >= DAILY_TOPIC_LIMIT) return { ok: false, errors: {}, message: `Bir günde en fazla ${DAILY_TOPIC_LIMIT} konu açabilirsiniz. Yarın yeniden deneyin.` };
@@ -55,6 +64,42 @@ export async function createTopicFor(userId: string, raw: Partial<Record<keyof T
   const id = str(rows[0].id);
   await notify(userId, "mention", await usersByHandle(mentionsIn(t.body)), id, null);
   return { ok: true, id };
+}
+
+/**
+ * The author (or an admin) changes a topic: its category, title, text and photos. Photos taken off it
+ * are deleted. People newly mentioned are not notified again (an edit shouldn't ring anyone twice).
+ */
+export async function updateTopicFor(userId: string, admin: boolean, topicId: string, raw: Partial<Record<keyof TopicInput, unknown>>): Promise<CreateTopicOutcome> {
+  if (!isUuid(topicId)) return { ok: false, errors: {}, message: "Konu bulunamadı." };
+  const t = cleanTopic(raw);
+  const errors = await topicErrors(t);
+  if (Object.keys(errors).length) return { ok: false, errors };
+  const found = admin
+    ? await sql()`select photos from forum_topics where id = ${topicId}`
+    : await sql()`select photos from forum_topics where id = ${topicId} and author_id = ${userId}`;
+  if (!found[0]) return { ok: false, errors: {}, message: "Bu konuyu düzenleyemezsiniz." };
+  await sql()`
+    update forum_topics set category = ${t.category}, title = ${t.title}, body = ${t.body}, photos = ${t.photos},
+      search_text = ${topicSearchText(t.title, t.body)}, edited_at = now()
+    where id = ${topicId}`;
+  const before = (found[0].photos as string[] | null) ?? [];
+  await dropPhotos(before.filter((p) => !t.photos.includes(p)));
+  return { ok: true, id: topicId };
+}
+
+/** The author (or an admin) changes a reply's text; its photos stay. Returns the topic's id. */
+export async function updateReplyFor(userId: string, admin: boolean, replyId: string, rawBody: unknown): Promise<{ ok: true; topicId: string } | { ok: false; message: string }> {
+  if (!isUuid(replyId)) return { ok: false, message: "Yanıt bulunamadı." };
+  const found = admin
+    ? await sql()`select topic_id, photos from forum_replies where id = ${replyId} and deleted_at is null`
+    : await sql()`select topic_id, photos from forum_replies where id = ${replyId} and author_id = ${userId} and deleted_at is null`;
+  if (!found[0]) return { ok: false, message: "Bu yanıtı düzenleyemezsiniz." };
+  const body = s(rawBody).replace(/\r\n/g, "\n").trim();
+  const invalid = validateReply(body, (found[0].photos as string[] | null) ?? []);
+  if (invalid) return { ok: false, message: invalid };
+  await sql()`update forum_replies set body = ${body}, edited_at = now() where id = ${replyId}`;
+  return { ok: true, topicId: str(found[0].topic_id) };
 }
 
 /** Recounts a topic's replies (not the deleted ones) and the latest one. */

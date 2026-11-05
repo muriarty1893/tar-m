@@ -3,10 +3,11 @@ import { siteConfig } from "@/config/site";
 import { PageHero } from "@/components/PageHero";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { faqs } from "@/data/faqs";
+import { QuestionForm } from "@/components/QuestionForm";
 
 export const metadata: Metadata = {
   title: "Sıkça Sorulan Sorular",
-  description: `${siteConfig.name} hakkında merak edilenler: ne zaman çıkacak, ücretli mi, hangi ürünleri tanıyor, verilerim güvende mi?`,
+  description: `${siteConfig.name} hakkında merak edilenler: forum, pazar, ücretli mi, verilerim güvende mi?`,
 };
 
 
@@ -25,7 +26,7 @@ export default function FaqPage() {
           </>
         }
       />
-      <section className="mx-auto max-w-3xl px-4 py-14">
+      <section className="mx-auto max-w-3xl px-3 py-8 sm:px-4 sm:py-14">
         {/* shadcn/ui Accordion (Base UI): answers stay in the HTML for search engines. */}
         <Accordion className="gap-3">
           {faqs.map((f) => (
@@ -35,6 +36,15 @@ export default function FaqPage() {
             </AccordionItem>
           ))}
         </Accordion>
+      </section>
+      <section id="soru" aria-labelledby="soru-baslik" className="mx-auto max-w-3xl scroll-mt-20 px-3 pb-12 sm:px-4 sm:pb-16">
+        <h2 id="soru-baslik" className="text-2xl font-bold tracking-tight">
+          Cevabını bulamadınız mı?
+        </h2>
+        <p className="mt-2 text-muted-foreground">Sorunuzu yazın, ekibimiz e-postayla yanıtlasın.</p>
+        <div className="mt-6">
+          <QuestionForm />
+        </div>
       </section>
     </>
   );

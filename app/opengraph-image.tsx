@@ -38,7 +38,7 @@ export default function OpengraphImage() {
         </div>
         <div style={{ display: "flex", fontSize: 96, lineHeight: 1.1, maxWidth: 1000 }}>{siteConfig.tagline}</div>
         <div style={{ display: "flex", fontSize: 32, color: "#15803d" }}>
-          Hastalık tespiti · Hasat başarı tahmini · Çiftçiye özel hava uyarıları
+          Çiftçi forumu · Pazar · Hava durumu ve tarım takvimi
         </div>
       </div>
     ),

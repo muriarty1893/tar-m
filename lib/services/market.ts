@@ -39,8 +39,8 @@ export function cleanListing(input: Partial<Record<keyof ListingInput, unknown>>
 
 export type SaveListingOutcome = { ok: true; id: string; created: boolean } | { ok: false; errors: ListingErrors; message?: string };
 
-/** Posts a new listing, or saves the owner's changes to `id`. */
-export async function saveListingFor(profile: Profile, raw: Partial<Record<keyof ListingInput, unknown>>, id?: string): Promise<SaveListingOutcome> {
+/** Posts a new listing, or saves the owner's (or, with `admin`, a moderator's) changes to `id`. */
+export async function saveListingFor(profile: Profile, raw: Partial<Record<keyof ListingInput, unknown>>, id?: string, admin = false): Promise<SaveListingOutcome> {
   const input = cleanListing(raw);
   const errors = validateListing(input);
   if (Object.keys(errors).length) return { ok: false, errors };
@@ -53,7 +53,7 @@ export async function saveListingFor(profile: Profile, raw: Partial<Record<keyof
         unit = ${v.unit}, quantity = ${v.quantity}, negotiable = ${v.negotiable}, province = ${v.province},
         district = ${v.district}, description = ${v.description}, photos = ${v.photos}, search_text = ${v.searchText},
         updated_at = now()
-      where id = ${id} and seller_id = ${profile.userId} and status <> 'removed'
+      where id = ${id} and ((seller_id = ${profile.userId} and status <> 'removed') or ${admin}::boolean)
       returning id`;
     if (!rows[0]) return { ok: false, errors: {}, message: "Bu ilanı düzenleyemezsiniz." };
     return { ok: true, id, created: false };
@@ -76,13 +76,15 @@ export async function saveListingFor(profile: Profile, raw: Partial<Record<keyof
 export type ListingStatusChange = "active" | "sold" | "removed";
 export const isListingStatusChange = (s: unknown): s is ListingStatusChange => s === "active" || s === "sold" || s === "removed";
 
-/** The owner marks a listing sold, puts it back on sale or removes it. A moderator may remove any listing. */
+/**
+ * The owner marks a listing sold, puts it back on sale or removes it. With `admin`, a moderator may do
+ * any of these to any listing, including putting a removed one back on sale.
+ */
 export async function setListingStatusFor(userId: string, admin: boolean, id: string, status: ListingStatusChange): Promise<boolean> {
   if (!isUuid(id) || !isListingStatusChange(status)) return false;
-  const rows =
-    status === "removed" && admin
-      ? await sql()`update listings set status = 'removed', updated_at = now() where id = ${id} returning id`
-      : await sql()`update listings set status = ${status}, updated_at = now() where id = ${id} and seller_id = ${userId} and status <> 'removed' returning id`;
+  const rows = admin
+    ? await sql()`update listings set status = ${status}, updated_at = now() where id = ${id} returning id`
+    : await sql()`update listings set status = ${status}, updated_at = now() where id = ${id} and seller_id = ${userId} and status <> 'removed' returning id`;
   return rows.length > 0;
 }
 

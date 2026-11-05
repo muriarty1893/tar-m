@@ -5,10 +5,10 @@ import { ArrowUpRight } from "@/components/ui/arrow-up-right";
 import { Section } from "./Section";
 
 const audiences = [
-  { icon: BriefcaseIcon, title: "Yatırımcılar", text: "Tarımda yapay zekâ dönüşümünün erken aşamasında yer alın." },
+  { icon: BriefcaseIcon, title: "Reklam verenler", text: "Ürününüzü ve hizmetinizi doğrudan çiftçilere tanıtın: ana sayfadaki sponsor ve reklam alanları." },
   { icon: UsersThreeIcon, title: "Kooperatifler ve birlikler", text: "Üyelerinize ücretsiz pilot erişim ve toplu destek sağlayın." },
   { icon: BankIcon, title: "Ziraat odaları ve kurumlar", text: "Sahadaki verilerle bölgesel erken uyarı çalışmalarına katkı verin." },
-  { icon: TractorIcon, title: "Pilot çiftlikler", text: "Uygulamayı kendi tarlanızda ilk deneyen ve şekillendiren siz olun." },
+  { icon: TractorIcon, title: "Öncü çiftçiler", text: "Forumda deneyiminizi paylaşın, siteyi birlikte şekillendirelim." },
 ];
 
 export function PartnerCta() {
@@ -17,7 +17,7 @@ export function PartnerCta() {
       id="is-birligi"
       eyebrow="İş birliği"
       title="Birlikte büyüyelim"
-      intro="Uygulamamızı sahaya birlikte taşıyacağımız kurum ve kişilerle tanışmak istiyoruz."
+      intro="Çiftçilere birlikte ulaşacağımız firma, kurum ve kişilerle tanışmak istiyoruz."
       className="bg-surface"
     >
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

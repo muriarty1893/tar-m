@@ -1,0 +1,18 @@
+/* Design previews (/tasarimlar/<n>): each design draws its own top bar, footer and tab bar, so the
+   site's own are hidden on these pages, and headings take the design's typeface. Temporary. */
+body:has(#tasarim-onizleme) > header,
+body:has(#tasarim-onizleme) > footer,
+body:has(#tasarim-onizleme) > nav[aria-label="Alt menü"],
+body:has(#tasarim-onizleme) > a[href="#icerik"] {
+  display: none !important;
+}
+body:has(#tasarim-onizleme) {
+  padding-bottom: 0 !important;
+}
+#tasarim-onizleme :where(h1, h2, h3, h4) {
+  font-family: inherit;
+  letter-spacing: normal;
+}
+#tasarim-onizleme {
+  line-height: 1.45;
+}

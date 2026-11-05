@@ -1,16 +1,21 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
-import { CheckCircleIcon, FlagIcon, TrashIcon } from "@phosphor-icons/react/dist/ssr";
+import { CheckCircleIcon, FlagIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react/dist/ssr";
 import { deleteReply, deleteTopic, reportPost } from "@/app/forum/actions";
 import { FORUM_REPORT_REASONS } from "@/lib/forum";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { FieldError } from "@/components/forms/fields";
 
+const actionClass =
+  "inline-flex min-h-11 cursor-pointer items-center gap-1.5 text-sm font-semibold text-muted-foreground underline-offset-4 hover:underline";
+
 /**
- * Under a topic or a reply: "Sil" for its author (and admins), with a confirmation step, and
- * "Şikâyet et" for signed-in people who didn't write it.
+ * Under a topic or a reply: "Düzenle" and "Sil" for its author (and admins), deleting with a
+ * confirmation step, and "Şikâyet et" for signed-in people who didn't write it. A topic is edited on
+ * its own page (`editHref`); a reply right where it is (`onEdit`).
  */
 export function PostActions({
   topicId,
@@ -19,6 +24,8 @@ export function PostActions({
   canReport,
   reported,
   hasReplies = false,
+  editHref,
+  onEdit,
 }: {
   topicId: string;
   replyId?: string | null;
@@ -26,6 +33,8 @@ export function PostActions({
   canReport: boolean;
   reported: boolean;
   hasReplies?: boolean;
+  editHref?: string;
+  onEdit?: () => void;
 }) {
   const [mode, setMode] = useState<"idle" | "delete" | "report">("idle");
   const [reason, setReason] = useState("");
@@ -34,7 +43,7 @@ export function PostActions({
   const [done, setDone] = useState(reported);
   const [pending, start] = useTransition();
   const what = replyId ? "yanıt" : "konu";
-  if (!canDelete && !canReport) return null;
+  if (!canDelete && !canReport && !editHref && !onEdit) return null;
 
   if (mode === "delete") {
     return (
@@ -102,8 +111,20 @@ export function PostActions({
 
   return (
     <div className="flex flex-wrap items-center gap-x-4">
+      {editHref && (
+        <Link href={editHref} className={`${actionClass} hover:text-primary`}>
+          <PencilSimpleIcon aria-hidden="true" weight="bold" className="size-4" />
+          Düzenle
+        </Link>
+      )}
+      {onEdit && (
+        <button type="button" onClick={onEdit} className={`${actionClass} hover:text-primary`}>
+          <PencilSimpleIcon aria-hidden="true" weight="bold" className="size-4" />
+          Düzenle
+        </button>
+      )}
       {canDelete && (
-        <button type="button" onClick={() => setMode("delete")} className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 text-sm font-semibold text-muted-foreground underline-offset-4 hover:text-destructive hover:underline">
+        <button type="button" onClick={() => setMode("delete")} className={`${actionClass} hover:text-destructive`}>
           <TrashIcon aria-hidden="true" weight="bold" className="size-4" />
           Sil
         </button>

@@ -132,7 +132,8 @@ test("a clear night shows the moon", async ({ page }) => {
   await expect(page.getByText("Açık", { exact: true })).toBeVisible();
 });
 
-test("the home page weather card shows today and the next days", async ({ page }) => {
+test("the home page weather card shows today and the next days", async ({ page, isMobile }) => {
+  test.skip(isMobile, "the card is on the wide-screen home; phones get the one-line tile (portal.spec.ts)");
   await mockWeather(page);
   await page.goto("/#hava");
   const section = page.locator("#hava");

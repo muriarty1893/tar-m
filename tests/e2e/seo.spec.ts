@@ -50,7 +50,8 @@ test("article shares its cover image and the site name", async ({ page, request 
 test("the slogan names the page, and the logo badge shows in the header and the browser tab", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle("Çiftçi Destek — Çiftçinin Akıllı Rehberi");
-  const logo = page.locator("header").getByRole("link", { name: /Çiftçi Destek/ }).locator("img");
+  // Phones show a compact mark, wide screens the full logo: one of them is on screen.
+  const logo = page.locator("header").getByRole("link", { name: /Çiftçi Destek/ }).locator("img").filter({ visible: true });
   await expect(logo).toHaveAttribute("src", /brand%2Flogo|brand\/logo/);
   await expect(logo).toBeVisible();
   expect(await logo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);

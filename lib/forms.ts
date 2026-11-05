@@ -21,15 +21,6 @@ const email = z
 // The honeypot is accepted here and checked separately; any value means a bot.
 const honeypot = z.string().optional();
 
-export const waitlistSchema = z.object({
-  name: requiredText("Ad soyad", 2, 100),
-  email,
-  city: optionalText("İl", 100),
-  crop: optionalText("Ürün", 100),
-  consent: z.literal(true, { error: "Devam etmek için KVKK onayı gerekli." }),
-  website: honeypot,
-});
-
 
 /** The first-visit "Bizi nereden duydunuz?" answer. */
 export const sourceSchema = z
@@ -75,7 +66,6 @@ export const questionSchema = z.object({
   website: honeypot,
 });
 
-export type WaitlistInput = z.input<typeof waitlistSchema>;
 export type PartnerInput = z.input<typeof partnerSchema>;
 export type QuestionInput = z.input<typeof questionSchema>;
 

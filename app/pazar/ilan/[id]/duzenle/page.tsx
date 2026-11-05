@@ -3,10 +3,10 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ToolHeader } from "@/components/tool/ToolHeader";
 import { ListingForm } from "@/components/market/ListingForm";
-import { requireProfile } from "@/lib/auth";
+import { isAdmin, requireProfile } from "@/lib/auth";
 import { num, str } from "@/lib/db";
 import { formatPrice } from "@/lib/market";
-import { getOwnListing } from "@/lib/market-data";
+import { getEditableListing } from "@/lib/market-data";
 
 export const metadata: Metadata = { title: "İlanı düzenle", robots: { index: false } };
 
@@ -14,7 +14,7 @@ export default function EditListingPage({ params }: PageProps<"/pazar/ilan/[id]/
   return (
     <>
       <ToolHeader eyebrow="Pazar" title="İlanı düzenle" />
-      <div className="mx-auto max-w-3xl px-4 py-10">
+      <div className="mx-auto max-w-3xl px-3 py-6 sm:px-4 sm:py-10">
         <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-2xl bg-muted motion-safe:animate-pulse" />}>
           <EditListing params={params} />
         </Suspense>
@@ -26,13 +26,21 @@ export default function EditListingPage({ params }: PageProps<"/pazar/ilan/[id]/
 async function EditListing({ params }: { params: PageProps<"/pazar/ilan/[id]/duzenle">["params"] }) {
   const { id } = await params;
   const profile = await requireProfile(`/pazar/ilan/${id}/duzenle`);
-  const r = await getOwnListing(id, profile.userId);
+  const admin = await isAdmin(profile.userId);
+  const r = await getEditableListing(id, profile.userId, admin);
   if (!r) notFound();
+  const someoneElses = str(r.seller_id) !== profile.userId;
   const unit = str(r.unit);
   // "25 ton" is edited as "25" with the unit chosen separately.
   const quantity = unit && str(r.quantity).endsWith(` ${unit}`) ? str(r.quantity).slice(0, -unit.length - 1) : str(r.quantity);
   return (
-    <ListingForm
+    <>
+      {someoneElses && (
+        <p className="mb-5 rounded-xl bg-gold-soft px-4 py-3 font-semibold text-gold ring-1 ring-gold/30">
+          Yönetici olarak başkasının ilanını düzenliyorsunuz (satıcı: {str(r.seller_name) || "Kullanıcı"}).
+        </p>
+      )}
+      <ListingForm
       listingId={id}
       initial={{
         title: str(r.title),
@@ -47,6 +55,7 @@ async function EditListing({ params }: { params: PageProps<"/pazar/ilan/[id]/duz
         description: str(r.description),
         photos: (r.photos as string[] | null) ?? [],
       }}
-    />
+      />
+    </>
   );
 }

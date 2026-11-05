@@ -38,13 +38,13 @@ export function PageHero({
           />
         </>
       )}
-      <div className={`relative mx-auto flex max-w-4xl flex-col justify-end px-4 ${onPhoto ? "min-h-[24rem] pb-14 pt-24 sm:min-h-[28rem]" : "pb-14 pt-14 sm:pt-20"}`}>
-        {heading ?? <h1 className="text-5xl font-bold leading-[0.98] tracking-tight sm:text-7xl">{title}</h1>}
-        {intro && <p className={`mt-5 max-w-2xl text-xl ${onPhoto ? "text-white/90 [&_a]:text-white" : "text-muted-foreground"}`}>{intro}</p>}
+      <div className={`relative mx-auto flex max-w-4xl flex-col justify-end px-4 ${onPhoto ? "min-h-[12rem] pb-8 pt-12 sm:min-h-[28rem] sm:pb-14 sm:pt-24" : "pb-8 pt-8 sm:pb-14 sm:pt-20"}`}>
+        {heading ?? <h1 className="text-3xl font-bold leading-[0.98] tracking-tight sm:text-7xl">{title}</h1>}
+        {intro && <p className={`mt-2 max-w-2xl text-base sm:mt-5 sm:text-xl ${onPhoto ? "text-white/90 [&_a]:text-white" : "text-muted-foreground"}`}>{intro}</p>}
         {children}
       </div>
       {photo && (
-        <p className="absolute bottom-3 right-4 text-xs text-white/80">
+        <p className="absolute bottom-2 right-4 text-xs text-white/80 sm:bottom-3">
           Fotoğraf:{" "}
           <a href={photo.sourceUrl} rel="noopener" className="underline underline-offset-2 hover:text-white">
             {photo.author}

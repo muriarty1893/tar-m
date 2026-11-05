@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { refresh, updateTag } from "next/cache";
 import { getUserId, isAdmin, requireProfile, signInHref } from "@/lib/auth";
-import { isUuid } from "@/lib/db";
+import { isUuid, sql } from "@/lib/db";
 import { LISTINGS_TAG } from "@/lib/market-data";
 import type { ListingErrors, ListingInput } from "@/lib/market";
 import { reportListingFor, saveListingFor, setListingStatusFor, startConversationFor, toggleFavoriteFor } from "@/lib/services/market";
@@ -13,19 +13,24 @@ export type SaveListingResult = { errors: ListingErrors; message?: string };
 /** Posts a new listing, or saves the owner's changes to `id`. On success it opens the listing. */
 export async function saveListing(raw: ListingInput, id?: string): Promise<SaveListingResult> {
   const profile = await requireProfile(id ? `/pazar/ilan/${id}/duzenle` : "/pazar/ilan-ver");
-  const saved = await saveListingFor(profile, raw, id);
+  const saved = await saveListingFor(profile, raw, id, Boolean(id) && (await isAdmin(profile.userId)));
   if (!saved.ok) return { errors: saved.errors, message: saved.message };
   updateTag(LISTINGS_TAG);
   redirect(saved.created ? `/pazar/ilan/${saved.id}?yeni=1` : `/pazar/ilan/${saved.id}?kaydedildi=1`);
 }
 
-/** The owner marks a listing sold, puts it back on sale or removes it. A moderator may remove any listing. */
+/**
+ * The owner marks a listing sold, puts it back on sale or removes it. An admin may do any of these to
+ * any listing (and put a removed one back); they stay on the listing to see the result.
+ */
 export async function setListingStatus(id: string, status: "active" | "sold" | "removed") {
   const userId = await getUserId();
   if (!userId || !isUuid(id)) return;
-  await setListingStatusFor(userId, status === "removed" && (await isAdmin(userId)), id, status);
+  const admin = await isAdmin(userId);
+  const owner = (await sql()`select seller_id from listings where id = ${id}`)[0]?.seller_id === userId;
+  await setListingStatusFor(userId, admin, id, status);
   updateTag(LISTINGS_TAG);
-  if (status === "removed") redirect("/pazar?gorunum=ilanlarim&kaldirildi=1");
+  if (status === "removed" && owner) redirect("/pazar?gorunum=ilanlarim&kaldirildi=1");
   refresh();
 }
 

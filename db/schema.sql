@@ -230,3 +230,34 @@ create table if not exists notifications (
 );
 create index if not exists notifications_user_idx on notifications (user_id, created_at desc);
 create unique index if not exists notifications_once_idx on notifications (user_id, topic_id, coalesce(reply_id, '00000000-0000-0000-0000-000000000000'::uuid));
+
+-- Forum categories, as on r10.net: sections (parent_id null) and their sub-categories, managed by the
+-- admins on /yonetim/forum. A topic sits in a section or in one of its sub-categories. The first six
+-- are the forum's original kinds; the mobile app still sends these ids.
+create table if not exists forum_categories (
+  id          text primary key check (id ~ '^[a-z0-9]+(-[a-z0-9]+)*$' and char_length(id) <= 40),
+  parent_id   text references forum_categories(id) on delete restrict,
+  name        text not null check (char_length(name) between 2 and 60),
+  description text not null default '' check (char_length(description) <= 160),
+  position    integer not null default 0,
+  created_at  timestamptz not null default now(),
+  check (parent_id is null or parent_id <> id)
+);
+create index if not exists forum_categories_parent_idx on forum_categories (parent_id, position);
+insert into forum_categories (id, name, description, position) values
+  ('bitki', 'Bitkisel üretim', 'Ekim, gübreleme, ilaçlama, sulama ve hasat', 1),
+  ('hayvan', 'Hayvancılık', 'Büyükbaş, küçükbaş, kanatlı ve arıcılık', 2),
+  ('makine', 'Makine ve ekipman', 'Traktör, alet, bakım ve arıza', 3),
+  ('destek', 'Destek ve teşvik', 'Hibe, kredi, devlet destekleri ve başvurular', 4),
+  ('pazar', 'Fiyat ve pazar', 'Ürün fiyatları, borsa ve satış', 5),
+  ('genel', 'Genel', 'Diğer her şey', 6)
+on conflict (id) do nothing;
+-- The fixed list of six gives way to the table.
+alter table forum_topics drop constraint if exists forum_topics_category_check;
+alter table forum_topics drop constraint if exists forum_topics_category_fkey;
+alter table forum_topics add constraint forum_topics_category_fkey foreign key (category) references forum_categories(id) on update cascade on delete restrict;
+create index if not exists forum_topics_category_idx on forum_topics (category, created_at desc);
+
+-- "düzenlendi": the author or an admin changed the post after it went up.
+alter table forum_topics add column if not exists edited_at timestamptz;
+alter table forum_replies add column if not exists edited_at timestamptz;

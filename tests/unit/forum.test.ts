@@ -1,13 +1,16 @@
 import { describe, expect, test } from "vitest";
-import { forumHref, handleFromName, insertMention, mentionAtCursor, mentionsIn, parseForumQuery, splitMentions, threadReplies, topicSearchText, validateHandle, validateReply, validateTopic } from "@/lib/forum";
+import { FALLBACK_FORUM_CATS, categoryHref, categoryName, categoryPath, forumHref, handleFromName, sectionOf, insertMention, mentionAtCursor, mentionsIn, parseForumQuery, splitMentions, threadReplies, topicSearchText, validateHandle, validateReply, validateTopic } from "@/lib/forum";
 
 const PHOTO = "https://abc123.public.blob.vercel-storage.com/forum/foto-1.jpg";
 
 describe("forum topics", () => {
-  test("a kind, a title and some text are required", () => {
+  test("a category, a title and some text are required", () => {
     expect(Object.keys(validateTopic({ category: "", title: "", body: "", photos: [] })).sort()).toEqual(["body", "category", "title"]);
     expect(validateTopic({ category: "bitki", title: "Mısır kurdu ilacı", body: "Hangi ilacı önerirsiniz?", photos: [] })).toEqual({});
-    expect(validateTopic({ category: "uzay", title: "Mısır kurdu ilacı", body: "Hangi ilacı önerirsiniz?", photos: [] }).category).toBeTruthy();
+    // The server knows the categories (the admins' list); an unknown one is refused.
+    const known = (id: string) => id in FALLBACK_FORUM_CATS.byId;
+    expect(validateTopic({ category: "uzay", title: "Mısır kurdu ilacı", body: "Hangi ilacı önerirsiniz?", photos: [] }, known).category).toBeTruthy();
+    expect(validateTopic({ category: "bitki", title: "Mısır kurdu ilacı", body: "Hangi ilacı önerirsiniz?", photos: [] }, known)).toEqual({});
     expect(validateTopic({ category: "bitki", title: "x".repeat(121), body: "Hangi ilacı önerirsiniz?", photos: [] }).title).toBeTruthy();
   });
 
@@ -24,7 +27,9 @@ describe("forum topics", () => {
 
 describe("forum addresses", () => {
   test("unknown filters fall back to the defaults", () => {
-    expect(parseForumQuery({ kategori: "uzay", sirala: "rastgele", sayfa: "-3", q: "  mazot " })).toEqual({ q: "mazot", kategori: "tumu", sirala: "yeni", sayfa: 1 });
+    expect(parseForumQuery({ kategori: "Uzay Gemisi!", sirala: "rastgele", sayfa: "-3", q: "  mazot " })).toEqual({ q: "mazot", kategori: "tumu", sirala: "yeni", sayfa: 1 });
+    // Any well-formed category id passes (the admins add new ones); one that doesn't exist lists nothing.
+    expect(parseForumQuery({ kategori: "sut-hayvanciligi" }).kategori).toBe("sut-hayvanciligi");
     expect(parseForumQuery({ kategori: "hayvan", sirala: "populer", sayfa: "2" })).toMatchObject({ kategori: "hayvan", sirala: "populer", sayfa: 2 });
   });
 
@@ -33,6 +38,38 @@ describe("forum addresses", () => {
     expect(forumHref(q)).toBe("/forum?kategori=hayvan");
     expect(forumHref(q, { sayfa: 4 })).toBe("/forum?kategori=hayvan&sayfa=4");
     expect(forumHref(parseForumQuery({}))).toBe("/forum");
+  });
+});
+
+describe("forum categories, r10-style", () => {
+  const cats = {
+    sections: [{ id: "bitki", parentId: null, name: "Bitkisel üretim", description: "", children: [{ id: "bugday", parentId: "bitki", name: "Buğday", description: "" }] }],
+    byId: {
+      bitki: { id: "bitki", parentId: null, name: "Bitkisel üretim", description: "" },
+      bugday: { id: "bugday", parentId: "bitki", name: "Buğday", description: "" },
+    },
+  };
+
+  test("a sub-category belongs to its section, a section to itself", () => {
+    expect(sectionOf(cats, "bugday")).toBe("bitki");
+    expect(sectionOf(cats, "bitki")).toBe("bitki");
+    expect(categoryPath(cats, "bugday")).toBe("Bitkisel üretim › Buğday");
+    expect(categoryPath(cats, "bitki")).toBe("Bitkisel üretim");
+  });
+
+  test("a category that is gone reads as Genel", () => {
+    expect(categoryName(cats, "silindi")).toBe("Genel");
+    expect(categoryPath(cats, "silindi")).toBe("Genel");
+  });
+
+  test("the six first sections stand in when the list can't be read", () => {
+    expect(FALLBACK_FORUM_CATS.sections.map((s) => s.id)).toEqual(["bitki", "hayvan", "makine", "destek", "pazar", "genel"]);
+  });
+
+  test("category addresses leave the default order out", () => {
+    expect(categoryHref("bugday")).toBe("/forum/k/bugday");
+    expect(categoryHref("bugday", "yeni")).toBe("/forum/k/bugday");
+    expect(categoryHref("bugday", "populer")).toBe("/forum/k/bugday?sirala=populer");
   });
 });
 

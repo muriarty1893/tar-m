@@ -1,13 +1,14 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ChartBarIcon, FlagIcon, NewspaperIcon } from "@phosphor-icons/react/dist/ssr";
+import { ChartBarIcon, ChatsTeardropIcon, FlagIcon, NewspaperIcon } from "@phosphor-icons/react/dist/ssr";
 import { ToolHeader } from "@/components/tool/ToolHeader";
 
-export type AdminSection = "genel" | "haberler" | "sikayetler";
+export type AdminSection = "genel" | "haberler" | "forum" | "sikayetler";
 
 const TABS: { id: AdminSection; href: string; label: string; Icon: typeof NewspaperIcon }[] = [
   { id: "genel", href: "/yonetim", label: "Genel bakış", Icon: ChartBarIcon },
   { id: "haberler", href: "/yonetim/haberler", label: "Haberler", Icon: NewspaperIcon },
+  { id: "forum", href: "/yonetim/forum", label: "Forum kategorileri", Icon: ChatsTeardropIcon },
   { id: "sikayetler", href: "/yonetim/sikayetler", label: "Şikâyetler", Icon: FlagIcon },
 ];
 

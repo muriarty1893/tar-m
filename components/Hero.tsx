@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CloudSunIcon, ScanIcon, SparkleIcon } from "@phosphor-icons/react/dist/ssr";
+import { ChatsTeardropIcon, CloudSunIcon, SparkleIcon } from "@phosphor-icons/react/dist/ssr";
 import { siteConfig } from "@/config/site";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,21 +17,20 @@ export function Hero() {
   return (
     <CinematicHero
       brandName={siteConfig.name}
-      brandNote="Tarla asistanı"
+      brandNote="Dijital tarım"
       tagline1={line1}
       tagline2={line2 ?? ""}
       eyebrow={
         <Badge variant="secondary" className="max-w-full shrink whitespace-normal text-primary shadow-soft">
           <SparkleIcon aria-hidden="true" weight="fill" />
-          Pazar, hava ve takvim şimdi açık · Yapay zekâ taraması yakında
+          Forum, pazar, hava ve takvim · Hepsi ücretsiz
         </Badge>
       }
-      cardHeading="Ziraat uzmanınız cebinizde."
+      cardHeading="Çiftçiler burada buluşuyor."
       cardDescription={
         <>
-          <span className="hero-fg font-semibold">{siteConfig.name}</span> ile bugünden çiftçi pazarında alıp satın,
-          hava durumunu ve tarım takviminizi takip edin. Yakında mobil uygulama, tarlanızın fotoğrafından hastalık ve
-          zararlı belirtilerini tanıyacak.
+          <span className="hero-fg font-semibold">{siteConfig.name}</span> ile forumda diğer çiftçilere sorun, çiftçi
+          pazarında alıp satın; ilinizin hava durumunu, borsa fiyatlarını ve tarım takviminizi tek yerden takip edin.
         </>
       }
       actions={
@@ -52,14 +51,14 @@ export function Hero() {
       footnote="Ücretsiz hesap · Tamamen Türkçe · KVKK'ya uygun"
       phone={{
         src: "/hero/phone.webp",
-        alt: `${siteConfig.name} mobil uygulamasının ana ekranı: hızlı menü kısayolları ve tarla hava durumu`,
+        alt: `${siteConfig.name} telefonda: sponsor alanı, hava durumu, Pazar ve forum`,
         width: 760,
         height: 1512,
       }}
       background={{ src: "/hero/field-horizon.webp" }}
       cardPhoto={{ src: pageHeroPhoto.src }}
       badges={[
-        { icon: <ScanIcon weight="duotone" className="size-5" />, title: "Sarı pas tespit edildi", detail: "Buğday · erken evre" },
+        { icon: <ChatsTeardropIcon weight="duotone" className="size-5" />, title: "Forumda 3 yeni yanıt", detail: "Bitkisel üretim" },
         { icon: <CloudSunIcon weight="duotone" className="size-5" />, title: "İlaçlama için uygun gün", detail: "Konya · 18°C" },
       ]}
     />

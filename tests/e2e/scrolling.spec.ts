@@ -2,7 +2,8 @@ import { test, expect } from "@playwright/test";
 
 // Page load must not look like a scroll, and wheel scrolling is smoothed (Lenis) unless motion is reduced.
 
-test("the hero's intro brings the card in close to its place, not up from below the screen", async ({ page }) => {
+test("the hero's intro brings the card in close to its place, not up from below the screen", async ({ page, isMobile }) => {
+  test.skip(isMobile, "the hero is the wide-screen home");
   await page.addInitScript(() => {
     const w = window as unknown as { __offsets: number[] };
     w.__offsets = [];

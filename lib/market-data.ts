@@ -102,6 +102,33 @@ export async function latestListings(limit = 4): Promise<ListingCard[]> {
   }
 }
 
+export type MarketSummary = { active: number; byCategory: Record<string, number>; newest: { id: string; title: string; price: number; unit: string | null } | null };
+
+/** Live listings in all and per category, and the newest one: the home page's Pazar tile and Pazar's category list. Cached for minutes. */
+export async function marketSummary(): Promise<MarketSummary> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(LISTINGS_TAG);
+  const empty: MarketSummary = { active: 0, byCategory: {}, newest: null };
+  if (!process.env.DATABASE_URL) return empty;
+  try {
+    const [counts, newest] = await Promise.all([
+      sql()`select category, count(*) as n from listings where status = 'active' group by category`,
+      sql()`select id, title, price, unit from listings where status = 'active' order by created_at desc limit 1`,
+    ]);
+    const byCategory = Object.fromEntries(counts.map((r) => [str(r.category), Number(r.n)]));
+    const n = newest[0];
+    return {
+      active: Object.values(byCategory).reduce((a, b) => a + b, 0),
+      byCategory,
+      newest: n ? { id: str(n.id), title: str(n.title), price: num(n.price) ?? 0, unit: n.unit ? str(n.unit) : null } : null,
+    };
+  } catch (err) {
+    console.error("marketSummary", err);
+    return empty;
+  }
+}
+
 export type ListingDetail = ListingCard & {
   condition: string | null;
   quantity: string | null;
@@ -143,9 +170,11 @@ export async function getListing(id: string, userId: string | null): Promise<Lis
   };
 }
 
-/** A listing's editable fields, for its owner. */
-export async function getOwnListing(id: string, userId: string) {
+/** A listing's editable fields, for its owner (not once removed) or an admin (any listing). */
+export async function getEditableListing(id: string, userId: string, admin = false) {
   if (!isUuid(id)) return null;
-  const rows = await sql()`select * from listings where id = ${id} and seller_id = ${userId} and status <> 'removed'`;
+  const rows = admin
+    ? await sql()`select l.*, p.name as seller_name from listings l join profiles p on p.user_id = l.seller_id where l.id = ${id}`
+    : await sql()`select l.*, p.name as seller_name from listings l join profiles p on p.user_id = l.seller_id where l.id = ${id} and l.seller_id = ${userId} and l.status <> 'removed'`;
   return rows[0] ?? null;
 }

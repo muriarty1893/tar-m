@@ -103,7 +103,8 @@ test("picking 'Diğer' asks where, and 'Bitti' waits for an answer there too", a
   expect(sent).toEqual([expect.objectContaining({ source: "diger", other: "Tarım fuarı" })]);
 });
 
-test("on the home page the welcome waits until the hero's opening animation has finished", async ({ page }) => {
+test("on the home page the welcome waits until the hero's opening animation has finished", async ({ page, isMobile }) => {
+  test.skip(isMobile, "the hero (and its intro) is the wide-screen home");
   await page.goto("/");
   const dialog = page.getByRole("dialog", { name: /hoş geldiniz/i });
   await expect(dialog).toBeVisible({ timeout: 15_000 });

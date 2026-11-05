@@ -23,7 +23,6 @@ export const PLANS: Plan[] = [
     price: 149,
     audience: "tek çiftçi için",
     features: [
-      "Fotoğrafla hastalık ve zararlı tespiti",
       "İlinize özel hava durumu ve don uyarıları",
       "Tarım takvimi ve hatırlatmalar",
       "E-posta desteği",
@@ -33,7 +32,7 @@ export const PLANS: Plan[] = [
     name: "Profesyonel",
     price: 399,
     audience: "büyük işletmeler ve aile çiftlikleri için",
-    features: ["Bireysel'deki her şey", "Sınırsız tarla ve tarama", "Verim tahmini ve gübreleme önerileri", "Öncelikli destek"],
+    features: ["Bireysel'deki her şey", "Sınırsız tarla ve masraf takibi", "Öncelikli destek"],
     popular: true,
   },
   {

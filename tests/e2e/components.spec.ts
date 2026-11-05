@@ -1,8 +1,7 @@
 import { test, expect } from "@playwright/test";
-import { demoScenarios } from "../../data/demo-scenarios";
 
 test.describe("PillNav (desktop navigation)", () => {
-  test.skip(({ isMobile }) => isMobile, "the pill nav is the desktop bar; phones use the menu");
+  test.skip(({ isMobile }) => isMobile, "the pill nav is the desktop bar; phones use the tab bar");
 
   test("marks the current page and rolls the label on hover, without a colour fill", async ({ page }) => {
     await page.goto("/haberler");
@@ -19,35 +18,6 @@ test.describe("PillNav (desktop navigation)", () => {
     expect(hoverLabel).not.toBe(restLabel);
     expect(hoverBg).toBe(restBg);
   });
-});
-
-test("SpringCheck: the result's recommendations are a to-do list the farmer can tick off", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/#demo");
-  const demo = page.locator("#demo");
-  await demo.getByRole("button", { name: /Buğday tarlası/ }).click();
-  await demo.getByRole("button", { name: "Fotoğraf çek", exact: true }).click();
-  await expect(demo.getByTestId("demo-cevap")).toBeVisible({ timeout: 4000 });
-  const first = demo.getByRole("checkbox", { name: demoScenarios[0].suggestions[0] });
-  await expect(first).toHaveAttribute("aria-checked", "false");
-  await first.click();
-  await expect(first).toHaveAttribute("aria-checked", "true");
-  await expect(demo.getByRole("checkbox")).toHaveCount(demoScenarios[0].suggestions.length);
-});
-
-test("CircularText: a spinning free-early-access stamp on the sign-up panel", async ({ page, isMobile }) => {
-  test.skip(isMobile, "tablet and up only, so the form stays in view on phones");
-  await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/");
-  // Scroll to the panel: the stamp itself spins, so it never counts as "stable" for scrolling.
-  await page.locator("#kayit").scrollIntoViewIfNeeded();
-  const stamp = page.locator("#kayit").getByTestId("circular-text");
-  await expect(stamp).toHaveAttribute("aria-hidden", "true");
-  await expect(stamp).toContainText("ÜCRETSİZ");
-  const ring = stamp.locator(".circular-text");
-  expect(await ring.evaluate((el) => getComputedStyle(el).animationName)).toBe("circular-text-spin");
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  expect(await ring.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
 });
 
 test("MaskedHeading: the about page title shows the field through its letters", async ({ page }) => {
@@ -70,15 +40,15 @@ test.describe("MaskedHeading without JavaScript", () => {
 });
 
 test("every sign-up button carries the diagonal arrow, which turns to point ahead on hover", async ({ page, isMobile }) => {
+  test.skip(isMobile, "the buttons are on the wide-screen home; hover is a pointer interaction");
   await page.goto("/");
-  const signups = page.locator('a[href="/#kayit"]');
+  const signups = page.locator('a[href="/kayit"]').filter({ visible: true });
   const n = await signups.count();
-  expect(n).toBeGreaterThan(2);
+  expect(n).toBeGreaterThanOrEqual(2);
   for (let i = 0; i < n; i++) await expect(signups.nth(i).locator(".btn-arrow svg"), `sign-up button ${i}`).toHaveCount(1);
-  await expect(page.locator("main section").first().getByRole("link", { name: "Pazar’a göz atın" }).locator(".btn-arrow")).toHaveCount(1);
-  test.skip(isMobile, "hover is a pointer interaction");
+  await expect(page.locator("main section").filter({ visible: true }).first().getByRole("link", { name: "Pazar’a göz atın" }).locator(".btn-arrow")).toHaveCount(1);
 
-  const cta = page.locator("[data-cine='card']").getByRole("link", { name: /Erken erişim/ });
+  const cta = page.locator("[data-cine='card']").getByRole("link", { name: "Ücretsiz hesap açın" });
   const arrow = cta.locator(".btn-arrow");
   await expect(arrow).toHaveCSS("rotate", "none");
   await cta.hover();

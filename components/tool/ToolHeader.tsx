@@ -20,14 +20,15 @@ export function ToolHeader({
 }) {
   return (
     <section className="border-b border-border bg-surface">
-      <div className="mx-auto max-w-6xl px-4 pb-8 pt-10 sm:pt-14">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+      {/* Phones: a short band (title, one or two lines of intro), so the tool starts high on the screen. */}
+      <div className="mx-auto max-w-6xl px-4 pb-4 pt-4 sm:pb-8 sm:pt-14">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-5">
           <div className="min-w-0">
-            {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-            <h1 className="mt-1 text-4xl font-bold tracking-tight sm:text-5xl">{title}</h1>
-            {intro && <p className="mt-3 max-w-2xl text-lg text-muted-foreground">{intro}</p>}
+            {eyebrow && <p className="eyebrow max-sm:hidden">{eyebrow}</p>}
+            <h1 className="text-2xl font-bold tracking-tight sm:mt-1 sm:text-5xl">{title}</h1>
+            {intro && <p className="mt-1 max-w-2xl text-muted-foreground max-sm:line-clamp-2 max-sm:text-[0.9375rem] sm:mt-3 sm:text-lg">{intro}</p>}
           </div>
-          {actions && <div className="flex shrink-0 flex-wrap gap-3">{actions}</div>}
+          {actions && <div className="flex shrink-0 flex-wrap gap-2 sm:gap-3">{actions}</div>}
         </div>
         {children}
       </div>

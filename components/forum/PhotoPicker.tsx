@@ -10,14 +10,14 @@ type Item = { key: string; preview: string; url?: string; state: "uploading" | "
 
 const randomName = () => Math.random().toString(36).slice(2, 12);
 
-/** The photos being added to a post: uploaded as they're picked (shrunk first), at most 4. */
-export function usePhotoUploads() {
-  const [items, setItems] = useState<Item[]>([]);
+/** The photos being added to a post: uploaded as they're picked (shrunk first), at most 4. `initial`: a saved post's photos, when editing it. */
+export function usePhotoUploads(initial: string[] = []) {
+  const [items, setItems] = useState<Item[]>(() => initial.map((url) => ({ key: url, preview: url, url, state: "done" as const })));
   const all = useRef<Item[]>([]);
   useEffect(() => {
     all.current = items;
   }, [items]);
-  useEffect(() => () => all.current.forEach((p) => URL.revokeObjectURL(p.preview)), []);
+  useEffect(() => () => all.current.forEach((p) => p.preview.startsWith("blob:") && URL.revokeObjectURL(p.preview)), []);
 
   async function add(files: FileList | null) {
     if (!files) return;
@@ -44,13 +44,13 @@ export function usePhotoUploads() {
   const remove = (key: string) =>
     setItems((ps) => {
       const gone = ps.find((p) => p.key === key);
-      if (gone) URL.revokeObjectURL(gone.preview);
+      if (gone?.preview.startsWith("blob:")) URL.revokeObjectURL(gone.preview);
       return ps.filter((p) => p.key !== key);
     });
 
   const reset = () =>
     setItems((ps) => {
-      ps.forEach((p) => URL.revokeObjectURL(p.preview));
+      ps.forEach((p) => p.preview.startsWith("blob:") && URL.revokeObjectURL(p.preview));
       return [];
     });
 

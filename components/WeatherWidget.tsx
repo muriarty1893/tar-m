@@ -15,6 +15,7 @@ import {
   type WeatherKind,
 } from "@/lib/weather";
 import { formatTrDay, formatTrShortDate } from "@/lib/format";
+import { readSavedProvince, saveProvince } from "@/lib/saved-province";
 import {
   ArrowClockwiseIcon,
   ArrowRightIcon,
@@ -340,7 +341,10 @@ function ProvinceSearch({ onPick }: { onPick: (p: Province) => void }) {
 
 export function WeatherWidget({ compact = false, headingLevel = 3 }: { compact?: boolean; headingLevel?: 2 | 3 }) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
-  const [province, setProvince] = useState<Province>(DEFAULT_PROVINCE);
+  // A province picked before (storage, browser-only) wins over the default; one picked now over both.
+  const saved = useSyncExternalStore(noopSubscribe, readSavedProvince, () => null);
+  const [picked, setPicked] = useState<Province | null>(null);
+  const province = picked ?? saved ?? DEFAULT_PROVINCE;
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<{ key: string; forecast?: Forecast } | null>(null);
   const geoAvailable = useSyncExternalStore(
@@ -355,7 +359,11 @@ export function WeatherWidget({ compact = false, headingLevel = 3 }: { compact?:
   const status: Status = result?.key !== requestKey ? "loading" : result.forecast ? "ok" : "error";
   const forecast = status === "ok" ? result!.forecast! : null;
 
-  const pick = useCallback((p: Province) => setProvince(p), []);
+  // The province picked here is remembered, so the home page's and the calendar's weather match.
+  const pick = useCallback((p: Province) => {
+    setPicked(p);
+    saveProvince(p);
+  }, []);
   const retry = () => setAttempt((n) => n + 1);
 
   const locateMe = useCallback(() => {

@@ -14,8 +14,10 @@ const subscribe = (cb: () => void) => {
   return () => window.removeEventListener(ANSWERED, cb);
 };
 // Without storage (blocked, private mode) treat the visitor as welcomed rather than asking every time.
+// Inside a frame or on a design preview (/tasarimlar) the question never opens.
 const seen = () => {
   try {
+    if (window.self !== window.top || document.getElementById("tasarim-onizleme")) return true;
     return localStorage.getItem(WELCOME_KEY) !== null;
   } catch {
     return true;

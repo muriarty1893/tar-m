@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import { Avatar } from "@/components/market/Avatar";
 import { TopicList } from "@/components/forum/TopicList";
+import { forumCategories } from "@/lib/forum-categories";
 import { forumProfile, listTopics } from "@/lib/forum-data";
 import { requestNow } from "@/lib/now";
 
@@ -35,7 +36,7 @@ async function Person({ params }: { params: PageProps<"/forum/kisi/[handle]">["p
   const { handle } = await params;
   const profile = await forumProfile(handle);
   if (!profile) notFound();
-  const [{ items }, now] = await Promise.all([listTopics({ q: "", kategori: "tumu", sirala: "yeni", sayfa: 1 }, profile.userId), requestNow()]);
+  const [{ items }, now, cats] = await Promise.all([listTopics({ q: "", kategori: "tumu", sirala: "yeni", sayfa: 1 }, profile.userId), requestNow(), forumCategories()]);
   return (
     <div className="mt-4 space-y-8">
       <header className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5">
@@ -52,7 +53,7 @@ async function Person({ params }: { params: PageProps<"/forum/kisi/[handle]">["p
         <h2 id="konulari" className="text-xl font-bold">
           Açtığı konular
         </h2>
-        {items.length ? <TopicList items={items} now={now} /> : <p className="text-muted-foreground">Henüz konu açmadı.</p>}
+        {items.length ? <TopicList items={items} cats={cats} now={now} /> : <p className="text-muted-foreground">Henüz konu açmadı.</p>}
       </section>
     </div>
   );

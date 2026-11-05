@@ -12,8 +12,8 @@ export const metadata: Metadata = {
 
 const values = [
   { icon: HandHeartIcon, title: "Çiftçi önce gelir", text: "Her özelliği, tarlada çalışan birinin gerçekten işine yarayıp yaramayacağına bakarak tasarlıyoruz." },
-  { icon: TranslateIcon, title: "Sade ve Türkçe", text: "Teknik terimlerle değil, çiftçinin kendi diliyle konuşan bir uygulama." },
-  { icon: ScalesIcon, title: "Dürüst tahmin", text: "Yapay zekânın sınırlarını açıkça söyler, gerektiğinde uzmana yönlendiririz." },
+  { icon: TranslateIcon, title: "Sade ve Türkçe", text: "Teknik terimlerle değil, çiftçinin kendi diliyle konuşan bir site." },
+  { icon: ScalesIcon, title: "Dürüst ve açık", text: "Forumda deneyim paylaşılır, kararı çiftçi verir; önemli konularda uzmana yönlendiririz." },
   { icon: ShieldCheckIcon, title: "Veriye saygı", text: "Çiftçinin verisi çiftçinindir; KVKK'ya uygun, şeffaf ve güvenli." },
 ];
 
@@ -27,7 +27,7 @@ export default function AboutPage() {
           // React Bits MaskedHeading: the sunset field shows through the letters.
           <MaskedHeading tag="h1" text="Hakkımızda" src="/app/hero-field.webp" align="left" textScale={0.155} parallax={22} drift={14} brightness={0.92} saturation={1.15} />
         }
-        intro="Yapay zekâyı çiftçinin gözünün yerine değil, yanına koyuyoruz."
+        intro="Çiftçiyi çiftçiyle, alıcıyı satıcıyla buluşturuyoruz."
       />
       <div className="mx-auto max-w-4xl px-4 py-14">
         <div className="space-y-5 text-lg leading-relaxed">
@@ -36,9 +36,9 @@ export default function AboutPage() {
             cebindeki telefonla tarlası hakkında hızlı ve anlaşılır bilgiye ulaşabilmesi.
           </p>
           <p>
-            Hastalıklar ve zararlılar çoğu zaman fark edildiğinde iş işten geçmiş oluyor. Biz, yapay zekâyı çiftçinin
-            gözünün yerine değil, yanına koymak istiyoruz: erken fark etmek, doğru soruyu sormak ve zamanında uzmana
-            ulaşmak için.
+            Tarlada karşılaşılan bir sorunun cevabı çoğu zaman başka bir çiftçinin deneyiminde saklı. Bu yüzden forumu,
+            pazarı, hava durumunu ve takvimi tek bir yere topladık: doğru soruyu sormak, ürünü doğru alıcıyla buluşturmak
+            ve işi zamanında yapmak için.
           </p>
         </div>
 
@@ -49,7 +49,7 @@ export default function AboutPage() {
           <div>
             <h2 className="text-2xl font-bold">Misyonumuz</h2>
             <p className="mt-2 text-lg">
-              Türkiye&apos;deki her ölçekten çiftçiye, kendi dilinde, kolay ve güvenilir bir yapay zekâ tarla asistanı sunmak.
+              Türkiye&apos;deki her ölçekten çiftçiye, kendi dilinde, kolay ve güvenilir bir buluşma ve bilgi yeri sunmak.
             </p>
           </div>
         </div>

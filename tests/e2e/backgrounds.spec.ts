@@ -26,120 +26,18 @@ test("about page keeps the photo inside its title instead of behind it", async (
   await expect(band.locator(":scope > img, [data-hero-photo]")).toHaveCount(0);
 });
 
-test("footer credit reads like the reference: 'BY ME' rolls into the maker's full name", async ({ page, isMobile }) => {
-  await page.goto("/");
-  const footer = page.locator("footer");
-  const credit = footer.getByRole("link", { name: "vibecoded with love by Murat Eker (yeni sekmede açılır)" });
-  await expect(credit).toHaveAttribute("href", "https://murateker.com.tr");
-  // The maker's portfolio opens in a new tab; this page stays where it is.
-  await expect(credit).toHaveAttribute("target", "_blank");
-  await expect(credit).toHaveAttribute("rel", /\bnoopener\b.*\bnoreferrer\b|\bnoreferrer\b.*\bnoopener\b/);
-  await page.context().route("https://murateker.com.tr/**", (r) => r.fulfill({ body: "portfolio", contentType: "text/html" }));
-  await credit.scrollIntoViewIfNeeded();
-  const [tab] = await Promise.all([page.context().waitForEvent("page"), credit.click()]);
-  await expect(tab).toHaveURL(/murateker\.com\.tr/);
-  expect(page.url()).not.toMatch(/murateker/);
-  await tab.close();
-  await expect(credit).toContainText("VIBECODED WITH ♡ BY");
-  expect(await footer.textContent()).not.toMatch(/\p{Emoji_Presentation}|\uFE0F/u);
-  test.skip(isMobile, "hover is a pointer interaction");
-  const full = credit.locator(".site-footer__fullname");
-  await credit.scrollIntoViewIfNeeded();
-  await expect(full).toHaveCSS("translate", /0px [1-9]/);
-  await credit.hover();
-  await expect(full).toHaveCSS("translate", "0px");
-  await expect(credit.locator(".site-footer__initials")).toHaveCSS("translate", /0px -/);
-});
-
-test("footer bracket links roll their letters on hover, a copy rolling in from below", async ({ page, isMobile }) => {
-  await page.goto("/");
-  const footer = page.locator("footer");
-  for (const name of ["SSS", "Gizlilik ve KVKK", "Görsel kaynakları"]) {
-    const link = footer.getByRole("link", { name, exact: true });
-    await expect(link).toBeVisible();
-    await expect(link.locator(".roll__row")).toHaveCount(2);
-  }
-  test.skip(isMobile, "hover is a pointer interaction");
-  const link = footer.getByRole("link", { name: "Gizlilik ve KVKK", exact: true });
-  const first = link.locator(".roll__row").first().locator("span").first();
-  const clone = link.locator(".roll__row--clone span").first();
-  await link.scrollIntoViewIfNeeded();
-  await expect(first).toHaveCSS("translate", "none");
-  await link.hover();
-  await expect(first).toHaveCSS("translate", "0px -100%");
-  await expect(clone).toHaveCSS("translate", "0px");
-});
-
-test("footer: the brand name spans the full width, with Türkiye's time and the contact address", async ({ page }) => {
+test("the footer is one thin band: the info pages, the contact address and the copyright", async ({ page, isMobile }) => {
   await page.goto("/");
   const footer = page.locator("footer");
   await footer.scrollIntoViewIfNeeded();
-  const mark = footer.getByTestId("footer-wordmark");
-  await expect(mark).toHaveText("ÇİFTÇİ DESTEK");
-  const [markW, innerW, overflow] = await mark.evaluate((el) => {
-    const box = el.parentElement!.getBoundingClientRect();
-    const cs = getComputedStyle(el.parentElement!);
-    const inner = box.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    return [range.getBoundingClientRect().width, inner, document.documentElement.scrollWidth - innerWidth];
-  });
-  expect(markW / innerW).toBeGreaterThan(0.9);
-  expect(markW / innerW).toBeLessThanOrEqual(1.01);
-  expect(overflow).toBeLessThanOrEqual(0);
-  await expect(footer.getByTestId("footer-clock")).toHaveText(/TÜRKİYE: \(GMT\+3\) \d{2}:\d{2}/);
+  // Phones: two short lines (Hakkımızda and İş birliği are in the Hızlı menü there).
+  const names = ["SSS", "Pazar kuralları", "Gizlilik ve KVKK", "Görsel kaynakları", ...(isMobile ? [] : ["Hakkımızda", "İş birliği"])];
+  for (const name of names) await expect(footer.getByRole("link", { name, exact: true })).toBeVisible();
   await expect(footer.getByRole("link", { name: "iletisim@bereketai.com" })).toHaveAttribute("href", "mailto:iletisim@bereketai.com");
-  for (const name of ["Hakkımızda", "İş Birliği", "Haberler", "Hava Durumu"])
-    await expect(footer.getByRole("link", { name, exact: true })).toBeVisible();
-});
-
-test("demo result: the success estimate is a half donut chart", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/#demo");
-  const demo = page.locator("#demo");
-  await demo.getByRole("button", { name: /Domates bahçesi/ }).click();
-  await demo.getByRole("button", { name: "Fotoğraf çek", exact: true }).click();
-  const meter = demo.getByRole("meter", { name: "Hasat başarı tahmini" });
-  await expect(meter).toHaveAttribute("aria-valuenow", "48", { timeout: 4000 });
-  await expect(meter.locator(".recharts-pie-sector")).toHaveCount(2);
-});
-
-test("footer runs from one side of a wide screen to the other, with only a small margin", async ({ page, isMobile }) => {
-  test.skip(isMobile, "wide screens only");
-  await page.setViewportSize({ width: 1920, height: 1080 });
-  await page.goto("/");
-  const mark = page.locator("footer").getByTestId("footer-wordmark");
-  await mark.scrollIntoViewIfNeeded();
-  const box = (await mark.boundingBox())!;
-  expect(box.x).toBeLessThan(1920 * 0.05);
-  expect(box.width).toBeGreaterThan(1920 * 0.88);
-  const email = (await page.locator("footer").getByRole("link", { name: "iletisim@bereketai.com" }).boundingBox())!;
-  expect(1920 - (email.x + email.width)).toBeLessThan(1920 * 0.05);
-});
-
-test("the footer's brand name, dots and cedillas included, stays clear of the links above and the row below", async ({ page, isMobile }) => {
-  const widths = isMobile ? [page.viewportSize()!.width] : [1280, 1440, 1920];
-  for (const width of widths) {
-    if (!isMobile) await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
-    await page.locator("footer").scrollIntoViewIfNeeded();
-    await page.evaluate(() => document.fonts.ready);
-    const m = await page.evaluate(() => {
-      const el = document.querySelector<HTMLElement>("[data-testid=footer-wordmark]")!;
-      const cs = getComputedStyle(el);
-      const ctx = document.createElement("canvas").getContext("2d")!;
-      ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-      const t = ctx.measureText(el.textContent!);
-      // CSS line box: the baseline sits half-leading + font ascent below the content box's top.
-      const box = el.getBoundingClientRect();
-      const top = box.top + parseFloat(cs.paddingTop);
-      const lineHeight = parseFloat(cs.lineHeight);
-      const baseline = top + (lineHeight - (t.fontBoundingBoxAscent + t.fontBoundingBoxDescent)) / 2 + t.fontBoundingBoxAscent;
-      const above = Math.max(...[...document.querySelectorAll("footer .site-footer__bracket")].map((a) => a.getBoundingClientRect().bottom));
-      const below = document.querySelector("[data-testid=footer-clock]")!.getBoundingClientRect().top;
-      return { inkTop: baseline - t.actualBoundingBoxAscent, inkBottom: baseline + t.actualBoundingBoxDescent, above, below };
-    });
-    expect(m.inkTop, `dots clear the links above at ${width}px`).toBeGreaterThanOrEqual(m.above + 4);
-    expect(m.inkBottom, `cedillas clear the row below at ${width}px`).toBeLessThanOrEqual(m.below - 4);
-  }
+  await expect(footer.getByText(/© 2026 Çiftçi Destek/)).toBeVisible();
+  // No maker credit, no big wordmark.
+  await expect(footer).not.toContainText(/vibecoded/i);
+  expect(await footer.textContent()).not.toMatch(/\p{Emoji_Presentation}|\uFE0F/u);
+  const height = (await footer.boundingBox())!.height;
+  expect(height).toBeLessThan(isMobile ? 100 : 70);
 });

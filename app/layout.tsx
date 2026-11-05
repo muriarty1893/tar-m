@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { clerkLocalization } from "@/lib/clerk-localization";
-import { Onest, Plus_Jakarta_Sans, Sofia_Sans_Condensed, Spline_Sans_Mono } from "next/font/google";
+import { Onest, Plus_Jakarta_Sans } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import { siteUrl } from "@/lib/site-url";
 import { Header } from "@/components/Header";
+import { BottomNav } from "@/components/nav/BottomNav";
 import { Footer } from "@/components/Footer";
 import { WelcomeGate } from "@/components/WelcomeGate";
 import { SmoothScroll } from "@/components/SmoothScroll";
@@ -15,10 +16,7 @@ import "./globals.css";
 const jakarta = Plus_Jakarta_Sans({ variable: "--font-jakarta", subsets: ["latin", "latin-ext"], preload: false });
 // The site is set in Onest; the demo phone's app uses the mobile app's Plus Jakarta Sans (loaded on demand).
 const onest = Onest({ variable: "--font-onest", subsets: ["latin", "latin-ext"] });
-// The footer's type: a condensed display face for the brand name and address, a monospace for its labels.
-const sofiaCondensed = Sofia_Sans_Condensed({ variable: "--font-sofia-condensed", subsets: ["latin", "latin-ext"], preload: false });
-const splineMono = Spline_Sans_Mono({ variable: "--font-spline-mono", subsets: ["latin", "latin-ext"], preload: false });
-const fonts = [onest, jakarta, sofiaCondensed, splineMono].map((f) => f.variable).join(" ");
+const fonts = [onest, jakarta].map((f) => f.variable).join(" ");
 
 const defaultTitle = `${siteConfig.name} — ${siteConfig.tagline}`;
 
@@ -39,9 +37,13 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
+// `cover`: the page runs under the iPhone's rounded corners and home bar; the bottom tab bar keeps
+// clear of them with env(safe-area-inset-bottom).
+export const viewport: Viewport = { viewportFit: "cover", themeColor: "#ffffff" };
+
 // Arms the home hero's one-time intro before first paint (so nothing flashes), only when motion is
-// allowed. If the hero hasn't started within 4 s (slow or failed JS), the content simply shows.
-const cineScript = `(function(){var d=document.documentElement;if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("cine");setTimeout(function(){if(!d.dataset.cineRun)d.classList.remove("cine")},4000)})()`;
+// allowed and on wide screens (phones get the portal home, without the hero). If the hero hasn't started within 4 s (slow or failed JS), the content simply shows.
+const cineScript = `(function(){var d=document.documentElement;if(matchMedia("(prefers-reduced-motion: reduce)").matches||!matchMedia("(min-width: 80rem)").matches)return;d.classList.add("cine");setTimeout(function(){if(!d.dataset.cineRun)d.classList.remove("cine")},4000)})()`;
 
 const clerkAppearance = {
   variables: {
@@ -76,6 +78,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {children}
           </main>
           <Footer />
+          <BottomNav />
           <WelcomeGate />
           <SmoothScroll />
         </ClerkProvider>

@@ -1,65 +1,55 @@
 import { test, expect } from "@playwright/test";
 
-test("header CTA is hidden on phones and the menu holds it instead", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/hakkimizda");
-  const headerCta = page.locator("header").getByRole("link", { name: "Erken erişim için kaydol" });
-  await expect(headerCta).toBeHidden();
-  await page.getByRole("button", { name: "Menüyü aç" }).click();
-  // The menu (shadcn Sheet) is portaled outside <header>; it holds the CTA instead.
-  await expect(page.locator("#mobil-menu").getByRole("link", { name: "Erken erişim için kaydol" })).toBeVisible();
-});
-
-test("CTA inside the mobile menu closes the menu so the form is visible", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 750 });
-  await page.goto("/haberler");
-  await page.getByRole("button", { name: "Menüyü aç" }).click();
-  await page.locator("#mobil-menu").getByRole("link", { name: "Erken erişim için kaydol" }).click();
-  await expect(page).toHaveURL(/#kayit$/);
-  await expect(page.locator("#mobil-menu")).toHaveCount(0);
-  await expect(page.getByLabel("Ad soyad")).toBeInViewport();
-});
-
-test("home page has Turkish lang, brand name and CTA", async ({ page }) => {
+test("home page has Turkish lang and the brand name in the top bar", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("lang", "tr");
   await expect(page.locator("header")).toContainText("Çiftçi Destek");
-  await expect(
-    page
-      .getByRole("link", { name: "Erken erişim için kaydol" })
-      .filter({ visible: true })
-      .first(),
-  ).toBeVisible();
 });
 
-test("a sign-up button takes you to the form every time, not only the first time", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
-  const name = page.locator("#kayit").getByLabel("Ad soyad");
-  const heroCta = page.locator("[data-cine='card']").getByRole("link", { name: "Erken erişim için kaydol" });
-  await heroCta.click();
-  await expect(page).toHaveURL(/#kayit$/);
-  await expect(name).toBeInViewport();
-
-  // The address already ends in #kayit now; the button must still scroll.
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await expect(name).not.toBeInViewport();
-  await heroCta.click();
-  await expect(name).toBeInViewport();
-
-  const footerCta = page.locator("footer").getByRole("link", { name: "Erken erişim için kaydol" });
-  await footerCta.scrollIntoViewIfNeeded();
-  await footerCta.click();
-  await expect(name).toBeInViewport();
+test("phones: the top bar holds the logo, the name and Giriş yap; there is no burger menu", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/hakkimizda");
+  const header = page.locator("header");
+  await expect(header.getByRole("link", { name: "Çiftçi Destek" }).first()).toBeVisible();
+  await expect(header.getByRole("link", { name: "Giriş yap" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Menüyü aç" })).toHaveCount(0);
 });
 
-test("on the home page, the menu's sign-up button closes the menu and shows the form", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.setViewportSize({ width: 390, height: 750 });
-  await page.goto("/#kayit");
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.getByRole("button", { name: "Menüyü aç" }).click();
-  await page.locator("#mobil-menu").getByRole("link", { name: "Erken erişim için kaydol" }).click();
-  await expect(page.locator("#mobil-menu")).toHaveCount(0);
-  await expect(page.getByLabel("Ad soyad")).toBeInViewport();
+test("phones: the tab bar has Ana sayfa, Pazar, Takvim & Hava and Hızlı menü, the current one marked", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/pazar");
+  const tabs = page.getByRole("navigation", { name: "Alt menü" });
+  await expect(tabs).toBeVisible();
+  await expect(tabs.getByRole("link", { name: "Ana sayfa" })).toHaveAttribute("href", "/");
+  await expect(tabs.getByRole("link", { name: "Pazar" })).toHaveAttribute("aria-current", "page");
+  await expect(tabs.getByRole("link", { name: "Takvim & Hava" })).toHaveAttribute("href", "/takvim");
+  await expect(tabs.getByRole("button", { name: "Hızlı menü" })).toBeVisible();
+  // The page ends above the bar: the last of the footer isn't hidden under it.
+  const bar = (await tabs.boundingBox())!;
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  const legal = page.locator("footer").getByText(/© 2026/).first();
+  const last = (await legal.boundingBox())!;
+  expect(last.y + last.height).toBeLessThanOrEqual(bar.y + 1);
+});
+
+test("phones: Hızlı menü opens the other tools; a tile goes there and closes the sheet", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/pazar");
+  await page.getByRole("button", { name: "Hızlı menü" }).click();
+  const sheet = page.getByRole("dialog", { name: "Hızlı menü" });
+  await expect(sheet).toBeVisible();
+  for (const name of ["Forum", "Konu aç", "İlan ver", "Fiyatlar", "Hava durumu", "Tarım takvimi", "Tarlalarım", "Haberler"]) {
+    await expect(sheet.getByRole("link", { name, exact: true })).toBeVisible();
+  }
+  await expect(sheet.getByRole("link", { name: "Giriş yap" })).toBeVisible();
+  await sheet.getByRole("link", { name: "Fiyatlar", exact: true }).click();
+  await expect(page).toHaveURL(/\/fiyatlar$/);
+  await expect(sheet).toHaveCount(0);
+});
+
+test("wide screens keep the top menu and have no tab bar", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/pazar");
+  await expect(page.getByRole("navigation", { name: "Ana menü" })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Alt menü" })).toBeHidden();
 });

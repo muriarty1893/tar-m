@@ -1,15 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { waitlistSchema, partnerSchema, questionSchema, neutraliseFormula } from "@/lib/forms";
-
-const waitlist = (over: Record<string, unknown> = {}) => ({
-  name: "Ayşe Yılmaz",
-  email: "ayse@example.com",
-  city: "Konya",
-  crop: "Buğday",
-  consent: true,
-  website: "",
-  ...over,
-});
+import { partnerSchema, questionSchema, neutraliseFormula } from "@/lib/forms";
 
 const partner = (over: Record<string, unknown> = {}) => ({
   name: "Mehmet Demir",
@@ -22,38 +12,21 @@ const partner = (over: Record<string, unknown> = {}) => ({
   ...over,
 });
 
-describe("waitlistSchema", () => {
-  it("accepts Turkish names", () => {
-    expect(waitlistSchema.safeParse(waitlist({ name: "Şükrü Çağlar" })).success).toBe(true);
-  });
-
-  it("rejects a whitespace-only name", () => {
-    expect(waitlistSchema.safeParse(waitlist({ name: "   " })).success).toBe(false);
-  });
+describe("shared fields", () => {
+  const question = (over: Record<string, unknown> = {}) => ({ name: "Ayşe", email: "ayse@example.com", question: "Buğday ekimi ne zaman yapılır?", consent: true, website: "", ...over });
 
   it("trims and lowercases the email", () => {
-    const r = waitlistSchema.safeParse(waitlist({ email: "  Ali@Example.COM " }));
+    const r = questionSchema.safeParse(question({ email: "  Ali@Example.COM " }));
     expect(r.success && r.data.email).toBe("ali@example.com");
   });
 
   it("rejects an invalid email", () => {
-    expect(waitlistSchema.safeParse(waitlist({ email: "ali@" })).success).toBe(false);
+    expect(questionSchema.safeParse(question({ email: "ali@" })).success).toBe(false);
   });
 
   it("requires consent to be exactly true", () => {
-    expect(waitlistSchema.safeParse(waitlist({ consent: false })).success).toBe(false);
-    expect(waitlistSchema.safeParse(waitlist({ consent: "true" })).success).toBe(false);
-  });
-
-  it("allows city and crop to be omitted", () => {
-    const withoutOptional = { name: "Ali Kaya", email: "ali@example.com", consent: true };
-    expect(waitlistSchema.safeParse(withoutOptional).success).toBe(true);
-  });
-
-  it("gives a Turkish message for a missing name", () => {
-    const r = waitlistSchema.safeParse(waitlist({ name: "" }));
-    expect(r.success).toBe(false);
-    expect(r.error?.issues[0].message).toMatch(/ad/i);
+    expect(questionSchema.safeParse(question({ consent: false })).success).toBe(false);
+    expect(questionSchema.safeParse(question({ consent: "true" })).success).toBe(false);
   });
 });
 

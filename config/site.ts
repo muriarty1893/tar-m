@@ -4,11 +4,9 @@ export const siteConfig = {
   name: "Çiftçi Destek",
   tagline: "Çiftçinin Akıllı Rehberi",
   description:
-    "Çiftçi Destek, çiftçiler için Türkçe dijital tarım rehberi: çiftçi pazarı ve mesajlaşma, hava durumu, tarım takvimi, tarla ve masraf takibi. Fotoğraftan yapay zekâ ile hastalık tespiti yakında mobil uygulamada.",
+    "Çiftçi Destek, çiftçiler için Türkçe dijital tarım rehberi: çiftçi forumu, çiftçi pazarı ve mesajlaşma, hava durumu, tarım takvimi, tarla ve masraf takibi.",
   contactEmail: "iletisim@bereketai.com",
-  /** Footer maker credit. */
-  creator: { name: "Murat Eker", url: "https://murateker.com.tr" },
-  ctaLabel: "Erken erişim için kaydol",
+  ctaLabel: "Ücretsiz hesap açın",
   /** The header's main menu: the tools that work on the website today. */
   nav: [
     { label: "Pazar", href: "/pazar" },
@@ -21,8 +19,6 @@ export const siteConfig = {
   ] satisfies NavItem[],
   /** The rest, in the phone menu and the footer. */
   moreNav: [
-    { label: "Nasıl Çalışır", href: "/#nasil-calisir" },
-    { label: "Demo", href: "/#demo" },
     { label: "İş Birliği", href: "/is-birligi" },
     { label: "SSS", href: "/sss" },
   ] satisfies NavItem[],

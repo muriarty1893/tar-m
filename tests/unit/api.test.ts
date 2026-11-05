@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { POST as waitlistPOST } from "@/app/api/waitlist/route";
 import { POST as partnerPOST } from "@/app/api/partner/route";
 import { POST as questionPOST } from "@/app/api/question/route";
 
@@ -7,16 +6,18 @@ let ipCounter = 0;
 const freshIp = () => `10.0.0.${++ipCounter}`;
 
 const req = (body: unknown, ip = freshIp(), raw?: string) =>
-  new Request("http://localhost/api/waitlist", {
+  new Request("http://localhost/api/question", {
     method: "POST",
     headers: { "content-type": "application/json", "x-forwarded-for": `${ip}, 70.0.0.1` },
     body: raw ?? JSON.stringify(body),
   });
 
-const validWaitlist = (over: Record<string, unknown> = {}) => ({
-  name: "Ayşe Yılmaz",
+// The shared form handling (honeypot, limits, formula escaping, upstream errors) is tested through
+// the question form; every form goes through the same handler (lib/submit.ts).
+const validQuestion = (over: Record<string, unknown> = {}) => ({
+  name: "=Ayşe",
   email: "Ayse@Example.com",
-  city: "=Konya",
+  question: "Buğday ekimi için en uygun ay hangisi?",
   consent: true,
   website: "",
   ...over,
@@ -49,90 +50,90 @@ afterEach(() => {
 
 const sentBody = () => JSON.parse(fetchMock.mock.calls[0][1].body as string);
 
-describe("POST /api/waitlist", () => {
+describe("form submissions (POST /api/question)", () => {
   it("forwards a valid submission once and returns ok", async () => {
-    const res = await waitlistPOST(req(validWaitlist()));
+    const res = await questionPOST(req(validQuestion()));
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ ok: true });
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock.mock.calls[0][0]).toBe("https://script.example/exec");
     const body = sentBody();
-    expect(body).toMatchObject({ sheet: "waitlist", secret: "s3cret", email: "ayse@example.com", name: "Ayşe Yılmaz" });
+    expect(body).toMatchObject({ sheet: "question", secret: "s3cret", email: "ayse@example.com" });
     expect(body.submittedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     expect(body.website).toBeUndefined();
     expect(fetchMock.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
   });
 
   it("neutralises spreadsheet formulas before forwarding", async () => {
-    await waitlistPOST(req(validWaitlist()));
-    expect(sentBody().city).toBe("'=Konya");
+    await questionPOST(req(validQuestion()));
+    expect(sentBody().name).toBe("'=Ayşe");
   });
 
   it("returns fake success without forwarding when the honeypot is filled", async () => {
-    const res = await waitlistPOST(req(validWaitlist({ website: "http://spam" })));
+    const res = await questionPOST(req(validQuestion({ website: "http://spam" })));
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ ok: true });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("returns 400 for an invalid body", async () => {
-    const res = await waitlistPOST(req(validWaitlist({ consent: false })));
+    const res = await questionPOST(req(validQuestion({ consent: false })));
     expect(res.status).toBe(400);
     expect(await res.json()).toMatchObject({ ok: false, error: "validation" });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("returns 400 for malformed JSON", async () => {
-    const res = await waitlistPOST(req(null, freshIp(), "{not json"));
+    const res = await questionPOST(req(null, freshIp(), "{not json"));
     expect(res.status).toBe(400);
   });
 
   it("returns 400 for an oversized body", async () => {
-    const res = await waitlistPOST(req(validWaitlist({ crop: "x".repeat(20_000) })));
+    const res = await questionPOST(req(validQuestion({ name: "x".repeat(20_000) })));
     expect(res.status).toBe(400);
   });
 
   it("allows 20 requests per IP (a shared cooperative Wi-Fi) and returns 429 on the 21st", async () => {
     const ip = freshIp();
     for (let i = 0; i < 20; i++) {
-      expect((await waitlistPOST(req(validWaitlist(), ip))).status).toBe(200);
+      expect((await questionPOST(req(validQuestion(), ip))).status).toBe(200);
     }
-    const res = await waitlistPOST(req(validWaitlist(), ip));
+    const res = await questionPOST(req(validQuestion(), ip));
     expect(res.status).toBe(429);
     expect(await res.json()).toEqual({ ok: false, error: "rate" });
   });
 
   it("returns 502 when the upstream returns 500", async () => {
     fetchMock.mockResolvedValueOnce(new Response("boom", { status: 500 }));
-    const res = await waitlistPOST(req(validWaitlist()));
+    const res = await questionPOST(req(validQuestion()));
     expect(res.status).toBe(502);
     expect(await res.json()).toEqual({ ok: false, error: "upstream" });
   });
 
   it("returns 502 when the upstream times out", async () => {
     fetchMock.mockRejectedValueOnce(new DOMException("The operation timed out.", "TimeoutError"));
-    expect((await waitlistPOST(req(validWaitlist()))).status).toBe(502);
+    expect((await questionPOST(req(validQuestion()))).status).toBe(502);
   });
 
   it("returns 502 when the Apps Script reports an error in its body", async () => {
     fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ ok: false }), { status: 200 }));
-    expect((await waitlistPOST(req(validWaitlist()))).status).toBe(502);
+    expect((await questionPOST(req(validQuestion()))).status).toBe(502);
   });
 
   it("returns 502 when the Apps Script answers 200 with an HTML error page", async () => {
     fetchMock.mockResolvedValueOnce(new Response("<html>Script function not found</html>", { status: 200 }));
-    expect((await waitlistPOST(req(validWaitlist()))).status).toBe(502);
+    expect((await questionPOST(req(validQuestion()))).status).toBe(502);
   });
 
   it("returns 502 when APPS_SCRIPT_URL is not configured", async () => {
     vi.stubEnv("APPS_SCRIPT_URL", "");
-    expect((await waitlistPOST(req(validWaitlist()))).status).toBe(502);
+    expect((await questionPOST(req(validQuestion()))).status).toBe(502);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("accepts duplicate email submissions", async () => {
-    expect((await waitlistPOST(req(validWaitlist()))).status).toBe(200);
-    expect((await waitlistPOST(req(validWaitlist()))).status).toBe(200);
+    expect((await questionPOST(req(validQuestion()))).status).toBe(200);
+    expect((await questionPOST(req(validQuestion()))).status).toBe(200);
   });
 });
 
@@ -143,25 +144,22 @@ describe("POST /api/partner", () => {
     expect(sentBody()).toMatchObject({ sheet: "partner", type: "kooperatif" });
   });
 
-  it("rate-limits separately from the waitlist", async () => {
+  it("rate-limits separately from the question form", async () => {
     const ip = freshIp();
-    for (let i = 0; i < 20; i++) await waitlistPOST(req(validWaitlist(), ip));
+    for (let i = 0; i < 20; i++) await questionPOST(req(validQuestion(), ip));
     expect((await partnerPOST(req(validPartner, ip))).status).toBe(200);
   });
 });
 
 describe("POST /api/question", () => {
-  const validQuestion = { email: "hasan@example.com", question: "Uygulama hangi ürünleri tanıyacak?", consent: true, website: "" };
-
-  it("forwards to the question sheet", async () => {
-    const res = await questionPOST(req(validQuestion));
+  it("forwards the question to the question sheet", async () => {
+    const res = await questionPOST(req(validQuestion()));
     expect(res.status).toBe(200);
-    expect(sentBody().sheet).toBe("question");
-    expect(sentBody().question).toBe(validQuestion.question);
+    expect(sentBody().question).toBe(validQuestion().question);
   });
 
   it("returns 400 with a field error for a too-short question", async () => {
-    const res = await questionPOST(req({ ...validQuestion, question: "Neden?" }));
+    const res = await questionPOST(req(validQuestion({ question: "Neden?" })));
     expect(res.status).toBe(400);
     expect((await res.json()).fields.question).toBe("Sorunuz en az 10 karakter olmalı.");
     expect(fetchMock).not.toHaveBeenCalled();

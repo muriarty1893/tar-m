@@ -115,7 +115,9 @@ export function CinematicHero({
       {/* Backdrop: field running to the horizon, washed to white at the top. It runs on below the hero
           through the next section's top padding and fades out there, so no blank band follows the hero. */}
       <div data-cine-backdrop className="hero-backdrop absolute inset-x-0 top-0 -bottom-20 -z-10 sm:-bottom-24">
-        <Image src={background.src} alt={background.alt ?? ""} fill preload sizes="100vw" className="object-cover object-bottom" />
+        {/* Lazy, not preloaded: the hero shows only on wide screens, and a hidden lazy image is never
+            fetched, so phones don't download it. On desktop it is in view at once and loads first. */}
+        <Image src={background.src} alt={background.alt ?? ""} fill loading="lazy" fetchPriority="high" sizes="100vw" className="object-cover object-bottom" />
         <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,var(--background)_0%,var(--background)_8%,color-mix(in_srgb,var(--background)_60%,transparent)_24%,color-mix(in_srgb,var(--background)_20%,transparent)_40%,transparent_60%)]" />
       </div>
       <div aria-hidden="true" className="cine-grain pointer-events-none absolute inset-0 z-50 opacity-[0.05]" />
@@ -146,7 +148,8 @@ export function CinematicHero({
                 src={cardPhoto.src}
                 alt=""
                 fill
-                preload
+                loading="lazy"
+                fetchPriority="high"
                 sizes="(min-width: 768px) 90vw, 94vw"
                 className="object-cover"
                 style={{ objectPosition: cardPhoto.position ?? "50% 70%" }}

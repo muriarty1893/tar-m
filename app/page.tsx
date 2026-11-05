@@ -2,20 +2,34 @@ import Link from "next/link";
 import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { listPublished } from "@/lib/news-data";
 import { Hero } from "@/components/Hero";
-import { HowItWorks } from "@/components/HowItWorks";
 import { HomeTools } from "@/components/HomeTools";
-import { Features } from "@/components/Features";
 import { Section } from "@/components/Section";
-import { DemoShowcase } from "@/components/DemoShowcase";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { NewsCard } from "@/components/NewsCard";
 import { PartnerCta } from "@/components/PartnerCta";
 import { Pricing } from "@/components/Pricing";
-import { WaitlistForm } from "@/components/WaitlistForm";
 import { QuestionSection } from "@/components/QuestionSection";
+import { MobileHome } from "@/components/home/MobileHome";
 import { BlurFade } from "@/components/magicui/blur-fade";
 
-export default async function Home() {
+/**
+ * Two homes in one page: phones and tablets (below 1280 px) get the portal (MobileHome), wide screens
+ * the landing page. CSS picks one; the other is display:none, so its lazy images never load.
+ */
+export default function Home() {
+  return (
+    <>
+      <div className="xl:hidden">
+        <MobileHome />
+      </div>
+      <div className="max-xl:hidden">
+        <DesktopHome />
+      </div>
+    </>
+  );
+}
+
+async function DesktopHome() {
   const latest = (await listPublished()).slice(0, 3);
 
   return (
@@ -24,24 +38,6 @@ export default async function Home() {
       <Hero />
 
       <HomeTools />
-
-      <BlurFade>
-        <HowItWorks />
-      </BlurFade>
-
-      <BlurFade>
-        <Features />
-      </BlurFade>
-
-      <Section
-        id="demo"
-        eyebrow="Canlı demo"
-        title="Uygulamayı deneyin"
-        intro="Mobil uygulamanın nasıl olacağını telefonda deneyin: taramayı başlatın, fotoğrafı çekin, yanıtı görün. Bu bir demo; yanıtlar örnektir, yapay zekâ taraması yakında."
-        className="bg-surface"
-      >
-        <DemoShowcase />
-      </Section>
 
       <Section
         id="hava"
@@ -78,12 +74,6 @@ export default async function Home() {
       </BlurFade>
 
       <QuestionSection />
-
-      <section className="px-4 py-20 sm:py-24">
-        <div className="mx-auto max-w-4xl">
-          <WaitlistForm />
-        </div>
-      </section>
     </>
   );
 }

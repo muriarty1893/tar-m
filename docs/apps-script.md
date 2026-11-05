@@ -1,15 +1,15 @@
 # Connecting the forms to Google Sheets
 
-The waitlist, partner and question forms, and the first-visit "Bizi nereden duydunuz?" question, post to the site's own API routes, which forward
+The partner and question forms, and the first-visit "Bizi nereden duydunuz?" question, post to the site's own API routes, which forward
 each submission to a small Google Apps Script. The script writes it into a
 Google Sheet. This takes about 10 minutes, once.
 
 ## 1. Create the sheet
 
 1. Go to <https://sheets.google.com> and create a blank spreadsheet, e.g. "Çiftçi Destek Kayıtlar".
-2. Rename the first tab to `waitlist` (exactly, lowercase).
-3. Add a second tab named `partner`, a third named `question` (the home page's "Sorunuz mu var?" form)
-   and a fourth named `source` (answers to the welcome question shown on a visitor's first visit).
+2. Name the tabs `partner`, `question` (the "Sorunuz mu var?" form on the home page and /sss) and `source`
+   (answers to the welcome question shown on a visitor's first visit), exactly, lowercase. A `waitlist` tab from
+   the early-access form, which the site no longer has, can stay: it keeps the old sign-ups.
 
 Leave the tabs empty. The script writes the header row on the first submission.
 
@@ -47,7 +47,7 @@ submissions too), then redeploy.
 
 ## 5. Test it
 
-Run `npm run dev`, open <http://localhost:3000/#kayit>, submit the form, and check that a row appears in the `waitlist` tab.
+Run `npm run dev`, open <http://localhost:3000/sss#soru>, submit the question form, and check that a row appears in the `question` tab.
 
 ## Notes
 

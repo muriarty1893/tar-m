@@ -22,7 +22,7 @@ export default function SourcesPage() {
           </h2>
           <ul className="mt-4 text-lg">
             <li>
-              Canlı demodaki telefon:{" "}
+              Ana sayfadaki telefon görseli:{" "}
               <a href={modelCredit.sourceUrl} className={link} rel="noopener">
                 “{modelCredit.title}”, {modelCredit.author}
               </a>{" "}

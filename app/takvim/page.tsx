@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { ToolHeader } from "@/components/tool/ToolHeader";
+import { WeatherTile } from "@/components/home/WeatherTile";
 import { SignInPrompt } from "@/components/tool/SignInPrompt";
 import { TaskForm } from "@/components/farm/TaskForm";
 import { TaskItem } from "@/components/farm/TaskItem";
@@ -22,7 +23,11 @@ export default function CalendarPage({ searchParams }: PageProps<"/takvim">) {
   return (
     <>
       <ToolHeader eyebrow="Planlama" title="Tarım takvimi" intro="Tarladaki işlerinizi gün gün planlayın, yaptıklarınızı işaretleyin. Bir işi tarlanıza bağlarsanız tarla sayfasında da görünür." />
-      <div className="mx-auto max-w-6xl px-4 py-8">
+      <div className="mx-auto max-w-6xl px-3 py-4 sm:px-4 sm:py-8">
+        {/* "Takvim & Hava" on the phone's tab bar: today's weather sits on top of the calendar. */}
+        <div className="mb-4 xl:hidden">
+          <WeatherTile wide />
+        </div>
         <Suspense fallback={<div aria-hidden="true" className="h-[32rem] rounded-2xl bg-muted motion-safe:animate-pulse" />}>
           <Calendar searchParams={searchParams} />
         </Suspense>

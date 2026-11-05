@@ -30,7 +30,7 @@ export default function PrivacyPage() {
 
         <h2>2. İşlenen kişisel veriler</h2>
         <ul>
-          <li>Erken erişim formu: ad soyad, e-posta adresi, il ve yetiştirilen ürün (isteğe bağlı).</li>
+          <li>Erken erişim formu (artık kullanılmıyor; daha önce kaydolanlar için): ad soyad, e-posta adresi, il ve yetiştirilen ürün (isteğe bağlı).</li>
           <li>İş birliği formu: ad soyad, kurum adı, e-posta adresi, telefon (isteğe bağlı), kurum türü ve mesaj.</li>
           <li>
             Hava durumu bölümü: &quot;Konumumu kullan&quot; seçeneğini kullanırsanız konumunuz yalnızca tarayıcınızda en
@@ -46,13 +46,17 @@ export default function PrivacyPage() {
             alıcı ya da satıcılarla mesajlarınız ve teklifleriniz. İlanlar ve satıcı adı herkese açıktır; mesajlar
             yalnızca sohbetin iki tarafına görünür. E-posta adresiniz ve telefonunuz ilanlarda gösterilmez.
           </li>
+          <li>
+            Forum: açtığınız konular, yanıtlarınız, eklediğiniz fotoğraflar ve beğenileriniz; adınız ve kullanıcı adınızla
+            herkese açık görünür. Bildirimleriniz yalnızca size görünür.
+          </li>
           <li>Tarlalarım ve Tarım takvimi: tarla bilgileriniz, masraflarınız ve takvim işleriniz; yalnızca size görünür.</li>
           <li>Teknik veriler: güvenlik amacıyla, form gönderimlerinde IP adresi geçici olarak kullanılır ve saklanmaz.</li>
         </ul>
 
         <h2>3. İşleme amaçları</h2>
         <ul>
-          <li>Uygulama hazır olduğunda sizi bilgilendirmek ve erken erişim daveti göndermek,</li>
+          <li>Daha önce erken erişim listesine kaydolduysanız, mobil uygulama hazır olduğunda sizi bilgilendirmek,</li>
           <li>İş birliği taleplerinize dönüş yapmak,</li>
           <li>Hesabınızı, ilanlarınızı, mesajlarınızı, tarla ve takvim kayıtlarınızı size sunmak,</li>
           <li>Pazar kurallarına aykırı ilanları ve dolandırıcılığı önlemek,</li>
@@ -62,7 +66,7 @@ export default function PrivacyPage() {
         <h2>4. Hukuki sebep</h2>
         <p>
           Kişisel verileriniz, KVKK madde 5/1 kapsamında açık rızanıza ve madde 5/2-f kapsamında meşru menfaatimize
-          dayanarak işlenir. Erken erişim formundaki onay kutusu açık rızanızı ifade eder.
+          dayanarak işlenir. Erken erişim formundaki onay kutusu (form artık kullanılmıyor) açık rızanızı ifade eder.
         </p>
 
         <h2>5. Aktarım</h2>

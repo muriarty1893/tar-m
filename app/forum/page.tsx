@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { ChatsTeardropIcon, CheckCircleIcon, ListIcon, MagnifyingGlassIcon, NotePencilIcon } from "@phosphor-icons/react/dist/ssr";
+import { CheckCircleIcon, NotePencilIcon } from "@phosphor-icons/react/dist/ssr";
 import { ToolHeader } from "@/components/tool/ToolHeader";
-import { TopicList } from "@/components/forum/TopicList";
+import { ForumFeed } from "@/components/forum/ForumFeed";
+import { ForumSearch, Sections, box, boxHeader } from "@/components/forum/ForumSections";
 import { buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { getUserId, signInHref } from "@/lib/auth";
-import { FORUM_CATEGORIES, FORUM_PAGE_SIZE, FORUM_SORTS, forumHref, parseForumQuery, type ForumQuery } from "@/lib/forum";
+import { categoryName, parseForumQuery } from "@/lib/forum";
+import { categoryStats, forumCategories } from "@/lib/forum-categories";
 import { listTopics } from "@/lib/forum-data";
 import { requestNow } from "@/lib/now";
 
@@ -29,9 +30,9 @@ export default function ForumPage({ searchParams }: PageProps<"/forum">) {
           </Suspense>
         }
       />
-      <div className="mx-auto max-w-4xl px-4 py-8">
+      <div className="mx-auto max-w-4xl py-4 sm:px-4 sm:py-8">
         <Suspense fallback={<ForumSkeleton />}>
-          <Topics searchParams={searchParams} />
+          <Forum searchParams={searchParams} />
         </Suspense>
       </div>
     </>
@@ -40,7 +41,7 @@ export default function ForumPage({ searchParams }: PageProps<"/forum">) {
 
 function OpenTopicLink({ href }: { href: string }) {
   return (
-    <Link href={href} className={buttonVariants({ size: "lg", className: "bg-emerald-950 hover:bg-emerald-900" })}>
+    <Link href={href} className={buttonVariants({ className: "max-sm:w-full" })}>
       <NotePencilIcon aria-hidden="true" weight="bold" />
       Konu aç
     </Link>
@@ -52,130 +53,71 @@ async function OpenTopicButton() {
   return <OpenTopicLink href={userId ? "/forum/yeni" : signInHref("/forum/yeni")} />;
 }
 
-async function Topics({ searchParams }: { searchParams: PageProps<"/forum">["searchParams"] }) {
+
+async function Forum({ searchParams }: { searchParams: PageProps<"/forum">["searchParams"] }) {
   const sp = await searchParams;
   const query = parseForumQuery(sp);
-  const { items, total } = await listTopics(query);
-  const now = await requestNow();
-  const pages = Math.max(1, Math.ceil(total / FORUM_PAGE_SIZE));
-  const sortLabel = FORUM_SORTS.find((s) => s.id === query.sirala)?.label ?? "Son açılan";
+  const searching = Boolean(query.q) || query.kategori !== "tumu";
+  const [cats, now] = await Promise.all([forumCategories(), requestNow()]);
 
+  if (searching) {
+    const first = await listTopics(query);
+    const title = query.q ? `“${query.q}” için sonuçlar` : categoryName(cats, query.kategori);
+    return (
+      <div className="space-y-5">
+        <ForumSearch q={query.q} />
+        <section aria-labelledby="sonuclar" className={box}>
+          <h2 id="sonuclar" className={boxHeader}>
+            <span className="truncate">{title}</span>
+            <span className="shrink-0 font-semibold opacity-80">{first.total.toLocaleString("tr-TR")} konu</span>
+          </h2>
+          <ForumFeed
+            initial={first}
+            sort={query.sirala}
+            q={query.q}
+            kategori={query.kategori === "tumu" ? "" : query.kategori}
+            cats={cats}
+            now={now.toISOString()}
+            tabs
+            emptyText="Bu aramayla konu bulunamadı. Başka kelimeler deneyin ya da yeni bir konu açın."
+          />
+        </section>
+        <p className="px-3 sm:px-0">
+          <Link href="/forum" className="font-semibold text-primary underline-offset-4 hover:underline">
+            Forumun ana sayfasına dön
+          </Link>
+        </p>
+      </div>
+    );
+  }
+
+  const [stats, latest] = await Promise.all([categoryStats(), listTopics(query)]);
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {sp.silindi === "1" && (
-        <p role="status" className="flex items-center gap-2 rounded-2xl border border-primary/30 bg-secondary px-4 py-3 font-semibold">
+        <p role="status" className="mx-3 flex items-center gap-2 rounded-xl border border-primary/30 bg-secondary px-4 py-3 font-semibold sm:mx-0">
           <CheckCircleIcon aria-hidden="true" weight="fill" className="size-6 text-primary" />
           Konu silindi.
         </p>
       )}
-
-      <form role="search" aria-label="Forumda ara" action="/forum" className="flex gap-2">
-        {query.kategori !== "tumu" && <input type="hidden" name="kategori" value={query.kategori} />}
-        {query.sirala !== "yeni" && <input type="hidden" name="sirala" value={query.sirala} />}
-        <label htmlFor="forum-ara" className="sr-only">
-          Forumda ara
-        </label>
-        <Input id="forum-ara" name="q" defaultValue={query.q} placeholder="Buğday tohumu, süt verimi, mazot desteği…" className="min-h-12 flex-1" />
-        <button type="submit" className={buttonVariants({ variant: "outline", size: "lg" })}>
-          <MagnifyingGlassIcon aria-hidden="true" weight="bold" />
-          Ara
-        </button>
-      </form>
-
-      <nav aria-label="Konu türleri">
-        <ul className="flex flex-wrap gap-2">
-          {[{ id: "tumu" as const, label: "Tümü" }, ...FORUM_CATEGORIES].map((c) => (
-            <li key={c.id}>
-              <Link
-                href={forumHref(query, { kategori: c.id })}
-                aria-current={query.kategori === c.id ? "page" : undefined}
-                className="inline-flex min-h-11 items-center rounded-full bg-secondary px-4 font-semibold text-secondary-foreground transition-colors hover:bg-[color-mix(in_oklab,var(--secondary),var(--foreground)_8%)] aria-[current=page]:bg-foreground aria-[current=page]:text-background"
-              >
-                {c.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      <section aria-labelledby="konular" className="overflow-hidden rounded-2xl border border-border">
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-700 px-4 py-3 text-white">
-          <h2 id="konular" className="flex items-center gap-2 text-lg font-bold">
-            <ListIcon aria-hidden="true" weight="bold" className="size-5" />
-            {sortLabel}
-          </h2>
-          <nav aria-label="Sıralama" className="flex flex-wrap gap-1">
-            {FORUM_SORTS.map((s) => (
-              <Link
-                key={s.id}
-                href={forumHref(query, { sirala: s.id })}
-                aria-current={query.sirala === s.id ? "page" : undefined}
-                className="inline-flex min-h-10 items-center rounded-full px-3 text-sm font-semibold text-white/85 hover:bg-white/10 aria-[current=page]:bg-white aria-[current=page]:text-slate-900"
-              >
-                {s.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-        {items.length === 0 ? (
-          <EmptyState query={query} />
-        ) : (
-          <TopicList items={items} now={now} framed={false} />
-        )}
+      <ForumSearch />
+      <Sections cats={cats} stats={stats} now={now} />
+      <section aria-labelledby="son-konular" className={box}>
+        <h2 id="son-konular" className={boxHeader}>
+          Konular
+        </h2>
+        <ForumFeed initial={latest} cats={cats} now={now.toISOString()} tabs />
       </section>
-
-      {pages > 1 && (
-        <nav aria-label="Sayfalar" className="flex items-center justify-between gap-3">
-          {query.sayfa > 1 ? (
-            <Link href={forumHref(query, { sayfa: query.sayfa - 1 })} className={buttonVariants({ variant: "outline" })}>
-              Önceki sayfa
-            </Link>
-          ) : (
-            <span />
-          )}
-          <span className="text-muted-foreground">
-            Sayfa {query.sayfa} / {pages}
-          </span>
-          {query.sayfa < pages ? (
-            <Link href={forumHref(query, { sayfa: query.sayfa + 1 })} className={buttonVariants({ variant: "outline" })}>
-              Sonraki sayfa
-            </Link>
-          ) : (
-            <span />
-          )}
-        </nav>
-      )}
-    </div>
-  );
-}
-
-function EmptyState({ query }: { query: ForumQuery }) {
-  const filtered = Boolean(query.q) || query.kategori !== "tumu";
-  return (
-    <div className="bg-card px-6 py-12 text-center">
-      <ChatsTeardropIcon aria-hidden="true" weight="duotone" className="mx-auto size-12 text-primary" />
-      <p className="mx-auto mt-3 max-w-md text-lg">{filtered ? "Bu aramayla konu bulunamadı. Başka kelimeler deneyin ya da yeni bir konu açın." : "Henüz konu yok. İlk soruyu siz sorun!"}</p>
-      <div className="mt-6 flex flex-wrap justify-center gap-3">
-        {filtered && (
-          <Link href="/forum" className={buttonVariants({ variant: "outline" })}>
-            Filtreleri temizle
-          </Link>
-        )}
-        <Link href="/forum/yeni" className={buttonVariants({})}>
-          Konu aç
-        </Link>
-      </div>
     </div>
   );
 }
 
 function ForumSkeleton() {
   return (
-    <div className="space-y-4" aria-hidden="true">
-      <div className="h-12 animate-pulse rounded-2xl bg-muted" />
-      <div className="h-11 w-2/3 animate-pulse rounded-full bg-muted" />
+    <div className="space-y-4 px-3 sm:px-0" aria-hidden="true">
+      <div className="h-12 animate-pulse rounded-xl bg-muted" />
       {[0, 1, 2, 3].map((i) => (
-        <div key={i} className="h-24 animate-pulse rounded-2xl bg-muted" />
+        <div key={i} className="h-20 animate-pulse rounded-xl bg-muted" />
       ))}
     </div>
   );

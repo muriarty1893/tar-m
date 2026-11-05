@@ -46,19 +46,19 @@ Measured locally against `npm run build && npm start` with Lighthouse 12.8.2, mo
 | `/is-birligi` | 97 | 100 | 100 | 100 |
 | `/sss` | 93–94 | 100 | 100 | 100 |
 
-The 3D phone showcase (added later) loads three.js and the 1 MB model only when the demo nears the viewport, so the home page's first load is unchanged; measured against the build before it in alternating runs, both landed in the same 79–94 band on this laptop. After the hero switched to the phone render (lazy-loaded, about 60 KB), runs gave 71–91 with a dev server running alongside; re-measure on a quiet machine or on the Vercel preview before launch.
+These figures predate the November 2026 rebuild (the portal home on phones, the demo removed); re-measure on a quiet machine or on the Vercel preview before launch. Phones and tablets get the portal home and never load the wide-screen hero's images (they are lazy and hidden below 1280 px).
 
-What keeps the home page fast: the scroll-reveal is CSS (no animation library on load), Motion loads only when a demo answer appears, the mobile menu's Sheet code loads on first tap, form validation (zod) loads on first submit, and only the heading font is preloaded.
+What keeps the home page fast: the scroll-reveal is CSS (no animation library on load), the hero's intro (GSAP) runs only on wide screens, the Hızlı menü's Sheet code loads on first tap, form validation (zod) loads on first submit, and only the heading font is preloaded.
 
 ## Pre-launch checklist
 
 - [ ] **Accounts and Pazar**: see [accounts-and-market.md](accounts-and-market.md): Clerk production instance (needs your own domain), sign-up name fields, `ADMIN_USER_IDS`.
 
-- [ ] **Agronomist review** of the demo answers (`data/demo-scenarios.ts`), weather hint thresholds (`lib/weather.ts` → `farmingHint`), sample news, and FAQ answers.
+- [ ] **Agronomist review** of the weather hint thresholds (`lib/weather.ts` → `farmingHint`), sample news, and FAQ answers.
 - [ ] **KVKK legal review** of `/gizlilik`: fill in the data controller, retention period, and the basis for transferring data abroad (Google Sheets); then remove the "Taslak" note.
 - [ ] **Name check**: trademark search for "Çiftçi Destek" (TÜRKPATENT) and domain availability.
-- [ ] **Replace placeholders**: see [placeholders.md](placeholders.md) (logo, demo images, contact e-mail, favicon).
+- [ ] **Replace placeholders**: see [placeholders.md](placeholders.md) (logo, contact e-mail, favicon).
 - [ ] **Replace sample news** (marked "Örnek haber") with real posts on `/yonetim/haberler`, or delete them; the site handles zero articles.
 - [ ] **Forms**: submit both forms on the live site and confirm rows appear in the sheet.
-- [ ] **Real-phone test**: open the live URL on an actual Android phone (and an iPhone if possible) over mobile data; try the menu, demo, weather, and the waitlist form.
+- [ ] **Real-phone test**: open the live URL on an actual Android phone (and an iPhone if possible) over mobile data; try the tab bar and Hızlı menü, the forum (open a topic, reply), Pazar, the weather and the question form on /sss.
 - [ ] **Share preview**: paste the live URL into WhatsApp and check the preview image and title.

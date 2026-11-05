@@ -1,13 +1,14 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// The home page has two forms (waitlist and questions); scope waitlist steps to its card.
-const kayit = (page: Page) => page.locator("#kayit");
+// The question form ("Cevabını bulamadınız mı?") at the bottom of /sss: on every screen size. The
+// shared form handling (errors, rate limits, upstream failures) is tested through it.
+const soru = (page: Page) => page.locator("#soru form");
 
-async function fillWaitlist(page: Page) {
-  await kayit(page).getByLabel("Ad soyad").fill("Şükrü Çağlar");
-  await kayit(page).getByLabel("E-posta").fill("sukru@example.com");
-  await kayit(page).getByLabel("İl").fill("Konya");
-  await kayit(page).getByRole("checkbox").check();
+async function fillQuestion(page: Page) {
+  await soru(page).getByLabel("Adınız").fill("Şükrü Çağlar");
+  await soru(page).getByLabel("E-posta", { exact: true }).fill("sukru@example.com");
+  await soru(page).getByLabel("Sorunuz").fill("Buğday ekimi için en uygun ay hangisi?");
+  await soru(page).getByRole("checkbox").check();
 }
 
 test("validation library is not part of the initial page load", async ({ page }) => {
@@ -21,75 +22,75 @@ test("validation library is not part of the initial page load", async ({ page })
   expect(scripts.some((s) => s.includes("ZodError"))).toBe(false);
 });
 
-test("waitlist submits and shows the thank-you message", async ({ page }) => {
+test("the question form submits and thanks the visitor", async ({ page }) => {
   let sent: Record<string, unknown> | null = null;
-  await page.route("**/api/waitlist", async (route) => {
+  await page.route("**/api/question", async (route) => {
     sent = route.request().postDataJSON();
     await route.fulfill({ status: 200, contentType: "application/json", body: '{"ok":true}' });
   });
-  await page.goto("/#kayit");
-  await fillWaitlist(page);
-  await kayit(page).getByRole("button", { name: "Kaydol" }).click();
-  await expect(page.getByText("Teşekkürler! Sizi bilgilendireceğiz.")).toBeVisible();
-  expect(sent).toMatchObject({ name: "Şükrü Çağlar", email: "sukru@example.com", consent: true, website: "" });
+  await page.goto("/sss#soru");
+  await fillQuestion(page);
+  await soru(page).getByRole("button", { name: "Soruyu gönder" }).click();
+  await expect(page.getByText("Teşekkürler! Sorunuzu aldık.")).toBeVisible();
+  expect(sent).toMatchObject({ name: "Şükrü Çağlar", email: "sukru@example.com", question: "Buğday ekimi için en uygun ay hangisi?", consent: true, website: "" });
 });
 
-test("waitlist upstream failure shows the error and keeps typed values", async ({ page }) => {
-  await page.route("**/api/waitlist", (route) =>
+test("an upstream failure shows the error and keeps the typed values", async ({ page }) => {
+  await page.route("**/api/question", (route) =>
     route.fulfill({ status: 502, contentType: "application/json", body: '{"ok":false,"error":"upstream"}' }),
   );
-  await page.goto("/#kayit");
-  await fillWaitlist(page);
-  await kayit(page).getByRole("button", { name: "Kaydol" }).click();
+  await page.goto("/sss#soru");
+  await fillQuestion(page);
+  await soru(page).getByRole("button", { name: "Soruyu gönder" }).click();
   await expect(page.getByRole("alert").filter({ hasText: "Bir sorun" })).toContainText("Bir sorun oluştu, lütfen tekrar deneyin");
   await expect(page.getByRole("alert").filter({ hasText: "Bir sorun" })).toContainText("iletisim@bereketai.com");
-  await expect(kayit(page).getByLabel("Ad soyad")).toHaveValue("Şükrü Çağlar");
-  await expect(kayit(page).getByLabel("E-posta")).toHaveValue("sukru@example.com");
-  await expect(kayit(page).getByRole("checkbox")).toBeChecked();
+  await expect(soru(page).getByLabel("Adınız")).toHaveValue("Şükrü Çağlar");
+  await expect(soru(page).getByLabel("E-posta", { exact: true })).toHaveValue("sukru@example.com");
+  await expect(soru(page).getByRole("checkbox")).toBeChecked();
 });
 
 test("rate-limited submission explains to wait instead of a generic error", async ({ page }) => {
-  await page.route("**/api/waitlist", (route) =>
+  await page.route("**/api/question", (route) =>
     route.fulfill({ status: 429, contentType: "application/json", body: '{"ok":false,"error":"rate"}' }),
   );
-  await page.goto("/#kayit");
-  await fillWaitlist(page);
-  await kayit(page).getByRole("button", { name: "Kaydol" }).click();
+  await page.goto("/sss#soru");
+  await fillQuestion(page);
+  await soru(page).getByRole("button", { name: "Soruyu gönder" }).click();
   await expect(page.getByRole("alert").filter({ hasText: "Çok fazla deneme" })).toContainText(
     "Çok fazla deneme yapıldı, lütfen birkaç dakika sonra tekrar deneyin.",
   );
-  await expect(kayit(page).getByLabel("E-posta")).toHaveValue("sukru@example.com");
+  await expect(soru(page).getByLabel("E-posta", { exact: true })).toHaveValue("sukru@example.com");
 });
 
 test("real API route with an unreachable Apps Script shows the error (no mocks)", async ({ page }) => {
   // playwright.config points APPS_SCRIPT_URL at a closed port.
-  await page.goto("/#kayit");
-  await fillWaitlist(page);
-  await kayit(page).getByRole("button", { name: "Kaydol" }).click();
+  await page.goto("/sss#soru");
+  await fillQuestion(page);
+  await soru(page).getByRole("button", { name: "Soruyu gönder" }).click();
   await expect(page.getByRole("alert").filter({ hasText: "Bir sorun" })).toBeVisible();
-  await expect(kayit(page).getByLabel("E-posta")).toHaveValue("sukru@example.com");
+  await expect(soru(page).getByLabel("E-posta", { exact: true })).toHaveValue("sukru@example.com");
 });
 
-test("waitlist shows Turkish field errors without calling the API", async ({ page }) => {
+test("the question form shows Turkish field errors without calling the API", async ({ page }) => {
   let called = false;
-  await page.route("**/api/waitlist", (route) => {
+  await page.route("**/api/question", (route) => {
     called = true;
     return route.fulfill({ status: 200, body: '{"ok":true}' });
   });
-  await page.goto("/#kayit");
-  await kayit(page).getByLabel("Ad soyad").fill("   ");
-  await kayit(page).getByLabel("E-posta").fill("yanlis@");
-  await kayit(page).getByRole("button", { name: "Kaydol" }).click();
-  await expect(page.getByText("Ad soyad en az 2 karakter olmalı.")).toBeVisible();
-  await expect(page.getByText("Geçerli bir e-posta adresi girin.")).toBeVisible();
-  await expect(page.getByText("Devam etmek için KVKK onayı gerekli.")).toBeVisible();
-  await expect(kayit(page).getByLabel("Ad soyad")).toHaveAttribute("aria-invalid", "true");
+  await page.goto("/sss#soru");
+  await soru(page).getByLabel("E-posta", { exact: true }).fill("yanlis@");
+  await soru(page).getByLabel("Sorunuz").fill("Neden?");
+  await soru(page).getByRole("button", { name: "Soruyu gönder" }).click();
+  await expect(soru(page).getByText("Geçerli bir e-posta adresi girin.")).toBeVisible();
+  await expect(soru(page).getByText("Sorunuz en az 10 karakter olmalı.")).toBeVisible();
+  await expect(soru(page).getByText("Devam etmek için KVKK onayı gerekli.")).toBeVisible();
+  await expect(soru(page).getByLabel("Sorunuz")).toHaveAttribute("aria-invalid", "true");
   expect(called).toBe(false);
 });
 
 test("consent label links to the privacy page", async ({ page }) => {
-  await page.goto("/#kayit");
-  await expect(kayit(page).getByRole("link", { name: "KVKK Aydınlatma Metni" })).toHaveAttribute("href", "/gizlilik");
+  await page.goto("/sss#soru");
+  await expect(soru(page).getByRole("link", { name: "KVKK Aydınlatma Metni" })).toHaveAttribute("href", "/gizlilik");
 });
 
 test("partner form submits", async ({ page }) => {
@@ -109,7 +110,8 @@ test("partner form submits", async ({ page }) => {
   expect(sent).toMatchObject({ type: "kooperatif", organization: "Konya Tarım Kooperatifi" });
 });
 
-test("the home question form sends a question and thanks the visitor", async ({ page }) => {
+test("on wide screens, the home page's question form sends a question too", async ({ page, isMobile }) => {
+  test.skip(isMobile, "phones get the portal home; the form is on /sss");
   let sent: Record<string, unknown> | null = null;
   await page.route("**/api/question", async (route) => {
     sent = route.request().postDataJSON();
@@ -118,19 +120,9 @@ test("the home question form sends a question and thanks the visitor", async ({ 
   await page.goto("/#sorular");
   const form = page.locator("#sorular form");
   await form.getByLabel("E-posta", { exact: true }).fill("hasan@example.com");
-  await form.getByLabel("Sorunuz").fill("Uygulama sera domatesinde de çalışacak mı?");
+  await form.getByLabel("Sorunuz").fill("Forumda fotoğraf nasıl eklenir?");
   await form.getByRole("checkbox").check();
   await form.getByRole("button", { name: "Soruyu gönder" }).click();
   await expect(page.getByText("Teşekkürler! Sorunuzu aldık.")).toBeVisible();
-  expect(sent).toMatchObject({ email: "hasan@example.com", question: "Uygulama sera domatesinde de çalışacak mı?", consent: true });
-});
-
-test("the home question form explains a too-short question next to the field", async ({ page }) => {
-  await page.goto("/#sorular");
-  const form = page.locator("#sorular form");
-  await form.getByLabel("E-posta", { exact: true }).fill("hasan@example.com");
-  await form.getByLabel("Sorunuz").fill("Neden?");
-  await form.getByRole("button", { name: "Soruyu gönder" }).click();
-  await expect(form.getByText("Sorunuz en az 10 karakter olmalı.")).toBeVisible();
-  await expect(form.getByLabel("Sorunuz")).toHaveAttribute("aria-invalid", "true");
+  expect(sent).toMatchObject({ email: "hasan@example.com", question: "Forumda fotoğraf nasıl eklenir?", consent: true });
 });

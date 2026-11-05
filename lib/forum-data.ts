@@ -1,6 +1,6 @@
 import "server-only";
 import { iso, isUuid, sql, str, type Row } from "./db";
-import { FORUM_PAGE_SIZE, HANDLE_RE, type ForumCategory, type ForumQuery } from "./forum";
+import { FORUM_PAGE_SIZE, HANDLE_RE, type ForumQuery } from "./forum";
 import { fold } from "@/data/demo-market";
 
 /** Reads for the forum. Writes are in lib/services/forum.ts. */
@@ -8,7 +8,8 @@ import { fold } from "@/data/demo-market";
 export type TopicCard = {
   id: string;
   title: string;
-  category: ForumCategory;
+  /** A category id (lib/forum-categories.ts); the label comes from the category list. */
+  category: string;
   excerpt: string;
   authorId: string;
   authorName: string;
@@ -21,6 +22,8 @@ export type TopicCard = {
   /** The first photo, for the list. */
   photo: string | null;
   photoCount: number;
+  /** When the author or an admin last changed it. */
+  editedAt: string | null;
 };
 
 const EXCERPT = 160;
@@ -31,7 +34,7 @@ const toCard = (r: Row): TopicCard => {
   return {
     id: str(r.id),
     title: str(r.title),
-    category: str(r.category) as ForumCategory,
+    category: str(r.category),
     excerpt: body.length > EXCERPT ? `${body.slice(0, EXCERPT - 1).trimEnd()}…` : body,
     authorId: str(r.author_id),
     authorName: str(r.author_name) || "Kullanıcı",
@@ -42,6 +45,7 @@ const toCard = (r: Row): TopicCard => {
     lastReplyAt: r.last_reply_at ? iso(r.last_reply_at) : null,
     photo: photos[0] ?? null,
     photoCount: photos.length,
+    editedAt: r.edited_at ? iso(r.edited_at) : null,
   };
 };
 
@@ -54,7 +58,11 @@ export async function listTopics(q: ForumQuery, authorId?: string): Promise<{ it
   };
   const where: string[] = ["true"];
   if (authorId) where.push(`t.author_id = ${p(authorId)}`);
-  if (q.kategori !== "tumu") where.push(`t.category = ${p(q.kategori)}`);
+  // A section brings its sub-categories' topics with it.
+  if (q.kategori !== "tumu") {
+    const k = p(q.kategori);
+    where.push(`t.category in (select id from forum_categories where id = ${k} or parent_id = ${k})`);
+  }
   const words = fold(q.q).split(/\s+/).filter(Boolean).slice(0, 6);
   for (const w of words) where.push(`t.search_text like ${p(`%${w.replace(/[\\%_]/g, (c) => `\\${c}`)}%`)}`);
   const order =
@@ -64,7 +72,7 @@ export async function listTopics(q: ForumQuery, authorId?: string): Promise<{ it
         ? "t.reply_count desc, coalesce(t.last_reply_at, t.created_at) desc"
         : "t.created_at desc";
   const rows = await sql().query(
-    `select t.id, t.title, t.category, t.body, t.photos, t.author_id, t.created_at, t.reply_count, t.like_count, t.last_reply_at,
+    `select t.id, t.title, t.category, t.body, t.photos, t.author_id, t.created_at, t.reply_count, t.like_count, t.last_reply_at, t.edited_at,
        p.name as author_name, p.handle as author_handle, count(*) over () as total
      from forum_topics t join profiles p on p.user_id = t.author_id
      where ${where.join(" and ")}
@@ -91,6 +99,7 @@ export type ForumReply = {
   reported: boolean;
   /** "Bu yanıt silindi": kept because others answered it; no text, photos or author. */
   deleted: boolean;
+  editedAt: string | null;
 };
 
 export type TopicDetail = TopicCard & {
@@ -115,7 +124,7 @@ export async function getTopic(id: string, userId: string | null): Promise<Topic
   const t = rows[0];
   if (!t) return null;
   const replies = await sql()`
-    select r.id, r.parent_id, r.body, r.photos, r.author_id, r.created_at, r.like_count, r.deleted_at,
+    select r.id, r.parent_id, r.body, r.photos, r.author_id, r.created_at, r.like_count, r.deleted_at, r.edited_at,
       p.name as author_name, p.handle as author_handle,
       exists (select 1 from forum_reports f where f.reply_id = r.id and f.reporter_id = ${userId}) as reported,
       exists (select 1 from forum_likes l where l.reply_id = r.id and l.user_id = ${userId}) as liked
@@ -146,6 +155,7 @@ export async function getTopic(id: string, userId: string | null): Promise<Topic
         mine: !deleted && userId !== null && r.author_id === userId,
         reported: r.reported === true,
         deleted,
+        editedAt: !deleted && r.edited_at ? iso(r.edited_at) : null,
       };
     }),
   };

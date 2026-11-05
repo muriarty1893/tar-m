@@ -14,8 +14,8 @@ const blocks = [
     title: "Sorun",
     icon: WarningCircleIcon,
     points: [
-      "Hastalık ve zararlılar çoğu zaman gözle fark edildiğinde yayılmış oluyor; geç kalınan her gün verim kaybı demek.",
-      "Çiftçinin bir uzmana hızlıca ulaşması her zaman mümkün değil, özellikle kırsal bölgelerde.",
+      "Çiftçinin bir uzmana ya da deneyimli bir komşuya hızlıca ulaşması her zaman mümkün değil, özellikle kırsal bölgelerde.",
+      "Ürününü satmak ya da alet, tohum almak isteyen çiftçi için güvenilir ve kolay bir buluşma yeri yok.",
       "Mevcut dijital araçların çoğu Türkçe değil ya da çiftçinin günlük kullanımına uygun tasarlanmamış.",
     ],
   },
@@ -23,10 +23,10 @@ const blocks = [
     title: "Çözümümüz",
     icon: LightbulbIcon,
     points: [
-      "Telefonla çekilen bir fotoğraftan hastalık, zararlı ve stres belirtilerini tanıyacak yapay zekâ (geliştiriliyor).",
-      "Sade Türkçe öneriler, hasat başarı tahmini ve ile özel hava uyarıları tek uygulamada.",
-      "Uzman desteğinin yerini almak değil, çiftçiyi doğru zamanda doğru uzmana yönlendirmek.",
-      "Bugünden sitede açık: çiftçiden çiftçiye pazar ve mesajlaşma, ile özel hava uyarıları, tarım takvimi, tarla ve masraf takibi.",
+      "Çiftçilerin soru sorup deneyimini paylaştığı, kategorilere ayrılmış bir forum.",
+      "Çiftçiden çiftçiye pazar: ilan, site içi mesajlaşma ve teklif.",
+      "İle özel hava durumu ve uyarılar, borsa fiyatları, tarım takvimi, tarla ve masraf takibi tek yerde.",
+      "Telefona göre tasarlandı: tarladayken de tek elle kullanılır.",
     ],
   },
   {
@@ -34,8 +34,8 @@ const blocks = [
     icon: ChartLineUpIcon,
     points: [
       "Tarım, Türkiye ekonomisinin ve kırsal istihdamın temel taşlarından biri; milyonlarca işletme küçük ve orta ölçekli.",
-      "Akıllı telefon kullanımı kırsalda da yaygınlaşıyor; fotoğraf çekmek herkesin bildiği bir işlem.",
-      "İklim değişikliğiyle artan don, kuraklık ve hastalık riskleri erken uyarıya olan ihtiyacı büyütüyor.",
+      "Akıllı telefon kullanımı kırsalda da yaygınlaşıyor.",
+      "Tarıma ürün ve hizmet sunan firmalar için çiftçiye doğrudan ulaşan reklam ve sponsorluk alanları.",
     ],
   },
 ];

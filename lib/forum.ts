@@ -4,7 +4,12 @@
  */
 import { fold } from "@/data/demo-market";
 
-export const FORUM_CATEGORIES = [
+/**
+ * Categories live in the database (`forum_categories`), r10-style: sections and their sub-categories,
+ * added by the admins on /yonetim/forum. These six are the first sections; the mobile app still knows
+ * only them, so they are never renamed away (their ids stay).
+ */
+export const DEFAULT_FORUM_CATEGORIES = [
   { id: "bitki", label: "Bitkisel üretim" },
   { id: "hayvan", label: "Hayvancılık" },
   { id: "makine", label: "Makine ve ekipman" },
@@ -13,9 +18,41 @@ export const FORUM_CATEGORIES = [
   { id: "genel", label: "Genel" },
 ] as const;
 
-export type ForumCategory = (typeof FORUM_CATEGORIES)[number]["id"];
-export const isForumCategory = (s: string): s is ForumCategory => FORUM_CATEGORIES.some((c) => c.id === s);
-export const forumCategoryLabel = (id: string) => FORUM_CATEGORIES.find((c) => c.id === id)?.label ?? "Genel";
+/** A category as the pages and forms need it (`parentId` null: a section). */
+export type ForumCat = { id: string; parentId: string | null; name: string; description: string };
+export type ForumSection = ForumCat & { children: ForumCat[] };
+/** All categories: the sections in order, each with its sub-categories, and every one by id. */
+export type ForumCats = { sections: ForumSection[]; byId: Record<string, ForumCat> };
+
+/** A category id, as in the address: "bugday", "sut-hayvanciligi". */
+export const CATEGORY_ID_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+export const CATEGORY_NAME_MIN = 2;
+export const CATEGORY_NAME_MAX = 60;
+export const CATEGORY_DESCRIPTION_MAX = 160;
+
+/** "Buğday", or "Genel" for a category that is gone. */
+export const categoryName = (cats: ForumCats, id: string) => cats.byId[id]?.name ?? "Genel";
+/** The section a category is in (itself, for a section). */
+export const sectionOf = (cats: ForumCats, id: string) => {
+  const c = cats.byId[id];
+  return c?.parentId ?? c?.id ?? "genel";
+};
+/** "Bitkisel üretim › Buğday" */
+export function categoryPath(cats: ForumCats, id: string) {
+  const c = cats.byId[id];
+  if (!c) return "Genel";
+  const parent = c.parentId ? cats.byId[c.parentId] : null;
+  return parent ? `${parent.name} › ${c.name}` : c.name;
+}
+
+/** The six first sections, for when the database can't be read. */
+export const FALLBACK_FORUM_CATS: ForumCats = (() => {
+  const sections: ForumSection[] = DEFAULT_FORUM_CATEGORIES.map((c) => ({ id: c.id, parentId: null, name: c.label, description: "", children: [] }));
+  return { sections, byId: Object.fromEntries(sections.map((s) => [s.id, s])) };
+})();
+
+/** A category's address. */
+export const categoryHref = (id: string, sirala?: ForumSort) => `/forum/k/${id}${sirala && sirala !== "yeni" ? `?sirala=${sirala}` : ""}`;
 
 export const TOPIC_TITLE_MIN = 5;
 export const TOPIC_TITLE_MAX = 120;
@@ -42,9 +79,10 @@ function photoError(photos: string[]): string | undefined {
 export type TopicInput = { category: string; title: string; body: string; photos: string[] };
 export type TopicErrors = Partial<Record<keyof TopicInput, string>>;
 
-export function validateTopic(t: TopicInput): TopicErrors {
+/** `known`: whether a category exists (the server passes it; the browser only checks one was picked). */
+export function validateTopic(t: TopicInput, known?: (id: string) => boolean): TopicErrors {
   const e: TopicErrors = {};
-  if (!isForumCategory(t.category)) e.category = "Bir konu türü seçin.";
+  if (!t.category || (known && !known(t.category))) e.category = "Bir kategori seçin.";
   const title = t.title.trim();
   if (title.length < TOPIC_TITLE_MIN) e.title = `Başlık en az ${TOPIC_TITLE_MIN} karakter olmalı.`;
   else if (title.length > TOPIC_TITLE_MAX) e.title = `Başlık en fazla ${TOPIC_TITLE_MAX} karakter olabilir.`;
@@ -164,7 +202,8 @@ export const FORUM_SORTS: { id: ForumSort; label: string }[] = [
   { id: "populer", label: "En çok yanıt" },
 ];
 
-export type ForumQuery = { q: string; kategori: ForumCategory | "tumu"; sirala: ForumSort; sayfa: number };
+/** `kategori`: a category id (its sub-categories' topics come with it), or "tumu". */
+export type ForumQuery = { q: string; kategori: string; sirala: ForumSort; sayfa: number };
 
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
 
@@ -175,7 +214,7 @@ export function parseForumQuery(sp: Record<string, string | string[] | undefined
   const sayfa = Number.parseInt(first(sp.sayfa), 10);
   return {
     q: first(sp.q).trim().slice(0, 80),
-    kategori: isForumCategory(kategori) ? kategori : "tumu",
+    kategori: kategori.length <= 40 && CATEGORY_ID_RE.test(kategori) ? kategori : "tumu",
     sirala: FORUM_SORTS.some((s) => s.id === sirala) ? (sirala as ForumSort) : "yeni",
     sayfa: Number.isFinite(sayfa) && sayfa > 1 ? Math.min(sayfa, 100) : 1,
   };

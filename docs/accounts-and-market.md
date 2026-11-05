@@ -1,8 +1,8 @@
 # Accounts, Pazar, Mesajlar, Takvim and Tarlalarım
 
 The website's tools that work for real, without AI: the farmers' market and its chats, crop prices,
-the farm calendar and fields with expenses. The AI photo scan is **not** on the website: the 3D
-phone on the home page stays a scripted demo, and the copy calls the scan "yakında".
+the farm calendar and fields with expenses. The AI photo scan is **not** on the website, and since
+November 2026 the copy doesn't mention it (the scripted demo was removed).
 
 ## Pages
 

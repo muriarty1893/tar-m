@@ -9,6 +9,15 @@ import { NEWS_TAG } from "@/lib/news-data";
 import { renderMarkdown, type ArticleErrors, type ArticleInput } from "@/lib/news";
 import { deleteArticleFor, moderateFor, saveArticleFor } from "@/lib/services/admin";
 import { moderateForumFor } from "@/lib/services/forum";
+import {
+  FORUM_CATS_TAG,
+  createCategoryFor,
+  deleteCategoryFor,
+  moveCategoryFor,
+  updateCategoryFor,
+  type CategoryErrors,
+  type CategoryInput,
+} from "@/lib/forum-categories";
 
 /** Every action re-checks the admin itself: a server action can be called directly. */
 async function adminId() {
@@ -55,4 +64,46 @@ export async function deleteArticle(id: string) {
 export async function previewMarkdown(markdown: string): Promise<string> {
   if (!(await adminId())) return "";
   return renderMarkdown(String(markdown ?? "").slice(0, 50_000));
+}
+
+// ---------------------------------------------------------------- Forum categories (/yonetim/forum)
+
+export type CategoryResult = { errors?: CategoryErrors };
+
+const notAdmin: CategoryResult = { errors: { form: "Bu işlem için yönetici olmanız gerekiyor." } };
+
+/** A new section (no `parentId`) or a sub-category under one. */
+export async function createForumCategory(raw: CategoryInput): Promise<CategoryResult> {
+  if (!(await adminId())) return notAdmin;
+  const errors = await createCategoryFor(raw);
+  if (errors) return { errors };
+  updateTag(FORUM_CATS_TAG);
+  refresh();
+  return {};
+}
+
+export async function updateForumCategory(id: string, raw: CategoryInput): Promise<CategoryResult> {
+  if (!(await adminId())) return notAdmin;
+  const errors = await updateCategoryFor(String(id), raw);
+  if (errors) return { errors };
+  updateTag(FORUM_CATS_TAG);
+  refresh();
+  return {};
+}
+
+export async function moveForumCategory(id: string, direction: "up" | "down") {
+  if (!(await adminId())) return;
+  await moveCategoryFor(String(id), direction === "up" ? "up" : "down");
+  updateTag(FORUM_CATS_TAG);
+  refresh();
+}
+
+/** Deletes a category; its topics move to `moveTo` first. */
+export async function deleteForumCategory(id: string, moveTo: string): Promise<{ error?: string }> {
+  if (!(await adminId())) return { error: "Bu işlem için yönetici olmanız gerekiyor." };
+  const error = await deleteCategoryFor(String(id), String(moveTo ?? ""));
+  if (error) return { error };
+  updateTag(FORUM_CATS_TAG);
+  refresh();
+  return {};
 }

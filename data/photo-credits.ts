@@ -59,7 +59,7 @@ export const photoCredits: PhotoCredit[] = [
   pageHeroPhoto,
 ];
 
-/** The 3D phone in the demo (CC BY 4.0, credit required; listed on /kaynaklar). */
+/** The 3D phone the home hero's phone picture was rendered from (CC BY 4.0, credit required; listed on /kaynaklar). */
 export const modelCredit = {
   title: "iPhone 17 Pro",
   author: "Ranguel",
