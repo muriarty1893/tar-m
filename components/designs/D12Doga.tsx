@@ -72,49 +72,45 @@ export function D12Doga() {
           Forumda ve Pazar’da ara…
         </div>
 
-        {/* Weather: a sky-blue leaf with the sun in a blob. */}
-        <div className={`relative overflow-hidden rounded-[40px_14px_40px_14px] p-5 ${SHADOW}`} style={{ background: `linear-gradient(160deg, ${C.sky} 0%, #eef7e6 100%)` }}>
-          <svg aria-hidden="true" viewBox="0 0 200 200" className="absolute -right-10 -top-10 size-44">
-            <path fill="#fff4c9" d={BLOB} transform="translate(100 100)" />
-          </svg>
-          <SunIcon weight="fill" className="absolute right-6 top-6 size-14 text-[#e0a100]" />
-          <p className="text-[13px] font-semibold uppercase tracking-[0.12em]" style={{ color: C.muted }}>{WEATHER.place} · bugün</p>
-          <p className={`${serif} mt-1 text-[56px] font-semibold leading-none`} style={{ color: C.deep }}>{WEATHER.temp}°</p>
-          <p className="mt-1 text-[15px] font-medium">{WEATHER.sky} · {WEATHER.min}° / {WEATHER.max}°</p>
-          <div className="mt-3 flex flex-wrap gap-2 text-[13px] font-semibold">
-            <span className="flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5" style={{ color: C.forest }}>
-              <LeafIcon weight="fill" className="size-4" /> {WEATHER.hint}
-            </span>
-            <span className="flex items-center gap-1 rounded-full bg-white/60 px-3 py-1.5"><DropIcon weight="fill" className="size-4 text-[#2b7bb9]" /> %{WEATHER.rain}</span>
-            <span className="flex items-center gap-1 rounded-full bg-white/60 px-3 py-1.5"><WindIcon weight="bold" className="size-4" /> {WEATHER.wind} km/s</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-[1.25fr_1fr] gap-3">
-          <div className={`bg-white/90 p-3.5 ${LEAF} ${SHADOW}`}>
-            <div className="flex items-center gap-3">
-              <Image src={MARKET.newest.photo} alt="" width={120} height={120} className={`size-14 shrink-0 object-cover ${PEBBLE[0]}`} />
-              <div className="min-w-0">
-                <p className={`${serif} text-[24px] font-bold leading-none`} style={{ color: C.earth }}>{MARKET.count}</p>
-                <p className="text-[12.5px] font-semibold leading-tight" style={{ color: C.muted }}>ilan<br />+{MARKET.today} bugün</p>
-              </div>
-            </div>
-            <p className="mt-2.5 line-clamp-1 text-[13.5px] font-semibold">{MARKET.newest.title}</p>
-            <p className="text-[12.5px]" style={{ color: C.muted }}>{MARKET.newest.price} / {MARKET.newest.unit}</p>
-          </div>
-          <div className={`flex flex-col justify-between rounded-[8px_28px_8px_28px] border-2 border-dashed p-3.5`} style={{ borderColor: "#c9a77f", background: "#fbf3e4" }}>
-            <MegaphoneIcon weight="duotone" className="size-7" style={{ color: C.earth }} />
-            <p className="text-[14px] font-bold leading-snug" style={{ color: C.earth }}>Reklam vermek için</p>
-            <p className="text-[12.5px] font-semibold underline underline-offset-2" style={{ color: C.earth }}>İletişime geçin</p>
-          </div>
-        </div>
-
         <div className={`relative flex items-center gap-3 overflow-hidden rounded-[14px_40px_14px_40px] p-4 text-white ${SHADOW}`} style={{ background: `linear-gradient(120deg, ${C.forest}, ${C.deep})` }}>
           <span className={`flex size-12 shrink-0 items-center justify-center bg-white/15 ${PEBBLE[1]}`}><DropIcon weight="fill" className="size-6 text-[#bfe6ff]" /></span>
           <div className="min-w-0">
             <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/70">Sponsor · örnek</p>
             <p className={`${serif} text-[19px] font-bold leading-tight`}>{SPONSOR.name}</p>
             <p className="text-[13px] text-white/85">{SPONSOR.tagline}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 rounded-[8px_28px_8px_28px] border-2 border-dashed px-4 py-3" style={{ borderColor: "#c9a77f", background: "#fbf3e4", color: C.earth }}>
+          <MegaphoneIcon weight="duotone" className="size-7 shrink-0" />
+          <p className="flex-1 text-[14.5px] font-bold leading-snug">Reklam vermek için</p>
+          <p className="text-[13px] font-semibold underline underline-offset-2">İletişime geçin</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          {/* Weather: a sky-blue leaf with the sun in a blob. */}
+          <div className={`relative overflow-hidden rounded-[32px_10px_32px_10px] p-4 ${SHADOW}`} style={{ background: `linear-gradient(160deg, ${C.sky} 0%, #eef7e6 100%)` }}>
+            <svg aria-hidden="true" viewBox="0 0 200 200" className="absolute -right-12 -top-12 size-32">
+              <path fill="#fff4c9" d={BLOB} transform="translate(100 100)" />
+            </svg>
+            <SunIcon weight="fill" className="absolute right-3 top-3 size-9 text-[#e0a100]" />
+            <p className="text-[12px] font-semibold uppercase tracking-[0.12em]" style={{ color: C.muted }}>{WEATHER.place}</p>
+            <p className={`${serif} mt-1 text-[44px] font-semibold leading-none`} style={{ color: C.deep }}>{WEATHER.temp}°</p>
+            <p className="mt-1 text-[13.5px] font-medium">{WEATHER.sky} · {WEATHER.min}°/{WEATHER.max}°</p>
+            <p className="mt-2 flex items-center gap-1 rounded-full bg-white/80 px-2.5 py-1 text-[12px] font-semibold" style={{ color: C.forest }}>
+              <LeafIcon weight="fill" className="size-3.5 shrink-0" /> {WEATHER.hint}
+            </p>
+            <p className="mt-1.5 flex gap-2.5 text-[12px] font-semibold" style={{ color: C.muted }}>
+              <span className="flex items-center gap-0.5"><DropIcon weight="fill" className="size-3.5 text-[#2b7bb9]" />%{WEATHER.rain}</span>
+              <span className="flex items-center gap-0.5"><WindIcon weight="bold" className="size-3.5" />{WEATHER.wind} km/s</span>
+            </p>
+          </div>
+          <div className={`bg-white/90 p-4 ${LEAF} ${SHADOW}`}>
+            <Image src={MARKET.newest.photo} alt="" width={140} height={140} className={`size-16 object-cover ${PEBBLE[0]}`} />
+            <p className={`${serif} mt-2 text-[30px] font-bold leading-none`} style={{ color: C.earth }}>{MARKET.count}</p>
+            <p className="text-[12.5px] font-semibold" style={{ color: C.muted }}>ilan · +{MARKET.today} bugün</p>
+            <p className="mt-2 line-clamp-1 text-[13px] font-semibold">{MARKET.newest.title}</p>
+            <p className="text-[12.5px]" style={{ color: C.muted }}>{MARKET.newest.price} / {MARKET.newest.unit}</p>
           </div>
         </div>
 

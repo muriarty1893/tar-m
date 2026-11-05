@@ -25,23 +25,7 @@ export function D08Ios() {
           <MagnifyingGlassIcon weight="bold" className="size-4" /> Ara
         </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <div className="aspect-square rounded-[22px] bg-[linear-gradient(180deg,#4aa3ff,#2b6fd6)] p-3.5 text-white shadow-sm">
-            <p className="text-[15px] font-semibold">{WEATHER.place}</p>
-            <p className="text-[42px] font-light leading-none">{WEATHER.temp}°</p>
-            <SunIcon weight="fill" className="mt-3 size-5 text-[#ffd60a]" />
-            <p className="text-[13px] font-semibold">{WEATHER.sky}</p>
-            <p className="text-[13px] text-white/85">Y:{WEATHER.max}° D:{WEATHER.min}°</p>
-          </div>
-          <div className="flex aspect-square flex-col rounded-[22px] bg-white p-3.5 shadow-sm">
-            <span className="flex size-8 items-center justify-center rounded-[8px] bg-[#ff2d55] text-white"><StorefrontIcon weight="fill" className="size-5" /></span>
-            <p className="mt-auto text-[13px] font-semibold text-[#8e8e93]">PAZAR</p>
-            <p className="text-[34px] font-bold leading-none">{MARKET.count}</p>
-            <p className="text-[13px] text-[#8e8e93]">ilan · {MARKET.today} yeni</p>
-          </div>
-        </div>
-
-        <p className="mt-6 px-4 text-[13px] uppercase text-[#6d6d72]">Sponsorlu · örnek</p>
+        <p className="mt-5 px-4 text-[13px] uppercase text-[#6d6d72]">Sponsorlu · örnek</p>
         <div className="mt-1.5 overflow-hidden rounded-[10px] bg-white">
           <div className="flex items-center gap-3 px-4 py-3">
             <span className="flex size-12 items-center justify-center rounded-[12px] bg-[linear-gradient(135deg,#1d4ed8,#059669)] text-white"><DropIcon weight="fill" className="size-6" /></span>
@@ -57,6 +41,22 @@ export function D08Ios() {
             <span className="flex-1 text-[17px]">Reklam vermek için</span>
             <span className="text-[17px] text-[#8e8e93]">İletişim</span>
             <CaretRightIcon weight="bold" className="size-4 text-[#c4c4c6]" />
+          </div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <div className="aspect-square rounded-[22px] bg-[linear-gradient(180deg,#4aa3ff,#2b6fd6)] p-3.5 text-white shadow-sm">
+            <p className="text-[15px] font-semibold">{WEATHER.place}</p>
+            <p className="text-[42px] font-light leading-none">{WEATHER.temp}°</p>
+            <SunIcon weight="fill" className="mt-3 size-5 text-[#ffd60a]" />
+            <p className="text-[13px] font-semibold">{WEATHER.sky}</p>
+            <p className="text-[13px] text-white/85">Y:{WEATHER.max}° D:{WEATHER.min}°</p>
+          </div>
+          <div className="flex aspect-square flex-col rounded-[22px] bg-white p-3.5 shadow-sm">
+            <span className="flex size-8 items-center justify-center rounded-[8px] bg-[#ff2d55] text-white"><StorefrontIcon weight="fill" className="size-5" /></span>
+            <p className="mt-auto text-[13px] font-semibold text-[#8e8e93]">PAZAR</p>
+            <p className="text-[34px] font-bold leading-none">{MARKET.count}</p>
+            <p className="text-[13px] text-[#8e8e93]">ilan · {MARKET.today} yeni</p>
           </div>
         </div>
 

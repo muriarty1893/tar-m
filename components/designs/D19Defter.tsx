@@ -58,6 +58,11 @@ export function D19Defter() {
           <p className="text-[17px]">{SPONSOR.tagline}</p>
         </div>
 
+        <p className="flex items-center gap-2 text-[17px]">
+          <span className={`${hand} font-bold`} style={{ color: C.red }}>Not:</span> Reklam vermek için
+          <span className="underline decoration-wavy decoration-2 underline-offset-4" style={{ textDecorationColor: C.red }}>bize yazın</span>
+        </p>
+
         <div className="grid grid-cols-2 gap-3.5">
           <div className={`-rotate-1 bg-white p-3 ${WOBBLY} ${INK}`}>
             <p className={`${hand} flex items-center gap-1 text-[16px] font-bold`}><SunIcon weight="light" className="size-6 text-[#d97706]" /> {WEATHER.place}</p>
@@ -79,11 +84,6 @@ export function D19Defter() {
             <p className="text-[15.5px]" style={{ color: C.blue }}>+{MARKET.today} yeni, bugün</p>
           </div>
         </div>
-
-        <p className="flex items-center gap-2 text-[17px]">
-          <span className={`${hand} font-bold`} style={{ color: C.red }}>Not:</span> Reklam vermek için
-          <span className="underline decoration-wavy decoration-2 underline-offset-4" style={{ textDecorationColor: C.red }}>bize yazın</span>
-        </p>
 
         <section>
           <div className="flex items-end justify-between">

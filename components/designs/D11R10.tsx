@@ -18,12 +18,6 @@ export function D11R10() {
   const byId = Object.fromEntries(SECTIONS.map((s) => [s.id, s]));
   return (
     <div id="tasarim-onizleme" className={`${openSans.className} min-h-dvh pb-16 text-[13px]`} style={{ background: R.page, color: R.text }}>
-      {/* The top promotion strip (the sponsor). */}
-      <div className="relative bg-[#1565d8] px-10 py-2 text-center text-[13.5px] font-bold leading-snug text-white">
-        {SPONSOR.name.toLocaleUpperCase("tr")} <span className="rounded bg-[#ffd54f] px-1 text-[10px] text-[#3f4257]">ÖRNEK</span> — {SPONSOR.tagline} →
-        <span className="absolute right-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/20"><XIcon weight="bold" className="size-3.5" /></span>
-      </div>
-
       <header className="flex h-[62px] items-center gap-2.5 border-b bg-white px-2.5" style={{ borderColor: R.line }}>
         <Image src="/brand/logo.webp" alt="" width={84} height={84} className="size-11" />
         <div className="leading-none">
@@ -42,6 +36,19 @@ export function D11R10() {
         </span>
       </header>
 
+      <div className="p-2.5">
+        <div className="flex overflow-hidden rounded border bg-white" style={{ borderColor: R.line }}>
+          <span className="flex flex-1 items-center gap-2 px-3 py-2 text-[#9aa0ad]"><MagnifyingGlassIcon className="size-4" />Forumda ve Pazar’da ara</span>
+          <span className="px-4 py-2 font-bold text-white" style={{ background: R.blue }}>Ara</span>
+        </div>
+      </div>
+
+      {/* The sponsor strip, under the search as on the live home page. */}
+      <div className="relative bg-[#1565d8] px-10 py-2 text-center text-[13.5px] font-bold leading-snug text-white">
+        {SPONSOR.name.toLocaleUpperCase("tr")} <span className="rounded bg-[#ffd54f] px-1 text-[10px] text-[#3f4257]">ÖRNEK</span> — {SPONSOR.tagline} →
+        <span className="absolute right-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/20"><XIcon weight="bold" className="size-3.5" /></span>
+      </div>
+
       {/* Coloured strips, as r10's sponsor rows: the "advertise here" one. */}
       <div className="relative flex items-center gap-2 bg-[#f57c00] px-3 py-2 pr-10 font-bold text-white">
         <span className="text-[15px] font-extrabold italic tracking-tight">REKLAM</span>
@@ -50,10 +57,6 @@ export function D11R10() {
       </div>
 
       <div className="space-y-2.5 p-2.5">
-        <div className="flex overflow-hidden rounded border bg-white" style={{ borderColor: R.line }}>
-          <span className="flex flex-1 items-center gap-2 px-3 py-2 text-[#9aa0ad]"><MagnifyingGlassIcon className="size-4" />Forumda ve Pazar’da ara</span>
-          <span className="px-4 py-2 font-bold text-white" style={{ background: R.blue }}>Ara</span>
-        </div>
 
         <div className="grid grid-cols-2 gap-2.5">
           {[

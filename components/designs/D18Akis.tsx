@@ -74,7 +74,6 @@ export function D18Akis() {
       <header className="sticky top-0 z-10 flex h-14 items-center gap-1 border-b bg-white/95 px-3 backdrop-blur" style={{ borderColor: C.line }}>
         <Image src="/brand/logo.webp" alt="" width={56} height={56} className="size-8" />
         <p className={`${head} ml-1.5 flex-1 text-[21px] font-bold tracking-tight`}>{siteConfig.name}</p>
-        <span className="flex size-11 items-center justify-center"><MagnifyingGlassIcon weight="bold" className="size-6" /></span>
         {[HeartIcon, ChatsCircleIcon].map((Icon, i) => (
           <span key={i} className="relative flex size-11 items-center justify-center">
             <Icon weight="bold" className="size-6" />
@@ -82,6 +81,52 @@ export function D18Akis() {
           </span>
         ))}
       </header>
+
+      <div className="px-4 pt-3">
+        <div className="flex h-10 items-center gap-2 rounded-xl bg-[#f1f5f9] px-3 text-[14.5px]" style={{ color: C.muted }}>
+          <MagnifyingGlassIcon weight="bold" className="size-[18px]" />
+          Forumda ve Pazar’da ara
+        </div>
+      </div>
+
+      {/* Sponsored post, first under the top bar as on the live home page. */}
+      <article className="border-b py-3" style={{ borderColor: C.line }}>
+        <div className="flex items-center gap-2.5 px-4">
+          <span className="flex size-10 items-center justify-center rounded-full bg-[#e0f2fe] text-[13px] font-bold text-[#0369a1]">SU</span>
+          <div className="flex-1 leading-tight">
+            <p className="text-[14.5px] font-semibold">{SPONSOR.name}</p>
+            <p className="text-[12.5px]" style={{ color: C.muted }}>Sponsorlu · örnek</p>
+          </div>
+          <span className="rounded-lg px-3 py-2 text-[13px] font-bold text-white" style={{ background: C.text }}>İncele</span>
+        </div>
+        <div className="mx-4 mt-2.5 flex h-24 items-end rounded-2xl bg-gradient-to-br from-[#0ea5e9] via-[#0284c7] to-[#065f46] p-4 text-white">
+          <p className={`${head} text-[20px] font-bold leading-tight`}>{SPONSOR.tagline}</p>
+        </div>
+      </article>
+
+      <div className="flex items-center gap-3 border-b bg-[#fff7ed] px-4 py-3" style={{ borderColor: C.line }}>
+        <MegaphoneIcon weight="fill" className="size-6 shrink-0 text-[#c2410c]" />
+        <p className="flex-1 text-[14.5px] font-bold text-[#7c2d12]">Reklam vermek için</p>
+        <p className="text-[13px] font-semibold text-[#c2410c]">İletişim →</p>
+      </div>
+
+      {/* Weather and market, side by side. */}
+      <div className="grid grid-cols-2 gap-2.5 border-b px-4 py-3" style={{ borderColor: C.line }}>
+        <div className="flex flex-col rounded-2xl bg-gradient-to-br from-[#38bdf8] to-[#2563eb] p-3 text-white">
+          <SunIcon weight="fill" className="size-7 text-[#fde047]" />
+          <p className={`${head} mt-1 text-[32px] font-bold leading-none`}>{WEATHER.temp}°</p>
+          <p className="text-[12.5px] font-medium">{WEATHER.place} · {WEATHER.sky}</p>
+          <p className="mt-1.5 self-start rounded-full bg-white/25 px-2 py-0.5 text-[11.5px] font-semibold">{WEATHER.hint}</p>
+        </div>
+        <div className="relative min-h-[132px] overflow-hidden rounded-2xl text-white">
+          <Image src={MARKET.newest.photo} alt="" fill sizes="180px" className="object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-black/10" />
+          <div className="absolute inset-x-0 bottom-0 p-3">
+            <p className={`${head} text-[26px] font-bold leading-none`}>{MARKET.count} ilan</p>
+            <p className="text-[12px] font-medium">+{MARKET.today} bugün · Pazar</p>
+          </div>
+        </div>
+      </div>
 
       {/* Stories: one per forum section. */}
       <div className="flex gap-3.5 overflow-x-auto border-b px-3 py-3" style={{ borderColor: C.line }}>
@@ -114,29 +159,6 @@ export function D18Akis() {
         <ImageIcon weight="regular" className="size-6" style={{ color: C.green }} />
       </div>
 
-      {/* Quick cards: weather, market, advertise. */}
-      <div className="flex gap-2.5 overflow-x-auto px-4 py-3">
-        <div className="flex w-[150px] shrink-0 flex-col rounded-2xl bg-gradient-to-br from-[#38bdf8] to-[#2563eb] p-3 text-white">
-          <SunIcon weight="fill" className="size-7 text-[#fde047]" />
-          <p className={`${head} mt-1 text-[30px] font-bold leading-none`}>{WEATHER.temp}°</p>
-          <p className="text-[12.5px] font-medium">{WEATHER.place} · {WEATHER.sky}</p>
-          <p className="mt-1.5 self-start rounded-full bg-white/25 px-2 py-0.5 text-[11.5px] font-semibold">{WEATHER.hint}</p>
-        </div>
-        <div className="relative w-[150px] shrink-0 overflow-hidden rounded-2xl text-white">
-          <Image src={MARKET.newest.photo} alt="" fill sizes="150px" className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-black/10" />
-          <div className="absolute inset-x-0 bottom-0 p-3">
-            <p className={`${head} text-[24px] font-bold leading-none`}>{MARKET.count} ilan</p>
-            <p className="text-[12px] font-medium">+{MARKET.today} bugün · Pazar</p>
-          </div>
-        </div>
-        <div className="flex w-[150px] shrink-0 flex-col justify-between rounded-2xl bg-[#fff7ed] p-3">
-          <MegaphoneIcon weight="fill" className="size-7 text-[#c2410c]" />
-          <p className="text-[14px] font-bold leading-tight text-[#7c2d12]">Reklam vermek için</p>
-          <p className="text-[12.5px] font-semibold text-[#c2410c]">İletişim →</p>
-        </div>
-      </div>
-
       <div className="flex gap-5 border-y px-4 text-[14px] font-semibold" style={{ borderColor: C.line }}>
         <span className="border-b-2 py-2.5" style={{ borderColor: C.text }}>Sana özel</span>
         <span className="py-2.5" style={{ color: C.muted }}>Son konular</span>
@@ -145,25 +167,6 @@ export function D18Akis() {
 
       <Post t={a} i={0} head={head} />
       <Post t={b} i={1} head={head} />
-
-      {/* Sponsored post. */}
-      <article className="border-b py-3" style={{ borderColor: C.line }}>
-        <div className="flex items-center gap-2.5 px-4">
-          <span className="flex size-10 items-center justify-center rounded-full bg-[#e0f2fe] text-[13px] font-bold text-[#0369a1]">SU</span>
-          <div className="flex-1 leading-tight">
-            <p className="text-[14.5px] font-semibold">{SPONSOR.name}</p>
-            <p className="text-[12.5px]" style={{ color: C.muted }}>Sponsorlu · örnek</p>
-          </div>
-        </div>
-        <div className="mx-4 mt-2.5 flex aspect-[16/9] flex-col justify-end rounded-2xl bg-gradient-to-br from-[#0ea5e9] via-[#0284c7] to-[#065f46] p-4 text-white">
-          <p className={`${head} text-[22px] font-bold leading-tight`}>{SPONSOR.tagline}</p>
-        </div>
-        <div className="mx-4 mt-2.5 flex items-center justify-between rounded-xl bg-[#f1f5f9] px-3 py-2.5">
-          <span className="text-[13.5px] font-semibold">sukocu.com</span>
-          <span className="rounded-lg px-3 py-1.5 text-[13px] font-bold text-white" style={{ background: C.text }}>İncele</span>
-        </div>
-      </article>
-
       {rest.slice(0, 2).map((t, i) => (
         <Post key={t.title} t={t} i={i + 2} head={head} />
       ))}

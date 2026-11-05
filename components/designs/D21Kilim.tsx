@@ -63,6 +63,22 @@ export function D21Kilim() {
           Forumda ve Pazar’da ara…
         </div>
 
+        {/* The sponsor in a woven frame. */}
+        <div className="rounded-md p-[7px]" style={{ backgroundImage: FRAME, backgroundSize: "12px 12px" }}>
+          <div className="flex items-center gap-3 rounded-sm p-3.5" style={{ background: C.wool }}>
+            <Goz color={C.indigo} size={30} />
+            <div className="min-w-0">
+              <p className="text-[11.5px] font-bold uppercase tracking-[0.16em]" style={{ color: C.muted }}>Sponsor · örnek</p>
+              <p className={`${serif} text-[21px] font-bold leading-tight`}>{SPONSOR.name}</p>
+              <p className="text-[14.5px]">{SPONSOR.tagline}</p>
+            </div>
+          </div>
+        </div>
+
+        <p className="flex items-center justify-center gap-2 rounded-md border-2 border-dashed py-3 text-[15px] font-bold" style={{ borderColor: C.saffron, background: "#fbf1dc" }}>
+          <Goz color={C.saffron} size={14} /> Reklam vermek için <span className="underline underline-offset-2" style={{ color: C.red }}>iletişime geçin</span>
+        </p>
+
         <div className="grid grid-cols-2 gap-3">
           <div className="overflow-hidden rounded-md text-white" style={{ background: C.indigo }}>
             <div className="p-3.5">
@@ -83,22 +99,6 @@ export function D21Kilim() {
             <Band h={10} />
           </div>
         </div>
-
-        {/* The sponsor in a woven frame. */}
-        <div className="rounded-md p-[7px]" style={{ backgroundImage: FRAME, backgroundSize: "12px 12px" }}>
-          <div className="flex items-center gap-3 rounded-sm p-3.5" style={{ background: C.wool }}>
-            <Goz color={C.indigo} size={30} />
-            <div className="min-w-0">
-              <p className="text-[11.5px] font-bold uppercase tracking-[0.16em]" style={{ color: C.muted }}>Sponsor · örnek</p>
-              <p className={`${serif} text-[21px] font-bold leading-tight`}>{SPONSOR.name}</p>
-              <p className="text-[14.5px]">{SPONSOR.tagline}</p>
-            </div>
-          </div>
-        </div>
-
-        <p className="flex items-center justify-center gap-2 rounded-md border-2 border-dashed py-3 text-[15px] font-bold" style={{ borderColor: C.saffron, background: "#fbf1dc" }}>
-          <Goz color={C.saffron} size={14} /> Reklam vermek için <span className="underline underline-offset-2" style={{ color: C.red }}>iletişime geçin</span>
-        </p>
 
         <section className="overflow-hidden rounded-md border-2 bg-[#fbf6ec]" style={{ borderColor: C.walnut }}>
           <div className="flex items-center gap-2.5 px-3.5 pb-2 pt-3">

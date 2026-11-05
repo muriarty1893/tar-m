@@ -39,8 +39,22 @@ export function D13Toprak() {
           Forumda ve Pazar’da ara…
         </div>
 
+        <div className="mt-4 flex items-center gap-3 rounded-[20px] p-4 text-white" style={{ background: C.terraText }}>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] opacity-80">Sponsor · örnek</p>
+            <p className={`${serif} text-[21px] font-semibold leading-tight`}>{SPONSOR.name}</p>
+            <p className="text-[13.5px] opacity-90">{SPONSOR.tagline}</p>
+          </div>
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#fbf3e3]" style={{ color: C.terraText }}><ArrowRightIcon weight="bold" className="size-5" /></span>
+        </div>
+
+        <p className="mt-3 flex items-center justify-between border-y py-3 text-[14px] font-semibold" style={{ borderColor: C.sandDeep }}>
+          <span>Bu alanda reklam vermek için</span>
+          <span className="flex items-center gap-1" style={{ color: C.terraText }}>İletişim <ArrowRightIcon weight="bold" className="size-4" /></span>
+        </p>
+
         {/* Arch window: the season's photo with today's weather. */}
-        <div className="mt-5 grid grid-cols-[1.35fr_1fr] gap-3">
+        <div className="mt-4 grid grid-cols-[1.35fr_1fr] gap-3">
           <div className="relative h-[270px] overflow-hidden rounded-t-full rounded-b-[20px] shadow-[0_10px_30px_-10px_rgba(59,42,30,0.35)]">
             <Image src="/demo/sahne-balyalar.webp" alt="Balyalar ve hasat edilmiş tarla" fill sizes="220px" className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#3b2a1e]/85 via-[#3b2a1e]/10 to-transparent" />
@@ -64,20 +78,6 @@ export function D13Toprak() {
             </div>
           </div>
         </div>
-
-        <div className="mt-3 flex items-center gap-3 rounded-[20px] p-4 text-white" style={{ background: C.terraText }}>
-          <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] opacity-80">Sponsor · örnek</p>
-            <p className={`${serif} text-[21px] font-semibold leading-tight`}>{SPONSOR.name}</p>
-            <p className="text-[13.5px] opacity-90">{SPONSOR.tagline}</p>
-          </div>
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#fbf3e3]" style={{ color: C.terraText }}><ArrowRightIcon weight="bold" className="size-5" /></span>
-        </div>
-
-        <p className="mt-3 flex items-center justify-between border-y py-3 text-[14px] font-semibold" style={{ borderColor: C.sandDeep }}>
-          <span>Bu alanda reklam vermek için</span>
-          <span className="flex items-center gap-1" style={{ color: C.terraText }}>İletişim <ArrowRightIcon weight="bold" className="size-4" /></span>
-        </p>
 
         <section className="mt-6">
           <div className="flex items-end justify-between">

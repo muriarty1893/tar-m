@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { siteConfig } from "@/config/site";
-import { BellIcon, CalendarDotsIcon, CaretDownIcon, CaretUpIcon, ChatsCircleIcon, CloudIcon, CloudRainIcon, CloudSunIcon, EqualsIcon, HouseIcon, MagnifyingGlassIcon, SquaresFourIcon, StorefrontIcon, SunIcon } from "@phosphor-icons/react/dist/ssr";
+import { BellIcon, CalendarDotsIcon, CaretDownIcon, CaretUpIcon, ChatsCircleIcon, CloudIcon, CloudRainIcon, CloudSunIcon, EqualsIcon, HouseIcon, MagnifyingGlassIcon, MegaphoneIcon, SquaresFourIcon, StorefrontIcon, SunIcon } from "@phosphor-icons/react/dist/ssr";
 import { firaCode, firaSans } from "./fonts";
 import { BADGES, FORECAST, MARKET, NAV, PRICES, SECTIONS, SPONSOR, TOPICS, USER, WEATHER } from "./sample";
 
@@ -33,7 +33,7 @@ function Spark({ data, up }: { data: number[]; up: boolean }) {
   );
 }
 
-/** 17 · Borsa (data dashboard): a price ticker, small figures, a price table with 7-day lines and the forum as a dense table. */
+/** 17 · Borsa (data dashboard): compact weather and market panels, a price table with 7-day lines and the forum as a dense table. */
 export function D17Borsa() {
   const icons = [HouseIcon, StorefrontIcon, CalendarDotsIcon, SquaresFourIcon];
   const mono = firaCode.className;
@@ -52,20 +52,6 @@ export function D17Borsa() {
         <span className="flex size-8 items-center justify-center rounded-md text-[11.5px] font-bold text-white" style={{ background: C.ink }}>{USER.initials}</span>
       </header>
 
-      {/* Price ticker. */}
-      <div className="flex items-center gap-4 overflow-x-auto whitespace-nowrap px-2.5 py-2 text-white" style={{ background: C.ink }}>
-        {PRICES.map((p) => (
-          <span key={p.name} className="flex items-center gap-1.5">
-            <span className="text-[11.5px] font-semibold uppercase tracking-wide text-white/75">{p.name}</span>
-            <span className={`${mono} text-[12.5px] font-semibold`}>{p.price}</span>
-            <span className={`${mono} flex items-center text-[11.5px] font-semibold`} style={{ color: p.change > 0 ? "#4ade80" : p.change < 0 ? "#f87171" : "#cbd5e1" }}>
-              {p.change > 0 ? <CaretUpIcon weight="fill" className="size-3" /> : p.change < 0 ? <CaretDownIcon weight="fill" className="size-3" /> : <EqualsIcon weight="bold" className="size-3" />}
-              {tr(Math.abs(p.change))}%
-            </span>
-          </span>
-        ))}
-      </div>
-
       <div className="space-y-2 p-2">
         <div className="flex h-10 items-center gap-2 rounded-md border bg-white px-2.5 text-[13.5px]" style={{ borderColor: C.line, color: C.muted }}>
           <MagnifyingGlassIcon weight="bold" className="size-4" />
@@ -73,18 +59,60 @@ export function D17Borsa() {
           <span className={`${mono} ml-auto rounded border px-1.5 text-[11px]`} style={{ borderColor: C.line }}>/</span>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { k: "Hava", v: `${WEATHER.temp}°`, s: `${WEATHER.place} · ${WEATHER.sky}` },
-            { k: "İlan", v: String(MARKET.count), s: `+${MARKET.today} bugün` },
-            { k: "Konu", v: topics.toLocaleString("tr-TR"), s: "6 bölüm" },
-          ].map((x) => (
-            <div key={x.k} className="rounded-md border bg-white px-2.5 py-2" style={{ borderColor: C.line }}>
-              <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: C.muted }}>{x.k}</p>
-              <p className={`${mono} text-[22px] font-semibold leading-tight`}>{x.v}</p>
-              <p className="truncate text-[11.5px]" style={{ color: C.muted }}>{x.s}</p>
+        <div className="flex items-center gap-2 rounded-md border bg-white px-2.5 py-2" style={{ borderColor: C.line }}>
+          <span className="rounded px-1.5 py-0.5 text-[10.5px] font-bold uppercase" style={{ background: "#fef3c7", color: "#92400e" }}>Sponsor</span>
+          <p className="min-w-0 flex-1 truncate"><b>{SPONSOR.name}</b> <span style={{ color: C.muted }}>· {SPONSOR.tagline}</span></p>
+          <span className="shrink-0 text-[11px]" style={{ color: C.muted }}>örnek</span>
+        </div>
+
+        <div className="flex items-center gap-2 rounded-md border border-dashed bg-white px-2.5 py-2" style={{ borderColor: "#c4cad3" }}>
+          <MegaphoneIcon weight="bold" className="size-4" style={{ color: C.muted }} />
+          <p className="flex-1">Bu alanda reklam vermek için</p>
+          <span className="shrink-0 text-[12px] font-semibold" style={{ color: C.blue }}>İletişim →</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <section className="rounded-md border bg-white" style={{ borderColor: C.line }}>
+            <div className="flex items-center justify-between border-b px-2.5 py-1.5" style={{ borderColor: C.line }}>
+              <h2 className="text-[12.5px] font-bold">Hava · {WEATHER.place}</h2>
             </div>
-          ))}
+            <div className="px-2.5 pt-1.5">
+              <p className={`${mono} text-[26px] font-semibold leading-tight`}>{WEATHER.temp}°</p>
+              <p className="text-[11.5px]" style={{ color: C.muted }}>{WEATHER.sky} · %{WEATHER.rain} yağış</p>
+              <p className="mt-1 inline-block rounded px-1.5 py-0.5 text-[11px] font-semibold" style={{ background: "#dcfce7", color: C.up }}>{WEATHER.hint}</p>
+            </div>
+            <ul className="mt-1.5 border-t px-2.5 py-1" style={{ borderColor: C.line }}>
+              {FORECAST.slice(1, 4).map((f) => {
+                const Icon = SKY[f.sky];
+                return (
+                  <li key={f.day} className="flex h-6 items-center gap-1.5 text-[11.5px]">
+                    <span className="w-8 font-semibold" style={{ color: C.muted }}>{f.day}</span>
+                    <Icon weight="duotone" className="size-4" style={{ color: f.sky === "rain" ? C.blue : f.sky === "sun" ? "#b45309" : C.muted }} />
+                    <span className={`${mono} ml-auto font-semibold`}>{f.max}°<span className="font-normal" style={{ color: C.muted }}>/{f.min}°</span></span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+          <section className="rounded-md border bg-white" style={{ borderColor: C.line }}>
+            <div className="flex items-center justify-between border-b px-2.5 py-1.5" style={{ borderColor: C.line }}>
+              <h2 className="text-[12.5px] font-bold">Pazar</h2>
+              <span className={`${mono} text-[11px] font-semibold`} style={{ color: C.up }}>+{MARKET.today} bugün</span>
+            </div>
+            <div className="px-2.5 pt-1.5">
+              <p className={`${mono} text-[26px] font-semibold leading-tight`}>{MARKET.count}</p>
+              <p className="text-[11.5px]" style={{ color: C.muted }}>aktif ilan</p>
+            </div>
+            <ul className="mt-1.5 border-t px-2.5 py-1" style={{ borderColor: C.line }}>
+              {PRICES.slice(0, 3).map((p) => (
+                <li key={p.name} className="flex h-6 items-center gap-1 text-[11.5px]">
+                  <span className="font-medium">{p.name}</span>
+                  <span className={`${mono} ml-auto font-semibold`}>{p.price}</span>
+                  <Change v={p.change} mono={mono} />
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
 
         <section className="rounded-md border bg-white" style={{ borderColor: C.line }}>
@@ -115,33 +143,8 @@ export function D17Borsa() {
         </section>
 
         <section className="rounded-md border bg-white" style={{ borderColor: C.line }}>
-          <div className="flex items-center justify-between border-b px-2.5 py-2" style={{ borderColor: C.line }}>
-            <h2 className="text-[13.5px] font-bold">Hava · {WEATHER.place}</h2>
-            <span className="rounded px-1.5 py-0.5 text-[11px] font-semibold" style={{ background: "#dcfce7", color: C.up }}>{WEATHER.hint}</span>
-          </div>
-          <div className="grid grid-cols-5 divide-x" style={{ borderColor: C.line }}>
-            {FORECAST.map((f) => {
-              const Icon = SKY[f.sky];
-              return (
-                <div key={f.day} className="flex flex-col items-center py-2" style={{ borderColor: C.line }}>
-                  <span className="text-[11.5px] font-semibold" style={{ color: C.muted }}>{f.day}</span>
-                  <Icon weight="duotone" className="my-1 size-5" style={{ color: f.sky === "rain" ? C.blue : f.sky === "sun" ? "#b45309" : C.muted }} />
-                  <span className={`${mono} text-[12px] font-semibold`}>{f.max}°<span className="font-normal" style={{ color: C.muted }}>/{f.min}°</span></span>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        <div className="flex items-center gap-2 rounded-md border bg-white px-2.5 py-2" style={{ borderColor: C.line }}>
-          <span className="rounded px-1.5 py-0.5 text-[10.5px] font-bold uppercase" style={{ background: "#fef3c7", color: "#92400e" }}>Sponsor</span>
-          <p className="min-w-0 flex-1 truncate"><b>{SPONSOR.name}</b> <span style={{ color: C.muted }}>· {SPONSOR.tagline}</span></p>
-          <span className="shrink-0 text-[12px] font-semibold" style={{ color: C.blue }}>Reklam ver</span>
-        </div>
-
-        <section className="rounded-md border bg-white" style={{ borderColor: C.line }}>
           <div className="flex items-center gap-3 border-b px-2.5 text-[13px]" style={{ borderColor: C.line }}>
-            <h2 className="py-2 font-bold">Forum</h2>
+            <h2 className="py-2 font-bold">Forum <span className={`${mono} text-[11px] font-normal`} style={{ color: C.muted }}>{topics.toLocaleString("tr-TR")}</span></h2>
             <span className="border-b-2 py-2 font-semibold" style={{ borderColor: C.blue, color: C.blue }}>Son</span>
             <span className="py-2" style={{ color: C.muted }}>Yanıtlanan</span>
             <span className="py-2" style={{ color: C.muted }}>Popüler</span>

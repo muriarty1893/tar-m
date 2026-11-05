@@ -33,40 +33,43 @@ export function D15Bauhaus() {
         <span className="flex size-11 items-center justify-center rounded-full text-[14px] font-bold text-white" style={{ background: C.blue }}>{USER.initials}</span>
       </header>
 
-      {/* The composition: four colour blocks, each with a shape. */}
-      <div className="grid grid-cols-2 border-b-2" style={{ borderColor: C.fg }}>
-        <div className="relative col-span-2 h-[176px] overflow-hidden border-b-2 p-4 text-white" style={{ background: C.blue, borderColor: C.fg }}>
-          <span aria-hidden="true" className="absolute -right-10 -top-10 size-44 rounded-full" style={{ background: C.yellow }} />
-          <span aria-hidden="true" className="absolute bottom-0 right-6 size-16 [clip-path:polygon(50%_0,100%_100%,0_100%)]" style={{ background: C.red }} />
-          <p className="relative text-[13px] font-bold uppercase tracking-[0.2em]">{WEATHER.place} · Hava</p>
-          <p className="relative text-[84px] font-black leading-[0.9] tracking-tighter">{WEATHER.temp}°</p>
-          <p className="relative text-[15px] font-semibold uppercase">{WEATHER.sky} · {WEATHER.hint}</p>
-        </div>
-        <div className="relative h-[150px] overflow-hidden border-r-2 p-4 text-white" style={{ background: C.red, borderColor: C.fg }}>
-          <span aria-hidden="true" className="absolute -bottom-6 -right-6 size-24 bg-white/25 [clip-path:polygon(50%_0,100%_100%,0_100%)]" />
-          <p className="text-[12px] font-bold uppercase tracking-[0.2em]">Pazar</p>
-          <p className="text-[46px] font-black leading-none tracking-tighter">{MARKET.count}</p>
-          <p className="text-[13px] font-semibold uppercase">ilan · +{MARKET.today} bugün</p>
-        </div>
-        <div className="relative h-[150px] overflow-hidden p-4" style={{ background: C.yellow }}>
-          <span aria-hidden="true" className="absolute -bottom-8 -right-8 size-24 rounded-full border-[10px]" style={{ borderColor: C.fg }} />
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em]">Sponsor · örnek</p>
-          <p className="mt-1 text-[21px] font-black uppercase leading-none tracking-tight">{SPONSOR.name}</p>
-          <p className="mt-1 text-[13px] font-medium leading-snug">{SPONSOR.tagline}</p>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between gap-3 px-4 py-3 text-white" style={{ background: C.fg }}>
-        <span className="text-[14px] font-bold uppercase tracking-wide">Reklam vermek için</span>
-        <span className="flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-bold uppercase" style={{ background: C.yellow, color: C.fg }}>İletişim <ArrowRightIcon weight="bold" className="size-4" /></span>
-      </div>
-
-      <div className="space-y-5 bg-[radial-gradient(#12121226_1.2px,transparent_1.2px)] p-4 [background-size:16px_16px]">
+      <div className="border-b-2 bg-[radial-gradient(#12121226_1.2px,transparent_1.2px)] p-3 [background-size:16px_16px]" style={{ borderColor: C.fg }}>
         <div className="flex h-12 items-stretch border-2 bg-white" style={{ borderColor: C.fg }}>
           <span className="flex flex-1 items-center gap-2 px-3 text-[15px] text-[#555]"><MagnifyingGlassIcon weight="bold" className="size-5" style={{ color: C.fg }} />Forumda ve Pazar’da ara</span>
           <span className="flex items-center border-l-2 px-4 text-[14px] font-bold uppercase text-white" style={{ background: C.red, borderColor: C.fg }}>Ara</span>
         </div>
+      </div>
 
+      {/* The composition: colour blocks in the live page's order, each with a shape. */}
+      <div className="relative h-[124px] overflow-hidden border-b-2 p-4" style={{ background: C.yellow, borderColor: C.fg }}>
+        <span aria-hidden="true" className="absolute -bottom-10 -right-6 size-28 rounded-full border-[12px]" style={{ borderColor: C.fg }} />
+        <span aria-hidden="true" className="absolute right-4 top-4 size-10" style={{ background: C.blue }} />
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em]">Sponsor · örnek</p>
+        <p className="mt-1 text-[30px] font-black uppercase leading-none tracking-tighter">{SPONSOR.name}</p>
+        <p className="mt-1 max-w-[220px] text-[14px] font-medium leading-snug">{SPONSOR.tagline}</p>
+      </div>
+
+      <div className="flex items-center justify-between gap-3 border-b-2 px-4 py-3 text-white" style={{ background: C.fg, borderColor: C.fg }}>
+        <span className="text-[14px] font-bold uppercase tracking-wide">Reklam vermek için</span>
+        <span className="flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-bold uppercase" style={{ background: C.yellow, color: C.fg }}>İletişim <ArrowRightIcon weight="bold" className="size-4" /></span>
+      </div>
+
+      <div className="grid grid-cols-2 border-b-2" style={{ borderColor: C.fg }}>
+        <div className="relative h-[168px] overflow-hidden border-r-2 p-4 text-white" style={{ background: C.blue, borderColor: C.fg }}>
+          <span aria-hidden="true" className="absolute -right-8 -top-8 size-24 rounded-full" style={{ background: C.yellow }} />
+          <p className="relative text-[12px] font-bold uppercase tracking-[0.2em]">{WEATHER.place}</p>
+          <p className="relative text-[64px] font-black leading-[0.9] tracking-tighter">{WEATHER.temp}°</p>
+          <p className="relative text-[13px] font-semibold uppercase leading-tight">{WEATHER.sky}<br />{WEATHER.hint}</p>
+        </div>
+        <div className="relative h-[168px] overflow-hidden p-4 text-white" style={{ background: C.red }}>
+          <span aria-hidden="true" className="absolute -bottom-6 -right-6 size-24 bg-white/25 [clip-path:polygon(50%_0,100%_100%,0_100%)]" />
+          <p className="text-[12px] font-bold uppercase tracking-[0.2em]">Pazar</p>
+          <p className="text-[56px] font-black leading-[0.95] tracking-tighter">{MARKET.count}</p>
+          <p className="text-[13px] font-semibold uppercase">ilan · +{MARKET.today} bugün</p>
+        </div>
+      </div>
+
+      <div className="space-y-5 bg-[radial-gradient(#12121226_1.2px,transparent_1.2px)] p-4 [background-size:16px_16px]">
         <section className="border-2 bg-white" style={{ borderColor: C.fg }}>
           <div className="flex items-center gap-2 border-b-2 p-3" style={{ borderColor: C.fg }}>
             <Shape kind="circle" color={C.red} className="size-5" />

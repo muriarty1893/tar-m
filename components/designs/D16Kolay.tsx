@@ -35,10 +35,7 @@ export function D16Kolay() {
             </span>
           ))}
         </div>
-      </header>
-
-      <div className="space-y-6 px-4 pt-5">
-        <div className="flex items-center justify-between rounded-xl px-3 py-2" style={{ background: "#f2f2f2" }}>
+        <div className="mt-3 flex items-center justify-between rounded-xl px-3 py-2" style={{ background: "#f2f2f2" }}>
           <span className="text-[16px] font-semibold">Yazı boyutu</span>
           <span className="flex gap-1.5">
             {["A", "A", "A"].map((a, i) => (
@@ -46,7 +43,9 @@ export function D16Kolay() {
             ))}
           </span>
         </div>
+      </header>
 
+      <div className="space-y-6 px-4 pt-5">
         <div>
           <p className={`${head} mb-2 text-[17px] font-semibold`}>Ne arıyorsunuz?</p>
           <div className="flex min-h-14 overflow-hidden rounded-xl border-2" style={{ borderColor: C.text }}>
@@ -55,51 +54,42 @@ export function D16Kolay() {
           </div>
         </div>
 
-        <section className="rounded-2xl border-2 p-4" style={{ borderColor: C.text }}>
-          <h2 className={`${head} flex items-center gap-2 text-[21px] font-bold`}><SunIcon weight="fill" className="size-7 text-[#b26b00]" /> Bugün {WEATHER.place}’da hava</h2>
-          <p className={`${head} mt-2 text-[44px] font-bold leading-none`}>{WEATHER.temp} derece</p>
-          <p className="mt-1 text-[19px]">{WEATHER.sky}. En düşük {WEATHER.min}, en yüksek {WEATHER.max} derece.</p>
-          <p className="mt-3 flex items-center gap-2 rounded-xl px-3 py-2.5 text-[18px] font-bold" style={{ background: C.greenBg, color: C.green }}>
-            <CheckCircleIcon weight="fill" className="size-7 shrink-0" /> Evet, bugün {WEATHER.hint.toLocaleLowerCase("tr")}.
-          </p>
-          <div className="mt-3 grid grid-cols-2 gap-2 text-[17px]">
-            <p className="flex items-center gap-2"><DropIcon weight="fill" className="size-6 text-[#0b4fb3]" /> Yağmur: %{WEATHER.rain}</p>
-            <p className="flex items-center gap-2"><WindIcon weight="bold" className="size-6" /> Rüzgâr: {WEATHER.wind} km/s</p>
-          </div>
-        </section>
-
-        <div className="grid grid-cols-2 gap-3">
-          <span className="flex min-h-[88px] flex-col items-center justify-center gap-1 rounded-2xl text-[19px] font-bold text-white" style={{ background: C.green }}>
-            <PencilSimpleIcon weight="bold" className="size-8" /> Soru sor
-          </span>
-          <span className="flex min-h-[88px] flex-col items-center justify-center gap-1 rounded-2xl border-2 text-[19px] font-bold" style={{ borderColor: C.green, color: C.green }}>
-            <TagIcon weight="bold" className="size-8" /> İlan ver
-          </span>
+        <div className="rounded-2xl border-2 p-4" style={{ borderColor: C.text }}>
+          <p className="text-[15px] font-bold uppercase tracking-wide" style={{ color: C.muted }}>Reklam (örnek)</p>
+          <p className={`${head} text-[22px] font-bold`}>{SPONSOR.name}</p>
+          <p className="text-[18px]">{SPONSOR.tagline}</p>
         </div>
 
-        <section className="rounded-2xl border-2 p-4" style={{ borderColor: C.text }}>
-          <h2 className={`${head} flex items-center gap-2 text-[21px] font-bold`}><StorefrontIcon weight="bold" className="size-7" /> Pazar</h2>
-          <p className="mt-1 text-[18px]">Şu an <b>{MARKET.count} ilan</b> var. Bugün <b>{MARKET.today} yeni ilan</b> eklendi.</p>
-          <div className="mt-3 flex items-center gap-3">
-            <Image src={MARKET.newest.photo} alt={MARKET.newest.title} width={160} height={160} className="size-20 shrink-0 rounded-xl object-cover" />
-            <div>
-              <p className="text-[18px] font-bold leading-snug">{MARKET.newest.title}</p>
-              <p className="text-[18px]">{MARKET.newest.price} / {MARKET.newest.unit}</p>
-              <p className="text-[16px]" style={{ color: C.muted }}>{MARKET.newest.place}</p>
-            </div>
-          </div>
-          <p className="mt-3 flex min-h-14 items-center justify-center rounded-xl border-2 text-[18px] font-bold underline underline-offset-4" style={{ borderColor: C.text }}>Tüm ilanları gör</p>
-        </section>
+        <p className="flex min-h-14 items-center justify-center rounded-xl border-2 border-dashed px-3 text-center text-[18px] font-bold" style={{ borderColor: C.line, color: C.blue }}>
+          <span className="underline underline-offset-4">Reklam vermek için bize yazın</span>
+        </p>
 
-        <div className="rounded-2xl border-2 border-dashed p-4" style={{ borderColor: C.line }}>
-          <p className="text-[15px] font-bold uppercase tracking-wide" style={{ color: C.muted }}>Reklam (örnek)</p>
-          <p className={`${head} text-[21px] font-bold`}>{SPONSOR.name}</p>
-          <p className="text-[18px]">{SPONSOR.tagline}</p>
-          <p className="mt-2 text-[17px] font-bold underline underline-offset-4" style={{ color: C.blue }}>Siz de reklam vermek için bize yazın</p>
+        <div className="grid grid-cols-2 gap-3">
+          <section className="flex flex-col rounded-2xl border-2 p-3.5" style={{ borderColor: C.text }}>
+            <h2 className={`${head} flex items-center gap-1.5 text-[19px] font-bold`}><SunIcon weight="fill" className="size-7 text-[#b26b00]" /> Hava</h2>
+            <p className={`${head} mt-1 text-[46px] font-bold leading-none`}>{WEATHER.temp}°</p>
+            <p className="text-[18px] leading-snug">{WEATHER.place}, {WEATHER.sky.toLocaleLowerCase("tr")}</p>
+            <p className="mt-2 flex items-start gap-1.5 rounded-xl px-2 py-2 text-[16.5px] font-bold leading-snug" style={{ background: C.greenBg, color: C.green }}>
+              <CheckCircleIcon weight="fill" className="mt-0.5 size-6 shrink-0" /> {WEATHER.hint}
+            </p>
+            <p className="mt-2 flex items-center gap-1.5 text-[16.5px]"><DropIcon weight="fill" className="size-5 text-[#0b4fb3]" /> Yağmur %{WEATHER.rain}</p>
+            <p className="flex items-center gap-1.5 text-[16.5px]"><WindIcon weight="bold" className="size-5" /> {WEATHER.wind} km/s</p>
+          </section>
+          <section className="flex flex-col rounded-2xl border-2 p-3.5" style={{ borderColor: C.text }}>
+            <h2 className={`${head} flex items-center gap-1.5 text-[19px] font-bold`}><StorefrontIcon weight="bold" className="size-7" /> Pazar</h2>
+            <p className={`${head} mt-1 text-[46px] font-bold leading-none`}>{MARKET.count}</p>
+            <p className="text-[18px] leading-snug">ilan var. Bugün <b>{MARKET.today} yeni</b>.</p>
+            <p className="mt-auto flex min-h-14 items-center justify-center gap-1.5 rounded-xl border-2 text-[17px] font-bold" style={{ borderColor: C.green, color: C.green }}>
+              <TagIcon weight="bold" className="size-6" /> İlan ver
+            </p>
+          </section>
         </div>
 
         <section>
           <h2 className={`${head} text-[26px] font-bold`}>Forum: son sorular</h2>
+          <p className="mt-3 flex min-h-14 items-center justify-center gap-2 rounded-xl text-[19px] font-bold text-white" style={{ background: C.green }}>
+            <PencilSimpleIcon weight="bold" className="size-6" /> Soru sor
+          </p>
           <ul className="mt-3 space-y-3">
             {TOPICS.slice(0, 5).map((t) => (
               <li key={t.title} className="rounded-2xl border-2 p-4" style={{ borderColor: C.text }}>

@@ -15,13 +15,13 @@ const E = {
 };
 const SKY = { sun: SunIcon, cloudSun: CloudSunIcon, cloud: CloudIcon, rain: CloudRainIcon } as const;
 
-/** 20 · Manzara (photo, layers): the field fills the top with today's weather on it; the page rises over it as a sheet of layered cards. */
+/** 20 · Manzara (photo, layers): the field fills the top behind the search; the page rises over it as a sheet of layered cards. */
 export function D20Manzara() {
   const icons = [HouseIcon, StorefrontIcon, CalendarDotsIcon, SquaresFourIcon];
   const display = bebasNeue.className;
   return (
     <div id="tasarim-onizleme" className={`${sourceSans.className} min-h-dvh pb-28`} style={{ background: C.sheet, color: C.text }}>
-      <div className="relative h-[420px] overflow-hidden text-white">
+      <div className="relative h-[330px] overflow-hidden text-white">
         <Image src="/demo/sahne-surulmus-tarla.webp" alt="Sürülmüş tarla ve bulutlu gökyüzü" fill priority sizes="390px" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/5 to-black/55" />
         <header className="relative flex items-center gap-2 px-4 pt-4">
@@ -35,22 +35,13 @@ export function D20Manzara() {
           ))}
           <span className="flex size-11 items-center justify-center rounded-full bg-white text-[13px] font-bold text-black">{USER.initials}</span>
         </header>
-        <div className="relative px-5 pt-7">
-          <p className="text-[14px] font-semibold uppercase tracking-[0.25em] drop-shadow">{WEATHER.place} · Bugün</p>
-          <p className={`${display} text-[124px] leading-[0.85] drop-shadow-lg`}>{WEATHER.temp}°</p>
-          <p className="text-[18px] font-semibold drop-shadow">{WEATHER.sky} · {WEATHER.hint}</p>
+        <div className="relative px-5 pt-8">
+          <p className="text-[14px] font-semibold uppercase tracking-[0.25em] drop-shadow">Perşembe · 5 Kasım</p>
+          <p className={`${display} text-[64px] leading-[0.9] drop-shadow-lg`}>Günaydın {USER.first}</p>
         </div>
-        <div className="absolute inset-x-4 bottom-12 grid grid-cols-5 gap-1.5">
-          {FORECAST.map((f) => {
-            const Icon = SKY[f.sky];
-            return (
-              <div key={f.day} className="flex flex-col items-center rounded-2xl bg-white/20 py-2 ring-1 ring-white/25 backdrop-blur-md">
-                <span className="text-[12px] font-semibold">{f.day}</span>
-                <Icon weight="fill" className="my-0.5 size-5" />
-                <span className="text-[13px] font-bold">{f.max}°</span>
-              </div>
-            );
-          })}
+        <div className="absolute inset-x-4 bottom-12 flex h-12 items-center gap-2.5 rounded-2xl bg-white/20 px-4 text-[15.5px] ring-1 ring-white/30 backdrop-blur-md">
+          <MagnifyingGlassIcon weight="bold" className="size-5" />
+          Forumda ve Pazar’da ara…
         </div>
       </div>
 
@@ -58,33 +49,55 @@ export function D20Manzara() {
       <div className="relative z-10 -mt-7 rounded-t-[32px] px-4 pt-3" style={{ background: C.sheet }}>
         <span aria-hidden="true" className="mx-auto block h-1.5 w-12 rounded-full bg-black/15" />
 
-        <div className={`relative mt-3 flex h-12 items-center gap-2.5 rounded-2xl bg-white px-4 text-[15.5px] ${E[3]}`} style={{ color: C.muted }}>
-          <MagnifyingGlassIcon weight="bold" className="size-5" style={{ color: C.text }} />
-          Forumda ve Pazar’da ara…
+        <div className={`mt-4 flex items-center gap-3 rounded-3xl bg-[#14181f] p-4 text-white ${E[3]}`}>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/70">Sponsor · örnek</p>
+            <p className={`${display} mt-1 text-[30px] leading-none`}>{SPONSOR.name}</p>
+            <p className="mt-0.5 text-[13.5px] text-white/85">{SPONSOR.tagline}</p>
+          </div>
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white text-black"><ArrowUpRightIcon weight="bold" className="size-5" /></span>
         </div>
 
-        <div className="mt-6 grid grid-cols-[1.2fr_1fr] gap-3">
+        <div className={`mt-3 flex items-center gap-3 rounded-3xl bg-white px-4 py-3 ${E[1]}`}>
+          <MegaphoneIcon weight="fill" className="size-6 shrink-0" style={{ color: C.accent }} />
+          <p className="flex-1 text-[14.5px] font-bold">Reklam vermek için</p>
+          <p className="text-[13.5px] font-bold" style={{ color: C.accent }}>İletişim →</p>
+        </div>
+
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          {/* Weather on a sky photo. */}
+          <div className={`relative mt-3 overflow-hidden rounded-3xl text-white ${E[3]}`}>
+            <Image src="/demo/sahne-gokyuzu.webp" alt="" fill sizes="190px" className="object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/60" />
+            <div className="relative flex h-full flex-col p-3.5">
+              <p className="text-[12px] font-bold uppercase tracking-[0.2em] drop-shadow">{WEATHER.place}</p>
+              <p className={`${display} text-[64px] leading-[0.9] drop-shadow-lg`}>{WEATHER.temp}°</p>
+              <p className="text-[13px] font-semibold drop-shadow">{WEATHER.sky} · {WEATHER.hint}</p>
+              <div className="mt-auto grid grid-cols-3 gap-1 pt-2">
+                {FORECAST.slice(1, 4).map((f) => {
+                  const Icon = SKY[f.sky];
+                  return (
+                    <span key={f.day} className="flex flex-col items-center rounded-xl bg-white/20 py-1 text-[11px] font-semibold ring-1 ring-white/25 backdrop-blur-md">
+                      {f.day}
+                      <Icon weight="fill" className="size-4" />
+                      {f.max}°
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
           {/* Market as a deck of cards. */}
           <div className="relative pt-3">
             <span aria-hidden="true" className={`absolute inset-x-4 top-0 h-full rounded-3xl bg-white/70 ${E[1]}`} />
             <span aria-hidden="true" className={`absolute inset-x-2 top-1.5 h-full rounded-3xl bg-white/90 ${E[1]}`} />
             <div className={`relative overflow-hidden rounded-3xl bg-white ${E[3]}`}>
-              <Image src={MARKET.newest.photo} alt="" width={300} height={200} className="h-24 w-full object-cover" />
+              <Image src={MARKET.newest.photo} alt="" width={300} height={200} className="h-28 w-full object-cover" />
               <div className="p-3">
-                <p className={`${display} text-[30px] leading-none`}>{MARKET.count} ilan</p>
+                <p className={`${display} text-[32px] leading-none`}>{MARKET.count} ilan</p>
                 <p className="text-[13px]" style={{ color: C.muted }}>+{MARKET.today} bugün · Pazar</p>
+                <p className="mt-1 line-clamp-1 text-[12.5px] font-semibold">{MARKET.newest.title}</p>
               </div>
-            </div>
-          </div>
-          <div className="flex flex-col gap-3 pt-3">
-            <div className={`flex-1 rounded-3xl bg-[#14181f] p-3.5 text-white ${E[2]}`}>
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/70">Sponsor · örnek</p>
-              <p className={`${display} mt-1 text-[24px] leading-none`}>{SPONSOR.name}</p>
-              <p className="mt-1 text-[12.5px] leading-snug text-white/85">{SPONSOR.tagline}</p>
-            </div>
-            <div className={`flex items-center gap-2 rounded-3xl bg-white p-3 ${E[1]}`}>
-              <MegaphoneIcon weight="fill" className="size-6 shrink-0" style={{ color: C.accent }} />
-              <p className="text-[13px] font-bold leading-tight">Reklam vermek için <span style={{ color: C.accent }}>yazın</span></p>
             </div>
           </div>
         </div>

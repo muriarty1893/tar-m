@@ -47,24 +47,27 @@ export function D02Bento() {
           </span>
         </div>
 
-        <div className="row-span-2 flex flex-col rounded-[28px] bg-[linear-gradient(180deg,#bfe3ff_0%,#e8f5ff_100%)] p-4">
-          <p className="text-[13px] font-semibold text-[#0c4a6e]">{WEATHER.place}</p>
-          <SunIcon weight="fill" className="mt-2 size-12 text-[#f59e0b]" />
-          <p className="mt-auto text-[52px] font-extrabold leading-none tracking-tighter text-[#0c4a6e]">{WEATHER.temp}°</p>
+        <div className="col-span-2 flex items-center gap-3 rounded-[28px] border-2 border-dashed border-[#f59e0b]/60 bg-[#fffbeb] px-4 py-3">
+          <MegaphoneIcon weight="fill" className="size-6 shrink-0 text-[#b45309]" />
+          <p className="flex-1 text-[14px] font-bold leading-tight text-[#78350f]">Reklam vermek için</p>
+          <p className="text-[12.5px] font-semibold text-[#b45309]">İletişim →</p>
+        </div>
+
+        <div className="flex flex-col rounded-[28px] bg-[linear-gradient(180deg,#bfe3ff_0%,#e8f5ff_100%)] p-4">
+          <p className="flex items-center justify-between text-[13px] font-semibold text-[#0c4a6e]">
+            {WEATHER.place}
+            <SunIcon weight="fill" className="size-8 text-[#f59e0b]" />
+          </p>
+          <p className="mt-2 text-[44px] font-extrabold leading-none tracking-tighter text-[#0c4a6e]">{WEATHER.temp}°</p>
           <p className="text-[13px] text-[#0c4a6e]/80">{WEATHER.sky}</p>
           <span className="mt-2 self-start rounded-full bg-white/80 px-2.5 py-1 text-[11.5px] font-bold text-[#047857]">{WEATHER.hint}</span>
         </div>
-        <div className="rounded-[28px] bg-white p-4 shadow-sm">
+        <div className="flex flex-col rounded-[28px] bg-white p-4 shadow-sm">
           <span className="flex size-10 items-center justify-center rounded-2xl bg-[#ffe4e6] text-[#be123c]">
             <StorefrontIcon weight="fill" className="size-5" />
           </span>
-          <p className="mt-3 text-[30px] font-extrabold leading-none tracking-tight">{MARKET.count}</p>
+          <p className="mt-auto text-[38px] font-extrabold leading-none tracking-tight">{MARKET.count}</p>
           <p className="text-[13px] text-black/50">ilan · +{MARKET.today} bugün</p>
-        </div>
-        <div className="rounded-[28px] border-2 border-dashed border-[#f59e0b]/60 bg-[#fffbeb] p-4">
-          <MegaphoneIcon weight="fill" className="size-6 text-[#b45309]" />
-          <p className="mt-2 text-[14px] font-bold leading-tight text-[#78350f]">Reklam vermek için</p>
-          <p className="mt-1 text-[12.5px] font-semibold text-[#b45309]">İletişim →</p>
         </div>
 
         <section className="col-span-2 rounded-[28px] bg-white p-4 shadow-sm">
