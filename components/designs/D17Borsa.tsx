@@ -1,12 +1,14 @@
 import Image from "next/image";
 import { siteConfig } from "@/config/site";
-import { BellIcon, CalendarDotsIcon, CaretDownIcon, CaretUpIcon, ChatsCircleIcon, CloudIcon, CloudRainIcon, CloudSunIcon, EqualsIcon, HouseIcon, MagnifyingGlassIcon, MegaphoneIcon, SquaresFourIcon, StorefrontIcon, SunIcon } from "@phosphor-icons/react/dist/ssr";
+import { BellIcon, CalendarDotsIcon, CaretDownIcon, CaretUpIcon, ChatCircleIcon, ChatsCircleIcon, CloudIcon, CloudRainIcon, CloudSunIcon, EqualsIcon, EyeIcon, HouseIcon, MagnifyingGlassIcon, MegaphoneIcon, SquaresFourIcon, StorefrontIcon, SunIcon } from "@phosphor-icons/react/dist/ssr";
 import { firaCode, firaSans } from "./fonts";
-import { BADGES, FORECAST, MARKET, NAV, PRICES, SECTIONS, SPONSOR, TOPICS, USER, WEATHER } from "./sample";
+import { BADGES, FORECAST, MARKET, NAV, NEWS, PRICES, SECTIONS, SPONSOR, TOPICS, USER, WEATHER } from "./sample";
 
 // Data-Dense Dashboard (ui-ux-pro-max): light grey canvas, compact white cards, 8 px gaps, 36 px rows, green/red with arrows
 // (never colour alone), Fira Sans with Fira Code for every number.
-const C = { bg: "#f1f3f5", card: "#ffffff", line: "#dfe3e8", text: "#111827", muted: "#4b5563", up: "#15803d", down: "#b91c1c", blue: "#1d4ed8", ink: "#0f172a" };
+const C = { bg: "#f1f3f5", card: "#ffffff", line: "#dfe3e8", text: "#111827", muted: "#4b5563", up: "#15803d", down: "#b91c1c", blue: "#1d4ed8", ink: "#0f172a", red: "#dc2626" };
+// The label colour of each kind of news item in the ticker.
+const KIND = { Destek: "#15803d", Duyuru: "#b45309", Haber: "#1d4ed8" } as const;
 const SKY = { sun: SunIcon, cloudSun: CloudSunIcon, cloud: CloudIcon, rain: CloudRainIcon } as const;
 const tr = (n: number, d = 1) => n.toLocaleString("tr-TR", { minimumFractionDigits: d, maximumFractionDigits: d });
 
@@ -22,18 +24,21 @@ function Change({ v, mono }: { v: number; mono: string }) {
   );
 }
 
-function Spark({ data, up }: { data: number[]; up: boolean }) {
-  const min = Math.min(...data);
-  const span = Math.max(...data) - min || 1;
-  const pts = data.map((v, i) => `${(i / (data.length - 1)) * 56},${18 - ((v - min) / span) * 16 - 1}`).join(" ");
+/** The ticker's headlines; drawn twice (the second copy hidden from screen readers) so the loop has no seam. */
+function NewsRow({ copy, mono }: { copy?: boolean; mono: string }) {
   return (
-    <svg viewBox="0 0 56 18" className="h-[18px] w-14" aria-hidden="true">
-      <polyline points={pts} fill="none" stroke={up ? C.up : C.down} strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" />
-    </svg>
+    <ul className={`${copy ? "kayan-serit__kopya" : "flex"} items-center`} aria-hidden={copy || undefined}>
+      {NEWS.map((n) => (
+        <li key={n.title} className="flex shrink-0 items-center gap-1.5 whitespace-nowrap pr-5 text-[12.5px]">
+          <span className={`${mono} text-[10px] font-bold uppercase`} style={{ color: KIND[n.kind] }}>{n.kind}</span>
+          <span className="font-medium">{n.title}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
-/** 17 · Borsa (data dashboard): compact weather and market panels, a price table with 7-day lines and the forum as a dense table. */
+/** 17 · Borsa (data dashboard): a news ticker, compact weather and market panels, and the forum in dense lines. */
 export function D17Borsa() {
   const icons = [HouseIcon, StorefrontIcon, CalendarDotsIcon, SquaresFourIcon];
   const mono = firaCode.className;
@@ -71,10 +76,25 @@ export function D17Borsa() {
           <span className="shrink-0 text-[12px] font-semibold" style={{ color: C.blue }}>İletişim →</span>
         </div>
 
+        <section aria-label="Çiftçi destekleri ve haberler" className="flex h-8 items-stretch overflow-hidden rounded-md border bg-white" style={{ borderColor: C.line }}>
+          <h2 className="flex shrink-0 items-center px-2 text-[11px] font-bold leading-none text-white" style={{ background: C.up }}>Çiftçi destekleri & haberler</h2>
+          <div className="kayan-serit flex min-w-0 flex-1 items-center pl-2.5">
+            <div className="kayan-serit__ray">
+              <NewsRow mono={mono} />
+              <NewsRow copy mono={mono} />
+            </div>
+          </div>
+        </section>
+
         <div className="grid grid-cols-2 gap-2">
           <section className="rounded-md border bg-white" style={{ borderColor: C.line }}>
             <div className="flex items-center justify-between border-b px-2.5 py-1.5" style={{ borderColor: C.line }}>
-              <h2 className="text-[12.5px] font-bold">Hava · {WEATHER.place}</h2>
+              <h2 className="flex items-center gap-1.5 text-[12.5px] font-bold">
+                <span className="flex size-6 items-center justify-center rounded-md" style={{ background: "#dbeafe" }}>
+                  <CloudSunIcon weight="fill" className="size-4" style={{ color: C.blue }} aria-hidden="true" />
+                </span>
+                Hava · {WEATHER.place}
+              </h2>
             </div>
             <div className="px-2.5 pt-1.5">
               <p className={`${mono} text-[26px] font-semibold leading-tight`}>{WEATHER.temp}°</p>
@@ -96,7 +116,12 @@ export function D17Borsa() {
           </section>
           <section className="rounded-md border bg-white" style={{ borderColor: C.line }}>
             <div className="flex items-center justify-between border-b px-2.5 py-1.5" style={{ borderColor: C.line }}>
-              <h2 className="text-[12.5px] font-bold">Pazar</h2>
+              <h2 className="flex items-center gap-1.5 text-[12.5px] font-bold">
+                <span className="flex size-6 items-center justify-center rounded-md" style={{ background: "#ffe4e6" }}>
+                  <StorefrontIcon weight="fill" className="size-4" style={{ color: "#be123c" }} aria-hidden="true" />
+                </span>
+                Pazar
+              </h2>
               <span className={`${mono} text-[11px] font-semibold`} style={{ color: C.up }}>+{MARKET.today} bugün</span>
             </div>
             <div className="px-2.5 pt-1.5">
@@ -116,54 +141,32 @@ export function D17Borsa() {
         </div>
 
         <section className="rounded-md border bg-white" style={{ borderColor: C.line }}>
-          <div className="flex items-center justify-between border-b px-2.5 py-2" style={{ borderColor: C.line }}>
-            <h2 className="text-[13.5px] font-bold">Borsa fiyatları <span className="font-normal" style={{ color: C.muted }}>₺/kg</span></h2>
-            <span className="text-[11px]" style={{ color: C.muted }}>Konya TB · örnek · 5 Kas</span>
-          </div>
-          <table className="w-full">
-            <thead>
-              <tr className="text-left text-[11px] uppercase tracking-wide" style={{ color: C.muted }}>
-                <th className="px-2.5 py-1.5 font-semibold">Ürün</th>
-                <th className="py-1.5 text-right font-semibold">Fiyat</th>
-                <th className="py-1.5 text-right font-semibold">Gün</th>
-                <th className="px-2.5 py-1.5 text-right font-semibold">7 gün</th>
-              </tr>
-            </thead>
-            <tbody>
-              {PRICES.map((p) => (
-                <tr key={p.name} className="h-9 border-t" style={{ borderColor: C.line }}>
-                  <td className="px-2.5 font-medium">{p.name}</td>
-                  <td className={`${mono} text-right font-semibold`}>{p.price}</td>
-                  <td className="text-right"><Change v={p.change} mono={mono} /></td>
-                  <td className="px-2.5 text-right"><span className="inline-block align-middle"><Spark data={p.week} up={p.week[6] >= p.week[0]} /></span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-
-        <section className="rounded-md border bg-white" style={{ borderColor: C.line }}>
           <div className="flex items-center gap-3 border-b px-2.5 text-[13px]" style={{ borderColor: C.line }}>
             <h2 className="py-2 font-bold">Forum <span className={`${mono} text-[11px] font-normal`} style={{ color: C.muted }}>{topics.toLocaleString("tr-TR")}</span></h2>
             <span className="border-b-2 py-2 font-semibold" style={{ borderColor: C.blue, color: C.blue }}>Son</span>
             <span className="py-2" style={{ color: C.muted }}>Yanıtlanan</span>
             <span className="py-2" style={{ color: C.muted }}>Popüler</span>
-            <span className="ml-auto rounded px-2 py-1 text-[12px] font-semibold text-white" style={{ background: C.blue }}>+ Konu</span>
-          </div>
-          <div className="grid grid-cols-[1fr_36px_44px] gap-x-2 px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide" style={{ color: C.muted }}>
-            <span>Konu</span>
-            <span className="text-right">Yan.</span>
-            <span className="text-right">Gör.</span>
+            <span className="ml-auto rounded px-2 py-1 text-[12px] font-semibold text-white" style={{ background: C.red }}>+ Konu</span>
           </div>
           <ul>
             {TOPICS.map((t) => (
-              <li key={t.title} className="grid grid-cols-[1fr_36px_44px] items-center gap-x-2 border-t px-2.5 py-1.5" style={{ borderColor: C.line }}>
-                <div className="min-w-0">
-                  <p className="truncate font-medium">{t.title}</p>
-                  <p className="truncate text-[11.5px]" style={{ color: C.muted }}>{t.section} · {t.ago} · son: {t.lastBy}</p>
-                </div>
-                <span className={`${mono} text-right text-[12px] font-semibold`}>{t.replies}</span>
-                <span className={`${mono} text-right text-[12px]`} style={{ color: C.muted }}>{t.views.toLocaleString("tr-TR")}</span>
+              <li key={t.title} className="border-t px-2.5 py-1.5" style={{ borderColor: C.line }}>
+                <p className="truncate font-medium">{t.title}</p>
+                <p className="flex items-center gap-2 text-[11.5px]" style={{ color: C.muted }}>
+                  <span className="min-w-0 truncate">{t.section} · {t.ago} · son: {t.lastBy}</span>
+                  <span className={`${mono} flex shrink-0 items-center gap-2 text-[11px]`}>
+                    <span className="inline-flex items-center gap-0.5" style={{ color: C.text }}>
+                      <ChatCircleIcon weight="bold" className="size-3.5" aria-hidden="true" />
+                      {t.replies}
+                      <span className="sr-only"> yanıt</span>
+                    </span>
+                    <span className="inline-flex items-center gap-0.5">
+                      <EyeIcon weight="bold" className="size-3.5" aria-hidden="true" />
+                      {t.views.toLocaleString("tr-TR")}
+                      <span className="sr-only"> görüntülenme</span>
+                    </span>
+                  </span>
+                </p>
               </li>
             ))}
           </ul>

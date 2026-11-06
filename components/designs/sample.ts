@@ -51,6 +51,15 @@ export const TOPICS: SampleTopic[] = [
   { title: "Satılık: 2015 model 75 beygir traktör, bakımlı", section: "Fiyat ve pazar", sectionId: "pazar", author: "Kemal Aydın", initials: "KA", ago: "3 gün önce", replies: 3, likes: 2, views: 980, photo: "/market/ilan-traktor.webp", tag: { label: "SATIŞ", tone: "green" }, excerpt: "Tek sahibinden, 4200 saatte. Fiyat ve fotoğraflar Pazar'daki ilanda.", lastBy: "Ali Ç." },
 ];
 
+/** Sample farmer news and support announcements ("Çiftçi destekleri & haberler"). */
+export const NEWS: { kind: "Destek" | "Haber" | "Duyuru"; title: string }[] = [
+  { kind: "Destek", title: "Mazot ve gübre desteği ödemeleri hesaplara yatıyor" },
+  { kind: "Duyuru", title: "ÇKS kayıt güncellemesi için son gün 31 Aralık" },
+  { kind: "Haber", title: "Konya Ovası’nda buğday ekimi yüzde 80’i geçti" },
+  { kind: "Destek", title: "Genç çiftçi hibesi başvuruları açıldı" },
+  { kind: "Haber", title: "Arpa fiyatları borsada haftaya yükselişle başladı" },
+];
+
 /** Sample crop prices (₺/kg) for the price-led designs; the change is the day's, in per cent. */
 export const PRICES: { name: string; price: string; change: number; week: number[] }[] = [
   { name: "Buğday", price: "12,35", change: 1.2, week: [11.9, 12.0, 11.95, 12.1, 12.05, 12.2, 12.35] },

@@ -763,3 +763,43 @@ html.cine :is([data-cine="line2"], [data-cine="phone"], [data-cine="badge"]) {
     transition: none;
   }
 }
+
+/* Kayan şerit ("Çiftçi destekleri & haberler"): headlines glide right to left like a market ticker.
+   The list is drawn twice so the loop has no gap. It stops while a finger, the mouse or keyboard
+   focus is on it, and never moves for people who ask for less motion: then it scrolls by hand. */
+.kayan-serit {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.kayan-serit::-webkit-scrollbar {
+  display: none;
+}
+.kayan-serit__ray {
+  display: flex;
+  width: max-content;
+}
+.kayan-serit__kopya {
+  display: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .kayan-serit {
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 12px), transparent);
+  }
+  .kayan-serit__kopya {
+    display: flex;
+  }
+  .kayan-serit__ray {
+    animation: kayan-serit var(--serit-sure, 45s) linear infinite;
+  }
+  .kayan-serit:hover .kayan-serit__ray,
+  .kayan-serit:active .kayan-serit__ray,
+  .kayan-serit:focus-within .kayan-serit__ray {
+    animation-play-state: paused;
+  }
+}
+@keyframes kayan-serit {
+  to {
+    transform: translateX(-50%);
+  }
+}

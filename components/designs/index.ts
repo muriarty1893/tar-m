@@ -39,7 +39,7 @@ export const DESIGNS: { name: string; style: string; about: string; Page: Compon
   { name: "Yumuşak", style: "Yumuşak arayüz (neumorfizm)", about: "Her şey tek bir yumuşak gri yüzeyde, kabarık ya da içe basık; hava durumu kadran gibi. Sakin, dokunsal.", Page: D14Yumusak },
   { name: "Bauhaus", style: "Bauhaus", about: "Kırmızı, mavi, sarı renk blokları; daire ve üçgenler, siyah çizgiler, kalın büyük harfler. Afiş gibi.", Page: D15Bauhaus },
   { name: "Kolay", style: "Büyük yazı / erişilebilir", about: "Büyük yazı, yüksek kontrast, yazılı büyük butonlar, yazı boyutu ayarı. Yaşlı gözler ve tarlada güneş altında okumak için.", Page: D16Kolay },
-  { name: "Borsa", style: "Veri paneli", about: "Sık ve küçük: hava kutusunda 3 günlük tahmin, Pazar kutusunda fiyatlar, 7 günlük çizgili fiyat tablosu; forum sık bir tablo.", Page: D17Borsa },
+  { name: "Borsa", style: "Veri paneli", about: "Sık ve küçük: kayan “Çiftçi destekleri & haberler” şeridi, hava kutusunda 3 günlük tahmin, Pazar kutusunda fiyatlar; forumda yanıt ve görüntülenme satırın sonunda.", Page: D17Borsa },
   { name: "Akış", style: "Sosyal medya akışı", about: "Instagram gibi: sponsor “Sponsorlu” gönderi, forumda bölümler hikâye halkası, “Ne sormak istersin?” kutusu, fotoğraflı gönderiler.", Page: D18Akis },
   { name: "Defter", style: "El çizimi", about: "Çizgili defter sayfası, el yazısı, titrek kalem çizgili kutular, bantlı sarı not kâğıdında sponsor, kırmızı kalem notları.", Page: D19Defter },
   { name: "Manzara", style: "Fotoğraf ve katmanlar", about: "Üstü tam ekran tarla fotoğrafı, arama onun üstünde; sayfa fotoğrafın üstüne kayan bir tabaka, gölgeli katmanlı kartlar, yüzen “Konu aç”.", Page: D20Manzara },
