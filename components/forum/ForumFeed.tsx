@@ -1,17 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { ArrowClockwiseIcon, CaretDownIcon, ChatsTeardropIcon, SpinnerGapIcon } from "@phosphor-icons/react/dist/ssr";
 import { TopicRow } from "@/components/forum/TopicRow";
 import { buttonVariants } from "@/components/ui/button";
 import type { ForumCats, ForumSort } from "@/lib/forum";
 import type { TopicCard } from "@/lib/forum-data";
 
-const TABS: { id: ForumSort; label: string }[] = [
-  { id: "yeni", label: "Son konular" },
-  { id: "aktif", label: "Son yanıtlar" },
-  { id: "populer", label: "Popüler" },
+const TABS: { id: ForumSort; label: string; short: string }[] = [
+  { id: "yeni", label: "Son konular", short: "Son" },
+  { id: "aktif", label: "Son yanıtlar", short: "Yanıtlanan" },
+  { id: "populer", label: "Popüler", short: "Popüler" },
 ];
 
 type Feed = { items: TopicCard[]; total: number; page: number; state: "idle" | "loading" | "error" };
@@ -19,7 +19,8 @@ type Feed = { items: TopicCard[]; total: number; page: number; state: "idle" | "
 /**
  * A list of topics that grows in place, as on r10.net: "Daha fazla göster" adds the next page under
  * the last row (from the public forum API). With `tabs`, three orders to switch between; each is
- * fetched the first time it's opened, then kept.
+ * fetched the first time it's opened, then kept. `dense` is the home page's Borsa look: one header row
+ * with `heading`, the three orders and `action`, then short two-line rows.
  */
 export function ForumFeed({
   initial,
@@ -31,6 +32,9 @@ export function ForumFeed({
   tabs = false,
   emptyText = "Henüz konu yok. İlk konuyu siz açın!",
   label = "Konular",
+  dense = false,
+  heading,
+  action,
 }: {
   initial: { items: TopicCard[]; total: number };
   sort?: ForumSort;
@@ -42,6 +46,9 @@ export function ForumFeed({
   tabs?: boolean;
   emptyText?: string;
   label?: string;
+  dense?: boolean;
+  heading?: ReactNode;
+  action?: ReactNode;
 }) {
   const [active, setActive] = useState<ForumSort>(sort);
   const [feeds, setFeeds] = useState<Partial<Record<ForumSort, Feed>>>({ [sort]: { ...initial, page: 1, state: "idle" } });
@@ -80,7 +87,29 @@ export function ForumFeed({
 
   return (
     <div>
-      {tabs && (
+      {dense && (
+        <div className="flex items-center gap-1 border-b border-[#dfe3e8] pl-3 pr-2">
+          {heading}
+          {tabs && (
+            <div role="group" aria-label="Sıralama" className="flex min-w-0">
+              {TABS.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  aria-pressed={active === t.id}
+                  onClick={() => pick(t.id)}
+                  className="relative min-h-11 cursor-pointer px-1.5 text-[13px] text-[#4b5563] transition-colors hover:text-[#111827] aria-pressed:font-semibold aria-pressed:text-[#1d4ed8] focus-visible:outline-offset-[-3px]"
+                >
+                  {t.short}
+                  <span aria-hidden="true" className={`absolute inset-x-1 bottom-0 h-0.5 ${active === t.id ? "bg-[#1d4ed8]" : "bg-transparent"}`} />
+                </button>
+              ))}
+            </div>
+          )}
+          <span className="ml-auto shrink-0">{action}</span>
+        </div>
+      )}
+      {tabs && !dense && (
         <div role="group" aria-label="Sıralama" className="flex border-b border-border bg-card">
           {TABS.map((t) => (
             <button
@@ -97,7 +126,16 @@ export function ForumFeed({
         </div>
       )}
 
-      {firstLoad ? (
+      {firstLoad && dense ? (
+        <ul aria-hidden="true" className="divide-y divide-[#dfe3e8]">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <li key={i} className="space-y-1.5 px-3 py-2.5">
+              <span className="block h-3.5 w-4/5 rounded bg-[#eef0f3] motion-safe:animate-pulse" />
+              <span className="block h-3 w-1/2 rounded bg-[#eef0f3]" />
+            </li>
+          ))}
+        </ul>
+      ) : firstLoad ? (
         <ul aria-hidden="true" className="divide-y divide-border bg-card">
           {[0, 1, 2, 3, 4].map((i) => (
             <li key={i} className="flex gap-3 px-4 py-3.5">
@@ -115,9 +153,9 @@ export function ForumFeed({
           <p className="mx-auto mt-2 max-w-sm">{emptyText}</p>
         </div>
       ) : (
-        <ul aria-label={tabs ? TABS.find((t) => t.id === active)?.label : label} className="divide-y divide-border bg-card">
+        <ul aria-label={tabs ? TABS.find((t) => t.id === active)?.label : label} className={dense ? "divide-y divide-[#dfe3e8]" : "divide-y divide-border bg-card"}>
           {feed.items.map((t) => (
-            <TopicRow key={t.id} topic={t} cats={cats} now={clock} showLastReply={active === "aktif"} />
+            <TopicRow key={t.id} topic={t} cats={cats} now={clock} showLastReply={active === "aktif"} dense={dense} />
           ))}
         </ul>
       )}
@@ -132,7 +170,24 @@ export function ForumFeed({
         </p>
       )}
 
-      {feed && feed.state !== "error" && more && (
+      {feed && feed.state !== "error" && more && dense && (
+        <button
+          type="button"
+          onClick={() => load(active, feed.page + 1)}
+          disabled={feed.state === "loading"}
+          className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-1.5 border-t border-[#dfe3e8] font-semibold text-[#1d4ed8] transition-colors hover:bg-[#f6f7f9] disabled:cursor-wait"
+        >
+          {feed.state === "loading" ? (
+            <>
+              <SpinnerGapIcon aria-hidden="true" weight="bold" className="size-4 motion-safe:animate-spin" />
+              Yükleniyor…
+            </>
+          ) : (
+            "Daha fazla göster"
+          )}
+        </button>
+      )}
+      {feed && feed.state !== "error" && more && !dense && (
         <div className="border-t border-border bg-card p-3">
           <button
             type="button"

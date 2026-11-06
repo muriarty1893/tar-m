@@ -1,7 +1,7 @@
 import "server-only";
 import { del } from "@vercel/blob";
 import { iso, isUuid, sql, str } from "@/lib/db";
-import { validateArticle, type ArticleErrors, type ArticleInput } from "@/lib/news";
+import { isArticleKind, validateArticle, type ArticleErrors, type ArticleInput } from "@/lib/news";
 import { REPORT_REASONS } from "@/lib/market";
 
 /**
@@ -34,6 +34,8 @@ export function cleanArticle(raw: Partial<Record<keyof ArticleInput, unknown>>):
     cover: s(raw.cover).trim(),
     date: s(raw.date),
     status: raw.status === "published" ? "published" : "draft",
+    // The app's editor sends no kind: a news item.
+    kind: isArticleKind(raw.kind) ? raw.kind : "haber",
   };
 }
 
@@ -54,7 +56,7 @@ export async function saveArticleFor(adminId: string, raw: Partial<Record<keyof 
     if (!before[0]) return { errors: {}, message: "Haber bulunamadı." };
     await sql()`
       update articles set slug = ${a.slug}, title = ${a.title}, summary = ${a.summary}, body = ${a.body}, cover = ${a.cover || null},
-        published_on = ${a.date}, status = ${a.status}, updated_at = now()
+        published_on = ${a.date}, status = ${a.status}, kind = ${a.kind}, updated_at = now()
       where id = ${id}`;
     // A replaced or removed cover upload is deleted from Blob storage.
     const old = before[0].cover as string | null;
@@ -63,8 +65,8 @@ export async function saveArticleFor(adminId: string, raw: Partial<Record<keyof 
   }
 
   const rows = await sql()`
-    insert into articles (slug, title, summary, body, cover, published_on, status, author_id)
-    values (${a.slug}, ${a.title}, ${a.summary}, ${a.body}, ${a.cover || null}, ${a.date}, ${a.status}, ${adminId})
+    insert into articles (slug, title, summary, body, cover, published_on, status, kind, author_id)
+    values (${a.slug}, ${a.title}, ${a.summary}, ${a.body}, ${a.cover || null}, ${a.date}, ${a.status}, ${a.kind}, ${adminId})
     returning id`;
   return { errors: {}, saved: true, id: String(rows[0].id), created: true };
 }

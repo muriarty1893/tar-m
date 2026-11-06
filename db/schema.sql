@@ -261,3 +261,13 @@ create index if not exists forum_topics_category_idx on forum_topics (category, 
 -- "düzenlendi": the author or an admin changed the post after it went up.
 alter table forum_topics add column if not exists edited_at timestamptz;
 alter table forum_replies add column if not exists edited_at timestamptz;
+
+-- Görüntülenme: real opens of a topic page (one per browser session). Lists add made-up views on top
+-- (lib/forum-views.ts); those are never stored.
+alter table forum_topics add column if not exists view_count integer not null default 0;
+
+-- Haberler: each article is a support, a news item or an announcement, shown as its label on the home
+-- page's "Çiftçi destekleri & haberler" strip and on /haberler.
+alter table articles add column if not exists kind text not null default 'haber';
+alter table articles drop constraint if exists articles_kind_check;
+alter table articles add constraint articles_kind_check check (kind in ('destek', 'haber', 'duyuru'));

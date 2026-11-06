@@ -803,3 +803,8 @@ html.cine :is([data-cine="line2"], [data-cine="phone"], [data-cine="badge"]) {
     transform: translateX(-50%);
   }
 }
+
+/* The Borsa home's figures (Fira Code, components/home/fonts.ts). */
+.font-borsa-mono {
+  font-family: var(--font-borsa-mono), ui-monospace, monospace;
+}

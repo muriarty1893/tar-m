@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ArrowBendDownRightIcon, CaretRightIcon, ChatsTeardropIcon, CheckCircleIcon } from "@phosphor-icons/react/dist/ssr";
 import { Avatar } from "@/components/market/Avatar";
+import { CountView } from "@/components/forum/CountView";
 import { CategoryChip, repliesLabel } from "@/components/forum/parts";
 import { ForumText } from "@/components/forum/ForumText";
 import { PhotoGrid } from "@/components/forum/PhotoGrid";
@@ -63,6 +64,7 @@ async function Topic({ params, searchParams }: { params: PageProps<"/forum/[id]"
 
   return (
     <article className="space-y-6">
+      <CountView topicId={topic.id} />
       <Breadcrumb cats={cats} category={topic.category} />
       {(sp.yeni === "1" || sp.kaydedildi === "1") && (
         <p role="status" className="mx-3 flex items-center gap-2 rounded-xl border border-primary/30 bg-secondary px-4 py-3 font-semibold sm:mx-0">
@@ -80,7 +82,7 @@ async function Topic({ params, searchParams }: { params: PageProps<"/forum/[id]"
             <Author name={topic.authorName} handle={topic.authorHandle} mine={topic.mine} size="lg" />
             <p className="text-sm text-muted-foreground">
               {agoLabel(new Date(topic.createdAt), now)}
-              {topic.editedAt && <> · düzenlendi</>}
+              {topic.editedAt && <> · düzenlendi</>} · {topic.viewCount.toLocaleString("tr-TR")} görüntülenme
             </p>
           </div>
         </div>

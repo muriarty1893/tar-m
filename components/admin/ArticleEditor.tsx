@@ -21,6 +21,7 @@ import {
 import { deleteArticle, previewMarkdown, saveArticle } from "@/app/yonetim/actions";
 import {
   ARTICLE_FIELD_ORDER,
+  ARTICLE_KINDS,
   SUMMARY_MAX,
   slugify,
   validateArticle,
@@ -42,6 +43,7 @@ const LABELS: Record<ArticleField, string> = {
   cover: "Kapak fotoğrafı",
   date: "Tarih",
   status: "Durum",
+  kind: "Tür",
 };
 const IDS: Record<ArticleField, string> = {
   title: "haber-baslik",
@@ -51,6 +53,7 @@ const IDS: Record<ArticleField, string> = {
   cover: "haber-kapak",
   date: "haber-tarih",
   status: "haber-durum-taslak",
+  kind: "haber-tur-destek",
 };
 
 /** Toolbar actions: wrap the selection, or put a prefix at the start of each selected line. */
@@ -383,6 +386,28 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
               </span>
             </label>
           ))}
+        </fieldset>
+
+        <fieldset className="rounded-2xl border border-border p-5">
+          <legend className="px-1 text-base font-semibold">Tür</legend>
+          <p className="text-sm text-muted-foreground">Ana sayfadaki “Çiftçi destekleri & haberler” şeridinde başlığın önünde yazar.</p>
+          {ARTICLE_KINDS.map(({ id, label, hint }) => (
+            <label key={id} className="mt-2 flex cursor-pointer items-start gap-3 rounded-xl p-2 hover:bg-secondary">
+              <input
+                type="radio"
+                id={`haber-tur-${id}`}
+                name="tur"
+                checked={v.kind === id}
+                onChange={() => set("kind", id)}
+                className="mt-1 size-5 accent-[var(--primary)]"
+              />
+              <span>
+                <span className="block font-semibold">{label}</span>
+                <span className="block text-sm text-muted-foreground">{hint}</span>
+              </span>
+            </label>
+          ))}
+          {shown.kind && <FieldError id="haber-tur-hata">{shown.kind}</FieldError>}
         </fieldset>
 
         <Field id={IDS.date} label="Tarih" error={shown.date}>

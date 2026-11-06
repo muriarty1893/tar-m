@@ -102,26 +102,38 @@ export async function latestListings(limit = 4): Promise<ListingCard[]> {
   }
 }
 
-export type MarketSummary = { active: number; byCategory: Record<string, number>; newest: { id: string; title: string; price: number; unit: string | null } | null };
+type NewListing = { id: string; title: string; price: number; unit: string | null };
+export type MarketSummary = {
+  active: number;
+  byCategory: Record<string, number>;
+  newest: NewListing | null;
+  /** The three newest, for the home page's Pazar box. */
+  latest: NewListing[];
+  /** Live listings put up today (Türkiye time). */
+  today: number;
+};
 
-/** Live listings in all and per category, and the newest one: the home page's Pazar tile and Pazar's category list. Cached for minutes. */
+/** Live listings in all, per category and today, and the newest: the home page's Pazar box and Pazar's category list. Cached for minutes. */
 export async function marketSummary(): Promise<MarketSummary> {
   "use cache";
   cacheLife("minutes");
   cacheTag(LISTINGS_TAG);
-  const empty: MarketSummary = { active: 0, byCategory: {}, newest: null };
+  const empty: MarketSummary = { active: 0, byCategory: {}, newest: null, latest: [], today: 0 };
   if (!process.env.DATABASE_URL) return empty;
   try {
-    const [counts, newest] = await Promise.all([
+    const [counts, newest, today] = await Promise.all([
       sql()`select category, count(*) as n from listings where status = 'active' group by category`,
-      sql()`select id, title, price, unit from listings where status = 'active' order by created_at desc limit 1`,
+      sql()`select id, title, price, unit from listings where status = 'active' order by created_at desc limit 3`,
+      sql()`select count(*) as n from listings where status = 'active' and created_at >= date_trunc('day', now() at time zone 'Europe/Istanbul') at time zone 'Europe/Istanbul'`,
     ]);
     const byCategory = Object.fromEntries(counts.map((r) => [str(r.category), Number(r.n)]));
-    const n = newest[0];
+    const latest = newest.map((n) => ({ id: str(n.id), title: str(n.title), price: num(n.price) ?? 0, unit: n.unit ? str(n.unit) : null }));
     return {
       active: Object.values(byCategory).reduce((a, b) => a + b, 0),
       byCategory,
-      newest: n ? { id: str(n.id), title: str(n.title), price: num(n.price) ?? 0, unit: n.unit ? str(n.unit) : null } : null,
+      newest: latest[0] ?? null,
+      latest,
+      today: Number(today[0]?.n ?? 0),
     };
   } catch (err) {
     console.error("marketSummary", err);

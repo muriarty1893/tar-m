@@ -77,7 +77,7 @@ export function D17Borsa() {
         </div>
 
         <section aria-label="Çiftçi destekleri ve haberler" className="flex h-8 items-stretch overflow-hidden rounded-md border bg-white" style={{ borderColor: C.line }}>
-          <h2 className="flex shrink-0 items-center border-r px-2 text-[11px] font-bold leading-none" style={{ color: C.red, borderColor: C.line }}>Çiftçi destekleri & haberler</h2>
+          <h2 className="flex shrink-0 items-center px-2 text-[11px] font-bold leading-none text-white" style={{ background: C.red }}>Çiftçi destekleri & haberler</h2>
           <div className="kayan-serit flex min-w-0 flex-1 items-center pl-2.5">
             <div className="kayan-serit__ray">
               <NewsRow mono={mono} />

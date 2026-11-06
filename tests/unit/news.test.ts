@@ -9,6 +9,7 @@ const valid: ArticleInput = {
   cover: "",
   date: "2026-11-03",
   status: "published",
+  kind: "destek",
 };
 
 describe("slugify", () => {

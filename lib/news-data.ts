@@ -1,7 +1,7 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { day, iso, isUuid, sql, str, type Row } from "./db";
-import { renderMarkdown, type Article, type ArticleStatus, type ArticleSummary } from "./news";
+import { isArticleKind, renderMarkdown, type Article, type ArticleStatus, type ArticleSummary } from "./news";
 
 /** Reads for Haberler. Public reads are cached and refreshed when an article is saved (NEWS_TAG). */
 
@@ -9,6 +9,7 @@ export const NEWS_TAG = "news";
 
 const toSummary = (r: Row): ArticleSummary => ({
   slug: str(r.slug),
+  kind: isArticleKind(r.kind) ? r.kind : "haber",
   title: str(r.title),
   date: day(r.published_on),
   summary: str(r.summary),
@@ -22,7 +23,7 @@ export async function listPublished(): Promise<ArticleSummary[]> {
   cacheTag(NEWS_TAG);
   if (!process.env.DATABASE_URL) return [];
   const rows = await sql()`
-    select slug, title, summary, cover, published_on from articles
+    select slug, kind, title, summary, cover, published_on from articles
     where status = 'published' order by published_on desc, slug asc`;
   return rows.map(toSummary);
 }
@@ -33,7 +34,7 @@ export async function getPublished(slug: string): Promise<Article | null> {
   cacheLife("hours");
   cacheTag(NEWS_TAG);
   if (!process.env.DATABASE_URL) return null;
-  const rows = await sql()`select slug, title, summary, cover, published_on, body from articles where slug = ${slug} and status = 'published'`;
+  const rows = await sql()`select slug, kind, title, summary, cover, published_on, body from articles where slug = ${slug} and status = 'published'`;
   const r = rows[0];
   return r ? { ...toSummary(r), html: renderMarkdown(str(r.body)) } : null;
 }

@@ -1,6 +1,7 @@
 import "server-only";
 import { iso, isUuid, sql, str, type Row } from "./db";
 import { FORUM_PAGE_SIZE, HANDLE_RE, type ForumQuery } from "./forum";
+import { shownViews } from "./forum-views";
 import { fold } from "@/data/demo-market";
 
 /** Reads for the forum. Writes are in lib/services/forum.ts. */
@@ -18,7 +19,11 @@ export type TopicCard = {
   createdAt: string;
   replyCount: number;
   likeCount: number;
+  /** Real opens plus the made-up ones (lib/forum-views.ts). */
+  viewCount: number;
   lastReplyAt: string | null;
+  /** Who wrote the latest reply still standing (in lists only). */
+  lastReplyBy: string | null;
   /** The first photo, for the list. */
   photo: string | null;
   photoCount: number;
@@ -28,9 +33,10 @@ export type TopicCard = {
 
 const EXCERPT = 160;
 
-const toCard = (r: Row): TopicCard => {
+const toCard = (r: Row, now: Date): TopicCard => {
   const body = str(r.body).replace(/\s+/g, " ").trim();
   const photos = (r.photos as string[] | null) ?? [];
+  const createdAt = iso(r.created_at);
   return {
     id: str(r.id),
     title: str(r.title),
@@ -39,10 +45,12 @@ const toCard = (r: Row): TopicCard => {
     authorId: str(r.author_id),
     authorName: str(r.author_name) || "Kullanıcı",
     authorHandle: r.author_handle ? str(r.author_handle) : null,
-    createdAt: iso(r.created_at),
+    createdAt,
     replyCount: Number(r.reply_count ?? 0),
     likeCount: Number(r.like_count ?? 0),
+    viewCount: shownViews(str(r.id), Number(r.view_count ?? 0), new Date(createdAt), now),
     lastReplyAt: r.last_reply_at ? iso(r.last_reply_at) : null,
+    lastReplyBy: r.last_reply_by ? str(r.last_reply_by) : null,
     photo: photos[0] ?? null,
     photoCount: photos.length,
     editedAt: r.edited_at ? iso(r.edited_at) : null,
@@ -72,15 +80,19 @@ export async function listTopics(q: ForumQuery, authorId?: string): Promise<{ it
         ? "t.reply_count desc, coalesce(t.last_reply_at, t.created_at) desc"
         : "t.created_at desc";
   const rows = await sql().query(
-    `select t.id, t.title, t.category, t.body, t.photos, t.author_id, t.created_at, t.reply_count, t.like_count, t.last_reply_at, t.edited_at,
-       p.name as author_name, p.handle as author_handle, count(*) over () as total
+    `select t.id, t.title, t.category, t.body, t.photos, t.author_id, t.created_at, t.reply_count, t.like_count, t.view_count, t.last_reply_at, t.edited_at,
+       p.name as author_name, p.handle as author_handle, count(*) over () as total,
+       (select lp.name from forum_replies lr join profiles lp on lp.user_id = lr.author_id
+        where lr.topic_id = t.id and lr.deleted_at is null order by lr.created_at desc limit 1) as last_reply_by
      from forum_topics t join profiles p on p.user_id = t.author_id
      where ${where.join(" and ")}
      order by ${order}
      limit ${FORUM_PAGE_SIZE} offset ${(q.sayfa - 1) * FORUM_PAGE_SIZE}`,
     params,
   );
-  return { items: rows.map(toCard), total: rows.length ? Number(rows[0].total) : 0 };
+  // The time is read after the database answers, as Cache Components requires.
+  const now = new Date();
+  return { items: rows.map((r) => toCard(r, now)), total: rows.length ? Number(rows[0].total) : 0 };
 }
 
 export type ForumReply = {
@@ -133,7 +145,7 @@ export async function getTopic(id: string, userId: string | null): Promise<Topic
     order by r.created_at asc
     limit 500`;
   return {
-    ...toCard(t),
+    ...toCard(t, new Date()),
     body: str(t.body),
     photos: (t.photos as string[] | null) ?? [],
     liked: t.liked === true,

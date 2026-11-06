@@ -36,37 +36,51 @@ const topic = (i: number) => ({
   createdAt: "2026-11-01T09:00:00.000Z",
   replyCount: i,
   likeCount: 0,
+  viewCount: 100 + i,
   lastReplyAt: null,
+  lastReplyBy: null,
   photo: null,
   photoCount: 0,
   editedAt: null,
 });
 
-test("the portal home: search, the sponsor, Reklam vermek için, weather and Pazar side by side, then the forum", async ({ page }) => {
+test("the Borsa home: search, sponsor, reklam, the news ticker, weather and Pazar side by side, then the forum", async ({ page }) => {
   await mockWeather(page);
   await page.goto("/");
   const main = page.locator("main");
   const search = main.getByRole("search", { name: "Sitede ara" });
   const sponsor = main.getByRole("button", { name: /sukocu\.com/ });
-  const advertise = main.getByRole("link", { name: /Reklam vermek için/ });
-  const weatherTile = main.getByRole("link", { name: /^Hava durumu, Ankara: 17 derece/ });
-  const market = main.getByRole("link", { name: /^Pazar/ }).filter({ hasText: "ilan" });
-  const forum = main.getByRole("region", { name: "Forum" });
-  for (const part of [search, sponsor, advertise, weatherTile, market, forum]) await expect(part).toBeVisible();
+  const advertise = main.getByRole("link", { name: /Bu alanda reklam vermek için/ });
+  const news = main.getByRole("region", { name: "Çiftçi destekleri & haberler" });
+  const weatherBox = main.getByRole("link", { name: /^Hava durumu, Ankara: 17 derece/ });
+  const market = main.getByRole("region", { name: "Pazar" });
+  const forum = main.getByRole("region", { name: /^Forum/ });
+  for (const part of [search, sponsor, advertise, news, weatherBox, market, forum]) await expect(part).toBeVisible();
   await expect(advertise).toHaveAttribute("href", "/is-birligi");
-  await expect(market).toHaveAttribute("href", "/pazar");
-  await expect(weatherTile).toHaveAttribute("href", "/hava");
+  await expect(news.getByRole("link", { name: "Çiftçi destekleri & haberler" })).toHaveAttribute("href", "/haberler");
+  await expect(market.getByRole("link", { name: "Pazar", exact: true })).toHaveAttribute("href", "/pazar");
+  await expect(weatherBox).toHaveAttribute("href", "/hava");
 
-  // In that order, top to bottom; the two tiles share one line.
-  const y = async (l: ReturnType<Page["locator"]>) => (await l.boundingBox())!.y;
-  const order = [await y(search), await y(sponsor), await y(advertise), await y(weatherTile), await y(forum)];
+  // In that order, top to bottom; the two boxes share one line; the ticker is a bit thinner than the strips above it.
+  const box = async (l: ReturnType<Page["locator"]>) => (await l.boundingBox())!;
+  const order = [(await box(search)).y, (await box(sponsor)).y, (await box(advertise)).y, (await box(news)).y, (await box(weatherBox)).y, (await box(forum)).y];
   expect([...order].sort((a, b) => a - b)).toEqual(order);
-  expect(Math.abs((await y(weatherTile)) - (await y(market)))).toBeLessThan(2);
+  expect(Math.abs((await box(weatherBox)).y - (await box(market)).y)).toBeLessThan(2);
+  expect((await box(news)).height).toBeLessThan((await box(sponsor)).height);
 
   await expect(forum.getByRole("link", { name: "Konu aç" })).toHaveAttribute("href", "/forum/yeni");
-  await expect(forum.getByRole("group", { name: "Sıralama" }).getByRole("button")).toHaveText(["Son konular", "Son yanıtlar", "Popüler"]);
+  await expect(forum.getByRole("group", { name: "Sıralama" }).getByRole("button")).toHaveText(["Son", "Yanıtlanan", "Popüler"]);
   await expect(forum.getByRole("link", { name: "Forumun tamamı" })).toHaveAttribute("href", "/forum");
-  await expect(forum.getByRole("navigation", { name: "Forum bölümleri" }).getByRole("link", { name: "Bitkisel üretim" })).toHaveAttribute("href", "/forum/k/bitki");
+});
+
+test("topic rows end with their replies and views", async ({ page }) => {
+  await page.route((url) => url.pathname === "/api/app/forum", (route) =>
+    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ items: [topic(3)], total: 1, page: 1, pageSize: 20 }) }),
+  );
+  await page.goto("/");
+  const forum = page.getByRole("region", { name: /^Forum/ });
+  await forum.getByRole("button", { name: "Popüler" }).click();
+  await expect(forum.getByRole("list", { name: "Popüler" }).getByRole("link")).toContainText(["3 yanıt, 103 görüntülenme"]);
 });
 
 test("the sponsor space says what it is when tapped", async ({ page }) => {

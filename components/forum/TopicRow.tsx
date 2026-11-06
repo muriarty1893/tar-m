@@ -1,19 +1,63 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ChatCircleTextIcon, HeartIcon, ImageIcon } from "@phosphor-icons/react/dist/ssr";
+import { ChatCircleTextIcon, EyeIcon, HeartIcon, ImageIcon } from "@phosphor-icons/react/dist/ssr";
 import { Avatar } from "@/components/market/Avatar";
 import { CategoryChip } from "@/components/forum/parts";
-import type { ForumCats } from "@/lib/forum";
+import { categoryName, type ForumCats } from "@/lib/forum";
 import type { TopicCard } from "@/lib/forum-data";
 import { agoLabel } from "@/lib/tr-time";
 
+/** "Hasan Demir" → "Hasan D." for the dense list's "son: …". */
+const shortName = (name: string) => {
+  const [first, ...rest] = name.trim().split(/\s+/);
+  const last = rest.at(-1);
+  return last ? `${first} ${last.charAt(0).toLocaleUpperCase("tr-TR")}.` : first;
+};
+
+/** Replies and views at the end of a topic's line. */
+function Counts({ topic: t, className = "" }: { topic: TopicCard; className?: string }) {
+  return (
+    <span className={`inline-flex shrink-0 items-center gap-2 tabular-nums ${className}`}>
+      <span className="inline-flex items-center gap-0.5">
+        <ChatCircleTextIcon aria-hidden="true" weight="bold" className="size-3.5" />
+        {t.replyCount.toLocaleString("tr-TR")}
+        <span className="sr-only"> yanıt, </span>
+      </span>
+      <span className="inline-flex items-center gap-0.5">
+        <EyeIcon aria-hidden="true" weight="bold" className="size-3.5" />
+        {t.viewCount.toLocaleString("tr-TR")}
+        <span className="sr-only"> görüntülenme</span>
+      </span>
+    </span>
+  );
+}
+
 /**
- * One topic in a list, r10.net style: who, the title, category · author · time, and the reply count
- * in a box on the right. A photo shows as a small thumbnail. Used on the server and in the browser
- * ("Daha fazla göster" adds rows), so it reads nothing itself.
+ * One topic in a list, r10.net style: who, the title, then category · author · time with the likes,
+ * replies and views at the end of the line. A photo shows as a small thumbnail. `dense` is the home
+ * page's Borsa row: title, then category · time · last replier and the counts, on two short lines.
+ * Used on the server and in the browser ("Daha fazla göster" adds rows), so it reads nothing itself.
  */
-export function TopicRow({ topic: t, cats, now, showLastReply = false }: { topic: TopicCard; cats: ForumCats; now: Date; showLastReply?: boolean }) {
+export function TopicRow({ topic: t, cats, now, showLastReply = false, dense = false }: { topic: TopicCard; cats: ForumCats; now: Date; showLastReply?: boolean; dense?: boolean }) {
   const when = showLastReply && t.lastReplyAt ? `son yanıt ${agoLabel(new Date(t.lastReplyAt), now)}` : agoLabel(new Date(t.createdAt), now);
+
+  if (dense) {
+    const who = t.replyCount > 0 && t.lastReplyBy ? `son: ${shortName(t.lastReplyBy)}` : shortName(t.authorName);
+    return (
+      <li>
+        <Link href={`/forum/${t.id}`} className="block px-3 py-2 transition-colors hover:bg-[#f6f7f9] focus-visible:outline-offset-[-3px]">
+          <span className="block truncate font-medium leading-snug text-[#111827]">{t.title}</span>
+          <span className="mt-0.5 flex items-center gap-2 text-[12px] leading-5 text-[#4b5563]">
+            <span className="min-w-0 truncate">
+              {categoryName(cats, t.category)} · {when} · {who}
+            </span>
+            <Counts topic={t} className="font-borsa-mono text-[11.5px] [&>span:first-child]:text-[#111827]" />
+          </span>
+        </Link>
+      </li>
+    );
+  }
+
   return (
     <li>
       <Link href={`/forum/${t.id}`} className="flex items-start gap-3 px-3.5 py-3 transition-colors hover:bg-secondary focus-visible:outline-offset-[-3px] sm:px-4">
@@ -32,6 +76,7 @@ export function TopicRow({ topic: t, cats, now, showLastReply = false }: { topic
                 {t.likeCount}
               </span>
             )}
+            <Counts topic={t} />
           </span>
         </span>
         {t.photo && (
@@ -46,11 +91,6 @@ export function TopicRow({ topic: t, cats, now, showLastReply = false }: { topic
             <span className="sr-only">{t.photoCount} fotoğraf</span>
           </span>
         )}
-        <span className={`flex w-12 shrink-0 flex-col items-center rounded-lg py-1 ${t.replyCount ? "bg-secondary text-primary" : "bg-muted text-muted-foreground"}`}>
-          <ChatCircleTextIcon aria-hidden="true" weight="bold" className="size-4" />
-          <span className="text-sm font-bold leading-5 tabular-nums">{t.replyCount.toLocaleString("tr-TR")}</span>
-          <span className="sr-only">yanıt</span>
-        </span>
       </Link>
     </li>
   );

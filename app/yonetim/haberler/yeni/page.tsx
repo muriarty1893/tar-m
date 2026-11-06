@@ -21,5 +21,5 @@ export default function NewArticlePage() {
 async function NewArticle() {
   await requireAdmin("/yonetim/haberler/yeni");
   const today = trDayKey(await requestNow());
-  return <ArticleEditor initial={{ title: "", slug: "", summary: "", body: "", cover: "", date: today, status: "draft" }} />;
+  return <ArticleEditor initial={{ title: "", slug: "", summary: "", body: "", cover: "", date: today, status: "draft", kind: "haber" }} />;
 }

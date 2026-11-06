@@ -3,6 +3,9 @@ import AxeBuilder from "@axe-core/playwright";
 
 const ROUTES = ["/", "/haberler", "/hava", "/is-birligi", "/sss", "/hakkimizda", "/gizlilik", "/kaynaklar"];
 
+// Eight pages each, with an axe pass per page: more than the default 30 s.
+test.describe.configure({ timeout: 90_000 });
+
 test("headings never skip a level", async ({ page }) => {
   await page.route("https://api.open-meteo.com/**", (r) => r.fulfill({ status: 500, body: "{}" }));
   for (const route of ROUTES) {

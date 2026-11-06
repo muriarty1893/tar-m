@@ -7,9 +7,23 @@ import { fold } from "@/data/demo-market";
  * rules shared by the editor (in the browser) and the server actions that save an article.
  */
 
+/** What an article is: a support (hibe, ödeme), a news item or an announcement. */
+export type ArticleKind = "destek" | "haber" | "duyuru";
+
+/** The labels, in the editor's order. */
+export const ARTICLE_KINDS: { id: ArticleKind; label: string; hint: string }[] = [
+  { id: "destek", label: "Destek", hint: "Hibe, kredi, destek ödemesi, başvuru." },
+  { id: "haber", label: "Haber", hint: "Tarım dünyasından bir gelişme." },
+  { id: "duyuru", label: "Duyuru", hint: "Son tarih, kayıt, site duyurusu." },
+];
+
+export const isArticleKind = (v: unknown): v is ArticleKind => v === "destek" || v === "haber" || v === "duyuru";
+export const kindLabel = (k: ArticleKind) => ARTICLE_KINDS.find((x) => x.id === k)?.label ?? "Haber";
+
 /** A published article as the site shows it. */
 export type Article = {
   slug: string;
+  kind: ArticleKind;
   title: string;
   date: string;
   summary: string;
@@ -31,6 +45,7 @@ export type ArticleInput = {
   cover: string;
   date: string;
   status: ArticleStatus;
+  kind: ArticleKind;
 };
 
 export type ArticleField = keyof ArticleInput;
@@ -83,11 +98,12 @@ export function validateArticle(a: ArticleInput): ArticleErrors {
   if (a.cover && !isCover(a.cover)) e.cover = "Kapak fotoğrafı yüklenemedi; kaldırıp yeniden ekleyin.";
   if (!isDay(a.date)) e.date = "Tarihi seçin.";
   if (a.status !== "draft" && a.status !== "published") e.status = "Durumu seçin.";
+  if (!isArticleKind(a.kind)) e.kind = "Türünü seçin: Destek, Haber ya da Duyuru.";
   return e;
 }
 
 /** The editor's order, for the error summary. */
-export const ARTICLE_FIELD_ORDER: ArticleField[] = ["title", "slug", "summary", "date", "cover", "body", "status"];
+export const ARTICLE_FIELD_ORDER: ArticleField[] = ["title", "slug", "summary", "date", "cover", "body", "kind", "status"];
 
 /** Markdown to HTML. remark-html sanitizes, so raw HTML or scripts in the text are dropped. */
 export function renderMarkdown(markdown: string) {

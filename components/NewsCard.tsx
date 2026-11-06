@@ -2,10 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { CalendarBlankIcon, NewspaperIcon } from "@phosphor-icons/react/dist/ssr";
 import { ArrowUpRight } from "@/components/ui/arrow-up-right";
-import type { ArticleSummary } from "@/lib/news";
+import { kindLabel, type ArticleSummary } from "@/lib/news";
 import { formatTrDate } from "@/lib/format";
 
-/** News card: cover with date, title, summary and a "read more" button. */
+/** The label's colours: Destek green, Duyuru amber, Haber blue (as on the home page's strip). */
+export const KIND_TONE = { destek: "bg-emerald-100 text-emerald-900", duyuru: "bg-amber-100 text-amber-900", haber: "bg-sky-100 text-sky-900" } as const;
+
+/** News card: cover with date, the label (Destek, Haber, Duyuru), title, summary and a "read more" button. */
 export function NewsCard({ article, headingLevel = 3 }: { article: ArticleSummary; headingLevel?: 2 | 3 }) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
@@ -26,6 +29,7 @@ export function NewsCard({ article, headingLevel = 3 }: { article: ArticleSummar
         </div>
         <div className="flex flex-1 flex-col gap-2 px-3 pb-3 pt-5">
           <div>
+            <p className={`mb-1.5 inline-flex rounded-md px-2 text-sm font-semibold leading-6 ${KIND_TONE[article.kind]}`}>{kindLabel(article.kind)}</p>
             <Heading className="text-xl font-bold leading-snug">
               <Link href={`/haberler/${article.slug}`} className="hover:text-primary focus-visible:text-primary">
                 {article.title}

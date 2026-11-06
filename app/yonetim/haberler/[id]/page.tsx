@@ -28,7 +28,7 @@ async function EditArticle({ params, searchParams }: Pick<PageProps<"/yonetim/ha
       key={a.id}
       articleId={a.id}
       justSaved={sp.kaydedildi === "1"}
-      initial={{ title: a.title, slug: a.slug, summary: a.summary, body: a.body, cover: a.cover ?? "", date: a.date, status: a.status }}
+      initial={{ title: a.title, slug: a.slug, summary: a.summary, body: a.body, cover: a.cover ?? "", date: a.date, status: a.status, kind: a.kind }}
     />
   );
 }
