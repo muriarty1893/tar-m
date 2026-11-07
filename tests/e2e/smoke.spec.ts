@@ -15,7 +15,7 @@ test("phones: the top bar holds the logo, the name and Giriş yap; there is no b
   await expect(page.getByRole("button", { name: "Menüyü aç" })).toHaveCount(0);
 });
 
-test("phones: the red tab bar has Ana sayfa, Pazar, Destek & Haber and Hızlı menü, the current one marked", async ({ page }) => {
+test("phones: the tab bar has Ana sayfa, Pazar, Destek & Haber and Hızlı menü, the current one in red", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/pazar");
   const tabs = page.getByRole("navigation", { name: "Alt menü" });
@@ -23,7 +23,8 @@ test("phones: the red tab bar has Ana sayfa, Pazar, Destek & Haber and Hızlı m
   await expect(tabs.getByRole("link", { name: "Ana sayfa" })).toHaveAttribute("href", "/");
   await expect(tabs.getByRole("link", { name: "Pazar" })).toHaveAttribute("aria-current", "page");
   await expect(tabs.getByRole("link", { name: "Destek & Haber" })).toHaveAttribute("href", "/haberler");
-  await expect(tabs).toHaveCSS("background-color", "rgb(220, 38, 38)");
+  await expect(tabs).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(tabs.getByRole("link", { name: "Pazar" })).toHaveCSS("color", "rgb(220, 38, 38)");
   await expect(tabs.getByRole("button", { name: "Hızlı menü" })).toBeVisible();
   // The page ends above the bar: the last of the footer isn't hidden under it.
   const bar = (await tabs.boundingBox())!;

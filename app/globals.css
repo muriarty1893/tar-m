@@ -69,13 +69,13 @@
   --bar-line: var(--border);
   --bar-cta: var(--create);
   --bar-cta-fg: var(--create-foreground);
-  /* The phone's bottom tab bar (components/nav/BottomNav.tsx): red like the create buttons, white
-     icons and labels, the current tab on a light pill; its height, and with the home-bar inset below it. */
-  --nav-bg: var(--create);
-  --nav-line: var(--create-hover);
-  --nav-fg: #ffffff;
-  --nav-active: #ffffff;
-  --nav-pill: rgb(255 255 255 / 0.22);
+  /* The phone's bottom tab bar (components/nav/BottomNav.tsx): white, the current tab in the red of the
+     create buttons; its height, and with the home-bar inset below it. */
+  --nav-bg: #ffffff;
+  --nav-line: var(--border);
+  --nav-fg: var(--muted-foreground);
+  --nav-active: var(--create);
+  --nav-pill: transparent;
   --bottom-nav-bar: 3.5rem;
   --bottom-nav: calc(var(--bottom-nav-bar) + env(safe-area-inset-bottom));
 }

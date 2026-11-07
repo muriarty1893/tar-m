@@ -19,12 +19,12 @@ const TABS: Tab[] = [
 ];
 
 const item =
-  "group relative flex min-w-0 flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 text-[0.6875rem] font-medium leading-tight text-[var(--nav-fg)] transition-colors duration-150 hover:text-[var(--nav-active)] focus-visible:outline-offset-[-4px] focus-visible:outline-white aria-[current=page]:font-bold aria-[current=page]:text-[var(--nav-active)] data-[open]:font-bold data-[open]:text-[var(--nav-active)]";
+  "group relative flex min-w-0 flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 text-[0.6875rem] font-semibold leading-tight text-[var(--nav-fg)] transition-colors duration-150 hover:text-[var(--nav-active)] focus-visible:outline-offset-[-4px] aria-[current=page]:text-[var(--nav-active)] data-[open]:text-[var(--nav-active)]";
 const pill =
   "flex h-7 w-14 items-center justify-center rounded-full transition-colors duration-200 group-aria-[current=page]:bg-[var(--nav-pill)] group-data-[open]:bg-[var(--nav-pill)]";
 
 /**
- * The phone's tab bar, red: Ana sayfa (the portal and its forum), Pazar, Destek & Haber (the news),
+ * The phone's tab bar, the current tab in red: Ana sayfa (the portal and its forum), Pazar, Destek & Haber (the news),
  * and "Hızlı menü" for everything else (Takvim and Hava are tiles there). Below 1280 px only; wide screens keep the top menu. It steps
  * aside while the on-screen keyboard is up, so it never sits on a text box.
  */
