@@ -37,6 +37,8 @@ const toCard = (r: Row, now: Date): TopicCard => {
   const body = str(r.body).replace(/\s+/g, " ").trim();
   const photos = (r.photos as string[] | null) ?? [];
   const createdAt = iso(r.created_at);
+  const replyCount = Number(r.reply_count ?? 0);
+  const likeCount = Number(r.like_count ?? 0);
   return {
     id: str(r.id),
     title: str(r.title),
@@ -46,9 +48,9 @@ const toCard = (r: Row, now: Date): TopicCard => {
     authorName: str(r.author_name) || "Kullanıcı",
     authorHandle: r.author_handle ? str(r.author_handle) : null,
     createdAt,
-    replyCount: Number(r.reply_count ?? 0),
-    likeCount: Number(r.like_count ?? 0),
-    viewCount: shownViews(str(r.id), Number(r.view_count ?? 0), new Date(createdAt), now),
+    replyCount,
+    likeCount,
+    viewCount: shownViews(str(r.id), Number(r.view_count ?? 0), new Date(createdAt), now, replyCount, likeCount),
     lastReplyAt: r.last_reply_at ? iso(r.last_reply_at) : null,
     lastReplyBy: r.last_reply_by ? str(r.last_reply_by) : null,
     photo: photos[0] ?? null,

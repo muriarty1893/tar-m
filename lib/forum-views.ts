@@ -90,5 +90,9 @@ export function fakeViews(id: string, createdAt: Date, now: Date): number {
   return total;
 }
 
-/** What a topic shows: its real opens plus the made-up ones. */
-export const shownViews = (id: string, realViews: number, createdAt: Date, now: Date) => realViews + fakeViews(id, createdAt, now);
+/**
+ * What a topic shows: its real opens plus the made-up ones, and never fewer than its replies and likes
+ * suggest (three views a reply, one a like): a topic with 8 replies and 3 views would look wrong.
+ */
+export const shownViews = (id: string, realViews: number, createdAt: Date, now: Date, replies = 0, likes = 0) =>
+  Math.max(realViews + fakeViews(id, createdAt, now), replies * 3 + likes);

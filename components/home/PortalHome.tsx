@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { MagnifyingGlassIcon, PlusIcon, StorefrontIcon } from "@phosphor-icons/react/dist/ssr";
+import { PlusIcon, StorefrontIcon } from "@phosphor-icons/react/dist/ssr";
 import { AdvertiseBox, SponsorBanner } from "@/components/home/AdSlots";
 import { BorsaWeather } from "@/components/home/BorsaWeather";
 import { NewsTicker } from "@/components/home/NewsTicker";
+import { LiveSearch } from "@/components/search/LiveSearch";
 import { ForumFeed } from "@/components/forum/ForumFeed";
 import { siteConfig } from "@/config/site";
 import { categoryHref } from "@/lib/forum";
@@ -18,7 +19,8 @@ const PHONE_ADS = 3;
 
 /**
  * The home page, in the Borsa design (chosen on /tasarimlar, no. 17): compact white boxes on the grey
- * page, Fira Code for figures. The same order on every screen: a thin search bar, the sponsor and
+ * page, Fira Code for figures. The same order on every screen: a thin search bar (results open under
+ * it while typing), the sponsor and
  * "Bu alanda reklam vermek için" strips, the "Çiftçi destekleri & haberler" ticker, hava and Pazar
  * side by side, then the forum, which grows with "Daha fazla göster". From 1280 px the page widens:
  * the two ad strips share a line, hava shows five days, Pazar five ads, and the forum's sections sit
@@ -29,7 +31,7 @@ export function PortalHome() {
     <div className="text-[13px] leading-[1.45]">
       <div className="mx-auto max-w-3xl space-y-2 p-2 pb-4 sm:p-3 xl:max-w-6xl xl:space-y-3 xl:px-4 xl:py-4">
         <h1 className="sr-only">{siteConfig.name}: çiftçi forumu, pazar ve hava durumu</h1>
-        <HomeSearch />
+        <LiveSearch id="ana-ara" />
         <div className="space-y-2 xl:grid xl:grid-cols-2 xl:gap-3 xl:space-y-0">
           <SponsorBanner />
           <AdvertiseBox />
@@ -53,26 +55,6 @@ export function PortalHome() {
         </div>
       </div>
     </div>
-  );
-}
-
-/** One thin line: search the forum and Pazar at once (/ara). */
-function HomeSearch() {
-  return (
-    <form role="search" aria-label="Sitede ara" action="/ara" className="relative">
-      <label htmlFor="ana-ara" className="sr-only">
-        Forumda ve Pazar’da ara
-      </label>
-      <MagnifyingGlassIcon aria-hidden="true" weight="bold" className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-      <input
-        id="ana-ara"
-        name="q"
-        type="search"
-        enterKeyHint="search"
-        placeholder="Forumda ve Pazar’da ara"
-        className="h-10 w-full rounded-md border border-border bg-card pl-8 pr-3 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus-visible:ring-2 focus-visible:ring-ring/25 xl:h-11"
-      />
-    </form>
   );
 }
 

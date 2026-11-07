@@ -155,9 +155,36 @@ test("signed out, Konu aç and the admins' category page ask to sign in", async 
   }
 });
 
+test("the search box lists results while typing, each with its kind, and opens one", async ({ page }) => {
+  await page.route(
+    (url) => url.pathname === "/api/ara",
+    (route) =>
+      route.fulfill({
+        json: {
+          items: [
+            { kind: "konu", key: "konu-1", title: "Traktörde hidrolik ısınıyor", detail: "Makine ve ekipman · 7 yanıt", href: "/forum" },
+            { kind: "yanit", key: "yanit-1", title: "Filtreyi temizleyin", detail: "Hasan D. · “Traktörde hidrolik ısınıyor”", href: "/forum" },
+            { kind: "ilan", key: "ilan-1", title: "Traktör, 75 beygir", detail: "1.350.000 ₺ · Merkez, Konya", href: "/pazar" },
+            { kind: "haber", key: "haber-1", title: "Kış öncesi traktör bakımı", detail: "Haber · 6 Kasım 2026", href: "/haberler" },
+          ],
+        },
+      }),
+  );
+  await page.goto("/");
+  const box = page.locator("main").getByRole("combobox", { name: "Forumda, Pazar’da ve haberlerde ara" });
+  await box.fill("traktör");
+  const options = page.getByRole("listbox", { name: "Arama önerileri" }).getByRole("option");
+  await expect(options).toHaveText([/^Konu\s*Traktörde/, /^Yanıt\s*Filtreyi/, /^Pazar\s*Traktör, 75/, /^Haber\s*Kış öncesi/, "“traktör” için tüm sonuçlar →"]);
+  await expect(box).toHaveAttribute("aria-expanded", "true");
+  for (let i = 0; i < 3; i++) await box.press("ArrowDown");
+  await expect(box).toHaveAttribute("aria-activedescendant", /oneri-2$/);
+  await box.press("Enter");
+  await expect(page).toHaveURL(/\/pazar$/);
+});
+
 test("the home search looks through the forum and Pazar", async ({ page }) => {
   await page.goto("/");
-  await page.locator("main").getByRole("searchbox", { name: "Forumda ve Pazar’da ara" }).fill("zzqq yok böyle");
+  await page.locator("main").getByRole("combobox", { name: "Forumda, Pazar’da ve haberlerde ara" }).fill("zzqq yok böyle");
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/ara\?q=/);
   await expect(page.getByRole("heading", { level: 1, name: "“zzqq yok böyle” için sonuçlar" })).toBeVisible();

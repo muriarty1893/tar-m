@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { fakeViews } from "@/lib/forum-views";
+import { fakeViews, shownViews } from "@/lib/forum-views";
 
 /** A Türkiye time (UTC+3) as a Date. */
 const tr = (s: string) => new Date(`${s}+03:00`);
@@ -94,5 +94,16 @@ describe("fakeViews", () => {
     const start = performance.now();
     for (const id of ids.slice(0, 50)) fakeViews(id, tr("2023-01-01T12:00:00"), tr("2026-11-06T15:00:00"));
     expect(performance.now() - start).toBeLessThan(200);
+  });
+});
+
+describe("shownViews", () => {
+  const c = tr("2026-11-06T10:00:00");
+  const now = tr("2026-11-06T11:00:00");
+  test("real opens plus the made-up ones", () => {
+    expect(shownViews(ids[5], 4, c, now)).toBe(4 + fakeViews(ids[5], c, now));
+  });
+  test("never fewer than three a reply and one a like", () => {
+    expect(shownViews(ids[5], 0, c, now, 8, 5)).toBeGreaterThanOrEqual(29);
   });
 });

@@ -31,8 +31,8 @@ test("Pazar on phones, as on sahibinden: a category list with counts, then the l
   const cats = page.getByRole("navigation", { name: "Kategoriler" });
   await expect(cats.getByText("Kategoriler")).toBeVisible();
   await expect(cats.getByRole("link", { name: /^Araç \(\d+\)$/ })).toBeVisible();
-  // "Son ilanlar" over the rows, or "İlan bulunamadı." while there's no live listing.
-  await expect(page.getByText(/^(Son ilanlar|İlan bulunamadı\.)$/).filter({ visible: true })).toBeVisible();
+  // "Son ilanlar" (with "· Sayfa 1 / 3" when there are more pages) over the rows, or "İlan bulunamadı."
+  await expect(page.getByText(/^(Son ilanlar|İlan bulunamadı\.)/).filter({ visible: true })).toBeVisible();
   // The grid of cards is the wide-screen view; phones list rows with the photo on the left.
   await expect(page.locator("main ul.grid").filter({ visible: true })).toHaveCount(0);
 });
