@@ -7,7 +7,6 @@ import {
   CloudSunIcon,
   HeartIcon,
   MegaphoneIcon,
-  NewspaperIcon,
   NotePencilIcon,
   StorefrontIcon,
   TractorIcon,
@@ -36,7 +35,6 @@ export const QUICK_ITEMS: QuickItem[] = [
   { href: "/hava", label: "Hava durumu", Icon: CloudSunIcon, tone: "sky" },
   { href: "/takvim", label: "Tarım takvimi", Icon: CalendarDotsIcon, tone: "indigo" },
   { href: "/tarlalarim", label: "Tarlalarım", Icon: TractorIcon, tone: "amber" },
-  { href: "/haberler", label: "Haberler", Icon: NewspaperIcon, tone: "rose" },
   { href: "/mesajlar", label: "Mesajlar", Icon: ChatsCircleIcon, tone: "emerald", signedIn: true },
   { href: "/bildirimler", label: "Bildirimler", Icon: BellIcon, tone: "amber", signedIn: true },
   { href: "/pazar?gorunum=favoriler", label: "Favorilerim", Icon: HeartIcon, tone: "rose", signedIn: true },
@@ -54,4 +52,4 @@ export const QUICK_LINKS = [
 ];
 
 /** Pages reached from the Hızlı menü: its tab shows as current on them. */
-export const QUICK_PATHS = ["/fiyatlar", "/tarlalarim", "/haberler", "/is-birligi", "/sss", "/hakkimizda", "/gizlilik", "/kaynaklar", "/yonetim", "/hesabim"];
+export const QUICK_PATHS = ["/fiyatlar", "/tarlalarim", "/takvim", "/hava", "/is-birligi", "/sss", "/hakkimizda", "/gizlilik", "/kaynaklar", "/yonetim", "/hesabim"];

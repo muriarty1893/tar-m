@@ -24,7 +24,7 @@ export default function CalendarPage({ searchParams }: PageProps<"/takvim">) {
     <>
       <ToolHeader eyebrow="Planlama" title="Tarım takvimi" intro="Tarladaki işlerinizi gün gün planlayın, yaptıklarınızı işaretleyin. Bir işi tarlanıza bağlarsanız tarla sayfasında da görünür." />
       <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4 sm:py-6">
-        {/* "Takvim & Hava" on the phone's tab bar: today's weather sits on top of the calendar. */}
+        {/* Today's weather sits on top of the calendar. */}
         <div className="mb-4 xl:hidden">
           <WeatherTile wide />
         </div>

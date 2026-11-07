@@ -14,7 +14,7 @@ export const siteConfig = {
     { label: "Hava Durumu", href: "/hava" },
     { label: "Takvim", href: "/takvim" },
     { label: "Tarlalarım", href: "/tarlalarim" },
-    { label: "Haberler", href: "/haberler" },
+    { label: "Destek & Haber", href: "/haberler" },
     { label: "Forum", href: "/forum" },
   ] satisfies NavItem[],
   /** The rest, in the phone menu and the footer. */

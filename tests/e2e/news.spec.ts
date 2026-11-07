@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("news list shows the articles newest first and opens one", async ({ page }) => {
   await page.goto("/haberler");
-  await expect(page.getByRole("heading", { level: 1, name: "Haberler" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Destek ve haberler" })).toBeVisible();
 
   // Admins publish news live (also from the app), so only the first three articles are known: they are
   // listed, newest first.

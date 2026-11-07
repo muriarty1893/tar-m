@@ -7,8 +7,8 @@ import { NewsCard } from "@/components/NewsCard";
 import { PageHero } from "@/components/PageHero";
 
 export const metadata: Metadata = {
-  title: "Haberler",
-  description: `Tarım dünyasından haberler, öneriler ve ${siteConfig.name} duyuruları.`,
+  title: "Destek ve haberler",
+  description: `Çiftçi destekleri, tarım dünyasından haberler ve ${siteConfig.name} duyuruları.`,
 };
 
 export default async function NewsPage() {
@@ -17,8 +17,8 @@ export default async function NewsPage() {
   return (
     <>
       <PageHero
-        title="Haberler"
-        intro={<>Tarım dünyasından haberler, mevsimlik öneriler ve {siteConfig.name} duyuruları.</>}
+        title="Destek ve haberler"
+        intro={<>Çiftçi destekleri, tarım dünyasından haberler ve {siteConfig.name} duyuruları.</>}
       />
       <section className="mx-auto max-w-4xl py-3 sm:px-4 sm:py-6">
         <Suspense>

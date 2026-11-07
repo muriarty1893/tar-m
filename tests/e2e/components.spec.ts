@@ -6,7 +6,7 @@ test.describe("desktop menu", () => {
   test("plain links, the current page in blue with a line under it", async ({ page }) => {
     await page.goto("/haberler");
     const nav = page.getByRole("navigation", { name: "Ana menü" });
-    const current = nav.getByRole("link", { name: "Haberler", exact: true });
+    const current = nav.getByRole("link", { name: "Destek & Haber", exact: true });
     await expect(current).toHaveAttribute("aria-current", "page");
     await expect(current).toHaveCSS("color", "rgb(29, 78, 216)");
     await expect(nav.getByRole("link", { name: "Pazar", exact: true })).not.toHaveAttribute("aria-current", "page");

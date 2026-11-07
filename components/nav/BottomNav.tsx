@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useRef, useState, type RefObject } from "react";
-import { CalendarDotsIcon, HouseIcon, SquaresFourIcon, StorefrontIcon } from "@phosphor-icons/react/dist/ssr";
+import { HouseIcon, NewspaperIcon, SquaresFourIcon, StorefrontIcon } from "@phosphor-icons/react/dist/ssr";
 import { QUICK_PATHS } from "./quick-menu-items";
 
 // The sheet is only needed once someone opens it.
@@ -15,17 +15,17 @@ type Tab = { href: string; label: string; Icon: typeof HouseIcon; match: (path: 
 const TABS: Tab[] = [
   { href: "/", label: "Ana sayfa", Icon: HouseIcon, match: (p) => p === "/" || p.startsWith("/forum") || p.startsWith("/ara") },
   { href: "/pazar", label: "Pazar", Icon: StorefrontIcon, match: (p) => p.startsWith("/pazar") },
-  { href: "/takvim", label: "Takvim & Hava", Icon: CalendarDotsIcon, match: (p) => p.startsWith("/takvim") || p.startsWith("/hava") },
+  { href: "/haberler", label: "Destek & Haber", Icon: NewspaperIcon, match: (p) => p.startsWith("/haberler") },
 ];
 
 const item =
-  "group relative flex min-w-0 flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 text-[0.6875rem] font-semibold leading-tight text-[var(--nav-fg)] transition-colors duration-150 hover:text-[var(--nav-active)] focus-visible:outline-offset-[-4px] aria-[current=page]:text-[var(--nav-active)] data-[open]:text-[var(--nav-active)]";
+  "group relative flex min-w-0 flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 text-[0.6875rem] font-medium leading-tight text-[var(--nav-fg)] transition-colors duration-150 hover:text-[var(--nav-active)] focus-visible:outline-offset-[-4px] focus-visible:outline-white aria-[current=page]:font-bold aria-[current=page]:text-[var(--nav-active)] data-[open]:font-bold data-[open]:text-[var(--nav-active)]";
 const pill =
   "flex h-7 w-14 items-center justify-center rounded-full transition-colors duration-200 group-aria-[current=page]:bg-[var(--nav-pill)] group-data-[open]:bg-[var(--nav-pill)]";
 
 /**
- * The phone's tab bar, as in the app: Ana sayfa (the portal and its forum), Pazar, Takvim & Hava,
- * and "Hızlı menü" for everything else. Below 1280 px only; wide screens keep the top menu. It steps
+ * The phone's tab bar, red: Ana sayfa (the portal and its forum), Pazar, Destek & Haber (the news),
+ * and "Hızlı menü" for everything else (Takvim and Hava are tiles there). Below 1280 px only; wide screens keep the top menu. It steps
  * aside while the on-screen keyboard is up, so it never sits on a text box.
  */
 export function BottomNav() {

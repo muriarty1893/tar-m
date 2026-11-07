@@ -7,7 +7,7 @@ test("the header menu lists the tools that work on the site", async ({ page, isM
   test.skip(isMobile, "the text menu is the desktop bar");
   await page.goto("/");
   const nav = page.getByRole("navigation", { name: "Ana menü" });
-  for (const name of ["Pazar", "Fiyatlar", "Hava Durumu", "Takvim", "Tarlalarım", "Haberler"]) {
+  for (const name of ["Pazar", "Fiyatlar", "Hava Durumu", "Takvim", "Tarlalarım", "Destek & Haber"]) {
     await expect(nav.getByRole("link", { name, exact: true })).toBeVisible();
   }
   await expect(page.locator("header").getByRole("link", { name: "Giriş yap" })).toBeVisible();

@@ -99,7 +99,7 @@ test("the weather tile follows the province picked on the weather page", async (
   await expect(page.getByRole("heading", { name: "Konya" })).toBeVisible();
   await page.goto("/");
   await expect(page.locator("main").getByRole("link", { name: /^Hava durumu, Konya/ })).toBeVisible();
-  // Takvim & Hava shows the same place above the calendar.
+  // Takvim shows the same place above the calendar.
   await page.goto("/takvim");
   await expect(page.locator("main").getByRole("link", { name: /^Hava durumu, Konya/ })).toBeVisible();
 });
@@ -192,10 +192,10 @@ test("the home search looks through the forum and Pazar", async ({ page }) => {
   await expect(page.getByText("Pazar’da bu kelimelerle ilan yok.")).toBeVisible();
 });
 
-test("Takvim & Hava: today's weather sits on top of the calendar", async ({ page }) => {
+test("Takvim: today's weather sits on top of the calendar, reached from the Hızlı menü", async ({ page }) => {
   await mockWeather(page);
   await page.goto("/takvim");
   const tile = page.locator("main").getByRole("link", { name: /^Hava durumu, Ankara/ });
   await expect(tile).toBeVisible();
-  await expect(page.getByRole("navigation", { name: "Alt menü" }).getByRole("link", { name: "Takvim & Hava" })).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("navigation", { name: "Alt menü" }).getByRole("button", { name: "Hızlı menü" })).toHaveAttribute("aria-current", "page");
 });
