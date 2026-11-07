@@ -57,7 +57,7 @@ const clerkAppearance = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="tr" className={`${fonts} h-full antialiased`} suppressHydrationWarning>
-      <body className="flex min-h-full flex-col font-sans">
+      <body className="flex min-h-dvh flex-col font-sans">
         {/* Sign-in (Clerk), in Turkish and the site's blue. Inside <body>, as Cache Components needs. */}
         <ClerkProvider localization={clerkLocalization} signInUrl="/giris" signUpUrl="/kayit" afterSignOutUrl="/" appearance={clerkAppearance}>
           <a
