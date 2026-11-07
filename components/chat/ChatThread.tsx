@@ -101,7 +101,7 @@ export function ChatThread({ initial }: { initial: Thread }) {
         <Link href="/mesajlar" aria-label="Mesajlara dön" className="flex size-12 shrink-0 items-center justify-center rounded-md border border-border hover:border-primary/50 bg-card">
           <ArrowLeftIcon aria-hidden="true" weight="bold" className="size-5" />
         </Link>
-        <Avatar id={thread.peer.name} name={thread.peer.name} size={44} />
+        <Avatar id={thread.peer.name} name={thread.peer.name} photo={thread.peer.photo} size={44} />
         <div className="min-w-0">
           <h1 className="truncate text-xl font-bold">{thread.peer.name}</h1>
           <p className="text-sm text-muted-foreground">{thread.role === "buyer" ? "Satıcı" : "Alıcı"} · Mesajlar birkaç saniyede bir yenilenir</p>

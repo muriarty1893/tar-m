@@ -1,5 +1,6 @@
 import "server-only";
 import { iso, isUuid, num, sql, str, type Row } from "./db";
+import { photoOf } from "./avatars";
 import { MESSAGE_BURST_LIMIT, STOCK_PHOTOS, offerLine, type ListingCategory, type ListingStatus, type OfferStatus } from "./market";
 
 /** Reads for Mesajlar. Every read checks that the person is in the conversation. */
@@ -17,7 +18,8 @@ export type ChatMessage = {
 export type Thread = {
   id: string;
   role: ChatRole;
-  peer: { name: string };
+  /** `photo`: their profile photo (lib/avatars.ts); null shows their initials. */
+  peer: { name: string; photo: string | null };
   listing: { id: string; title: string; price: number; unit: string | null; photo: string; status: ListingStatus };
   messages: ChatMessage[];
   /** When the other person last opened the chat: my messages before it are "Görüldü". */
@@ -50,10 +52,11 @@ export async function getThread(conversationId: string, userId: string, { markRe
       where conversation_id = ${conversationId} order by created_at desc limit ${MESSAGE_LIMIT}
     ) m order by created_at asc`;
   const photos = (c.photos as string[] | null) ?? [];
+  const peerPhoto = await photoOf(str(role === "buyer" ? c.seller_id : c.buyer_id));
   return {
     id: str(c.id),
     role,
-    peer: { name: str(c.peer_name) || "Kullanıcı" },
+    peer: { name: str(c.peer_name) || "Kullanıcı", photo: peerPhoto },
     listing: {
       id: str(c.listing_id),
       title: str(c.title),

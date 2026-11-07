@@ -2,6 +2,7 @@ import "server-only";
 import { iso, isUuid, sql, str, type Row } from "./db";
 import { FORUM_PAGE_SIZE, HANDLE_RE, type ForumQuery } from "./forum";
 import { shownViews } from "./forum-views";
+import { photoOf, photosOf } from "./avatars";
 import { fold } from "@/data/demo-market";
 
 /** Reads for the forum. Writes are in lib/services/forum.ts. */
@@ -16,6 +17,8 @@ export type TopicCard = {
   authorName: string;
   /** The author's username for mentions ("ahmet"), when they have one. */
   authorHandle: string | null;
+  /** The author's profile photo (lib/avatars.ts); null shows their initials. */
+  authorPhoto: string | null;
   createdAt: string;
   replyCount: number;
   likeCount: number;
@@ -47,6 +50,7 @@ const toCard = (r: Row, now: Date): TopicCard => {
     authorId: str(r.author_id),
     authorName: str(r.author_name) || "Kullanıcı",
     authorHandle: r.author_handle ? str(r.author_handle) : null,
+    authorPhoto: null,
     createdAt,
     replyCount,
     likeCount,
@@ -94,7 +98,12 @@ export async function listTopics(q: ForumQuery, authorId?: string): Promise<{ it
   );
   // The time is read after the database answers, as Cache Components requires.
   const now = new Date();
-  return { items: rows.map((r) => toCard(r, now)), total: rows.length ? Number(rows[0].total) : 0 };
+  const photos = await photosOf(rows.map((r) => str(r.author_id)));
+  const items = rows.map((r) => {
+    const card = toCard(r, now);
+    return { ...card, authorPhoto: photos[card.authorId] ?? null };
+  });
+  return { items, total: rows.length ? Number(rows[0].total) : 0 };
 }
 
 export type ForumReply = {
@@ -106,6 +115,7 @@ export type ForumReply = {
   authorId: string;
   authorName: string;
   authorHandle: string | null;
+  authorPhoto: string | null;
   createdAt: string;
   likeCount: number;
   liked: boolean;
@@ -146,8 +156,10 @@ export async function getTopic(id: string, userId: string | null): Promise<Topic
     where r.topic_id = ${id}
     order by r.created_at asc
     limit 500`;
+  const photos = await photosOf([str(t.author_id), ...replies.filter((r: Row) => r.deleted_at === null).map((r: Row) => str(r.author_id))]);
   return {
     ...toCard(t, new Date()),
+    authorPhoto: photos[str(t.author_id)] ?? null,
     body: str(t.body),
     photos: (t.photos as string[] | null) ?? [],
     liked: t.liked === true,
@@ -163,6 +175,7 @@ export async function getTopic(id: string, userId: string | null): Promise<Topic
         authorId: deleted ? "" : str(r.author_id),
         authorName: deleted ? "" : str(r.author_name) || "Kullanıcı",
         authorHandle: deleted || !r.author_handle ? null : str(r.author_handle),
+        authorPhoto: deleted ? null : (photos[str(r.author_id)] ?? null),
         createdAt: iso(r.created_at),
         likeCount: deleted ? 0 : Number(r.like_count ?? 0),
         liked: !deleted && r.liked === true,
@@ -199,7 +212,7 @@ export async function mentionSuggestions(query: string, topicId: string | null, 
   return rows.map((r) => ({ handle: str(r.handle), name: str(r.name) }));
 }
 
-export type ForumProfile = { userId: string; handle: string; name: string; memberSince: string; topicCount: number; replyCount: number };
+export type ForumProfile = { userId: string; handle: string; name: string; photo: string | null; memberSince: string; topicCount: number; replyCount: number };
 
 /** /forum/kisi/ahmet: who @ahmet is, and how much they wrote. Null for an unknown username. */
 export async function forumProfile(handle: string): Promise<ForumProfile | null> {
@@ -212,5 +225,7 @@ export async function forumProfile(handle: string): Promise<ForumProfile | null>
     from profiles p where p.handle = ${h}`;
   const r = rows[0];
   if (!r) return null;
-  return { userId: str(r.user_id), handle: str(r.handle), name: str(r.name) || "Kullanıcı", memberSince: iso(r.created_at), topicCount: Number(r.topics), replyCount: Number(r.replies) };
+  const userId = str(r.user_id);
+  const photo = await photoOf(userId);
+  return { userId, handle: str(r.handle), name: str(r.name) || "Kullanıcı", photo, memberSince: iso(r.created_at), topicCount: Number(r.topics), replyCount: Number(r.replies) };
 }

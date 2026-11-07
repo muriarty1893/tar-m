@@ -130,7 +130,7 @@ async function Listing({ params, searchParams }: Pick<PageProps<"/pazar/ilan/[id
         <aside className="space-y-4 px-3 lg:sticky lg:top-24 lg:space-y-5 lg:px-0">
           <div id="iletisim" className="scroll-mt-20 rounded-xl border border-border p-4 sm:p-5 bg-card">
             <div className="flex items-center gap-3">
-              <Avatar id={l.seller.id} name={l.seller.name} size={52} />
+              <Avatar id={l.seller.id} name={l.seller.name} photo={l.seller.photo} size={52} />
               <div className="min-w-0">
                 <p className="truncate text-lg font-bold">{l.seller.name}</p>
                 <p className="text-muted-foreground">

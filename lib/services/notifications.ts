@@ -1,5 +1,6 @@
 import "server-only";
 import { iso, sql, str } from "@/lib/db";
+import { photosOf } from "@/lib/avatars";
 
 /**
  * "Bildirimler": someone answered your topic or your reply, or mentioned you (@kullanıcıadı).
@@ -13,6 +14,8 @@ export type Notification = {
   kind: NotificationKind;
   actorName: string;
   actorHandle: string | null;
+  /** The actor's profile photo (lib/avatars.ts); null shows their initials. */
+  actorPhoto: string | null;
   topicId: string;
   topicTitle: string;
   replyId: string | null;
@@ -48,7 +51,7 @@ const short = (s: string) => {
 /** The latest 50, newest first. */
 export async function listNotifications(userId: string): Promise<Notification[]> {
   const rows = await sql()`
-    select n.id, n.kind, n.topic_id, n.reply_id, n.created_at, n.read_at,
+    select n.id, n.kind, n.topic_id, n.reply_id, n.created_at, n.read_at, n.actor_id,
       a.name as actor_name, a.handle as actor_handle, t.title as topic_title,
       coalesce(r.body, t.body) as text, r.photos as reply_photos
     from notifications n
@@ -58,6 +61,7 @@ export async function listNotifications(userId: string): Promise<Notification[]>
     where n.user_id = ${userId} and (n.reply_id is null or r.deleted_at is null)
     order by n.created_at desc
     limit 50`;
+  const actorPhotos = await photosOf(rows.map((r) => str(r.actor_id)));
   return rows.map((r) => {
     const text = short(str(r.text));
     const photos = (r.reply_photos as string[] | null) ?? [];
@@ -66,6 +70,7 @@ export async function listNotifications(userId: string): Promise<Notification[]>
       kind: str(r.kind) as NotificationKind,
       actorName: str(r.actor_name) || "Kullanıcı",
       actorHandle: r.actor_handle ? str(r.actor_handle) : null,
+      actorPhoto: actorPhotos[str(r.actor_id)] ?? null,
       topicId: str(r.topic_id),
       topicTitle: str(r.topic_title),
       replyId: r.reply_id ? str(r.reply_id) : null,

@@ -61,7 +61,7 @@ export function TopicRow({ topic: t, cats, now, showLastReply = false, dense = f
   return (
     <li>
       <Link href={`/forum/${t.id}`} className="flex items-start gap-3 px-3.5 py-3 transition-colors hover:bg-secondary focus-visible:outline-offset-[-3px] sm:px-4">
-        <Avatar id={t.authorId} name={t.authorName} size={38} />
+        <Avatar id={t.authorId} name={t.authorName} photo={t.authorPhoto} size={38} />
         <span className="min-w-0 flex-1">
           <span className="line-clamp-2 font-semibold leading-snug text-foreground">{t.title}</span>
           <span className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-sm leading-5 text-muted-foreground">

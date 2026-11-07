@@ -40,7 +40,7 @@ async function Person({ params }: { params: PageProps<"/forum/kisi/[handle]">["p
   return (
     <div className="mt-4 space-y-8">
       <header className="flex items-center gap-4 rounded-lg border border-border bg-card p-4">
-        <Avatar id={profile.userId} name={profile.name} size={64} />
+        <Avatar id={profile.userId} name={profile.name} photo={profile.photo} size={64} />
         <div className="min-w-0">
           <h1 className="text-xl font-bold tracking-tight sm:text-3xl">{profile.name}</h1>
           <p className="text-muted-foreground">@{profile.handle}</p>

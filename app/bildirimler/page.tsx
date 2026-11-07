@@ -63,7 +63,7 @@ async function List() {
                 className={`flex gap-3 px-4 py-3 transition-colors hover:bg-secondary focus-visible:outline-offset-[-3px] ${n.read ? "" : "bg-secondary/60"}`}
               >
                 <span className="relative">
-                  <Avatar id={n.actorHandle ?? n.actorName} name={n.actorName} size={44} />
+                  <Avatar id={n.actorHandle ?? n.actorName} name={n.actorName} photo={n.actorPhoto} size={44} />
                   <span aria-hidden="true" className="absolute -bottom-1 -right-1 flex size-6 items-center justify-center rounded-md border border-card bg-primary text-primary-foreground">
                     <Icon weight="bold" className="size-3.5" />
                   </span>

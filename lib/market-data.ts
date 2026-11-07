@@ -1,6 +1,7 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { iso, isUuid, num, sql, str, type Row } from "./db";
+import { photoOf } from "./avatars";
 import { STOCK_PHOTOS, fold, type ListingCategory, type ListingStatus, type MarketQuery } from "./market";
 
 /** Reads for Pazar. Writes are server actions (app/pazar/actions.ts). */
@@ -148,7 +149,8 @@ export type ListingDetail = ListingCard & {
   description: string;
   photos: string[];
   updatedAt: string;
-  seller: { id: string; name: string; memberSince: string; activeListings: number };
+  /** `photo`: the seller's profile photo (lib/avatars.ts); null shows their initials. */
+  seller: { id: string; name: string; photo: string | null; memberSince: string; activeListings: number };
   /** The viewer's chat about this listing, if they've started one. */
   conversationId: string | null;
   /** Whether the viewer has already reported it. */
@@ -168,6 +170,7 @@ export async function getListing(id: string, userId: string | null): Promise<Lis
   const r = rows[0];
   if (!r) return null;
   const card = toCard(r);
+  const sellerPhoto = await photoOf(card.sellerId);
   return {
     ...card,
     condition: r.condition ? str(r.condition) : null,
@@ -176,7 +179,7 @@ export async function getListing(id: string, userId: string | null): Promise<Lis
     description: str(r.description),
     photos: ((r.photos as string[] | null) ?? []).length ? (r.photos as string[]) : [card.photo],
     updatedAt: iso(r.updated_at),
-    seller: { id: card.sellerId, name: str(r.seller_name), memberSince: iso(r.seller_since), activeListings: Number(r.seller_active) },
+    seller: { id: card.sellerId, name: str(r.seller_name), photo: sellerPhoto, memberSince: iso(r.seller_since), activeListings: Number(r.seller_active) },
     conversationId: r.conversation_id ? str(r.conversation_id) : null,
     reported: r.reported === true,
   };

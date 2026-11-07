@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com", pathname: "/ilanlar/**" },
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com", pathname: "/haberler/**" },
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com", pathname: "/forum/**" },
+      // Profile photos (lib/avatars.ts), served by Clerk.
+      { protocol: "https", hostname: "img.clerk.com" },
     ],
   },
   turbopack: {

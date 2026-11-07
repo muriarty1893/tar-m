@@ -77,7 +77,7 @@ async function Topic({ params, searchParams }: { params: PageProps<"/forum/[id]"
         <CategoryChip cats={cats} category={topic.category} />
         <h1 className="text-xl font-bold leading-tight tracking-tight sm:text-2xl">{topic.title}</h1>
         <div className="flex items-center gap-3">
-          <Avatar id={topic.authorId} name={topic.authorName} size={44} />
+          <Avatar id={topic.authorId} name={topic.authorName} photo={topic.authorPhoto} size={44} />
           <div>
             <Author name={topic.authorName} handle={topic.authorHandle} mine={topic.mine} size="lg" />
             <p className="text-sm text-muted-foreground">
@@ -167,7 +167,7 @@ function Reply({
         </p>
       )}
       <div className="flex items-center gap-3">
-        <Avatar id={r.authorId} name={r.authorName} size={36} />
+        <Avatar id={r.authorId} name={r.authorName} photo={r.authorPhoto} size={36} />
         <div className="min-w-0 flex-1">
           <span className="flex flex-wrap items-baseline gap-x-2">
             <Author name={r.authorName} handle={r.authorHandle} mine={r.mine} />
