@@ -35,10 +35,10 @@ async function List() {
 
   if (!items.length) {
     return (
-      <div className="rounded-lg border border-dashed border-input px-4 py-6 text-center">
-        <BellIcon aria-hidden="true" weight="duotone" className="mx-auto size-12 text-primary" />
-        <p className="mx-auto mt-3 max-w-md text-lg">Henüz bildirim yok. Biri konunuza ya da yanıtınıza yanıt verdiğinde, ya da sizden bahsettiğinde burada görünür.</p>
-        <Link href="/forum" className={buttonVariants({ className: "mt-6" })}>
+      <div className="rounded-md border border-dashed border-input bg-card px-4 py-6 text-center">
+        <BellIcon aria-hidden="true" weight="duotone" className="mx-auto size-9 text-primary" />
+        <p className="mx-auto mt-2 max-w-md text-[0.9375rem] text-muted-foreground">Henüz bildirim yok. Biri konunuza ya da yanıtınıza yanıt verdiğinde, ya da sizden bahsettiğinde burada görünür.</p>
+        <Link href="/forum" className={buttonVariants({ size: "sm", className: "mt-4" })}>
           Foruma git
         </Link>
       </div>

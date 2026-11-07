@@ -40,7 +40,7 @@ export function DeleteAccount() {
       }}
       className="space-y-4"
     >
-      <label className="flex cursor-pointer items-start gap-3 text-lg">
+      <label className="flex cursor-pointer items-start gap-2.5 text-[0.9375rem]">
         <input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} className="mt-1 size-6 shrink-0 accent-[var(--destructive)]" />
         Hesabımın ve bütün verilerimin (ilanlar, fotoğraflar, mesajlar, tarlalar, masraflar, takvim) kalıcı olarak silineceğini anlıyorum.
       </label>

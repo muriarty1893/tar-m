@@ -54,12 +54,12 @@ async function Inbox({ searchParams }: { searchParams: PageProps<"/mesajlar">["s
       </nav>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-input px-4 py-6 text-center">
-          <ChatsCircleIcon aria-hidden="true" weight="duotone" className="mx-auto size-12 text-primary" />
-          <p className="mx-auto mt-3 max-w-md text-lg">
+        <div className="rounded-md border border-dashed border-input bg-card px-4 py-6 text-center">
+          <ChatsCircleIcon aria-hidden="true" weight="duotone" className="mx-auto size-9 text-primary" />
+          <p className="mx-auto mt-2 max-w-md text-[0.9375rem] text-muted-foreground">
             {tab.role === "seller" ? "İlanlarınıza henüz mesaj gelmedi." : "Henüz bir sohbetiniz yok. Beğendiğiniz bir ilanda “Satıcıya mesaj gönder”e dokunun."}
           </p>
-          <Link href="/pazar" className={buttonVariants({ className: "mt-6" })}>
+          <Link href="/pazar" className={buttonVariants({ size: "sm", className: "mt-4" })}>
             Pazara göz at
           </Link>
         </div>

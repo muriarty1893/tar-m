@@ -19,7 +19,7 @@ export default function AdminNewsPage({ searchParams }: PageProps<"/yonetim/habe
       title="Haberler"
       intro="Taslaklar yalnızca burada görünür; yayındaki haberler Haberler sayfasında ve ana sayfada."
       actions={
-        <Link href="/yonetim/haberler/yeni" className={buttonVariants({ size: "lg" })}>
+        <Link href="/yonetim/haberler/yeni" className={buttonVariants({ variant: "create" })}>
           <PlusIcon aria-hidden="true" weight="bold" />
           Yeni haber
         </Link>

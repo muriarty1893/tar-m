@@ -19,7 +19,7 @@ export default function AdminHome() {
       title="Genel bakış"
       intro="Haberleri yazın ve yayınlayın, şikâyet edilen ilanları ve forum yazılarını inceleyin."
       actions={
-        <Link href="/yonetim/haberler/yeni" className={buttonVariants({ size: "lg" })}>
+        <Link href="/yonetim/haberler/yeni" className={buttonVariants({ variant: "create" })}>
           <PlusIcon aria-hidden="true" weight="bold" />
           Yeni haber
         </Link>

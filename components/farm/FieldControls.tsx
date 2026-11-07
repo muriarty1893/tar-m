@@ -13,7 +13,7 @@ export function AddField({ defaultProvince, open: startOpen = false }: { default
   if (!open) return <Button onClick={() => setOpen(true)}>Tarla ekle</Button>;
   return (
     <div className="rounded-lg border border-border p-4 bg-card">
-      <h2 className="text-xl font-bold">Yeni tarla</h2>
+      <h2 className="text-[15px] font-bold">Yeni tarla</h2>
       <div className="mt-4">
         <FieldForm initial={{ name: "", crop: "", stage: "", area: "", province: defaultProvince, district: "", expectedYield: "", notes: "" }} />
       </div>

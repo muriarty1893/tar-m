@@ -36,28 +36,28 @@ async function Account({ searchParams }: { searchParams: PageProps<"/hesabim">["
   const profile = await ensureProfile(userId);
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-3 sm:space-y-4">
       {next && !profile.name && (
-        <p role="status" className="rounded-lg border border-gold/30 bg-gold-soft px-4 py-3 text-lg">
+        <p role="status" className="rounded-md border border-gold/30 bg-gold-soft px-3 py-2.5 text-[0.9375rem] font-medium">
           Devam etmeden önce adınızı yazın: ilanlarınızda ve mesajlarda bu ad görünecek.
         </p>
       )}
-      <section aria-labelledby="profil">
-        <h2 id="profil" className="text-xl font-bold tracking-tight">
+      <section aria-labelledby="profil" className="overflow-hidden rounded-md border border-border bg-card">
+        <h2 id="profil" className="border-b border-border px-4 py-2.5 text-[15px] font-bold">
           Profil
         </h2>
-        <div className="mt-5">
+        <div className="p-4">
           <ProfileForm name={profile.name} province={profile.province} handle={profile.handle ?? ""} next={next} />
         </div>
       </section>
 
       <nav aria-label="Kısayollar">
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="grid gap-2 sm:grid-cols-2">
           {shortcuts.map(({ href, label, Icon }) => (
             <li key={href}>
-              <Link href={href} className="flex min-h-16 items-center gap-3 rounded-lg border border-border px-4 font-semibold transition-colors hover:border-primary/40 hover:bg-secondary bg-card">
-                <span aria-hidden="true" className="flex size-10 items-center justify-center rounded-xl bg-secondary text-primary">
-                  <Icon weight="duotone" className="size-6" />
+              <Link href={href} className="flex min-h-12 items-center gap-2.5 rounded-md border border-border bg-card px-3 text-[0.9375rem] font-semibold transition-colors hover:border-primary/40 hover:bg-secondary">
+                <span aria-hidden="true" className="flex size-8 items-center justify-center rounded-md bg-secondary text-primary">
+                  <Icon weight="fill" className="size-4" />
                 </span>
                 {label}
               </Link>
@@ -65,7 +65,7 @@ async function Account({ searchParams }: { searchParams: PageProps<"/hesabim">["
           ))}
           {(await isAdmin(userId)) && (
             <li>
-              <Link href="/yonetim" className="flex min-h-16 items-center gap-3 rounded-lg border border-border px-4 font-semibold hover:bg-secondary bg-card">
+              <Link href="/yonetim" className="flex min-h-12 items-center gap-3 rounded-md border border-border bg-card px-3 text-[0.9375rem] font-semibold hover:bg-secondary">
                 Yönetim paneli: haberler ve şikâyetler
               </Link>
             </li>
@@ -73,21 +73,21 @@ async function Account({ searchParams }: { searchParams: PageProps<"/hesabim">["
         </ul>
       </nav>
 
-      <section aria-labelledby="guvenlik">
-        <h2 id="guvenlik" className="text-xl font-bold tracking-tight">
+      <section aria-labelledby="guvenlik" className="overflow-hidden rounded-md border border-border bg-card">
+        <h2 id="guvenlik" className="border-b border-border px-4 py-2.5 text-[15px] font-bold">
           Giriş ve güvenlik
         </h2>
-        <div className="mt-5">
+        <div className="p-4">
           <SecurityControls />
         </div>
       </section>
 
-      <section aria-labelledby="sil" className="rounded-lg border border-destructive/30 p-4">
-        <h2 id="sil" className="text-xl font-bold tracking-tight">
+      <section aria-labelledby="sil" className="rounded-md border border-destructive/30 bg-card p-4">
+        <h2 id="sil" className="text-[15px] font-bold">
           Hesabı sil
         </h2>
-        <p className="mt-2 text-muted-foreground">Bu işlem geri alınamaz. Alıcılar ve satıcılarla olan sohbetleriniz de silinir.</p>
-        <div className="mt-5">
+        <p className="mt-1 text-[0.9375rem] text-muted-foreground">Bu işlem geri alınamaz. Alıcılar ve satıcılarla olan sohbetleriniz de silinir.</p>
+        <div className="mt-3">
           <DeleteAccount />
         </div>
       </section>

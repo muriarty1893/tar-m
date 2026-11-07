@@ -247,10 +247,10 @@ function EmptyState({ query, signedIn }: { query: MarketQuery; signedIn: boolean
           ? "Bu aramaya uygun ilan yok. Filtreleri temizleyin ya da başka bir kelime deneyin."
           : "Pazar yeni açıldı, henüz ilan yok. İlk ilanı siz verin!";
   return (
-    <div className="rounded-lg border border-dashed border-input px-4 py-6 text-center">
-      <StorefrontIcon aria-hidden="true" weight="duotone" className="mx-auto size-12 text-primary" />
-      <p className="mx-auto mt-3 max-w-md text-lg">{text}</p>
-      <div className="mt-6 flex flex-wrap justify-center gap-3">
+    <div className="rounded-md border border-dashed border-input bg-card px-4 py-6 text-center">
+      <StorefrontIcon aria-hidden="true" weight="duotone" className="mx-auto size-9 text-primary" />
+      <p className="mx-auto mt-2 max-w-md text-[0.9375rem] text-muted-foreground">{text}</p>
+      <div className="mt-4 flex flex-wrap justify-center gap-2">
         {filtered && query.gorunum === "tumu" && (
           <Link href="/pazar" className={buttonVariants({ variant: "outline" })}>
             Filtreleri temizle
