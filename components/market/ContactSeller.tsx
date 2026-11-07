@@ -54,7 +54,7 @@ export function ContactSeller({
       </Link>
     );
   }
-  if (sold) return <p className="rounded-2xl bg-muted px-4 py-3 text-center font-semibold">Bu ilan satıldı; satıcıya yeni mesaj gönderilemiyor.</p>;
+  if (sold) return <p className="rounded-lg bg-muted px-4 py-3 text-center font-semibold">Bu ilan satıldı; satıcıya yeni mesaj gönderilemiyor.</p>;
 
   const amount = parsePrice(offer);
   const submit = () =>
@@ -108,7 +108,7 @@ export function ContactSeller({
                 key={q}
                 type="button"
                 onClick={() => setText(q)}
-                className="min-h-11 cursor-pointer rounded-full border border-border px-3 text-sm font-medium transition-colors hover:border-primary/50 hover:bg-secondary"
+                className="min-h-11 cursor-pointer rounded-md border border-border px-3 text-sm font-medium transition-colors hover:border-primary/50 hover:bg-secondary bg-card"
               >
                 {q}
               </button>

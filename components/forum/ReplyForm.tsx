@@ -27,7 +27,7 @@ export function ReplyForm({ topicId, signInHref, parent = null, onDone }: { topi
 
   if (signInHref) {
     return (
-      <div className="rounded-2xl border border-dashed border-input p-6 text-center">
+      <div className="rounded-lg border border-dashed border-input p-4 text-center">
         <p className="text-lg">Yanıt yazmak için giriş yapın; hesap ücretsizdir.</p>
         <Link href={signInHref} className={buttonVariants({ className: "mt-4" })}>
           Giriş yap
@@ -55,7 +55,7 @@ export function ReplyForm({ topicId, signInHref, parent = null, onDone }: { topi
           else setSent(true);
         });
       }}
-      className={parent ? "mt-3 space-y-3 rounded-2xl border border-border bg-background p-3" : "space-y-3"}
+      className={parent ? "mt-3 space-y-3 rounded-lg border border-border bg-background p-3" : "space-y-3"}
       aria-label={parent ? `${parent.name} kişisine yanıt yaz` : "Yanıt yaz"}
     >
       {parent ? (

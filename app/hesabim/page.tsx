@@ -20,8 +20,8 @@ export default function AccountPage({ searchParams }: PageProps<"/hesabim">) {
   return (
     <>
       <ToolHeader eyebrow="Hesap" title="Hesabım" />
-      <div className="mx-auto max-w-3xl px-4 py-10">
-        <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-2xl bg-muted motion-safe:animate-pulse" />}>
+      <div className="mx-auto max-w-3xl px-3 py-3 sm:px-4 sm:py-6">
+        <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-lg bg-muted motion-safe:animate-pulse" />}>
           <Account searchParams={searchParams} />
         </Suspense>
       </div>
@@ -38,12 +38,12 @@ async function Account({ searchParams }: { searchParams: PageProps<"/hesabim">["
   return (
     <div className="space-y-12">
       {next && !profile.name && (
-        <p role="status" className="rounded-2xl border border-gold/30 bg-gold-soft px-4 py-3 text-lg">
+        <p role="status" className="rounded-lg border border-gold/30 bg-gold-soft px-4 py-3 text-lg">
           Devam etmeden önce adınızı yazın: ilanlarınızda ve mesajlarda bu ad görünecek.
         </p>
       )}
       <section aria-labelledby="profil">
-        <h2 id="profil" className="text-2xl font-bold tracking-tight">
+        <h2 id="profil" className="text-xl font-bold tracking-tight">
           Profil
         </h2>
         <div className="mt-5">
@@ -55,7 +55,7 @@ async function Account({ searchParams }: { searchParams: PageProps<"/hesabim">["
         <ul className="grid gap-3 sm:grid-cols-2">
           {shortcuts.map(({ href, label, Icon }) => (
             <li key={href}>
-              <Link href={href} className="flex min-h-16 items-center gap-3 rounded-2xl border border-border px-4 font-semibold transition-colors hover:border-primary/40 hover:bg-secondary">
+              <Link href={href} className="flex min-h-16 items-center gap-3 rounded-lg border border-border px-4 font-semibold transition-colors hover:border-primary/40 hover:bg-secondary bg-card">
                 <span aria-hidden="true" className="flex size-10 items-center justify-center rounded-xl bg-secondary text-primary">
                   <Icon weight="duotone" className="size-6" />
                 </span>
@@ -65,7 +65,7 @@ async function Account({ searchParams }: { searchParams: PageProps<"/hesabim">["
           ))}
           {(await isAdmin(userId)) && (
             <li>
-              <Link href="/yonetim" className="flex min-h-16 items-center gap-3 rounded-2xl border border-border px-4 font-semibold hover:bg-secondary">
+              <Link href="/yonetim" className="flex min-h-16 items-center gap-3 rounded-lg border border-border px-4 font-semibold hover:bg-secondary bg-card">
                 Yönetim paneli: haberler ve şikâyetler
               </Link>
             </li>
@@ -74,7 +74,7 @@ async function Account({ searchParams }: { searchParams: PageProps<"/hesabim">["
       </nav>
 
       <section aria-labelledby="guvenlik">
-        <h2 id="guvenlik" className="text-2xl font-bold tracking-tight">
+        <h2 id="guvenlik" className="text-xl font-bold tracking-tight">
           Giriş ve güvenlik
         </h2>
         <div className="mt-5">
@@ -82,8 +82,8 @@ async function Account({ searchParams }: { searchParams: PageProps<"/hesabim">["
         </div>
       </section>
 
-      <section aria-labelledby="sil" className="rounded-2xl border-2 border-destructive/30 p-5">
-        <h2 id="sil" className="text-2xl font-bold tracking-tight">
+      <section aria-labelledby="sil" className="rounded-lg border border-destructive/30 p-4">
+        <h2 id="sil" className="text-xl font-bold tracking-tight">
           Hesabı sil
         </h2>
         <p className="mt-2 text-muted-foreground">Bu işlem geri alınamaz. Alıcılar ve satıcılarla olan sohbetleriniz de silinir.</p>

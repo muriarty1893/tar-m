@@ -20,20 +20,22 @@ export default async function NewsPage() {
         title="Haberler"
         intro={<>Tarım dünyasından haberler, mevsimlik öneriler ve {siteConfig.name} duyuruları.</>}
       />
-      <section className="mx-auto max-w-6xl px-4 py-14">
+      <section className="mx-auto max-w-4xl py-3 sm:px-4 sm:py-6">
         <Suspense>
-          <div className="mb-8 empty:hidden">
+          <div className="mb-3 px-3 empty:hidden sm:px-0">
             <AdminNewsLink />
           </div>
         </Suspense>
         {articles.length === 0 ? (
-          <p className="text-lg">Henüz haber yok.</p>
+          <p className="px-4 sm:px-0">Henüz haber yok.</p>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="divide-y divide-border overflow-hidden border-y border-border bg-card sm:rounded-md sm:border-x">
             {articles.map((a) => (
-              <NewsCard key={a.slug} article={a} headingLevel={2} />
+              <li key={a.slug}>
+                <NewsCard article={a} headingLevel={2} />
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </section>
     </>

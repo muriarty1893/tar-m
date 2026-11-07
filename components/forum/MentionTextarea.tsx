@@ -114,7 +114,7 @@ export const MentionTextarea = forwardRef<HTMLTextAreaElement, Props>(function M
         aria-activedescendant={open ? `${listId}-${active}` : undefined}
       />
       {open && (
-        <ul id={listId} role="listbox" aria-label="Bahsedilecek kişiler" className="absolute inset-x-0 top-full z-20 mt-1 max-h-72 overflow-auto rounded-2xl border border-border bg-card p-1 shadow-lift">
+        <ul id={listId} role="listbox" aria-label="Bahsedilecek kişiler" className="absolute inset-x-0 top-full z-20 mt-1 max-h-72 overflow-auto rounded-lg border border-border bg-card p-1 shadow-lift">
           {items.map((s, i) => (
             <li
               key={s.handle}

@@ -22,7 +22,7 @@ export default function InboxPage({ searchParams }: PageProps<"/mesajlar">) {
   return (
     <>
       <ToolHeader eyebrow="Pazar" title="Mesajlar" intro="İlanlar hakkındaki bütün sohbetleriniz. Yeni mesajlar kalın yazılır." />
-      <div className="mx-auto max-w-3xl px-4 py-8">
+      <div className="mx-auto max-w-3xl px-3 py-3 sm:px-4 sm:py-6">
         <Suspense fallback={<InboxSkeleton />}>
           <Inbox searchParams={searchParams} />
         </Suspense>
@@ -46,7 +46,7 @@ async function Inbox({ searchParams }: { searchParams: PageProps<"/mesajlar">["s
             key={t.id}
             href={t.id ? `/mesajlar?rol=${t.id}` : "/mesajlar"}
             aria-current={t.id === tab.id ? "page" : undefined}
-            className="inline-flex min-h-11 items-center rounded-full border-2 border-border px-4 font-semibold transition-colors hover:border-primary/50 aria-[current=page]:border-primary aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground"
+            className="inline-flex min-h-11 items-center rounded-md border border-border px-4 font-semibold transition-colors hover:border-primary/50 aria-[current=page]:border-primary aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground bg-card"
           >
             {t.label}
           </Link>
@@ -54,7 +54,7 @@ async function Inbox({ searchParams }: { searchParams: PageProps<"/mesajlar">["s
       </nav>
 
       {rows.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-input px-6 py-12 text-center">
+        <div className="rounded-lg border border-dashed border-input px-4 py-6 text-center">
           <ChatsCircleIcon aria-hidden="true" weight="duotone" className="mx-auto size-12 text-primary" />
           <p className="mx-auto mt-3 max-w-md text-lg">
             {tab.role === "seller" ? "İlanlarınıza henüz mesaj gelmedi." : "Henüz bir sohbetiniz yok. Beğendiğiniz bir ilanda “Satıcıya mesaj gönder”e dokunun."}
@@ -64,7 +64,7 @@ async function Inbox({ searchParams }: { searchParams: PageProps<"/mesajlar">["s
           </Link>
         </div>
       ) : (
-        <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border">
+        <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
           {rows.map((r) => (
             <li key={r.id}>
               <Link href={`/mesajlar/${r.id}`} className="flex items-center gap-4 p-4 transition-colors hover:bg-secondary focus-visible:outline-offset-[-3px]">
@@ -101,7 +101,7 @@ function InboxSkeleton() {
   return (
     <ul aria-hidden="true" className="space-y-3">
       {Array.from({ length: 4 }, (_, i) => (
-        <li key={i} className="flex gap-4 rounded-2xl border border-border p-4">
+        <li key={i} className="flex gap-4 rounded-lg border border-border p-4 bg-card">
           <span className="size-16 rounded-xl bg-muted motion-safe:animate-pulse" />
           <span className="flex-1 space-y-2">
             <span className="block h-5 w-1/3 rounded bg-muted" />

@@ -45,7 +45,7 @@ const noop = () => () => {};
 
 /**
  * The home page's weather box (Borsa): a cloud logo, the place, today's temperature, sky, chance of
- * rain and farming advice, then the next three days. The place is the one last picked on /hava (else
+ * rain and farming advice, then the next three days (five, side by side, on wide screens). The place is the one last picked on /hava (else
  * Ankara). The whole box opens the 7-day forecast.
  */
 export function BorsaWeather() {
@@ -74,39 +74,58 @@ export function BorsaWeather() {
     : `Hava durumu, ${province.name}. 7 günlük tahmini aç`;
 
   return (
-    <Link href="/hava" aria-label={label} className="flex h-full flex-col rounded-md border border-[#dfe3e8] bg-white transition-colors hover:border-[#c4cad3] hover:bg-[#fafbfc]">
-      <span aria-hidden="true" className="flex items-center gap-1.5 border-b border-[#dfe3e8] px-2.5 py-1.5">
+    <Link href="/hava" aria-label={label} className="flex h-full flex-col rounded-md border border-border bg-card transition-colors hover:border-input hover:bg-muted/40">
+      <span aria-hidden="true" className="flex items-center gap-1.5 border-b border-border px-2.5 py-1.5">
         <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-[#dbeafe]">
-          <CloudSunIcon weight="fill" className="size-4 text-[#1d4ed8]" />
+          <CloudSunIcon weight="fill" className="size-4 text-primary" />
         </span>
-        <span className="min-w-0 truncate text-[12.5px] font-bold">Hava · {province.name}</span>
+        <span className="min-w-0 truncate text-[12.5px] font-bold xl:text-[13.5px]">Hava · {province.name}</span>
       </span>
-      <span aria-hidden="true" className="block px-2.5 pt-1.5">
-        <span className="block font-borsa-mono text-[26px] font-semibold leading-tight">{f ? `${Math.round(f.current.temp)}°` : failed ? "–" : "…"}</span>
-        <span className="block truncate text-[11.5px] text-[#4b5563]">
-          {f ? `${describeWeather(f.current.code)} · %${today?.rainProb ?? 0} yağış` : failed ? "Hava alınamadı" : "Yükleniyor"}
-        </span>
-        {hint && (
-          <span className="mt-1 inline-block rounded px-1.5 py-0.5 text-[11px] font-semibold" style={{ background: hint.bg, color: hint.fg }}>
-            {hint.label}
+      {/* Phones: today, then three days below. Wide screens: today on the left, five days across. */}
+      <span aria-hidden="true" className="flex flex-1 flex-col xl:flex-row">
+        <span className="block px-2.5 pt-1.5 xl:w-[38%] xl:shrink-0 xl:py-2.5">
+          <span className="block font-borsa-mono text-[26px] font-semibold leading-tight xl:text-[30px]">{f ? `${Math.round(f.current.temp)}°` : failed ? "–" : "…"}</span>
+          <span className="block truncate text-[11.5px] text-muted-foreground xl:text-[12.5px]">
+            {f ? `${describeWeather(f.current.code)} · %${today?.rainProb ?? 0} yağış` : failed ? "Hava alınamadı" : "Yükleniyor"}
           </span>
-        )}
-      </span>
-      <span aria-hidden="true" className="mt-auto block border-t border-[#dfe3e8] px-2.5 py-1">
-        {f
-          ? f.daily.slice(1, 4).map((d) => {
-              const { Icon, color } = SKY[weatherKind(d.code ?? 2)];
-              return (
-                <span key={d.date} className="flex h-6 items-center gap-1.5 text-[11.5px]">
-                  <span className="w-8 font-semibold capitalize text-[#4b5563]">{weekday(d.date)}</span>
-                  <Icon weight="duotone" className="size-4" style={{ color }} />
-                  <span className="ml-auto font-borsa-mono font-semibold">
-                    {Math.round(d.max)}°<span className="font-normal text-[#4b5563]">/{Math.round(d.min)}°</span>
+          {hint && (
+            <span className="mt-1 inline-block rounded px-1.5 py-0.5 text-[11px] font-semibold" style={{ background: hint.bg, color: hint.fg }}>
+              {hint.label}
+            </span>
+          )}
+        </span>
+        <span className="mt-auto block border-t border-border px-2.5 py-1 xl:hidden">
+          {f
+            ? f.daily.slice(1, 4).map((d) => {
+                const { Icon, color } = SKY[weatherKind(d.code ?? 2)];
+                return (
+                  <span key={d.date} className="flex h-6 items-center gap-1.5 text-[11.5px]">
+                    <span className="w-8 font-semibold capitalize text-muted-foreground">{weekday(d.date)}</span>
+                    <Icon weight="duotone" className="size-4" style={{ color }} />
+                    <span className="ml-auto font-borsa-mono font-semibold">
+                      {Math.round(d.max)}°<span className="font-normal text-muted-foreground">/{Math.round(d.min)}°</span>
+                    </span>
                   </span>
-                </span>
-              );
-            })
-          : [0, 1, 2].map((i) => <span key={i} className="my-1.5 block h-3 rounded bg-[#eef0f3]" />)}
+                );
+              })
+            : [0, 1, 2].map((i) => <span key={i} className="my-1.5 block h-3 rounded bg-muted" />)}
+        </span>
+        <span className="hidden flex-1 grid-cols-5 border-l border-border xl:grid">
+          {f
+            ? f.daily.slice(1, 6).map((d) => {
+                const { Icon, color } = SKY[weatherKind(d.code ?? 2)];
+                return (
+                  <span key={d.date} className="flex flex-col items-center justify-center gap-1 text-[12px]">
+                    <span className="font-semibold capitalize text-muted-foreground">{weekday(d.date)}</span>
+                    <Icon weight="duotone" className="size-6" style={{ color }} />
+                    <span className="font-borsa-mono font-semibold">
+                      {Math.round(d.max)}°<span className="font-normal text-muted-foreground">/{Math.round(d.min)}°</span>
+                    </span>
+                  </span>
+                );
+              })
+            : [0, 1, 2, 3, 4].map((i) => <span key={i} className="m-3 block rounded bg-muted" />)}
+        </span>
       </span>
     </Link>
   );

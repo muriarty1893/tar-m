@@ -73,16 +73,16 @@ export default function WelcomeDialog({ onDone }: { onDone: () => void }) {
     >
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-[70] bg-[rgb(8_20_12/0.45)] backdrop-blur-[2px] transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0" />
-        <Dialog.Viewport className="fixed inset-0 z-[71] flex items-end justify-center overflow-y-auto p-3 sm:items-center sm:p-6">
+        <Dialog.Viewport className="fixed inset-0 z-[71] flex items-end justify-center overflow-y-auto p-3 sm:items-center sm:p-5">
           <Dialog.Popup
             initialFocus={title}
-            className="w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-lift outline-none transition-[opacity,transform] duration-200 ease-out data-ending-style:translate-y-2 data-ending-style:opacity-0 data-starting-style:translate-y-3 data-starting-style:opacity-0"
+            className="w-full max-w-lg overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-lift outline-none transition-[opacity,transform] duration-200 ease-out data-ending-style:translate-y-2 data-ending-style:opacity-0 data-starting-style:translate-y-3 data-starting-style:opacity-0"
           >
             <div className="relative h-28 sm:h-32">
               <Image src={pageHeroPhoto.src} alt="" fill sizes="(min-width: 640px) 32rem, 100vw" className="object-cover object-[50%_62%]" />
             </div>
-            <form onSubmit={finish} className="p-5 sm:p-7">
-              <Dialog.Title ref={title} tabIndex={-1} className="text-2xl font-bold tracking-tight outline-none sm:text-3xl">
+            <form onSubmit={finish} className="p-4 sm:p-5">
+              <Dialog.Title ref={title} tabIndex={-1} className="text-xl font-bold tracking-tight outline-none sm:text-3xl">
                 Hoş geldiniz
               </Dialog.Title>
               <Dialog.Description className="mt-2 text-muted-foreground">
@@ -98,7 +98,7 @@ export default function WelcomeDialog({ onDone }: { onDone: () => void }) {
                   return (
                     <label
                       key={id}
-                      className="relative flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-border px-3.5 py-2.5 transition-colors duration-150 hover:bg-secondary has-[:checked]:border-primary has-[:checked]:bg-secondary has-[:checked]:text-primary has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring"
+                      className="relative flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-border px-3.5 py-2.5 transition-colors duration-150 hover:bg-secondary has-[:checked]:border-primary has-[:checked]:bg-secondary has-[:checked]:text-primary has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring bg-card"
                     >
                       <input
                         type="radio"

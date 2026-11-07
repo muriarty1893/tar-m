@@ -17,8 +17,8 @@ export default function NotificationsPage() {
   return (
     <>
       <ToolHeader eyebrow="Forum" title="Bildirimler" intro="Konularınıza ve yanıtlarınıza gelen yanıtlar, sizden bahsedenler (@kullanıcıadınız)." />
-      <div className="mx-auto max-w-3xl px-4 py-10">
-        <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-2xl bg-muted motion-safe:animate-pulse" />}>
+      <div className="mx-auto max-w-3xl px-3 py-3 sm:px-4 sm:py-6">
+        <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-lg bg-muted motion-safe:animate-pulse" />}>
           <List />
         </Suspense>
       </div>
@@ -35,7 +35,7 @@ async function List() {
 
   if (!items.length) {
     return (
-      <div className="rounded-2xl border border-dashed border-input px-6 py-12 text-center">
+      <div className="rounded-lg border border-dashed border-input px-4 py-6 text-center">
         <BellIcon aria-hidden="true" weight="duotone" className="mx-auto size-12 text-primary" />
         <p className="mx-auto mt-3 max-w-md text-lg">Henüz bildirim yok. Biri konunuza ya da yanıtınıza yanıt verdiğinde, ya da sizden bahsettiğinde burada görünür.</p>
         <Link href="/forum" className={buttonVariants({ className: "mt-6" })}>
@@ -53,18 +53,18 @@ async function List() {
           {unread} yeni bildirim
         </p>
       )}
-      <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+      <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
         {items.map((n) => {
           const Icon = n.kind === "mention" ? AtIcon : ChatsTeardropIcon;
           return (
             <li key={n.id}>
               <Link
                 href={`/forum/${n.topicId}${n.replyId ? `#yanit-${n.replyId}` : ""}`}
-                className={`flex gap-3 px-4 py-4 transition-colors hover:bg-secondary focus-visible:outline-offset-[-3px] ${n.read ? "" : "bg-secondary/60"}`}
+                className={`flex gap-3 px-4 py-3 transition-colors hover:bg-secondary focus-visible:outline-offset-[-3px] ${n.read ? "" : "bg-secondary/60"}`}
               >
                 <span className="relative">
                   <Avatar id={n.actorHandle ?? n.actorName} name={n.actorName} size={44} />
-                  <span aria-hidden="true" className="absolute -bottom-1 -right-1 flex size-6 items-center justify-center rounded-full border-2 border-card bg-primary text-primary-foreground">
+                  <span aria-hidden="true" className="absolute -bottom-1 -right-1 flex size-6 items-center justify-center rounded-md border border-card bg-primary text-primary-foreground">
                     <Icon weight="bold" className="size-3.5" />
                   </span>
                 </span>

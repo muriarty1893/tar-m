@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CaretRightIcon, NotePencilIcon } from "@phosphor-icons/react/dist/ssr";
 import { ForumFeed } from "@/components/forum/ForumFeed";
-import { box, boxHeader } from "@/components/forum/ForumSections";
+import { box } from "@/components/forum/ForumSections";
 import { sectionBar } from "@/components/forum/parts";
 import { buttonVariants } from "@/components/ui/button";
 import { getUserId, signInHref } from "@/lib/auth";
@@ -74,7 +74,7 @@ async function Category({ params, searchParams }: Pick<PageProps<"/forum/k/[id]"
           <p className="mt-1 text-sm text-muted-foreground tabular-nums">
             {total.topics.toLocaleString("tr-TR")} konu · {total.replies.toLocaleString("tr-TR")} yanıt
           </p>
-          <Link href={userId ? newHref : signInHref(newHref)} className={buttonVariants({ className: "mt-3 max-sm:w-full" })}>
+          <Link href={userId ? newHref : signInHref(newHref)} className={buttonVariants({ variant: "create", className: "mt-3 max-sm:w-full" })}>
             <NotePencilIcon aria-hidden="true" weight="bold" />
             Bu kategoride konu aç
           </Link>
@@ -97,10 +97,21 @@ async function Category({ params, searchParams }: Pick<PageProps<"/forum/k/[id]"
       )}
 
       <section aria-labelledby="kategori-konulari" className={box}>
-        <h2 id="kategori-konulari" className={boxHeader}>
-          Konular
-        </h2>
-        <ForumFeed initial={first} sort={query.sirala} kategori={id} cats={cats} now={now.toISOString()} tabs emptyText="Bu kategoride henüz konu yok. İlk konuyu siz açın!" />
+        <ForumFeed
+          initial={first}
+          sort={query.sirala}
+          kategori={id}
+          cats={cats}
+          now={now.toISOString()}
+          tabs
+          dense
+          heading={
+            <h2 id="kategori-konulari" className="mr-1.5 shrink-0 text-[14px] font-bold">
+              Konular
+            </h2>
+          }
+          emptyText="Bu kategoride henüz konu yok. İlk konuyu siz açın!"
+        />
       </section>
     </div>
   );

@@ -11,8 +11,8 @@ export default function NewListingPage() {
   return (
     <>
       <ToolHeader eyebrow="Pazar" title="İlan ver" intro="Birkaç dakikada ilanınızı yayınlayın. Alıcılar size site içinden mesaj gönderir; telefon numaranız görünmez." />
-      <div className="mx-auto max-w-3xl px-4 py-10">
-        <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-2xl bg-muted motion-safe:animate-pulse" />}>
+      <div className="mx-auto max-w-3xl px-3 py-3 sm:px-4 sm:py-6">
+        <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-lg bg-muted motion-safe:animate-pulse" />}>
           <NewListing />
         </Suspense>
       </div>

@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { WELCOME_KEY } from "@/lib/welcome";
-import { CINE_DONE } from "@/lib/cine";
 
 // The dialog (Base UI) loads only for first-time visitors.
 const WelcomeDialog = dynamic(() => import("./WelcomeDialog"), { ssr: false });
@@ -28,30 +27,18 @@ const seen = () => {
 export function WelcomeGate() {
   const welcomed = useSyncExternalStore(subscribe, seen, () => true);
   // Open only once the page has loaded and hydrated (the modal hides the rest of the page from
-  // assistive tech, which must not happen mid-hydration) and, on the home page, once the hero's
-  // opening animation has played.
+  // assistive tech, which must not happen mid-hydration).
   const [settled, setSettled] = useState(false);
   useEffect(() => {
     if (welcomed) return;
-    const html = document.documentElement;
     let timer = 0;
-    const open = () => setSettled(true);
     const afterLoad = () => {
-      timer = window.setTimeout(() => {
-        // The home hero is playing its opening animation, or is armed for it but its script hasn't
-        // started yet (slow phones): wait for it to finish (or 12 s at most).
-        const armed = html.classList.contains("cine") && document.querySelector("[data-cine]");
-        if ((html.dataset.cineRun || armed) && !html.dataset.cineDone) {
-          window.addEventListener(CINE_DONE, open, { once: true });
-          timer = window.setTimeout(open, 12_000);
-        } else open();
-      }, 300);
+      timer = window.setTimeout(() => setSettled(true), 300);
     };
     if (document.readyState === "complete") afterLoad();
     else window.addEventListener("load", afterLoad, { once: true });
     return () => {
       window.removeEventListener("load", afterLoad);
-      window.removeEventListener(CINE_DONE, open);
       window.clearTimeout(timer);
     };
   }, [welcomed]);

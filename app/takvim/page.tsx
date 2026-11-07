@@ -23,12 +23,12 @@ export default function CalendarPage({ searchParams }: PageProps<"/takvim">) {
   return (
     <>
       <ToolHeader eyebrow="Planlama" title="Tarım takvimi" intro="Tarladaki işlerinizi gün gün planlayın, yaptıklarınızı işaretleyin. Bir işi tarlanıza bağlarsanız tarla sayfasında da görünür." />
-      <div className="mx-auto max-w-6xl px-3 py-4 sm:px-4 sm:py-8">
+      <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4 sm:py-6">
         {/* "Takvim & Hava" on the phone's tab bar: today's weather sits on top of the calendar. */}
         <div className="mb-4 xl:hidden">
           <WeatherTile wide />
         </div>
-        <Suspense fallback={<div aria-hidden="true" className="h-[32rem] rounded-2xl bg-muted motion-safe:animate-pulse" />}>
+        <Suspense fallback={<div aria-hidden="true" className="h-[32rem] rounded-lg bg-muted motion-safe:animate-pulse" />}>
           <Calendar searchParams={searchParams} />
         </Suspense>
       </div>
@@ -65,15 +65,15 @@ async function Calendar({ searchParams }: { searchParams: PageProps<"/takvim">["
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-start">
-      <section aria-labelledby="ay-baslik" className="rounded-2xl border border-border p-4 sm:p-6">
+      <section aria-labelledby="ay-baslik" className="rounded-lg border border-border p-4 sm:p-5 bg-card">
         <div className="flex items-center justify-between gap-3">
-          <Link href={href(shiftMonth(ref, -1))} aria-label="Önceki ay" className="flex size-12 items-center justify-center rounded-full border-2 border-border hover:border-primary/50">
+          <Link href={href(shiftMonth(ref, -1))} aria-label="Önceki ay" className="flex size-12 items-center justify-center rounded-md border border-border hover:border-primary/50 bg-card">
             <CaretLeftIcon aria-hidden="true" weight="bold" className="size-5" />
           </Link>
-          <h2 id="ay-baslik" className="text-2xl font-bold tracking-tight">
+          <h2 id="ay-baslik" className="text-xl font-bold tracking-tight">
             {monthTitle(ref)}
           </h2>
-          <Link href={href(shiftMonth(ref, 1))} aria-label="Sonraki ay" className="flex size-12 items-center justify-center rounded-full border-2 border-border hover:border-primary/50">
+          <Link href={href(shiftMonth(ref, 1))} aria-label="Sonraki ay" className="flex size-12 items-center justify-center rounded-md border border-border hover:border-primary/50 bg-card">
             <CaretRightIcon aria-hidden="true" weight="bold" className="size-5" />
           </Link>
         </div>
@@ -133,7 +133,7 @@ async function Calendar({ searchParams }: { searchParams: PageProps<"/takvim">["
 
       <div className="space-y-8">
         <section aria-labelledby="gun-baslik">
-          <h2 id="gun-baslik" className="text-2xl font-bold tracking-tight">
+          <h2 id="gun-baslik" className="text-xl font-bold tracking-tight">
             {dayTitle(selected)}
             {selected === today && <span className="ml-2 text-base font-semibold text-primary">Bugün</span>}
           </h2>
@@ -148,7 +148,7 @@ async function Calendar({ searchParams }: { searchParams: PageProps<"/takvim">["
           )}
         </section>
 
-        <section aria-labelledby="ekle-baslik" className="rounded-2xl border border-border p-5">
+        <section aria-labelledby="ekle-baslik" className="rounded-lg border border-border p-4 bg-card">
           <h2 id="ekle-baslik" className="text-xl font-bold">
             İş ekle
           </h2>
@@ -159,7 +159,7 @@ async function Calendar({ searchParams }: { searchParams: PageProps<"/takvim">["
       </div>
 
       <section aria-labelledby="yaklasan" className="lg:col-span-2">
-        <h2 id="yaklasan" className="text-2xl font-bold tracking-tight">
+        <h2 id="yaklasan" className="text-xl font-bold tracking-tight">
           Yaklaşan işler
         </h2>
         {upcoming.length ? (

@@ -16,9 +16,9 @@ export default function ReportsPage() {
   return (
     <AdminShell section="sikayetler" title="Şikâyetler" intro="Açık şikâyetler: önce ilanlar, sonra forum yazıları; en çok şikâyet alan önce.">
       <Suspense fallback={<AdminSkeleton />}>
-        <h2 className="mb-4 text-2xl font-bold tracking-tight">İlanlar</h2>
+        <h2 className="mb-4 text-xl font-bold tracking-tight">İlanlar</h2>
         <Reports />
-        <h2 id="forum" className="mb-4 mt-12 scroll-mt-24 text-2xl font-bold tracking-tight">Forum</h2>
+        <h2 id="forum" className="mb-4 mt-6 scroll-mt-24 text-xl font-bold tracking-tight">Forum</h2>
         <ForumReports />
       </Suspense>
     </AdminShell>
@@ -35,7 +35,7 @@ async function Reports() {
       {rows.map((r) => {
         const id = r.id;
         return (
-          <li key={id} className="rounded-2xl border border-border p-5">
+          <li key={id} className="rounded-lg border border-border p-4 bg-card">
             <div className="flex flex-wrap items-baseline justify-between gap-3">
               <Link href={`/pazar/ilan/${id}`} className="text-lg font-bold text-primary underline-offset-4 hover:underline">
                 {r.title}
@@ -84,7 +84,7 @@ async function ForumReports() {
   return (
     <ul className="space-y-4">
       {rows.map((r) => (
-        <li key={`${r.topicId}-${r.replyId ?? "konu"}`} className="rounded-2xl border border-border p-5">
+        <li key={`${r.topicId}-${r.replyId ?? "konu"}`} className="rounded-lg border border-border p-4 bg-card">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <Link href={`/forum/${r.topicId}${r.replyId ? `#yanit-${r.replyId}` : ""}`} className="text-lg font-bold text-primary underline-offset-4 hover:underline">
               {r.replyId ? `Yanıt: ${r.topicTitle}` : r.topicTitle}

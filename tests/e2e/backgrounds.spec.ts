@@ -9,21 +9,13 @@ for (const path of ["/", "/hava", "/haberler", "/is-birligi", "/sss", "/hakkimiz
   });
 }
 
-test("subpage header band: a real wheat-field photo behind the title, credited in the band", async ({ page }) => {
+test("subpage header band: a compact white band with the title, no photo", async ({ page }) => {
   await page.goto("/sss");
   const band = page.getByTestId("page-hero");
-  await expect(band.locator("img")).toHaveAttribute("src", /susehri-wheat/);
   await expect(band.getByRole("heading", { level: 1 })).toBeVisible();
-  const credit = band.getByRole("link", { name: /Maurice Flesier/ });
-  await expect(credit).toHaveAttribute("href", /commons\.wikimedia\.org/);
-  await expect(band.getByRole("link", { name: "CC BY-SA 4.0" })).toHaveAttribute("href", /by-sa\/4\.0/);
-});
-
-test("about page keeps the photo inside its title instead of behind it", async ({ page }) => {
-  await page.goto("/hakkimizda");
-  const band = page.getByTestId("page-hero");
-  await expect(band.locator("h1 img")).toHaveCount(1);
-  await expect(band.locator(":scope > img, [data-hero-photo]")).toHaveCount(0);
+  await expect(band.locator("img")).toHaveCount(0);
+  await expect(band).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  expect((await band.boundingBox())!.height).toBeLessThan(200);
 });
 
 test("the footer is one thin band: the info pages, the contact address and the copyright", async ({ page, isMobile }) => {

@@ -4,9 +4,10 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { AdminNewsLink } from "@/components/admin/AdminNewsLink";
-import { shareImage } from "@/lib/news";
+import { kindLabel, shareImage } from "@/lib/news";
 import { getPublished, listPublished } from "@/lib/news-data";
 import { formatTrDate } from "@/lib/format";
+import { KIND_TONE } from "@/components/NewsCard";
 import { siteConfig } from "@/config/site";
 import { ArrowLeftIcon, CalendarBlankIcon } from "@phosphor-icons/react/dist/ssr";
 
@@ -51,10 +52,10 @@ export default function ArticlePage({ params }: PageProps<"/haberler/[slug]">) {
 
 function ArticleSkeleton() {
   return (
-    <div aria-hidden="true" className="mx-auto max-w-3xl space-y-6 px-4 py-14">
+    <div aria-hidden="true" className="mx-auto max-w-3xl space-y-6 px-3 py-3 sm:px-4 sm:py-6">
       <div className="h-12 w-3/4 rounded-xl bg-muted motion-safe:animate-pulse" />
       <div className="h-6 w-40 rounded-lg bg-muted" />
-      <div className="aspect-[16/9] rounded-3xl bg-muted" />
+      <div className="aspect-[16/9] rounded-lg bg-muted" />
     </div>
   );
 }
@@ -65,34 +66,36 @@ async function ArticleBody({ params }: { params: PageProps<"/haberler/[slug]">["
 
   return (
     <article>
-      <header className="relative border-b border-border bg-surface px-4 pb-12 pt-10 sm:pt-14">
-        <div className="relative mx-auto max-w-3xl">
-          <Link
-            href="/haberler"
-            className="inline-flex min-h-11 items-center gap-2 font-semibold text-primary underline-offset-4 hover:underline"
-          >
+      <header className="border-b border-border bg-surface px-4 pb-4 pt-2 sm:pb-6 sm:pt-4">
+        <div className="mx-auto max-w-3xl">
+          <Link href="/haberler" className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline">
             <ArrowLeftIcon aria-hidden="true" weight="bold" />
             Tüm haberler
           </Link>
-          <h1 className="mt-5 text-3xl font-bold leading-tight tracking-tight sm:text-5xl">{article.title}</h1>
-          <time dateTime={article.date} className="mt-5 flex items-center gap-1.5 text-muted-foreground">
-            <CalendarBlankIcon aria-hidden="true" weight="duotone" className="size-5" />
-            {formatTrDate(article.date)}
-          </time>
+          <p className="flex items-center gap-2 text-[12px]">
+            <span className={`rounded px-1.5 font-semibold leading-5 ${KIND_TONE[article.kind]}`}>{kindLabel(article.kind)}</span>
+            <time dateTime={article.date} className="flex items-center gap-1 font-borsa-mono text-muted-foreground">
+              <CalendarBlankIcon aria-hidden="true" weight="regular" className="size-3.5" />
+              {formatTrDate(article.date)}
+            </time>
+          </p>
+          <h1 className="mt-2 text-2xl font-bold leading-tight sm:text-3xl">{article.title}</h1>
           <Suspense>
-            <div className="mt-5 empty:hidden">
+            <div className="mt-3 empty:hidden">
               <AdminNewsLink slug={article.slug} />
             </div>
           </Suspense>
         </div>
       </header>
-      <div className="mx-auto max-w-3xl px-4 py-12">
-        {article.cover && (
-          <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-3xl shadow-soft">
-            <Image src={article.cover} alt="" fill priority sizes="(min-width: 768px) 768px, 100vw" className="object-cover" />
-          </div>
-        )}
-        <div className="prose-article space-y-5 text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: article.html }} />
+      <div className="mx-auto max-w-3xl py-3 sm:px-4 sm:py-6">
+        <div className="overflow-hidden border-y border-border bg-card sm:rounded-md sm:border-x">
+          {article.cover && (
+            <div className="relative aspect-[16/9] border-b border-border">
+              <Image src={article.cover} alt="" fill priority sizes="(min-width: 768px) 768px, 100vw" className="object-cover" />
+            </div>
+          )}
+          <div className="prose-article space-y-4 p-4 leading-relaxed sm:p-6" dangerouslySetInnerHTML={{ __html: article.html }} />
+        </div>
       </div>
     </article>
   );

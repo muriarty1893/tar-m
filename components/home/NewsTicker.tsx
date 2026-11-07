@@ -28,7 +28,7 @@ export async function NewsTicker() {
             href={`/haberler/${a.slug}`}
             tabIndex={copy || i >= latest.length ? -1 : undefined}
             aria-hidden={(!copy && i >= latest.length) || undefined}
-            className="flex min-h-8 items-center gap-1.5 whitespace-nowrap text-[12.5px] font-medium text-[#111827] hover:underline focus-visible:outline-offset-[-2px]"
+            className="flex min-h-8 items-center gap-1.5 whitespace-nowrap text-[12.5px] font-medium text-foreground hover:underline focus-visible:outline-offset-[-2px]"
           >
             <span className="font-borsa-mono text-[10px] font-bold uppercase" style={{ color: KIND_COLOR[a.kind] }}>
               {kindLabel(a.kind)}
@@ -40,9 +40,9 @@ export async function NewsTicker() {
     </ul>
   );
   return (
-    <section aria-labelledby="destek-haber" className="flex h-8 items-stretch overflow-hidden rounded-md border border-[#dfe3e8] bg-white">
+    <section aria-labelledby="destek-haber" className="flex h-8 items-stretch overflow-hidden rounded-md border border-border bg-card">
       <h2 id="destek-haber" className="flex shrink-0">
-        <Link href="/haberler" className="flex items-center bg-[#dc2626] px-2 text-[11px] font-bold leading-none text-white transition-colors hover:bg-[#b91c1c] focus-visible:outline-offset-[-3px]">
+        <Link href="/haberler" className="flex items-center bg-create px-2 text-[11px] font-bold leading-none text-white transition-colors hover:bg-[var(--create-hover)] focus-visible:outline-offset-[-3px]">
           Çiftçi destekleri & haberler
         </Link>
       </h2>

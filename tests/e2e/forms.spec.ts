@@ -109,20 +109,3 @@ test("partner form submits", async ({ page }) => {
   await expect(page.getByText("Mesajınızı aldık")).toBeVisible();
   expect(sent).toMatchObject({ type: "kooperatif", organization: "Konya Tarım Kooperatifi" });
 });
-
-test("on wide screens, the home page's question form sends a question too", async ({ page, isMobile }) => {
-  test.skip(isMobile, "phones get the portal home; the form is on /sss");
-  let sent: Record<string, unknown> | null = null;
-  await page.route("**/api/question", async (route) => {
-    sent = route.request().postDataJSON();
-    await route.fulfill({ status: 200, contentType: "application/json", body: '{"ok":true}' });
-  });
-  await page.goto("/#sorular");
-  const form = page.locator("#sorular form");
-  await form.getByLabel("E-posta", { exact: true }).fill("hasan@example.com");
-  await form.getByLabel("Sorunuz").fill("Forumda fotoğraf nasıl eklenir?");
-  await form.getByRole("checkbox").check();
-  await form.getByRole("button", { name: "Soruyu gönder" }).click();
-  await expect(page.getByText("Teşekkürler! Sorunuzu aldık.")).toBeVisible();
-  expect(sent).toMatchObject({ email: "hasan@example.com", question: "Forumda fotoğraf nasıl eklenir?", consent: true });
-});

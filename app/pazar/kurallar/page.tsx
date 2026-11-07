@@ -49,18 +49,18 @@ export default function MarketRulesPage() {
   return (
     <>
       <ToolHeader eyebrow="Pazar" title="Pazar kuralları" intro="Herkesin güvenle alıp satabilmesi için birkaç kural." />
-      <div className="mx-auto max-w-3xl space-y-10 px-4 py-12">
+      <div className="mx-auto max-w-3xl space-y-3 px-3 py-3 sm:px-4 sm:py-6">
         {rules.map((r) => (
-          <section key={r.title}>
-            <h2 className="text-2xl font-bold tracking-tight">{r.title}</h2>
-            <ul className="mt-4 list-disc space-y-2 pl-6 text-lg">
+          <section key={r.title} className="overflow-hidden rounded-md border border-border bg-card">
+            <h2 className="border-b border-border px-4 py-2.5 text-[15px] font-bold">{r.title}</h2>
+            <ul className="list-disc space-y-1.5 py-3 pl-8 pr-4 text-[0.9375rem]">
               {r.items.map((i) => (
                 <li key={i}>{i}</li>
               ))}
             </ul>
           </section>
         ))}
-        <p className="text-lg text-muted-foreground">
+        <p className="px-1 text-sm text-muted-foreground">
           Kişisel verilerinizin nasıl işlendiğini{" "}
           <Link href="/gizlilik" className="font-semibold text-primary underline underline-offset-4">
             Gizlilik ve KVKK

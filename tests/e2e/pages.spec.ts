@@ -1,24 +1,37 @@
 import { test, expect } from "@playwright/test";
 
-// The wide-screen home (the landing page); phones and tablets get the portal (portal.spec.ts).
-const LANDING_SECTIONS = [
-  "Sitede bugün açık olanlar",
-  "Bugün tarlanızda hava nasıl?",
-  "Son haberler",
-  "İşinize uygun bir plan seçin",
-  "Birlikte büyüyelim",
-  "Aklınıza takılan bir şey mi var?",
-];
+// The home page is the Borsa portal on every screen (portal.spec.ts has the phone's details).
 
-test("landing page has every section in spec order", async ({ page, isMobile }) => {
-  test.skip(isMobile, "phones get the portal home");
+test("wide screens: the portal in the phone's order, the ad strips side by side, the forum's sections beside the topics", async ({ page, isMobile }) => {
+  test.skip(isMobile, "the wide layout");
   await page.route("https://api.open-meteo.com/**", (r) => r.fulfill({ status: 500, body: "{}" }));
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
-  const h2s = await page.locator("main h2").allInnerTexts();
-  const found = LANDING_SECTIONS.map((s) => h2s.findIndex((h) => h.trim() === s));
-  expect(found.every((i) => i >= 0), `missing sections; got ${JSON.stringify(h2s)}`).toBe(true);
-  expect([...found].sort((a, b) => a - b)).toEqual(found);
+  const main = page.locator("main");
+  await expect(main.getByRole("heading", { level: 1 })).toHaveCount(1);
+  const box = async (l: ReturnType<typeof main.locator>) => (await l.boundingBox())!;
+  const search = await box(main.getByRole("search", { name: "Sitede ara" }));
+  const sponsor = await box(main.getByRole("button", { name: /sukocu\.com/ }));
+  const advertise = await box(main.getByRole("link", { name: /Bu alanda reklam vermek için/ }));
+  const weather = await box(main.getByRole("link", { name: /^Hava durumu/ }));
+  const market = await box(main.getByRole("region", { name: "Pazar" }));
+  const forum = await box(main.locator("#forum"));
+  const sections = await box(main.getByRole("region", { name: "Forum bölümleri" }));
+  expect(search.y).toBeLessThan(sponsor.y);
+  expect(Math.abs(sponsor.y - advertise.y)).toBeLessThan(2);
+  expect(advertise.y).toBeLessThan(weather.y);
+  expect(Math.abs(weather.y - market.y)).toBeLessThan(2);
+  expect(weather.y).toBeLessThan(forum.y);
+  expect(Math.abs(forum.y - sections.y)).toBeLessThan(2);
+  expect(sections.x).toBeGreaterThan(forum.x + forum.width - 1);
+});
+
+test("the old landing page is gone: no hero, no pricing", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("[data-cine]")).toHaveCount(0);
+  for (const gone of ["İşinize uygun bir plan seçin", "Sitede bugün açık olanlar", "Birlikte büyüyelim"]) {
+    await expect(page.getByRole("heading", { name: gone })).toHaveCount(0);
+  }
 });
 
 test("the demo, the scan explainer and the early-access list are gone", async ({ page }) => {
@@ -27,39 +40,6 @@ test("the demo, the scan explainer and the early-access list are gone", async ({
     await expect(page.getByRole("heading", { name: gone })).toHaveCount(0);
   }
   await expect(page.locator("#demo, #nasil-calisir, #kayit")).toHaveCount(0);
-});
-
-test("landing sections are visible without JavaScript (reveal animation is an enhancement)", async ({ browser, isMobile }) => {
-  test.skip(isMobile, "phones get the portal home");
-  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1440, height: 900 } });
-  const page = await context.newPage();
-  await page.goto("/");
-  for (const name of ["Sitede bugün açık olanlar", "Son haberler", "Birlikte büyüyelim"]) {
-    const heading = page.getByRole("heading", { level: 2, name });
-    await heading.scrollIntoViewIfNeeded();
-    const opacity = await heading.evaluate((el) => {
-      let node: Element | null = el;
-      let o = 1;
-      while (node) {
-        o *= Number(getComputedStyle(node).opacity);
-        node = node.parentElement;
-      }
-      return o;
-    });
-    expect(opacity, name).toBe(1);
-  }
-  await context.close();
-});
-
-test("landing CTA (a free account) is in the hero", async ({ page, isMobile }) => {
-  test.skip(isMobile, "phones get the portal home");
-  await page.goto("/");
-  await expect(page.locator("[data-cine='card']").getByRole("link", { name: "Ücretsiz hesap açın" })).toHaveAttribute("href", "/kayit");
-});
-
-test("landing shows the 3 latest news items", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator("#haberler article")).toHaveCount(3);
 });
 
 const ROUTES = ["/", "/forum", "/pazar", "/takvim", "/ara", "/haberler", "/hava", "/is-birligi", "/sss", "/hakkimizda", "/gizlilik", "/kaynaklar"];

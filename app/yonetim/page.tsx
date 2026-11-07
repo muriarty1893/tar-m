@@ -46,24 +46,24 @@ async function Overview() {
   ];
 
   return (
-    <div className="space-y-12">
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    <div className="space-y-3 sm:space-y-6">
+      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {stats.map(({ label, value, href, Icon }) => {
           const inner = (
             <>
-              <Icon aria-hidden="true" weight="duotone" className="size-7 text-primary" />
-              <span className="mt-3 block text-4xl font-bold tracking-tight tabular-nums">{Number(value).toLocaleString("tr-TR")}</span>
-              <span className="mt-1 block text-muted-foreground">{label}</span>
+              <Icon aria-hidden="true" weight="fill" className="size-4 text-primary" />
+              <span className="mt-1 block font-borsa-mono text-[26px] font-semibold leading-tight">{Number(value).toLocaleString("tr-TR")}</span>
+              <span className="block text-[12.5px] leading-snug text-muted-foreground">{label}</span>
             </>
           );
           return (
             <li key={label}>
               {href ? (
-                <Link href={href} className="block h-full rounded-2xl border border-border p-5 transition-colors hover:border-primary/40 hover:bg-secondary">
+                <Link href={href} className="block h-full rounded-md border border-border bg-card p-3 transition-colors hover:border-primary/40 hover:bg-secondary">
                   {inner}
                 </Link>
               ) : (
-                <div className="h-full rounded-2xl border border-border p-5">{inner}</div>
+                <div className="h-full rounded-md border border-border bg-card p-3">{inner}</div>
               )}
             </li>
           );
@@ -72,21 +72,21 @@ async function Overview() {
 
       <section aria-labelledby="son-haberler">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <h2 id="son-haberler" className="text-2xl font-bold tracking-tight">
+          <h2 id="son-haberler" className="text-lg font-bold">
             Son haberler
           </h2>
-          <Link href="/yonetim/haberler" className="font-semibold text-primary underline-offset-4 hover:underline">
+          <Link href="/yonetim/haberler" className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
             Tüm haberler
           </Link>
         </div>
         {articles.length ? (
-          <ul className="mt-4 divide-y divide-border rounded-2xl border border-border">
+          <ul className="mt-2 divide-y divide-border overflow-hidden rounded-md border border-border bg-card text-[14px]">
             {articles.map((a) => (
               <li key={a.id}>
-                <Link href={`/yonetim/haberler/${a.id}`} className="flex flex-wrap items-center gap-3 px-5 py-4 hover:bg-secondary">
+                <Link href={`/yonetim/haberler/${a.id}`} className="flex flex-wrap items-center gap-2.5 px-3 py-2.5 hover:bg-muted/50">
                   <span className="min-w-0 flex-1 truncate font-semibold">{a.title}</span>
                   <StatusBadge status={a.status} />
-                  <span className="text-sm text-muted-foreground">{formatTrDate(a.date)}</span>
+                  <span className="font-borsa-mono text-[12px] text-muted-foreground">{formatTrDate(a.date)}</span>
                 </Link>
               </li>
             ))}

@@ -17,16 +17,16 @@ export function AdminShell({ section, title, intro, actions, children }: { secti
   return (
     <>
       <ToolHeader eyebrow="Yönetim paneli" title={title} intro={intro} actions={actions}>
-        <nav aria-label="Yönetim bölümleri" className="mt-8">
-          <ul className="flex flex-wrap gap-2">
+        <nav aria-label="Yönetim bölümleri" className="-mb-3 mt-3 sm:-mb-6 sm:mt-4">
+          <ul className="flex gap-1 overflow-x-auto [scrollbar-width:none]">
             {TABS.map(({ id, href, label, Icon }) => (
               <li key={id}>
                 <Link
                   href={href}
                   aria-current={section === id ? "page" : undefined}
-                  className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-border px-4 font-semibold transition-colors hover:border-primary/50 aria-[current=page]:border-primary aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground"
+                  className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:border-primary aria-[current=page]:font-semibold aria-[current=page]:text-primary"
                 >
-                  <Icon aria-hidden="true" weight="duotone" className="size-5" />
+                  <Icon aria-hidden="true" weight={section === id ? "fill" : "regular"} className="size-4" />
                   {label}
                 </Link>
               </li>
@@ -34,11 +34,11 @@ export function AdminShell({ section, title, intro, actions, children }: { secti
           </ul>
         </nav>
       </ToolHeader>
-      <div className="mx-auto max-w-6xl px-4 py-10">{children}</div>
+      <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4 sm:py-6">{children}</div>
     </>
   );
 }
 
 export function AdminSkeleton() {
-  return <div aria-hidden="true" className="h-80 rounded-2xl bg-muted motion-safe:animate-pulse" />;
+  return <div aria-hidden="true" className="h-80 rounded-md bg-muted motion-safe:animate-pulse" />;
 }

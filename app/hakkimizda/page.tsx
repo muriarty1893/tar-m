@@ -3,7 +3,6 @@ import { siteConfig } from "@/config/site";
 import { HandHeartIcon, ScalesIcon, ShieldCheckIcon, TranslateIcon, TargetIcon } from "@phosphor-icons/react/dist/ssr";
 import { CtaLink } from "@/components/CtaLink";
 import { PageHero } from "@/components/PageHero";
-import { MaskedHeading } from "@/components/ui/masked-heading";
 
 export const metadata: Metadata = {
   title: "Hakkımızda",
@@ -20,17 +19,9 @@ const values = [
 export default function AboutPage() {
   return (
     <>
-      <PageHero
-        title="Hakkımızda"
-        photo={null}
-        heading={
-          // React Bits MaskedHeading: the sunset field shows through the letters.
-          <MaskedHeading tag="h1" text="Hakkımızda" src="/app/hero-field.webp" align="left" textScale={0.155} parallax={22} drift={14} brightness={0.92} saturation={1.15} />
-        }
-        intro="Çiftçiyi çiftçiyle, alıcıyı satıcıyla buluşturuyoruz."
-      />
-      <div className="mx-auto max-w-4xl px-4 py-14">
-        <div className="space-y-5 text-lg leading-relaxed">
+      <PageHero title="Hakkımızda" intro="Çiftçiyi çiftçiyle, alıcıyı satıcıyla buluşturuyoruz." />
+      <div className="mx-auto max-w-4xl space-y-3 px-2 py-3 sm:px-4 sm:py-6">
+        <div className="space-y-3 rounded-lg border border-border bg-card p-4 leading-relaxed sm:p-5">
           <p>
             {siteConfig.name}, tarımı daha verimli ve daha az riskli hâle getirmek için yola çıktı. Amacımız, her çiftçinin
             cebindeki telefonla tarlası hakkında hızlı ve anlaşılır bilgiye ulaşabilmesi.
@@ -42,33 +33,39 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <div className="mt-12 flex gap-5 rounded-3xl border border-border bg-card p-7 shadow-soft">
-          <span className="blob flex size-14 shrink-0 items-center justify-center bg-gold-soft text-gold">
-            <TargetIcon aria-hidden="true" weight="duotone" className="size-7" />
+        <div className="flex gap-3 rounded-lg border border-border bg-card p-4 sm:p-5">
+          <span className="blob flex size-9 shrink-0 items-center justify-center bg-gold-soft text-gold">
+            <TargetIcon aria-hidden="true" weight="fill" className="size-5" />
           </span>
           <div>
-            <h2 className="text-2xl font-bold">Misyonumuz</h2>
-            <p className="mt-2 text-lg">
+            <h2 className="text-lg font-bold">Misyonumuz</h2>
+            <p className="mt-1">
               Türkiye&apos;deki her ölçekten çiftçiye, kendi dilinde, kolay ve güvenilir bir buluşma ve bilgi yeri sunmak.
             </p>
           </div>
         </div>
 
-        <h2 className="mt-14 text-2xl font-bold">Değerlerimiz</h2>
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2">
-          {values.map(({ icon: Icon, title, text }) => (
-            <li key={title} className="rounded-3xl border border-border bg-card p-6 shadow-soft">
-              <span className="flex size-11 items-center justify-center rounded-2xl bg-secondary text-primary">
-                <Icon aria-hidden="true" weight="duotone" className="size-6" />
-              </span>
-              <h3 className="mt-4 text-lg font-bold">{title}</h3>
-              <p className="mt-1 text-muted-foreground">{text}</p>
-            </li>
-          ))}
-        </ul>
+        <section aria-labelledby="degerler" className="overflow-hidden rounded-lg border border-border bg-card">
+          <h2 id="degerler" className="border-b border-border px-4 py-2.5 text-[15px] font-bold">
+            Değerlerimiz
+          </h2>
+          <ul className="grid gap-px bg-border sm:grid-cols-2">
+            {values.map(({ icon: Icon, title, text }) => (
+              <li key={title} className="flex gap-3 bg-card p-4">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-secondary text-primary">
+                  <Icon aria-hidden="true" weight="fill" className="size-4" />
+                </span>
+                <span>
+                  <h3 className="font-bold">{title}</h3>
+                  <p className="mt-0.5 text-[0.9375rem] text-muted-foreground">{text}</p>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
 
-        <div className="mt-14 flex flex-col items-start gap-4 rounded-3xl bg-panel p-8 text-panel-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-heading text-2xl font-bold">Yolculuğumuza katılın.</p>
+        <div className="flex flex-col items-start gap-3 rounded-lg bg-panel p-4 text-panel-foreground sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <p className="text-lg font-bold">Yolculuğumuza katılın.</p>
           <CtaLink className="bg-panel-foreground text-panel shadow-none hover:bg-panel-foreground/90" />
         </div>
       </div>

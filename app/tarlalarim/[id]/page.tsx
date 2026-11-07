@@ -17,12 +17,12 @@ export const metadata: Metadata = { title: "Tarla", robots: { index: false } };
 
 export default function FieldPage({ params }: PageProps<"/tarlalarim/[id]">) {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <div className="mx-auto max-w-5xl px-3 py-3 sm:px-4 sm:py-6">
       <Link href="/tarlalarim" className="inline-flex min-h-11 items-center gap-2 font-semibold text-primary underline-offset-4 hover:underline">
         <ArrowLeftIcon aria-hidden="true" weight="bold" className="size-5" />
         Tarlalarım
       </Link>
-      <Suspense fallback={<div aria-hidden="true" className="mt-4 h-96 rounded-2xl bg-muted motion-safe:animate-pulse" />}>
+      <Suspense fallback={<div aria-hidden="true" className="mt-4 h-96 rounded-lg bg-muted motion-safe:animate-pulse" />}>
         <FieldDetail params={params} />
       </Suspense>
     </div>
@@ -44,7 +44,7 @@ async function FieldDetail({ params }: { params: PageProps<"/tarlalarim/[id]">["
   return (
     <div className="mt-4 space-y-10">
       <div>
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{f.name}</h1>
+        <h1 className="text-xl font-bold tracking-tight sm:text-3xl">{f.name}</h1>
         <p className="mt-2 text-lg text-muted-foreground">
           {[f.crop, f.stage, `${f.areaDonum.toLocaleString("tr-TR")} dönüm`, f.province || f.district ? placeLabel(f.province, f.district) : ""].filter(Boolean).join(" · ")}
         </p>
@@ -72,16 +72,16 @@ async function FieldDetail({ params }: { params: PageProps<"/tarlalarim/[id]">["
           ["Dönüm başı masraf", formatPrice(Math.round(perDonum))],
           ["Beklenen verim", f.expectedYieldKg ? tonsLabel(f.expectedYieldKg) : "Girilmedi"],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-2xl border border-border p-5">
+          <div key={label} className="rounded-lg border border-border p-4 bg-card">
             <dt className="text-muted-foreground">{label}</dt>
-            <dd className="mt-1 text-3xl font-bold tracking-tight">{value}</dd>
+            <dd className="mt-1 text-xl font-bold tracking-tight">{value}</dd>
           </div>
         ))}
       </dl>
 
       <section aria-labelledby="masraflar" className="grid gap-8 lg:grid-cols-2">
         <div>
-          <h2 id="masraflar" className="text-2xl font-bold tracking-tight">
+          <h2 id="masraflar" className="text-xl font-bold tracking-tight">
             Masraflar
           </h2>
           {byKind.length > 0 ? (
@@ -101,7 +101,7 @@ async function FieldDetail({ params }: { params: PageProps<"/tarlalarim/[id]">["
           ) : (
             <p className="mt-3 text-muted-foreground">Henüz masraf eklemediniz.</p>
           )}
-          <div className="mt-6 rounded-2xl border border-border p-5">
+          <div className="mt-6 rounded-lg border border-border p-4 bg-card">
             <h3 className="text-xl font-bold">Masraf ekle</h3>
             <div className="mt-4">
               <ExpenseForm fieldId={f.id} today={today} />
@@ -110,9 +110,9 @@ async function FieldDetail({ params }: { params: PageProps<"/tarlalarim/[id]">["
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Kayıtlar</h2>
+          <h2 className="text-xl font-bold tracking-tight">Kayıtlar</h2>
           {expenses.length ? (
-            <ul className="mt-4 divide-y divide-border rounded-2xl border border-border">
+            <ul className="mt-4 divide-y divide-border rounded-lg border border-border bg-card">
               {expenses.map((x) => (
                 <li key={x.id} className="flex items-center gap-3 px-4 py-3">
                   <div className="min-w-0 flex-1">
@@ -136,7 +136,7 @@ async function FieldDetail({ params }: { params: PageProps<"/tarlalarim/[id]">["
 
       <section aria-labelledby="isler">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <h2 id="isler" className="text-2xl font-bold tracking-tight">
+          <h2 id="isler" className="text-xl font-bold tracking-tight">
             Yaklaşan işler
           </h2>
           <Link href="/takvim" className="font-semibold text-primary underline-offset-4 hover:underline">

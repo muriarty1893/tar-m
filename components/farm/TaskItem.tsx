@@ -19,7 +19,7 @@ export function TaskItem({ task, showDate }: { task: Task; showDate?: string }) 
       await setTaskDone(task.id, !done);
     });
   return (
-    <li className="flex items-center gap-3 rounded-2xl border border-border p-3">
+    <li className="flex items-center gap-3 rounded-lg border border-border p-3 bg-card">
       <button
         type="button"
         role="checkbox"
@@ -27,7 +27,7 @@ export function TaskItem({ task, showDate }: { task: Task; showDate?: string }) 
         aria-label={`${task.title}: ${done ? "yapıldı" : "yapılmadı"}`}
         onClick={toggle}
         disabled={pending}
-        className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border-2 border-input transition-colors aria-checked:border-primary aria-checked:bg-primary aria-checked:text-primary-foreground"
+        className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-input transition-colors aria-checked:border-primary aria-checked:bg-primary aria-checked:text-primary-foreground bg-card"
       >
         {done && <CheckIcon aria-hidden="true" weight="bold" className="size-6" />}
       </button>

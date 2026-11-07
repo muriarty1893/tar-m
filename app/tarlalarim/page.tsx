@@ -23,8 +23,8 @@ export default function FieldsPage({ searchParams }: PageProps<"/tarlalarim">) {
   return (
     <>
       <ToolHeader eyebrow="Çiftliğim" title="Tarlalarım" intro="Tarlalarınızı ve bu sezonki masraflarınızı kaydedin; toplam alanı, harcamayı ve beklenen verimi bir bakışta görün." />
-      <div className="mx-auto max-w-6xl px-4 py-8">
-        <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-2xl bg-muted motion-safe:animate-pulse" />}>
+      <div className="mx-auto max-w-6xl px-3 py-3 sm:px-4 sm:py-6">
+        <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-lg bg-muted motion-safe:animate-pulse" />}>
           <Fields searchParams={searchParams} />
         </Suspense>
       </div>
@@ -54,7 +54,7 @@ async function Fields({ searchParams }: { searchParams: PageProps<"/tarlalarim">
   return (
     <div className="space-y-8">
       {sp.silindi === "1" && (
-        <p role="status" className="flex items-center gap-2 rounded-2xl border border-primary/30 bg-secondary px-4 py-3 font-semibold">
+        <p role="status" className="flex items-center gap-2 rounded-lg border border-primary/30 bg-secondary px-4 py-3 font-semibold">
           <CheckCircleIcon aria-hidden="true" weight="fill" className="size-6 text-primary" />
           Tarla silindi.
         </p>
@@ -67,9 +67,9 @@ async function Fields({ searchParams }: { searchParams: PageProps<"/tarlalarim">
             ["Sezon masrafı", formatPrice(Math.round(totals.expenses))],
             ["Beklenen verim", totals.yieldKg ? tonsLabel(totals.yieldKg) : "Girilmedi"],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-2xl border border-border p-5">
+            <div key={label} className="rounded-lg border border-border p-4 bg-card">
               <dt className="text-muted-foreground">{label}</dt>
-              <dd className="mt-1 text-3xl font-bold tracking-tight">{value}</dd>
+              <dd className="mt-1 text-xl font-bold tracking-tight">{value}</dd>
             </div>
           ))}
         </dl>
@@ -77,7 +77,7 @@ async function Fields({ searchParams }: { searchParams: PageProps<"/tarlalarim">
 
       {fields.length === 0 ? (
         <div className="space-y-6">
-          <div className="rounded-2xl border border-dashed border-input px-6 py-10 text-center">
+          <div className="rounded-lg border border-dashed border-input px-4 py-3 text-center">
             <PlantIcon aria-hidden="true" weight="duotone" className="mx-auto size-12 text-primary" />
             <p className="mx-auto mt-3 max-w-md text-lg">Henüz tarla eklemediniz. İlk tarlanızı ekleyin; masraflarını ve işlerini ona bağlayın.</p>
           </div>
@@ -88,7 +88,7 @@ async function Fields({ searchParams }: { searchParams: PageProps<"/tarlalarim">
           <ul className="grid gap-4 md:grid-cols-2">
             {fields.map((f) => (
               <li key={f.id}>
-                <Link href={`/tarlalarim/${f.id}`} className="group flex h-full items-start gap-4 rounded-2xl border border-border p-5 transition-colors hover:border-primary/40 hover:bg-secondary">
+                <Link href={`/tarlalarim/${f.id}`} className="group flex h-full items-start gap-4 rounded-lg border border-border p-4 transition-colors hover:border-primary/40 hover:bg-secondary bg-card">
                   <span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary group-hover:bg-card">
                     <PlantIcon weight="duotone" className="size-7" />
                   </span>

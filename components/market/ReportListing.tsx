@@ -44,7 +44,7 @@ export function ReportListing({ listingId, reported }: { listingId: string; repo
           else setError(r.message ?? "Gönderilemedi, yeniden deneyin.");
         });
       }}
-      className="space-y-3 rounded-2xl border border-border p-4"
+      className="space-y-3 rounded-lg border border-border p-4 bg-card"
     >
       <fieldset>
         <legend className="font-semibold">Bu ilanda sorun ne?</legend>

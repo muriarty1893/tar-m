@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/PageHero";
-import { modelCredit, photoCredits } from "@/data/photo-credits";
+import { photoCredits } from "@/data/photo-credits";
 
 export const metadata: Metadata = {
   title: "Görsel kaynakları",
@@ -14,35 +14,18 @@ export default function SourcesPage() {
   const photos = photoCredits.filter((c, i, all) => all.findIndex((o) => o.sourceUrl === c.sourceUrl) === i);
   return (
     <>
-      <PageHero title="Görsel kaynakları" intro="Sitede kullandığımız fotoğraflar ve 3B model; yazarları, lisansları ve kaynaklarıyla." />
-      <div className="mx-auto max-w-4xl space-y-12 px-4 py-14">
-        <section aria-labelledby="model">
-          <h2 id="model" className="text-2xl font-bold">
-            3B model
-          </h2>
-          <ul className="mt-4 text-lg">
-            <li>
-              Ana sayfadaki telefon görseli:{" "}
-              <a href={modelCredit.sourceUrl} className={link} rel="noopener">
-                “{modelCredit.title}”, {modelCredit.author}
-              </a>{" "}
-              —{" "}
-              <a href={modelCredit.licenseUrl} className={link} rel="noopener license">
-                {modelCredit.license}
-              </a>
-              , {modelCredit.note}.
-            </li>
-          </ul>
-        </section>
-
-        <section aria-labelledby="photos">
-          <h2 id="photos" className="text-2xl font-bold">
-            Fotoğraflar
-          </h2>
-          <p className="mt-2 text-muted-foreground">Wikimedia Commons; sitede kırpılmış ve küçültülmüş olarak kullanılmıştır.</p>
-          <ul className="mt-5 divide-y divide-border">
+      <PageHero title="Görsel kaynakları" intro="Sitede kullandığımız fotoğraflar; yazarları, lisansları ve kaynaklarıyla." />
+      <div className="mx-auto max-w-4xl space-y-6 px-3 py-3 sm:px-4 sm:py-6">
+        <section aria-labelledby="photos" className="overflow-hidden rounded-md border border-border bg-card">
+          <div className="border-b border-border px-4 py-2.5">
+            <h2 id="photos" className="text-[15px] font-bold">
+              Fotoğraflar
+            </h2>
+            <p className="text-[13px] text-muted-foreground">Wikimedia Commons; sitede kırpılmış ve küçültülmüş olarak kullanılmıştır.</p>
+          </div>
+          <ul className="divide-y divide-border text-[0.9375rem]">
             {photos.map((c) => (
-              <li key={c.src} className="flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+              <li key={c.src} className="flex flex-col gap-0.5 px-4 py-2.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
                 <a href={c.sourceUrl} className={link} rel="noopener">
                   {c.label}
                 </a>

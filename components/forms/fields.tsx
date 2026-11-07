@@ -6,14 +6,14 @@ import { Label } from "@/components/ui/label";
 
 /** Native select styled like the shadcn Input: native keeps the phone's own picker (best on mobile). */
 export const selectClass =
-  "min-h-12 w-full cursor-pointer appearance-none rounded-2xl border-2 border-input bg-card py-2 pl-4 pr-11 text-base text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-4 focus-visible:ring-ring/20 aria-invalid:border-destructive";
+  "min-h-11 w-full cursor-pointer appearance-none rounded-md border border-input bg-card py-2 pl-3 pr-10 text-base text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 aria-invalid:border-destructive";
 
 export function SelectChevron() {
   return (
     <CaretDownIcon
       aria-hidden="true"
       weight="bold"
-      className="pointer-events-none absolute right-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
+      className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
     />
   );
 }
@@ -46,8 +46,8 @@ export function Field({
 
 export function FieldError({ id, children }: { id: string; children: ReactNode }) {
   return (
-    <p id={id} className="flex items-center gap-1.5 text-base font-semibold text-destructive">
-      <WarningCircleIcon aria-hidden="true" weight="fill" className="size-5 shrink-0" />
+    <p id={id} className="flex items-center gap-1.5 text-sm font-semibold text-destructive">
+      <WarningCircleIcon aria-hidden="true" weight="fill" className="size-4 shrink-0" />
       {children}
     </p>
   );
@@ -73,7 +73,7 @@ export function Honeypot({ value, onChange }: { value: string; onChange: (v: str
 
 export function FormError({ rateLimited = false }: { rateLimited?: boolean }) {
   return (
-    <div role="alert" className="flex gap-3 rounded-2xl border-l-4 border-destructive bg-destructive/10 p-4">
+    <div role="alert" className="flex gap-3 rounded-lg border-l-4 border-destructive bg-destructive/10 p-4">
       <WarningCircleIcon aria-hidden="true" weight="duotone" className="mt-0.5 size-6 shrink-0 text-destructive" />
       <div>
         <p className="font-semibold">

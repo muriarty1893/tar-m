@@ -7,13 +7,13 @@ import { signInHref } from "@/lib/sign-in-href";
 /** What a signed-out visitor sees on a page that keeps their own data (Takvim, Tarlalarım). */
 export function SignInPrompt({ returnTo, title, children }: { returnTo: string; title: string; children: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
-      <span aria-hidden="true" className="flex size-12 items-center justify-center rounded-xl bg-secondary text-primary">
-        <LockKeyIcon weight="duotone" className="size-7" />
+    <div className="rounded-md border border-border bg-card p-4 sm:p-5">
+      <span aria-hidden="true" className="flex size-9 items-center justify-center rounded-md bg-secondary text-primary">
+        <LockKeyIcon weight="fill" className="size-5" />
       </span>
-      <h2 className="mt-4 text-2xl font-bold tracking-tight">{title}</h2>
-      <div className="mt-2 max-w-xl text-lg text-muted-foreground">{children}</div>
-      <div className="mt-6 flex flex-wrap gap-3">
+      <h2 className="mt-3 text-lg font-bold">{title}</h2>
+      <div className="mt-1 max-w-xl text-[0.9375rem] text-muted-foreground">{children}</div>
+      <div className="mt-4 flex flex-wrap gap-2">
         <Link href={signInHref(returnTo)} className={buttonVariants()}>
           Giriş yap
         </Link>

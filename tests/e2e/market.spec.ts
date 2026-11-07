@@ -4,7 +4,7 @@ import { test, expect } from "@playwright/test";
 // calendar, fields) were checked by hand with Clerk test users (docs/accounts-and-market.md).
 
 test("the header menu lists the tools that work on the site", async ({ page, isMobile }) => {
-  test.skip(isMobile, "the pill nav is the desktop bar");
+  test.skip(isMobile, "the text menu is the desktop bar");
   await page.goto("/");
   const nav = page.getByRole("navigation", { name: "Ana menü" });
   for (const name of ["Pazar", "Fiyatlar", "Hava Durumu", "Takvim", "Tarlalarım", "Haberler"]) {
@@ -31,7 +31,8 @@ test("Pazar on phones, as on sahibinden: a category list with counts, then the l
   const cats = page.getByRole("navigation", { name: "Kategoriler" });
   await expect(cats.getByText("Kategoriler")).toBeVisible();
   await expect(cats.getByRole("link", { name: /^Araç \(\d+\)$/ })).toBeVisible();
-  await expect(page.getByText("Son ilanlar")).toBeVisible();
+  // "Son ilanlar" over the rows, or "İlan bulunamadı." while there's no live listing.
+  await expect(page.getByText(/^(Son ilanlar|İlan bulunamadı\.)$/).filter({ visible: true })).toBeVisible();
   // The grid of cards is the wide-screen view; phones list rows with the photo on the left.
   await expect(page.locator("main ul.grid").filter({ visible: true })).toHaveCount(0);
 });
@@ -73,17 +74,14 @@ test("Fiyatlar: sample prices are labelled, and search and groups narrow the lis
   await expect(page.getByText("1 ürün")).toBeVisible();
 });
 
-test("the wide-screen home shows what works today, and says nothing of an AI scan", async ({ page, isMobile }) => {
-  test.skip(isMobile, "phones get the portal home (portal.spec.ts)");
+test("the home page says nothing of an AI scan", async ({ page }) => {
   await page.goto("/");
-  const tools = page.locator("#araclar");
-  await expect(tools.getByRole("heading", { level: 2, name: "Sitede bugün açık olanlar" })).toBeVisible();
-  for (const name of [/^Pazar/, /^Borsa fiyatları/, /^Hava durumu/, /^Tarım takvimi/, /^Tarlalarım/]) await expect(tools.getByRole("link", { name })).toBeVisible();
-  // What is on screen (innerText leaves out the phone layout, hidden here), news aside: articles are
-  // written by the admins on /yonetim/haberler, not by the site.
+  // What is on screen, the news strip and the forum aside: articles are written by the admins on
+  // /yonetim/haberler and topics by the farmers, not by the site.
   const text = await page.locator("main").evaluate((el) => {
     const copy = el.cloneNode(true) as HTMLElement;
-    copy.querySelector("#haberler")?.remove();
+    copy.querySelector("[aria-labelledby='destek-haber']")?.remove();
+    copy.querySelector("#forum")?.remove();
     document.body.appendChild(copy);
     const visible = copy.innerText;
     copy.remove();

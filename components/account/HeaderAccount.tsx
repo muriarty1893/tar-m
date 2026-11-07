@@ -52,15 +52,14 @@ export const useUnreadCount = () => useUnreadCounts().messages;
 function Badge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
-    <span aria-hidden="true" className="absolute -right-0.5 -top-0.5 flex min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[0.6875rem] font-bold leading-5 text-white ring-2 ring-background xl:-right-1 xl:-top-1 xl:min-w-6 xl:px-1.5 xl:text-xs xl:leading-6">
+    <span aria-hidden="true" className="font-borsa-mono absolute right-1 top-1.5 flex h-4 min-w-4 items-center justify-center rounded bg-primary px-0.5 text-[0.625rem] font-bold text-white">
       {count > 9 ? "9+" : count}
     </span>
   );
 }
 
-// 44 px on phones (the touch minimum), 48 px with the desktop menu.
-const roundButton =
-  "relative flex size-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-[color-mix(in_oklab,currentColor_12%,transparent)] xl:size-12 xl:border-2 xl:border-border xl:hover:border-primary/50 xl:hover:bg-transparent";
+// 44 px: the touch minimum.
+const roundButton = "relative flex size-11 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-muted";
 
 /** Bildirimler (answers and mentions in the forum) and Mesajlar, each with its badge (signed in only). */
 export function MessagesLink() {
@@ -70,11 +69,11 @@ export function MessagesLink() {
   return (
     <>
       <Link href="/bildirimler" aria-label={notifications ? `Bildirimler, ${notifications} yeni bildirim` : "Bildirimler"} className={roundButton}>
-        <BellIcon aria-hidden="true" weight="regular" className="size-6" />
+        <BellIcon aria-hidden="true" weight="regular" className="size-[22px]" />
         <Badge count={notifications} />
       </Link>
       <Link href="/mesajlar" aria-label={messages ? `Mesajlar, ${messages} okunmamış sohbet` : "Mesajlar"} className={roundButton}>
-        <ChatsCircleIcon aria-hidden="true" weight="regular" className="size-6" />
+        <ChatsCircleIcon aria-hidden="true" weight="regular" className="size-[22px]" />
         <Badge count={messages} />
       </Link>
     </>
@@ -88,21 +87,21 @@ export function MessagesLink() {
 export function AccountButton() {
   const { isLoaded, isSignedIn } = useAuth();
   const pathname = usePathname();
-  if (!isLoaded) return <span aria-hidden="true" className="block size-10 xl:size-12" />;
+  if (!isLoaded) return <span aria-hidden="true" className="block size-9" />;
   if (!isSignedIn) {
     const back = pathname.startsWith("/giris") || pathname.startsWith("/kayit") ? "/" : pathname;
     return (
       <Link
         href={`/giris?redirect_url=${encodeURIComponent(back)}`}
-        className={buttonVariants({ variant: "outline", className: "whitespace-nowrap border-[var(--header-cta)]! text-[var(--header-cta)]! max-xl:h-10 max-xl:gap-1.5 max-xl:px-3 max-xl:text-base" })}
+        className={buttonVariants({ size: "sm", className: "whitespace-nowrap" })}
       >
-        <SignInIcon aria-hidden="true" weight="bold" className="xl:hidden" />
+        <SignInIcon aria-hidden="true" weight="bold" />
         Giriş yap
       </Link>
     );
   }
   return (
-    <span className="flex size-11 items-center justify-center xl:size-12">
+    <span className="flex size-11 items-center justify-center">
       <UserButton appearance={{ elements: { avatarBox: { width: 36, height: 36 } } }}>
         <UserButton.MenuItems>
           <UserButton.Link label="Hesabım" labelIcon={<UserCircleIcon weight="duotone" className="size-4" />} href="/hesabim" />

@@ -132,15 +132,15 @@ test("a clear night shows the moon", async ({ page }) => {
   await expect(page.getByText("Açık", { exact: true })).toBeVisible();
 });
 
-test("the home page weather card shows today and the next days", async ({ page, isMobile }) => {
-  test.skip(isMobile, "the card is on the wide-screen home; phones get the one-line tile (portal.spec.ts)");
+test("the home page weather box shows today and the next days, and opens the forecast", async ({ page }) => {
   await mockWeather(page);
-  await page.goto("/#hava");
-  const section = page.locator("#hava");
-  await expect(section.getByTestId("sicaklik")).toHaveText("17°C");
-  const next = section.getByRole("list", { name: "Önümüzdeki günler" });
-  await expect(next.getByRole("listitem").first()).toContainText("Yarın");
-  await expect(section.getByRole("link", { name: /7 günlük tahmin/ })).toHaveAttribute("href", "/hava");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const box = page.locator("main").getByRole("link", { name: /^Hava durumu, Ankara: 17 derece/ });
+  await expect(box).toHaveAttribute("href", "/hava");
+  // 13 and 14 October 2026: Salı and Çarşamba, side by side on a wide screen.
+  await expect(box).toContainText("Sal");
+  await expect(box).toContainText("Çar");
 });
 
 test("no weather icon is cut off: every drawing fits inside its icon box", async ({ page }) => {

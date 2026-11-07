@@ -45,13 +45,13 @@ export function TopicRow({ topic: t, cats, now, showLastReply = false, dense = f
     const who = t.replyCount > 0 && t.lastReplyBy ? `son: ${shortName(t.lastReplyBy)}` : shortName(t.authorName);
     return (
       <li>
-        <Link href={`/forum/${t.id}`} className="block px-3 py-2 transition-colors hover:bg-[#f6f7f9] focus-visible:outline-offset-[-3px]">
-          <span className="block truncate font-medium leading-snug text-[#111827]">{t.title}</span>
-          <span className="mt-0.5 flex items-center gap-2 text-[12px] leading-5 text-[#4b5563]">
+        <Link href={`/forum/${t.id}`} className="block px-3 py-2 transition-colors hover:bg-muted/50 focus-visible:outline-offset-[-3px]">
+          <span className="block truncate font-medium leading-snug text-foreground">{t.title}</span>
+          <span className="mt-0.5 flex items-center gap-2 text-[12px] leading-5 text-muted-foreground">
             <span className="min-w-0 truncate">
               {categoryName(cats, t.category)} · {when} · {who}
             </span>
-            <Counts topic={t} className="font-borsa-mono text-[11.5px] [&>span:first-child]:text-[#111827]" />
+            <Counts topic={t} className="font-borsa-mono text-[11.5px] [&>span:first-child]:text-foreground" />
           </span>
         </Link>
       </li>

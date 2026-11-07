@@ -98,7 +98,7 @@ export function ChatThread({ initial }: { initial: Thread }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
-        <Link href="/mesajlar" aria-label="Mesajlara dön" className="flex size-12 shrink-0 items-center justify-center rounded-full border-2 border-border hover:border-primary/50">
+        <Link href="/mesajlar" aria-label="Mesajlara dön" className="flex size-12 shrink-0 items-center justify-center rounded-md border border-border hover:border-primary/50 bg-card">
           <ArrowLeftIcon aria-hidden="true" weight="bold" className="size-5" />
         </Link>
         <Avatar id={thread.peer.name} name={thread.peer.name} size={44} />
@@ -108,7 +108,7 @@ export function ChatThread({ initial }: { initial: Thread }) {
         </div>
       </div>
 
-      <Link href={`/pazar/ilan/${thread.listing.id}`} className="flex items-center gap-3 rounded-2xl border border-border p-3 transition-colors hover:border-primary/40 hover:bg-secondary">
+      <Link href={`/pazar/ilan/${thread.listing.id}`} className="flex items-center gap-3 rounded-lg border border-border p-3 transition-colors hover:border-primary/40 hover:bg-secondary bg-card">
         <span className="relative size-14 shrink-0 overflow-hidden rounded-xl bg-muted">
           <Image src={thread.listing.photo} alt="" fill sizes="56px" className="object-cover" />
         </span>
@@ -122,7 +122,7 @@ export function ChatThread({ initial }: { initial: Thread }) {
       </Link>
 
       {accepted?.offer && (
-        <p className="flex items-start gap-3 rounded-2xl border border-primary/30 bg-secondary px-4 py-3">
+        <p className="flex items-start gap-3 rounded-lg border border-primary/30 bg-secondary px-4 py-3">
           <HandshakeIcon aria-hidden="true" weight="duotone" className="mt-0.5 size-6 shrink-0 text-primary" />
           <span>
             <b>Anlaştınız: {formatPrice(accepted.offer.amount)}.</b> Ödemeyi ve teslimi yüz yüze, ürünü görerek yapın.
@@ -148,9 +148,9 @@ export function ChatThread({ initial }: { initial: Thread }) {
         }}
         role="log"
         aria-label={`${thread.peer.name} ile mesajlar`}
-        className="h-[min(60vh,36rem)] space-y-3 overflow-y-auto rounded-2xl border border-border bg-surface p-4"
+        className="h-[min(60vh,36rem)] space-y-3 overflow-y-auto rounded-lg border border-border bg-surface p-4"
       >
-        {thread.messages.length === 0 && <p className="py-10 text-center text-muted-foreground">Henüz mesaj yok. İlk mesajı siz yazın.</p>}
+        {thread.messages.length === 0 && <p className="py-3 text-center text-muted-foreground">Henüz mesaj yok. İlk mesajı siz yazın.</p>}
         {thread.messages.map((m, i) => {
           const day = trDayKey(new Date(m.at));
           const newDay = i === 0 || trDayKey(new Date(thread.messages[i - 1].at)) !== day;
@@ -174,7 +174,7 @@ export function ChatThread({ initial }: { initial: Thread }) {
       </div>
 
       {removed ? (
-        <p className="rounded-2xl bg-muted px-4 py-3 text-center font-semibold">İlan kaldırıldığı için bu sohbete yeni mesaj yazılamıyor.</p>
+        <p className="rounded-lg bg-muted px-4 py-3 text-center font-semibold">İlan kaldırıldığı için bu sohbete yeni mesaj yazılamıyor.</p>
       ) : (
         <div className="space-y-3">
           <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Hazır mesajlar">
@@ -184,7 +184,7 @@ export function ChatThread({ initial }: { initial: Thread }) {
                 type="button"
                 disabled={pending}
                 onClick={() => send(q)}
-                className="min-h-11 shrink-0 cursor-pointer rounded-full border border-border px-3 text-sm font-medium transition-colors hover:border-primary/50 hover:bg-secondary disabled:opacity-60"
+                className="min-h-11 shrink-0 cursor-pointer rounded-md border border-border px-3 text-sm font-medium transition-colors hover:border-primary/50 hover:bg-secondary disabled:opacity-60 bg-card"
               >
                 {q}
               </button>
@@ -197,7 +197,7 @@ export function ChatThread({ initial }: { initial: Thread }) {
                 e.preventDefault();
                 submitOffer();
               }}
-              className="flex flex-wrap items-end gap-3 rounded-2xl border border-gold/30 bg-gold-soft p-3"
+              className="flex flex-wrap items-end gap-3 rounded-lg border border-gold/30 bg-gold-soft p-3"
             >
               <div className="min-w-48 flex-1">
                 <label htmlFor="sohbet-teklif" className="block font-semibold">
@@ -243,7 +243,7 @@ export function ChatThread({ initial }: { initial: Thread }) {
                 rows={1}
                 maxLength={1000}
                 placeholder="Mesaj yazın…"
-                className="field-sizing-content max-h-40 min-h-12 w-full resize-none rounded-2xl border-2 border-input bg-card px-4 py-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-4 focus-visible:ring-ring/20"
+                className="field-sizing-content max-h-40 min-h-11 w-full resize-none rounded-lg border border-input bg-card px-4 py-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-4 focus-visible:ring-ring/20"
               />
             </div>
             <Button type="submit" size="icon" disabled={pending || !text.trim()} aria-label="Gönder" className="shrink-0">
@@ -277,12 +277,12 @@ function Bubble({
     const who = m.mine ? (role === "seller" ? "Karşı teklifiniz" : "Teklifiniz") : role === "buyer" ? "Satıcının karşı teklifi" : "Alıcının teklifi";
     return (
       <div className={`flex ${m.mine ? "justify-end" : "justify-start"}`}>
-        <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-4 shadow-soft">
+        <div className="w-full max-w-sm rounded-lg border border-border bg-card p-4 shadow-soft">
           <p className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
             <HandCoinsIcon aria-hidden="true" weight="duotone" className="size-5 text-gold" />
             {who}
           </p>
-          <p className="mt-1 text-2xl font-bold">{formatPrice(m.offer.amount)}</p>
+          <p className="mt-1 text-xl font-bold">{formatPrice(m.offer.amount)}</p>
           <p className="mt-2 flex items-center justify-between gap-2">
             <span className={`rounded-full px-3 py-0.5 text-sm font-semibold ${OFFER_TONE[m.offer.status]}`}>{OFFER_STATUS[m.offer.status]}</span>
             <span className="text-sm text-muted-foreground">{time}</span>
@@ -330,7 +330,7 @@ function Bubble({
   return (
     <div className={`flex ${m.mine ? "justify-end" : "justify-start"}`}>
       <p
-        className={`max-w-[85%] whitespace-pre-line break-words rounded-2xl px-4 py-2.5 ${m.mine ? "rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md border border-border bg-card"}`}
+        className={`max-w-[85%] whitespace-pre-line break-words rounded-lg px-4 py-2.5 ${m.mine ? "rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md border border-border bg-card"}`}
       >
         <span className="sr-only">{m.mine ? "Siz: " : ""}</span>
         {m.body}

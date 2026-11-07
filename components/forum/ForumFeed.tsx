@@ -86,9 +86,9 @@ export function ForumFeed({
   const firstLoad = !feed || (feed.state === "loading" && feed.items.length === 0);
 
   return (
-    <div>
+    <div className={dense ? "text-[13px] leading-[1.45]" : undefined}>
       {dense && (
-        <div className="flex items-center gap-1 border-b border-[#dfe3e8] pl-3 pr-2">
+        <div className="flex items-center gap-1 border-b border-border pl-3 pr-2">
           {heading}
           {tabs && (
             <div role="group" aria-label="Sıralama" className="flex min-w-0">
@@ -98,10 +98,10 @@ export function ForumFeed({
                   type="button"
                   aria-pressed={active === t.id}
                   onClick={() => pick(t.id)}
-                  className="relative min-h-11 cursor-pointer px-1.5 text-[13px] text-[#4b5563] transition-colors hover:text-[#111827] aria-pressed:font-semibold aria-pressed:text-[#1d4ed8] focus-visible:outline-offset-[-3px]"
+                  className="relative min-h-11 cursor-pointer px-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground aria-pressed:font-semibold aria-pressed:text-primary focus-visible:outline-offset-[-3px]"
                 >
                   {t.short}
-                  <span aria-hidden="true" className={`absolute inset-x-1 bottom-0 h-0.5 ${active === t.id ? "bg-[#1d4ed8]" : "bg-transparent"}`} />
+                  <span aria-hidden="true" className={`absolute inset-x-1 bottom-0 h-0.5 ${active === t.id ? "bg-primary" : "bg-transparent"}`} />
                 </button>
               ))}
             </div>
@@ -127,11 +127,11 @@ export function ForumFeed({
       )}
 
       {firstLoad && dense ? (
-        <ul aria-hidden="true" className="divide-y divide-[#dfe3e8]">
+        <ul aria-hidden="true" className="divide-y divide-border">
           {[0, 1, 2, 3, 4].map((i) => (
             <li key={i} className="space-y-1.5 px-3 py-2.5">
-              <span className="block h-3.5 w-4/5 rounded bg-[#eef0f3] motion-safe:animate-pulse" />
-              <span className="block h-3 w-1/2 rounded bg-[#eef0f3]" />
+              <span className="block h-3.5 w-4/5 rounded bg-muted motion-safe:animate-pulse" />
+              <span className="block h-3 w-1/2 rounded bg-muted" />
             </li>
           ))}
         </ul>
@@ -148,12 +148,12 @@ export function ForumFeed({
           ))}
         </ul>
       ) : feed.items.length === 0 && feed.state !== "error" ? (
-        <div className="bg-card px-6 py-10 text-center">
+        <div className="bg-card px-6 py-5 text-center">
           <ChatsTeardropIcon aria-hidden="true" weight="duotone" className="mx-auto size-10 text-primary" />
           <p className="mx-auto mt-2 max-w-sm">{emptyText}</p>
         </div>
       ) : (
-        <ul aria-label={tabs ? TABS.find((t) => t.id === active)?.label : label} className={dense ? "divide-y divide-[#dfe3e8]" : "divide-y divide-border bg-card"}>
+        <ul aria-label={tabs ? TABS.find((t) => t.id === active)?.label : label} className={dense ? "divide-y divide-border" : "divide-y divide-border bg-card"}>
           {feed.items.map((t) => (
             <TopicRow key={t.id} topic={t} cats={cats} now={clock} showLastReply={active === "aktif"} dense={dense} />
           ))}
@@ -175,7 +175,7 @@ export function ForumFeed({
           type="button"
           onClick={() => load(active, feed.page + 1)}
           disabled={feed.state === "loading"}
-          className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-1.5 border-t border-[#dfe3e8] font-semibold text-[#1d4ed8] transition-colors hover:bg-[#f6f7f9] disabled:cursor-wait"
+          className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-1.5 border-t border-border font-semibold text-primary transition-colors hover:bg-muted/50 disabled:cursor-wait"
         >
           {feed.state === "loading" ? (
             <>

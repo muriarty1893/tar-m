@@ -11,7 +11,7 @@ export default function NewTopicPage({ searchParams }: PageProps<"/forum/yeni">)
   return (
     <>
       <ToolHeader eyebrow="Forum" title="Konu aç" intro="Kategorisini seçin, başlığını ve açıklamasını yazın; diğer çiftçiler yanıtlasın. Adınız konunun altında görünür." />
-      <div className="mx-auto max-w-3xl px-3 py-6 sm:px-4 sm:py-10">
+      <div className="mx-auto max-w-3xl px-3 py-3 sm:px-4 sm:py-6">
         <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-xl bg-muted motion-safe:animate-pulse" />}>
           <NewTopic searchParams={searchParams} />
         </Suspense>

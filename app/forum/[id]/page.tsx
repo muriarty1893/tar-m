@@ -73,9 +73,9 @@ async function Topic({ params, searchParams }: { params: PageProps<"/forum/[id]"
         </p>
       )}
 
-      <header className="space-y-4 border-y border-border bg-card p-4 sm:rounded-xl sm:border-x sm:p-6">
+      <header className="space-y-4 border-y border-border bg-card p-4 sm:rounded-xl sm:border-x sm:p-5">
         <CategoryChip cats={cats} category={topic.category} />
-        <h1 className="text-2xl font-bold leading-tight tracking-tight sm:text-4xl">{topic.title}</h1>
+        <h1 className="text-xl font-bold leading-tight tracking-tight sm:text-2xl">{topic.title}</h1>
         <div className="flex items-center gap-3">
           <Avatar id={topic.authorId} name={topic.authorName} size={44} />
           <div>

@@ -9,8 +9,8 @@ export const metadata: Metadata = { title: "Sohbet", robots: { index: false } };
 
 export default function ConversationPage({ params }: PageProps<"/mesajlar/[id]">) {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6">
-      <Suspense fallback={<div aria-hidden="true" className="h-[70vh] rounded-2xl bg-muted motion-safe:animate-pulse" />}>
+    <div className="mx-auto max-w-3xl px-3 py-3 sm:px-4 sm:py-6">
+      <Suspense fallback={<div aria-hidden="true" className="h-[70vh] rounded-lg bg-muted motion-safe:animate-pulse" />}>
         <Conversation params={params} />
       </Suspense>
     </div>

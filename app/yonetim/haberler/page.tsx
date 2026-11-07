@@ -39,13 +39,13 @@ async function NewsList({ searchParams }: { searchParams: PageProps<"/yonetim/ha
   return (
     <div className="space-y-6">
       {sp.silindi === "1" && (
-        <p role="status" className="flex items-center gap-2 rounded-2xl border border-primary/30 bg-secondary px-4 py-3 font-semibold">
+        <p role="status" className="flex items-center gap-2 rounded-lg border border-primary/30 bg-secondary px-4 py-3 font-semibold">
           <CheckCircleIcon aria-hidden="true" weight="fill" className="size-6 text-primary" />
           Haber silindi.
         </p>
       )}
       {articles.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-input px-6 py-12 text-center">
+        <div className="rounded-lg border border-dashed border-input px-4 py-6 text-center">
           <NewspaperIcon aria-hidden="true" weight="duotone" className="mx-auto size-12 text-primary" />
           <p className="mt-3 text-lg">Henüz haber yok.</p>
           <Link href="/yonetim/haberler/yeni" className={buttonVariants({ className: "mt-6" })}>
@@ -53,7 +53,7 @@ async function NewsList({ searchParams }: { searchParams: PageProps<"/yonetim/ha
           </Link>
         </div>
       ) : (
-        <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border">
+        <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
           {articles.map((a) => (
             <li key={a.id} className="flex flex-wrap items-center gap-4 p-4 sm:flex-nowrap">
               <span className="relative hidden size-16 shrink-0 overflow-hidden rounded-xl bg-muted sm:block">

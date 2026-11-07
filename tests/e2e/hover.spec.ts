@@ -1,36 +1,32 @@
 import { test, expect, type Locator } from "@playwright/test";
 
-// Cards stay still under the mouse; buttons keep their hover feedback.
+// Rows stay still under the mouse (a light tint at most, no lift or shadow); buttons keep their hover feedback.
 test.skip(({ isMobile }) => isMobile, "hover is a mouse interaction");
 
-const look = (l: Locator) =>
+const motion = (l: Locator) =>
   l.evaluate((el) => {
     const c = getComputedStyle(el);
-    return [c.transform, c.boxShadow, c.filter, c.backgroundColor].join("|");
+    return [c.transform, c.boxShadow, c.filter].join("|");
   });
 
-async function unchangedOnHover(card: Locator) {
-  await card.scrollIntoViewIfNeeded();
-  await card.page().mouse.move(0, 0);
-  const before = await look(card);
-  await card.hover();
-  await card.page().waitForTimeout(450);
-  expect(await look(card)).toBe(before);
-}
-
-test("news cards have no hover effect", async ({ page }) => {
-  await page.goto("/");
-  await unchangedOnHover(page.locator("#haberler article").first());
-  await unchangedOnHover(page.locator("#haberler article").first().locator("xpath=.."));
+test("news rows don't lift or cast a shadow on hover", async ({ page }) => {
+  await page.goto("/haberler");
+  const row = page.locator("main article").first();
+  await row.scrollIntoViewIfNeeded();
+  await page.mouse.move(0, 0);
+  const before = await motion(row);
+  await row.hover();
+  await page.waitForTimeout(450);
+  expect(await motion(row)).toBe(before);
 });
 
 test("buttons keep their hover feedback", async ({ page }) => {
-  await page.goto("/");
-  const button = page.getByRole("link", { name: "İş birliği için bize ulaşın" });
+  await page.goto("/pazar");
+  const button = page.locator("main").getByRole("link", { name: "İlan ver" }).filter({ visible: true }).first();
   await button.scrollIntoViewIfNeeded();
   await page.mouse.move(0, 0);
-  const before = await look(button);
+  const before = await button.evaluate((el) => getComputedStyle(el).backgroundColor);
   await button.hover();
   await page.waitForTimeout(450);
-  expect(await look(button)).not.toBe(before);
+  expect(await button.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(before);
 });

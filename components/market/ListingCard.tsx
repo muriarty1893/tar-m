@@ -11,7 +11,7 @@ export function ListingCard({ listing: l, now, mine = false, showFavorite = true
   const when = now ? agoLabel(new Date(l.createdAt), now) : "";
   const place = l.district || l.province;
   return (
-    <article className="group relative overflow-hidden rounded-2xl border border-border bg-card transition-[border-color,box-shadow] duration-200 hover:border-primary/40 hover:shadow-lift">
+    <article className="group relative overflow-hidden rounded-lg border border-border bg-card transition-[border-color,box-shadow] duration-200 hover:border-primary/40 hover:shadow-lift">
       <Link href={`/pazar/ilan/${l.id}`} className="block focus-visible:outline-offset-[-3px]">
         <div className="relative aspect-[4/3] bg-muted">
           <Image src={l.photo} alt="" fill sizes="(min-width: 1024px) 280px, (min-width: 640px) 33vw, 50vw" className="object-cover" />

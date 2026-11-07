@@ -26,7 +26,7 @@ export function PartnerForm() {
         <span className="blob flex size-16 items-center justify-center bg-secondary text-primary">
           <SealCheckIcon aria-hidden="true" weight="duotone" className="size-9" />
         </span>
-        <p className="font-heading text-2xl font-bold">Teşekkürler! Mesajınızı aldık, en kısa sürede size dönüş yapacağız.</p>
+        <p className="font-heading text-xl font-bold">Teşekkürler! Mesajınızı aldık, en kısa sürede size dönüş yapacağız.</p>
       </div>
     );
   }

@@ -107,7 +107,7 @@ export type MarketSummary = {
   active: number;
   byCategory: Record<string, number>;
   newest: NewListing | null;
-  /** The three newest, for the home page's Pazar box. */
+  /** The five newest, for the home page's Pazar box (phones show three). */
   latest: NewListing[];
   /** Live listings put up today (Türkiye time). */
   today: number;
@@ -123,7 +123,7 @@ export async function marketSummary(): Promise<MarketSummary> {
   try {
     const [counts, newest, today] = await Promise.all([
       sql()`select category, count(*) as n from listings where status = 'active' group by category`,
-      sql()`select id, title, price, unit from listings where status = 'active' order by created_at desc limit 3`,
+      sql()`select id, title, price, unit from listings where status = 'active' order by created_at desc limit 5`,
       sql()`select count(*) as n from listings where status = 'active' and created_at >= date_trunc('day', now() at time zone 'Europe/Istanbul') at time zone 'Europe/Istanbul'`,
     ]);
     const byCategory = Object.fromEntries(counts.map((r) => [str(r.category), Number(r.n)]));

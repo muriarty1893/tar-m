@@ -9,8 +9,8 @@ export default function NotFound() {
         <span className="blob mx-auto flex size-24 items-center justify-center bg-secondary text-primary">
           <PlantIcon aria-hidden="true" weight="duotone" className="size-12" />
         </span>
-        <p className="mt-6 font-heading text-6xl font-bold text-gold">404</p>
-        <h1 className="mt-3 text-3xl font-bold">Sayfa bulunamadı</h1>
+        <p className="mt-4 font-borsa-mono text-5xl font-semibold text-gold">404</p>
+        <h1 className="mt-3 text-2xl font-bold">Sayfa bulunamadı</h1>
         <p className="mt-3 text-lg text-muted-foreground">Aradığınız sayfa taşınmış ya da hiç var olmamış olabilir.</p>
         <div className="mt-9 flex flex-wrap justify-center gap-3">
           <Link href="/" className={buttonVariants()}>

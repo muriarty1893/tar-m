@@ -41,7 +41,7 @@ export default function QuickMenu({
         side="bottom"
         finalFocus={returnFocusTo}
         data-lenis-prevent
-        className="max-h-[88dvh] gap-0 overflow-y-auto overscroll-contain rounded-t-3xl border-0 bg-background px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] pt-5 [&>[data-slot=sheet-close]]:right-3 [&>[data-slot=sheet-close]]:top-3 [&>[data-slot=sheet-close]]:size-11 [&>[data-slot=sheet-close]]:rounded-full"
+        className="max-h-[88dvh] gap-0 overflow-y-auto overscroll-contain rounded-t-lg border-0 bg-background px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] pt-5 [&>[data-slot=sheet-close]]:right-3 [&>[data-slot=sheet-close]]:top-3 [&>[data-slot=sheet-close]]:size-11 [&>[data-slot=sheet-close]]:rounded-full"
       >
         <SheetTitle className="pr-12 text-lg font-bold">Hızlı menü</SheetTitle>
 
@@ -54,7 +54,7 @@ export default function QuickMenu({
                   <Link
                     href={href}
                     onClick={close}
-                    className={`relative flex h-full flex-col items-center gap-1.5 rounded-2xl border px-1 pb-2 pt-2.5 transition-transform duration-150 active:scale-[0.97] motion-reduce:active:scale-100 ${TILE[tone]}`}
+                    className={`relative flex h-full flex-col items-center gap-1.5 rounded-lg border px-1 pb-2 pt-2.5 transition-transform duration-150 active:scale-[0.97] motion-reduce:active:scale-100 ${TILE[tone]}`}
                   >
                     <span aria-hidden="true" className="flex size-10 items-center justify-center rounded-[14px] bg-[var(--solid)] text-white shadow-[0_6px_14px_-6px_var(--solid)]">
                       <Icon weight="bold" className="size-5" />
@@ -102,10 +102,10 @@ export default function QuickMenu({
         </div>
 
         <nav aria-label="Diğer sayfalar" className="mt-5">
-          <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border">
+          <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
             {QUICK_LINKS.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} onClick={close} className="flex min-h-12 items-center justify-between gap-3 px-4 font-medium transition-colors hover:bg-secondary">
+                <Link href={l.href} onClick={close} className="flex min-h-11 items-center justify-between gap-3 px-4 font-medium transition-colors hover:bg-secondary">
                   {l.label}
                   <CaretRightIcon aria-hidden="true" weight="bold" className="size-4 text-muted-foreground" />
                 </Link>

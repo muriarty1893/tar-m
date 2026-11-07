@@ -1,30 +1,11 @@
 import { test, expect } from "@playwright/test";
 
-// Page load must not look like a scroll, and wheel scrolling is smoothed (Lenis) unless motion is reduced.
-
-test("the hero's intro brings the card in close to its place, not up from below the screen", async ({ page, isMobile }) => {
-  test.skip(isMobile, "the hero is the wide-screen home");
-  await page.addInitScript(() => {
-    const w = window as unknown as { __offsets: number[] };
-    w.__offsets = [];
-    const tick = () => {
-      const card = document.querySelector("[data-cine='card']");
-      if (card) w.__offsets.push(card.getBoundingClientRect().top);
-      if (w.__offsets.length < 400) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  });
-  await page.goto("/");
-  await expect(page.locator("html")).toHaveAttribute("data-cine-done", "1", { timeout: 15_000 });
-  const offsets = await page.evaluate(() => (window as unknown as { __offsets: number[] }).__offsets);
-  const rest = await page.locator("[data-cine='card']").evaluate((el) => el.getBoundingClientRect().top);
-  expect(Math.max(...offsets) - rest).toBeLessThan(80);
-  expect(await page.evaluate(() => window.scrollY)).toBe(0);
-});
+// Wheel scrolling is smoothed (Lenis) unless motion is reduced.
 
 test("wheel scrolling glides over several frames to where the wheel sent it", async ({ page, isMobile }) => {
   test.skip(isMobile, "wheel scrolling is a desktop interaction; touch stays native");
-  await page.goto("/");
+  // A long page: the privacy notice.
+  await page.goto("/gizlilik");
   await expect(page.locator("html")).toHaveClass(/\blenis\b/);
   await page.mouse.move(700, 400);
   await page.evaluate(() => {

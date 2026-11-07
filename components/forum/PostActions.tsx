@@ -47,7 +47,7 @@ export function PostActions({
 
   if (mode === "delete") {
     return (
-      <div role="alertdialog" aria-labelledby={`sil-${replyId ?? topicId}`} className="w-full rounded-2xl border-2 border-destructive/40 bg-destructive/5 p-4">
+      <div role="alertdialog" aria-labelledby={`sil-${replyId ?? topicId}`} className="w-full rounded-lg border border-destructive/40 bg-destructive/5 p-4">
         <p id={`sil-${replyId ?? topicId}`} className="font-semibold">
           {replyId ? (hasReplies ? "Yanıt silinsin mi? Altındaki yanıtlar kalır; sizinkinin yerinde “Bu yanıt silindi” yazar." : "Yanıt silinsin mi?") : hasReplies ? "Konu, yanıtlarıyla birlikte silinsin mi?" : "Konu silinsin mi?"} Bu geri alınamaz.
         </p>
@@ -82,7 +82,7 @@ export function PostActions({
             } else setError(r.message ?? "Gönderilemedi, yeniden deneyin.");
           });
         }}
-        className="w-full space-y-3 rounded-2xl border border-border p-4"
+        className="w-full space-y-3 rounded-lg border border-border p-4 bg-card"
       >
         <fieldset>
           <legend className="font-semibold">Bu {what} neden uygunsuz?</legend>

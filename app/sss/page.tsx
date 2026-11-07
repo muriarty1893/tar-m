@@ -26,23 +26,23 @@ export default function FaqPage() {
           </>
         }
       />
-      <section className="mx-auto max-w-3xl px-3 py-8 sm:px-4 sm:py-14">
+      <section className="mx-auto max-w-3xl px-3 py-3 sm:px-4 sm:py-6">
         {/* shadcn/ui Accordion (Base UI): answers stay in the HTML for search engines. */}
-        <Accordion className="gap-3">
+        <Accordion className="overflow-hidden rounded-md border border-border bg-card">
           {faqs.map((f) => (
-            <AccordionItem key={f.q} value={f.q} className="rounded-3xl border border-border bg-card px-6 shadow-soft not-last:border-b">
+            <AccordionItem key={f.q} value={f.q} className="px-4 not-last:border-b not-last:border-border">
               <AccordionTrigger headingLevel={2}>{f.q}</AccordionTrigger>
-              <AccordionContent className="text-lg">{f.a}</AccordionContent>
+              <AccordionContent className="text-[0.9375rem] text-muted-foreground">{f.a}</AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
       </section>
-      <section id="soru" aria-labelledby="soru-baslik" className="mx-auto max-w-3xl scroll-mt-20 px-3 pb-12 sm:px-4 sm:pb-16">
-        <h2 id="soru-baslik" className="text-2xl font-bold tracking-tight">
+      <section id="soru" aria-labelledby="soru-baslik" className="mx-auto max-w-3xl scroll-mt-20 px-3 pb-6 sm:px-4 sm:pb-10">
+        <h2 id="soru-baslik" className="text-xl font-bold tracking-tight">
           Cevabını bulamadınız mı?
         </h2>
         <p className="mt-2 text-muted-foreground">Sorunuzu yazın, ekibimiz e-postayla yanıtlasın.</p>
-        <div className="mt-6">
+        <div className="mt-3">
           <QuestionForm />
         </div>
       </section>

@@ -25,19 +25,19 @@ export function QuestionForm() {
 
   if (status === "success") {
     return (
-      <div role="status" className="flex h-full flex-col items-start justify-center gap-4 rounded-3xl border border-border bg-card p-8 shadow-lift">
+      <div role="status" className="flex h-full flex-col items-start justify-center gap-4 rounded-lg border border-border bg-card p-5 shadow-lift">
         <span className="blob flex size-16 items-center justify-center bg-secondary text-primary">
           <SealCheckIcon aria-hidden="true" weight="duotone" className="size-9" />
         </span>
-        <p className="font-heading text-2xl font-bold">Teşekkürler! Sorunuzu aldık.</p>
+        <p className="font-heading text-xl font-bold">Teşekkürler! Sorunuzu aldık.</p>
         <p className="text-muted-foreground">En kısa sürede e-posta adresinize yanıt vereceğiz.</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="relative space-y-5 rounded-3xl border border-border bg-card p-6 shadow-lift sm:p-8">
-      <p className="flex items-center gap-2 font-heading text-xl font-bold">
+    <form onSubmit={onSubmit} noValidate className="relative space-y-5 rounded-lg border border-border bg-card p-6 shadow-lift sm:p-6">
+      <p className="flex items-center gap-2 font-heading text-lg font-bold">
         <ChatCircleDotsIcon aria-hidden="true" weight="duotone" className="size-7 text-primary" />
         Ekibimize sorun
       </p>
@@ -75,7 +75,7 @@ export function QuestionForm() {
       </Field>
 
       <div className="space-y-2">
-        <label className="flex cursor-pointer items-start gap-3 rounded-2xl bg-secondary/50 p-4 text-base">
+        <label className="flex cursor-pointer items-start gap-3 rounded-lg bg-secondary/50 p-4 text-base">
           <Checkbox
             name="consent"
             checked={values.consent}

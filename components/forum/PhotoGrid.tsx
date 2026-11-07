@@ -22,7 +22,7 @@ export function PhotoGrid({ photos, label }: { photos: string[]; label: string }
 
   return (
     <>
-      <div className={`grid aspect-[16/10] max-h-[28rem] w-full gap-1 overflow-hidden rounded-2xl border border-border ${layout}`}>
+      <div className={`grid aspect-[16/10] max-h-[28rem] w-full gap-1 overflow-hidden rounded-lg border border-border ${layout}`}>
         {photos.slice(0, 4).map((src, i) => (
           <button
             key={src}
@@ -43,7 +43,7 @@ export function PhotoGrid({ photos, label }: { photos: string[]; label: string }
           if (e.key === "ArrowLeft") step(-1);
         }}
         onClick={(e) => e.target === dialog.current && dialog.current?.close()}
-        className="m-auto max-h-[92vh] w-[min(64rem,94vw)] rounded-2xl bg-black p-0 text-white backdrop:bg-black/80"
+        className="m-auto max-h-[92vh] w-[min(64rem,94vw)] rounded-lg bg-black p-0 text-white backdrop:bg-black/80"
       >
         <div className="relative flex h-[85vh] items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element -- full size, any shape: next/image needs a box */}

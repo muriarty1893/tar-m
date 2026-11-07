@@ -21,7 +21,7 @@ const iconButton =
 export function ForumCategoryManager({ cats, counts }: { cats: ForumCats; counts: Counts }) {
   return (
     <div className="space-y-8">
-      <section aria-labelledby="yeni-bolum" className="rounded-xl border border-border p-4 sm:p-5">
+      <section aria-labelledby="yeni-bolum" className="rounded-xl border border-border p-4 sm:p-5 bg-card">
         <h2 id="yeni-bolum" className="text-xl font-bold">
           Yeni ana bölüm
         </h2>
@@ -31,7 +31,7 @@ export function ForumCategoryManager({ cats, counts }: { cats: ForumCats; counts
 
       <ol className="space-y-4">
         {cats.sections.map((s, i) => (
-          <li key={s.id} className="overflow-hidden rounded-xl border border-border">
+          <li key={s.id} className="overflow-hidden rounded-xl border border-border bg-card">
             <div className="bg-secondary/60">
               <Row cat={s} cats={cats} counts={counts} first={i === 0} last={i === cats.sections.length - 1} section />
             </div>
@@ -118,7 +118,7 @@ function DeleteBox({ cat, cats, topics, onCancel }: { cat: ForumCat; cats: Forum
       ? "Önce bu bölümün alt kategorilerini silin ya da başka bir bölüme taşıyın."
       : "";
   return (
-    <div role="alertdialog" aria-labelledby={`${id}-baslik`} className="mt-3 rounded-xl border-2 border-destructive/40 bg-destructive/5 p-4">
+    <div role="alertdialog" aria-labelledby={`${id}-baslik`} className="mt-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4">
       <p id={`${id}-baslik`} className="font-semibold">
         {blocked || `“${cat.name}” silinsin mi?`}
       </p>

@@ -54,7 +54,7 @@ export function OwnerActions({ listingId, status, admin = false }: { listingId: 
         )}
       </div>
       {confirming ? (
-        <div role="alertdialog" aria-labelledby="kaldir-baslik" className="rounded-xl border-2 border-destructive/40 bg-destructive/5 p-4">
+        <div role="alertdialog" aria-labelledby="kaldir-baslik" className="rounded-xl border border-destructive/40 bg-destructive/5 p-4">
           <p id="kaldir-baslik" className="font-semibold">
             İlan kaldırılsın mı? Pazar’da görünmez; mevcut sohbetler okunabilir kalır.{admin ? " Yönetici olarak sonra yeniden yayına alabilirsiniz." : " Bu geri alınamaz."}
           </p>

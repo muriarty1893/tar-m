@@ -30,7 +30,7 @@ export default function ForumPage({ searchParams }: PageProps<"/forum">) {
           </Suspense>
         }
       />
-      <div className="mx-auto max-w-4xl py-4 sm:px-4 sm:py-8">
+      <div className="mx-auto max-w-4xl py-3 sm:px-4 sm:py-5">
         <Suspense fallback={<ForumSkeleton />}>
           <Forum searchParams={searchParams} />
         </Suspense>
@@ -41,7 +41,7 @@ export default function ForumPage({ searchParams }: PageProps<"/forum">) {
 
 function OpenTopicLink({ href }: { href: string }) {
   return (
-    <Link href={href} className={buttonVariants({ className: "max-sm:w-full" })}>
+    <Link href={href} className={buttonVariants({ variant: "create", className: "max-sm:w-full" })}>
       <NotePencilIcon aria-hidden="true" weight="bold" />
       Konu aç
     </Link>
@@ -64,12 +64,12 @@ async function Forum({ searchParams }: { searchParams: PageProps<"/forum">["sear
     const first = await listTopics(query);
     const title = query.q ? `“${query.q}” için sonuçlar` : categoryName(cats, query.kategori);
     return (
-      <div className="space-y-5">
+      <div className="space-y-3">
         <ForumSearch q={query.q} />
         <section aria-labelledby="sonuclar" className={box}>
           <h2 id="sonuclar" className={boxHeader}>
             <span className="truncate">{title}</span>
-            <span className="shrink-0 font-semibold opacity-80">{first.total.toLocaleString("tr-TR")} konu</span>
+            <span className="shrink-0 text-[12px] font-medium text-muted-foreground">{first.total.toLocaleString("tr-TR")} konu</span>
           </h2>
           <ForumFeed
             initial={first}
@@ -79,6 +79,7 @@ async function Forum({ searchParams }: { searchParams: PageProps<"/forum">["sear
             cats={cats}
             now={now.toISOString()}
             tabs
+            dense
             emptyText="Bu aramayla konu bulunamadı. Başka kelimeler deneyin ya da yeni bir konu açın."
           />
         </section>
@@ -93,7 +94,7 @@ async function Forum({ searchParams }: { searchParams: PageProps<"/forum">["sear
 
   const [stats, latest] = await Promise.all([categoryStats(), listTopics(query)]);
   return (
-    <div className="space-y-5">
+    <div className="space-y-3">
       {sp.silindi === "1" && (
         <p role="status" className="mx-3 flex items-center gap-2 rounded-xl border border-primary/30 bg-secondary px-4 py-3 font-semibold sm:mx-0">
           <CheckCircleIcon aria-hidden="true" weight="fill" className="size-6 text-primary" />
@@ -103,10 +104,18 @@ async function Forum({ searchParams }: { searchParams: PageProps<"/forum">["sear
       <ForumSearch />
       <Sections cats={cats} stats={stats} now={now} />
       <section aria-labelledby="son-konular" className={box}>
-        <h2 id="son-konular" className={boxHeader}>
-          Konular
-        </h2>
-        <ForumFeed initial={latest} cats={cats} now={now.toISOString()} tabs />
+        <ForumFeed
+          initial={latest}
+          cats={cats}
+          now={now.toISOString()}
+          tabs
+          dense
+          heading={
+            <h2 id="son-konular" className="mr-1.5 shrink-0 text-[14px] font-bold">
+              Konular
+            </h2>
+          }
+        />
       </section>
     </div>
   );

@@ -20,13 +20,13 @@ export function SponsorBanner() {
         type="button"
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
-        className="flex w-full cursor-pointer items-center gap-2 rounded-md border border-[#dfe3e8] bg-white px-2.5 py-2 text-left transition-colors hover:bg-[#fafbfc]"
+        className="flex w-full cursor-pointer items-center gap-2 rounded-md border border-border bg-card px-2.5 py-2 text-left transition-colors hover:bg-muted/40"
       >
         <span className="shrink-0 rounded bg-[#fef3c7] px-1.5 py-0.5 text-[10.5px] font-bold uppercase text-[#92400e]">Sponsor</span>
         <span className="min-w-0 flex-1 truncate">
-          <b>sukocu.com</b> <span className="text-[#4b5563]">· Yakıtsız, elektriksiz su pompası</span>
+          <b>sukocu.com</b> <span className="text-muted-foreground">· Yakıtsız, elektriksiz su pompası</span>
         </span>
-        <span className="shrink-0 text-[11px] text-[#4b5563]">örnek</span>
+        <span className="shrink-0 text-[11px] text-muted-foreground">örnek</span>
       </button>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="bottom" className="rounded-t-3xl px-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-6 [&>[data-slot=sheet-close]]:size-11">
@@ -45,10 +45,10 @@ export function SponsorBanner() {
 
 export function AdvertiseBox() {
   return (
-    <Link href="/is-birligi" className="flex items-center gap-2 rounded-md border border-dashed border-[#c4cad3] bg-white px-2.5 py-2 transition-colors hover:bg-[#fafbfc]">
-      <MegaphoneIcon aria-hidden="true" weight="bold" className="size-4 shrink-0 text-[#4b5563]" />
+    <Link href="/is-birligi" className="flex items-center gap-2 rounded-md border border-dashed border-input bg-card px-2.5 py-2 transition-colors hover:bg-muted/40">
+      <MegaphoneIcon aria-hidden="true" weight="bold" className="size-4 shrink-0 text-muted-foreground" />
       <span className="min-w-0 flex-1 truncate">Bu alanda reklam vermek için</span>
-      <span className="flex shrink-0 items-center gap-0.5 text-[12px] font-semibold text-[#1d4ed8]">
+      <span className="flex shrink-0 items-center gap-0.5 text-[12px] font-semibold text-primary">
         İletişim
         <ArrowRightIcon aria-hidden="true" weight="bold" className="size-3.5" />
       </span>

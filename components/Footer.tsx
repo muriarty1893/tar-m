@@ -17,7 +17,7 @@ const links: { label: string; href: string; wide?: boolean; short?: string }[] =
  */
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-border bg-muted/50">
+    <footer className="mt-auto border-t border-border bg-card">
       <div className="mx-auto flex max-w-6xl flex-col gap-0.5 px-4 py-2.5 text-[0.8125rem] leading-snug text-muted-foreground xl:flex-row xl:items-center xl:justify-between xl:gap-6 xl:py-3">
         <nav aria-label="Site bilgileri">
           <ul className="flex flex-wrap items-center gap-x-3">

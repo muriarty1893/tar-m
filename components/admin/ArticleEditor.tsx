@@ -236,7 +236,7 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
     <form onSubmit={onSubmit} noValidate className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
       <div className="min-w-0 space-y-7">
         {(summaryList.length > 0 || message) && (
-          <div ref={summaryRef} tabIndex={-1} role="alert" aria-labelledby="haber-hata" className="rounded-2xl border-l-4 border-destructive bg-destructive/10 p-4 outline-none">
+          <div ref={summaryRef} tabIndex={-1} role="alert" aria-labelledby="haber-hata" className="rounded-lg border-l-4 border-destructive bg-destructive/10 p-4 outline-none">
             <p id="haber-hata" className="flex items-center gap-2 font-semibold">
               <WarningCircleIcon aria-hidden="true" weight="fill" className="size-6 text-destructive" />
               {message || "Kaydetmeden önce şunları düzeltin:"}
@@ -313,7 +313,7 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
           </div>
           {tab === "yaz" ? (
             <>
-              <div role="toolbar" aria-label="Biçimlendirme" className="flex flex-wrap gap-1 rounded-t-2xl border-2 border-b-0 border-input bg-surface p-1.5">
+              <div role="toolbar" aria-label="Biçimlendirme" className="flex flex-wrap gap-1 rounded-t-lg border border-b-0 border-input bg-surface p-1.5">
                 {TOOLS.map((t) => (
                   <button
                     key={t.label}
@@ -342,7 +342,7 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
               </p>
             </>
           ) : (
-            <div className="min-h-64 rounded-2xl border-2 border-input p-6">
+            <div className="min-h-64 rounded-lg border border-input p-4 bg-card">
               <p className="mb-4 text-sm text-muted-foreground">
                 Önizleme: haber sitede böyle görünecek.{" "}
                 <button type="button" onClick={() => setTab("yaz")} className="cursor-pointer font-semibold text-primary underline underline-offset-4">
@@ -363,7 +363,7 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
       </div>
 
       <aside className="space-y-6 lg:sticky lg:top-24">
-        <fieldset className="rounded-2xl border border-border p-5">
+        <fieldset className="rounded-lg border border-border p-4 bg-card">
           <legend className="px-1 text-base font-semibold">Durum</legend>
           {(
             [
@@ -388,7 +388,7 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
           ))}
         </fieldset>
 
-        <fieldset className="rounded-2xl border border-border p-5">
+        <fieldset className="rounded-lg border border-border p-4 bg-card">
           <legend className="px-1 text-base font-semibold">Tür</legend>
           <p className="text-sm text-muted-foreground">Ana sayfadaki “Çiftçi destekleri & haberler” şeridinde başlığın önünde yazar.</p>
           {ARTICLE_KINDS.map(({ id, label, hint }) => (
@@ -419,16 +419,16 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
             Kapak fotoğrafı <span className="font-normal text-muted-foreground">(isteğe bağlı)</span>
           </p>
           {v.cover ? (
-            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-border bg-muted">
+            <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-border bg-muted">
               <Image src={v.cover} alt="Kapak fotoğrafı" fill sizes="320px" className="object-cover" />
             </div>
           ) : (
-            <div className="flex aspect-[16/10] items-center justify-center rounded-2xl border-2 border-dashed border-input text-muted-foreground">
+            <div className="flex aspect-[16/10] items-center justify-center rounded-lg border border-dashed border-input text-muted-foreground">
               <ImageIcon aria-hidden="true" weight="duotone" className="size-10" />
             </div>
           )}
           <div className="flex flex-wrap gap-2">
-            <label htmlFor={IDS.cover} className="inline-flex min-h-11 cursor-pointer items-center rounded-[var(--btn-radius)] border-2 border-primary px-4 font-semibold text-primary hover:bg-primary/10 has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-ring/30">
+            <label htmlFor={IDS.cover} className="inline-flex min-h-11 cursor-pointer items-center rounded-[var(--btn-radius)] border border-primary px-4 font-semibold text-primary hover:bg-primary/10 has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-ring/30">
               {uploading ? "Yükleniyor…" : v.cover ? "Değiştir" : "Fotoğraf yükle"}
               <input
                 ref={fileRef}
@@ -452,7 +452,7 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
 
         <div className="space-y-3 border-t border-border pt-6">
           {/* Never disabled: a click always answers, even while something is still in progress. */}
-          <Button type="submit" size="lg" aria-busy={pending || uploading} className="w-full">
+          <Button type="submit" variant={v.status === "published" ? "create" : "default"} size="lg" aria-busy={pending || uploading} className="w-full">
             {pending ? "Kaydediliyor…" : uploading ? "Fotoğraf yükleniyor…" : articleId ? "Kaydet" : v.status === "published" ? "Yayınla" : "Taslak olarak kaydet"}
           </Button>
           {(summaryList.length > 0 || message) && (
@@ -484,7 +484,7 @@ export function ArticleEditor({ initial, articleId, justSaved = false }: { initi
         {articleId && (
           <div className="border-t border-border pt-6">
             {confirmDelete ? (
-              <div role="alertdialog" aria-labelledby="haber-sil" className="rounded-2xl border-2 border-destructive/40 bg-destructive/5 p-4">
+              <div role="alertdialog" aria-labelledby="haber-sil" className="rounded-lg border border-destructive/40 bg-destructive/5 p-4">
                 <p id="haber-sil" className="font-semibold">
                   Haber kalıcı olarak silinsin mi? Bu işlem geri alınamaz.
                 </p>

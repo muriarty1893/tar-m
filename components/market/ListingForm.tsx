@@ -138,7 +138,7 @@ export function ListingForm({ initial, listingId, defaultProvince = "" }: { init
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-8">
       {(summary.length > 0 || message) && (
-        <div ref={summaryRef} tabIndex={-1} role="alert" aria-labelledby="ilan-hata-baslik" className="rounded-2xl border-l-4 border-destructive bg-destructive/10 p-4 outline-none">
+        <div ref={summaryRef} tabIndex={-1} role="alert" aria-labelledby="ilan-hata-baslik" className="rounded-lg border-l-4 border-destructive bg-destructive/10 p-4 outline-none">
           <p id="ilan-hata-baslik" className="flex items-center gap-2 font-semibold">
             <WarningCircleIcon aria-hidden="true" weight="fill" className="size-6 text-destructive" />
             {message || "İlanı yayınlamadan önce şunları düzeltin:"}
@@ -190,7 +190,7 @@ export function ListingForm({ initial, listingId, defaultProvince = "" }: { init
             <li>
               <label
                 htmlFor={FIELD_IDS.photos}
-                className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-input text-center font-semibold text-primary transition-colors hover:border-primary hover:bg-secondary has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-ring/30"
+                className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-input text-center font-semibold text-primary transition-colors hover:border-primary hover:bg-secondary has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-ring/30"
               >
                 <CameraIcon aria-hidden="true" weight="duotone" className="size-8" />
                 Fotoğraf ekle
@@ -250,7 +250,7 @@ export function ListingForm({ initial, listingId, defaultProvince = "" }: { init
                   onBlur={blur("category")}
                   className="peer sr-only"
                 />
-                <span className="inline-flex min-h-12 items-center rounded-full border-2 border-input px-4 font-semibold transition-colors peer-checked:border-primary peer-checked:bg-primary peer-checked:text-primary-foreground peer-focus-visible:ring-4 peer-focus-visible:ring-ring/30">
+                <span className="inline-flex min-h-11 items-center rounded-md border border-input px-4 font-semibold transition-colors peer-checked:border-primary peer-checked:bg-primary peer-checked:text-primary-foreground peer-focus-visible:ring-4 peer-focus-visible:ring-ring/30 bg-card">
                   {c.label}
                 </span>
               </label>
@@ -275,7 +275,7 @@ export function ListingForm({ initial, listingId, defaultProvince = "" }: { init
                     onBlur={blur("condition")}
                     className="peer sr-only"
                   />
-                  <span className="inline-flex min-h-12 items-center rounded-full border-2 border-input px-4 font-semibold transition-colors peer-checked:border-primary peer-checked:bg-primary peer-checked:text-primary-foreground peer-focus-visible:ring-4 peer-focus-visible:ring-ring/30">
+                  <span className="inline-flex min-h-11 items-center rounded-md border border-input px-4 font-semibold transition-colors peer-checked:border-primary peer-checked:bg-primary peer-checked:text-primary-foreground peer-focus-visible:ring-4 peer-focus-visible:ring-ring/30 bg-card">
                     {c.label}
                   </span>
                 </label>
@@ -285,7 +285,7 @@ export function ListingForm({ initial, listingId, defaultProvince = "" }: { init
           </fieldset>
         )}
 
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <Field id={FIELD_IDS.price} label={byUnit ? "Birim fiyatı (₺)" : "Fiyat (₺)"} error={shown("price")}>
             <Input
               id={FIELD_IDS.price}
@@ -333,7 +333,7 @@ export function ListingForm({ initial, listingId, defaultProvince = "" }: { init
             </Field>
           )}
         </div>
-        <label htmlFor={FIELD_IDS.negotiable} className="flex min-h-12 cursor-pointer items-center gap-3 text-lg">
+        <label htmlFor={FIELD_IDS.negotiable} className="flex min-h-11 cursor-pointer items-center gap-3 text-lg">
           <input
             id={FIELD_IDS.negotiable}
             type="checkbox"
@@ -344,7 +344,7 @@ export function ListingForm({ initial, listingId, defaultProvince = "" }: { init
           Pazarlık payı var
         </label>
 
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <Field id={FIELD_IDS.province} label="İl" error={shown("province")}>
             <div className="relative">
               <select
@@ -394,7 +394,7 @@ export function ListingForm({ initial, listingId, defaultProvince = "" }: { init
         </Field>
       </section>
 
-      <div className="sticky bottom-0 -mx-4 border-t border-border bg-background/95 px-4 py-4 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
+      <div className="sticky bottom-0 -mx-4 border-t border-border bg-background/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
         <p className="mb-3 text-muted-foreground">
           İlan vererek{" "}
           <Link href="/pazar/kurallar" className="font-semibold text-primary underline underline-offset-4">
@@ -402,7 +402,7 @@ export function ListingForm({ initial, listingId, defaultProvince = "" }: { init
           </Link>{" "}
           kabul etmiş olursunuz.
         </p>
-        <Button type="submit" size="lg" disabled={pending} className="w-full sm:w-auto">
+        <Button type="submit" variant="create" size="lg" disabled={pending} className="w-full sm:w-auto">
           {pending && <span aria-hidden="true" className="size-5 rounded-full border-2 border-current border-t-transparent motion-safe:animate-spin" />}
           {pending ? "Kaydediliyor…" : listingId ? "Değişiklikleri kaydet" : "İlanı yayınla"}
         </Button>

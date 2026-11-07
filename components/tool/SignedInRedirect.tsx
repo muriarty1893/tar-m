@@ -61,11 +61,11 @@ export function SignedInRedirect({ children }: { children: ReactNode }) {
 
   // Clerk's form waits for Clerk anyway; holding it back until then keeps it from sending a
   // signed-in visitor home before this can step in.
-  if (!isLoaded) return <div aria-hidden="true" className="h-[28rem] w-full max-w-[25rem] rounded-2xl bg-muted motion-safe:animate-pulse" />;
+  if (!isLoaded) return <div aria-hidden="true" className="h-[28rem] w-full max-w-[25rem] rounded-lg bg-muted motion-safe:animate-pulse" />;
   if (!isSignedIn) return <>{children}</>;
   if (!stuck) {
     return (
-      <p role="status" className="w-full max-w-[25rem] rounded-2xl border border-border bg-card p-6 text-lg">
+      <p role="status" className="w-full max-w-[25rem] rounded-lg border border-border bg-card p-6 text-lg">
         Giriş yapılmış; sayfanıza dönüyorsunuz…
       </p>
     );
@@ -73,7 +73,7 @@ export function SignedInRedirect({ children }: { children: ReactNode }) {
 
   const off = stuck.skew !== null && Math.abs(stuck.skew) >= 2 ? stuck.skew : null;
   return (
-    <div role="alert" className="w-full max-w-[25rem] space-y-4 rounded-2xl border border-border bg-card p-6">
+    <div role="alert" className="w-full max-w-[25rem] space-y-4 rounded-lg border border-border bg-card p-6">
       <h2 className="text-xl font-bold">Oturumunuz doğrulanamadı</h2>
       {off !== null ? (
         <p className="text-lg">

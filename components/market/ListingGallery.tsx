@@ -10,7 +10,7 @@ export function ListingGallery({ photos, title, stockPhoto }: { photos: string[]
   return (
     <div>
       {/* Edge to edge on phones, as on sahibinden; a rounded card from 1024 px. */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted lg:rounded-2xl lg:border lg:border-border">
+      <div className="relative aspect-[4/3] overflow-hidden bg-muted lg:rounded-lg lg:border lg:border-border">
         <Image
           src={current}
           alt={stockPhoto ? "" : `${title}, fotoğraf ${index + 1} / ${photos.length}`}
@@ -40,7 +40,7 @@ export function ListingGallery({ photos, title, stockPhoto }: { photos: string[]
                 onClick={() => setIndex(i)}
                 aria-label={`Fotoğraf ${i + 1}`}
                 aria-current={i === index ? "true" : undefined}
-                className="relative block size-16 cursor-pointer overflow-hidden rounded-lg border-2 border-transparent bg-muted aria-[current=true]:border-primary lg:size-20 lg:rounded-xl"
+                className="relative block size-16 cursor-pointer overflow-hidden rounded-lg border border-transparent bg-muted aria-[current=true]:border-primary lg:size-20 lg:rounded-xl"
               >
                 <Image src={p} alt="" fill sizes="80px" className="object-cover" />
               </button>

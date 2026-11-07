@@ -38,11 +38,11 @@ export default function MarketPage({ searchParams }: PageProps<"/pazar">) {
       <div className="flex items-center justify-between gap-3 border-b border-border bg-surface px-3 py-2.5 xl:hidden">
         <h1 className="text-xl font-bold tracking-tight">Pazar</h1>
         <div className="flex gap-2">
-          <Link href="/mesajlar" className={buttonVariants({ variant: "outline", size: "sm", className: "h-10" })}>
+          <Link href="/mesajlar" className={buttonVariants({ variant: "outline", size: "sm" })}>
             <ChatsCircleIcon aria-hidden="true" weight="duotone" />
             Mesajlar
           </Link>
-          <Link href="/pazar/ilan-ver" className={buttonVariants({ size: "sm", className: "h-10" })}>
+          <Link href="/pazar/ilan-ver" className={buttonVariants({ variant: "create", size: "sm" })}>
             <PlusIcon aria-hidden="true" weight="bold" />
             İlan ver
           </Link>
@@ -55,11 +55,11 @@ export default function MarketPage({ searchParams }: PageProps<"/pazar">) {
         intro="Ürününüzü, tohumunuzu, aletinizi ya da aracınızı ilan edin; alıcıyla site içinden mesajlaşın. Ödeme ve teslim yüz yüze yapılır."
         actions={
           <>
-            <Link href="/pazar/ilan-ver" className={buttonVariants({ size: "lg" })}>
+            <Link href="/pazar/ilan-ver" className={buttonVariants({ variant: "create" })}>
               <PlusIcon aria-hidden="true" weight="bold" />
               İlan ver
             </Link>
-            <Link href="/mesajlar" className={buttonVariants({ variant: "outline", size: "lg" })}>
+            <Link href="/mesajlar" className={buttonVariants({ variant: "outline" })}>
               <ChatsCircleIcon aria-hidden="true" weight="duotone" />
               Mesajlar
             </Link>
@@ -141,7 +141,7 @@ async function Market({ searchParams }: { searchParams: PageProps<"/pazar">["sea
               const Icon = CATEGORY_ICON[c.id as Exclude<CategoryId, "tumu">];
               return (
                 <li key={c.id}>
-                  <Link href={marketHref(query, { kategori: c.id })} className="flex min-h-12 items-center gap-3 px-4 transition-colors hover:bg-secondary">
+                  <Link href={marketHref(query, { kategori: c.id })} className="flex min-h-11 items-center gap-3 px-4 transition-colors hover:bg-secondary">
                     <Icon aria-hidden="true" weight="duotone" className="size-6 shrink-0 text-primary" />
                     <span className="flex-1 font-semibold">{c.label}</span>
                     <span className="text-sm text-muted-foreground tabular-nums">({(summary.byCategory[c.id] ?? 0).toLocaleString("tr-TR")})</span>
@@ -167,13 +167,13 @@ async function Market({ searchParams }: { searchParams: PageProps<"/pazar">["sea
       )}
 
       <nav aria-label="Kategoriler" className="max-xl:hidden">
-        <ul className="flex flex-wrap gap-2">
+        <ul className="flex flex-wrap gap-1.5">
           {CATEGORIES.map((c) => (
             <li key={c.id}>
               <Link
                 href={marketHref(query, { kategori: c.id })}
                 aria-current={query.kategori === c.id ? "page" : undefined}
-                className="inline-flex min-h-11 items-center rounded-full bg-secondary px-4 font-semibold text-secondary-foreground transition-colors hover:bg-[color-mix(in_oklab,var(--secondary),var(--foreground)_8%)] aria-[current=page]:bg-foreground aria-[current=page]:text-background"
+                className="inline-flex min-h-9 items-center rounded-md border border-border bg-card px-3 text-sm font-medium transition-colors hover:border-primary/40 aria-[current=page]:border-primary aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground"
               >
                 {c.label}
               </Link>
@@ -247,7 +247,7 @@ function EmptyState({ query, signedIn }: { query: MarketQuery; signedIn: boolean
           ? "Bu aramaya uygun ilan yok. Filtreleri temizleyin ya da başka bir kelime deneyin."
           : "Pazar yeni açıldı, henüz ilan yok. İlk ilanı siz verin!";
   return (
-    <div className="rounded-2xl border border-dashed border-input px-6 py-12 text-center">
+    <div className="rounded-lg border border-dashed border-input px-4 py-6 text-center">
       <StorefrontIcon aria-hidden="true" weight="duotone" className="mx-auto size-12 text-primary" />
       <p className="mx-auto mt-3 max-w-md text-lg">{text}</p>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
@@ -261,7 +261,7 @@ function EmptyState({ query, signedIn }: { query: MarketQuery; signedIn: boolean
             Pazara göz at
           </Link>
         ) : (
-          <Link href={signedIn ? "/pazar/ilan-ver" : "/giris?redirect_url=%2Fpazar%2Filan-ver"} className={buttonVariants()}>
+          <Link href={signedIn ? "/pazar/ilan-ver" : "/giris?redirect_url=%2Fpazar%2Filan-ver"} className={buttonVariants({ variant: "create" })}>
             İlan ver
           </Link>
         )}
@@ -273,15 +273,15 @@ function EmptyState({ query, signedIn }: { query: MarketQuery; signedIn: boolean
 function MarketSkeleton() {
   return (
     <div aria-hidden="true" className="space-y-6 px-3 xl:px-0">
-      <div className="h-12 rounded-2xl bg-muted motion-safe:animate-pulse" />
+      <div className="h-12 rounded-lg bg-muted motion-safe:animate-pulse" />
       <div className="flex flex-wrap gap-2">
         {CATEGORIES.map((c) => (
-          <span key={c.id} className="h-11 w-24 rounded-full bg-muted" />
+          <span key={c.id} className="h-9 w-20 rounded-md bg-muted" />
         ))}
       </div>
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
         {Array.from({ length: 8 }, (_, i) => (
-          <li key={i} className="overflow-hidden rounded-2xl border border-border">
+          <li key={i} className="overflow-hidden rounded-lg border border-border bg-card">
             <div className="aspect-[4/3] bg-muted motion-safe:animate-pulse" />
             <div className="space-y-2 p-3">
               <div className="h-5 w-2/3 rounded bg-muted" />

@@ -14,8 +14,8 @@ export default function EditListingPage({ params }: PageProps<"/pazar/ilan/[id]/
   return (
     <>
       <ToolHeader eyebrow="Pazar" title="İlanı düzenle" />
-      <div className="mx-auto max-w-3xl px-3 py-6 sm:px-4 sm:py-10">
-        <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-2xl bg-muted motion-safe:animate-pulse" />}>
+      <div className="mx-auto max-w-3xl px-3 py-3 sm:px-4 sm:py-6">
+        <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-lg bg-muted motion-safe:animate-pulse" />}>
           <EditListing params={params} />
         </Suspense>
       </div>

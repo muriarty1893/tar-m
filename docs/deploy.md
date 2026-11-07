@@ -46,9 +46,9 @@ Measured locally against `npm run build && npm start` with Lighthouse 12.8.2, mo
 | `/is-birligi` | 97 | 100 | 100 | 100 |
 | `/sss` | 93–94 | 100 | 100 | 100 |
 
-These figures predate the November 2026 rebuild (the portal home on phones, the demo removed); re-measure on a quiet machine or on the Vercel preview before launch. Phones and tablets get the portal home and never load the wide-screen hero's images (they are lazy and hidden below 1280 px).
+These figures predate the November 2026 rebuild (the Borsa design on every page; the home is the portal on every screen, without the old landing page's hero and pricing); re-measure on a quiet machine or on the Vercel preview before launch.
 
-What keeps the home page fast: the scroll-reveal is CSS (no animation library on load), the hero's intro (GSAP) runs only on wide screens, the Hızlı menü's Sheet code loads on first tap, form validation (zod) loads on first submit, and only the heading font is preloaded.
+What keeps the home page fast: no animation library on load, the Hızlı menü's Sheet code loads on first tap, form validation (zod) loads on first submit, and only Fira Sans is preloaded (Fira Code, for figures, loads on use).
 
 ## Pre-launch checklist
 

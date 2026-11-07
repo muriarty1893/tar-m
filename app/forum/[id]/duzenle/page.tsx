@@ -13,7 +13,7 @@ export default function EditTopicPage({ params }: PageProps<"/forum/[id]/duzenle
   return (
     <>
       <ToolHeader eyebrow="Forum" title="Konuyu düzenle" />
-      <div className="mx-auto max-w-3xl px-3 py-6 sm:px-4 sm:py-10">
+      <div className="mx-auto max-w-3xl px-3 py-3 sm:px-4 sm:py-6">
         <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-xl bg-muted motion-safe:animate-pulse" />}>
           <EditTopic params={params} />
         </Suspense>

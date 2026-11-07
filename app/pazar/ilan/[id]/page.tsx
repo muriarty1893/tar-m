@@ -67,7 +67,7 @@ async function Listing({ params, searchParams }: Pick<PageProps<"/pazar/ilan/[id
 
   return (
     <>
-      <div className="grid gap-5 lg:mt-4 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start lg:gap-8">
+      <div className="grid gap-3 lg:mt-4 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start lg:gap-8">
         <div className="min-w-0 space-y-5 lg:space-y-8">
           {(sp.yeni === "1" || sp.kaydedildi === "1") && (
             <p role="status" className="mx-3 flex items-center gap-2 rounded-xl border border-primary/30 bg-secondary px-4 py-3 font-semibold lg:mx-0">
@@ -80,12 +80,12 @@ async function Listing({ params, searchParams }: Pick<PageProps<"/pazar/ilan/[id
           <div className="px-3 lg:px-0">
             <div className="flex flex-wrap gap-2">
               <span className="rounded-md bg-secondary px-2.5 py-0.5 text-sm font-semibold">{categoryLabel(l.category)}</span>
-              {condition && <span className="rounded-md border border-border px-2.5 py-0.5 text-sm font-semibold">{condition}</span>}
+              {condition && <span className="rounded-md border border-border px-2.5 py-0.5 text-sm font-semibold bg-card">{condition}</span>}
               {l.status === "sold" && <span className="rounded-md bg-foreground px-2.5 py-0.5 text-sm font-semibold text-background">Satıldı</span>}
               {l.status === "removed" && <span className="rounded-md bg-destructive/10 px-2.5 py-0.5 text-sm font-semibold text-destructive">Kaldırıldı</span>}
             </div>
-            <h1 className="mt-2 text-2xl font-bold leading-tight tracking-tight sm:text-4xl">{l.title}</h1>
-            <p className="mt-2 text-2xl font-bold text-primary tabular-nums sm:text-3xl">
+            <h1 className="mt-2 text-xl font-bold leading-tight tracking-tight sm:text-2xl">{l.title}</h1>
+            <p className="mt-2 text-xl font-bold text-primary tabular-nums sm:text-3xl">
               {priceLabel(l.price, l.unit)}
               {l.negotiable && <span className="ml-3 align-middle text-base font-semibold text-gold">Pazarlık payı var</span>}
             </p>
@@ -128,7 +128,7 @@ async function Listing({ params, searchParams }: Pick<PageProps<"/pazar/ilan/[id
         </div>
 
         <aside className="space-y-4 px-3 lg:sticky lg:top-24 lg:space-y-5 lg:px-0">
-          <div id="iletisim" className="scroll-mt-20 rounded-xl border border-border p-4 sm:p-5">
+          <div id="iletisim" className="scroll-mt-20 rounded-xl border border-border p-4 sm:p-5 bg-card">
             <div className="flex items-center gap-3">
               <Avatar id={l.seller.id} name={l.seller.name} size={52} />
               <div className="min-w-0">
@@ -188,11 +188,11 @@ function DetailSkeleton() {
   return (
     <div aria-hidden="true" className="mt-4 grid gap-8 px-3 lg:grid-cols-[minmax(0,1fr)_24rem] lg:px-0">
       <div className="space-y-6">
-        <div className="aspect-[4/3] rounded-2xl bg-muted motion-safe:animate-pulse" />
+        <div className="aspect-[4/3] rounded-lg bg-muted motion-safe:animate-pulse" />
         <div className="h-10 w-3/4 rounded-xl bg-muted" />
         <div className="h-8 w-1/3 rounded-xl bg-muted" />
       </div>
-      <div className="h-80 rounded-2xl bg-muted motion-safe:animate-pulse" />
+      <div className="h-80 rounded-lg bg-muted motion-safe:animate-pulse" />
     </div>
   );
 }

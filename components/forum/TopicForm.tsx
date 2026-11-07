@@ -66,7 +66,7 @@ export function TopicForm({ cats, initial, topicId }: { cats: ForumCats; initial
       className="space-y-6"
     >
       {(failed.length > 0 || message) && (
-        <div ref={summary} tabIndex={-1} role="alert" aria-labelledby="konu-hata-baslik" className="rounded-xl border-2 border-destructive/40 bg-destructive/5 p-4 outline-none">
+        <div ref={summary} tabIndex={-1} role="alert" aria-labelledby="konu-hata-baslik" className="rounded-xl border border-destructive/40 bg-destructive/5 p-4 outline-none">
           <p id="konu-hata-baslik" className="flex items-center gap-2 font-bold text-destructive">
             <WarningCircleIcon aria-hidden="true" weight="fill" className="size-6" />
             {failed.length ? "Yayınlamadan önce düzeltin" : message}
@@ -185,7 +185,7 @@ export function TopicForm({ cats, initial, topicId }: { cats: ForumCats; initial
       </div>
 
       <p className="text-sm text-muted-foreground">Kişisel bilgilerinizi (telefon, adres) paylaşmayın. Hakaret ve reklam içeren konular kaldırılır.</p>
-      <Button type="submit" size="lg" disabled={pending} className="w-full sm:w-auto">
+      <Button type="submit" variant="create" size="lg" disabled={pending} className="w-full sm:w-auto">
         {pending ? (topicId ? "Kaydediliyor…" : "Yayınlanıyor…") : topicId ? "Değişiklikleri kaydet" : "Konuyu yayınla"}
       </Button>
     </form>

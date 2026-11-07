@@ -40,7 +40,7 @@ export function FieldForm({ initial, fieldId, onDone }: { initial: FieldInput; f
       }}
       className="space-y-5"
     >
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Field id={id("ad")} label="Tarlanın adı" error={errors.name}>
           <Input id={id("ad")} value={v.name} onChange={(e) => set("name", e.target.value)} placeholder="Ör. Buğday tarlası" {...describedBy(id("ad"), errors.name)} />
         </Field>

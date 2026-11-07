@@ -6,7 +6,7 @@ import { SignedInRedirect } from "@/components/tool/SignedInRedirect";
 
 export const metadata: Metadata = { title: "Hesap aç", robots: { index: false } };
 
-const formSpace = <div aria-hidden="true" className="h-[28rem] w-full max-w-[25rem] rounded-2xl bg-muted motion-safe:animate-pulse" />;
+const formSpace = <div aria-hidden="true" className="h-[28rem] w-full max-w-[25rem] rounded-lg bg-muted motion-safe:animate-pulse" />;
 
 export default function SignUpPage() {
   return (
