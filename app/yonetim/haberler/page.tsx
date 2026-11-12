@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { ArrowSquareOutIcon, CheckCircleIcon, NewspaperIcon, PencilSimpleIcon, PlusIcon } from "@phosphor-icons/react/dist/ssr";
 import { AdminShell, AdminSkeleton } from "@/components/admin/AdminShell";
 import { StatusBadge } from "@/components/admin/StatusBadge";
+import { ImportNewsButton } from "@/components/admin/ImportNewsButton";
 import { buttonVariants } from "@/components/ui/button";
 import { requireAdmin } from "@/lib/auth";
 import { formatTrDate } from "@/lib/format";
@@ -38,6 +39,13 @@ async function NewsList({ searchParams }: { searchParams: PageProps<"/yonetim/ha
   const articles = await listAllArticles();
   return (
     <div className="space-y-6">
+      <section className="space-y-2 rounded-lg border border-border bg-card p-4">
+        <h2 className="font-semibold">Otomatik haberler</h2>
+        <p className="text-sm text-muted-foreground">
+          TKDK ve Tarım ve Orman Bakanlığı her sabah 09.00 civarı okunur; yeni haber ve duyurular kısa bir özet ve kaynağa bağlantıyla hemen yayımlanır. İhale, sınav ve personel duyuruları alınmaz. Silinen bir haber geri gelmez.
+        </p>
+        <ImportNewsButton />
+      </section>
       {sp.silindi === "1" && (
         <p role="status" className="flex items-center gap-2 rounded-lg border border-primary/30 bg-secondary px-4 py-3 font-semibold">
           <CheckCircleIcon aria-hidden="true" weight="fill" className="size-6 text-primary" />
@@ -67,6 +75,7 @@ async function NewsList({ searchParams }: { searchParams: PageProps<"/yonetim/ha
                 <p className="flex flex-wrap items-center gap-2">
                   <StatusBadge status={a.status} />
                   <span className="text-sm text-muted-foreground">{formatTrDate(a.date)}</span>
+                  {a.source && <span className="rounded bg-muted px-1.5 text-xs font-semibold leading-5 text-muted-foreground">Otomatik · {a.source.name}</span>}
                 </p>
                 <p className="mt-1 truncate text-lg font-semibold">{a.title}</p>
                 <p className="truncate text-sm text-muted-foreground">/haberler/{a.slug}</p>

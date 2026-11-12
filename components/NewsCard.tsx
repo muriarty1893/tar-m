@@ -28,6 +28,7 @@ export function NewsCard({ article, headingLevel = 3 }: { article: ArticleSummar
           <time dateTime={article.date} className="font-borsa-mono text-muted-foreground">
             {formatTrDate(article.date)}
           </time>
+          {article.source && <span className="truncate text-muted-foreground">· {article.source.name}</span>}
         </p>
         <Heading className="mt-1 line-clamp-2 text-[15px] font-semibold leading-snug">
           <Link href={`/haberler/${article.slug}`} className="after:absolute after:inset-0 hover:text-primary focus-visible:text-primary">

@@ -271,3 +271,19 @@ alter table forum_topics add column if not exists view_count integer not null de
 alter table articles add column if not exists kind text not null default 'haber';
 alter table articles drop constraint if exists articles_kind_check;
 alter table articles add constraint articles_kind_check check (kind in ('destek', 'haber', 'duyuru'));
+
+-- Haberler, automatically: lib/services/news-import.ts reads TKDK and the Ministry once a day and
+-- publishes their headlines with a short summary and a link to the original (source_name, source_url).
+-- Hand-written articles leave both empty.
+alter table articles add column if not exists source_name text;
+alter table articles add column if not exists source_url text;
+-- Every link the importer has looked at, published or not, so it never fetches or adds one twice: an
+-- article an admin deletes stays deleted, and skipped ones (tenders, exams, old items) aren't re-read.
+create table if not exists news_imports (
+  url        text primary key,
+  source     text not null,
+  article_id uuid references articles(id) on delete set null,
+  -- Why it wasn't published: 'konu dışı' (filtered) or 'eski' (older than the window); null = published.
+  skipped    text,
+  created_at timestamptz not null default now()
+);

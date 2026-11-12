@@ -9,6 +9,7 @@ import { NEWS_TAG } from "@/lib/news-data";
 import { renderMarkdown, type ArticleErrors, type ArticleInput } from "@/lib/news";
 import { deleteArticleFor, moderateFor, saveArticleFor } from "@/lib/services/admin";
 import { moderateForumFor } from "@/lib/services/forum";
+import { importNews } from "@/lib/services/news-import";
 import {
   FORUM_CATS_TAG,
   createCategoryFor,
@@ -58,6 +59,19 @@ export async function deleteArticle(id: string) {
   await deleteArticleFor(id);
   updateTag(NEWS_TAG);
   redirect("/yonetim/haberler?silindi=1");
+}
+
+/** "Kaynaklardan şimdi çek": the daily import (TKDK, the Ministry), run now. Says what it added. */
+export async function importNewsNow(): Promise<{ ok: boolean; message: string }> {
+  if (!(await adminId())) return { ok: false, message: "Bu işlem için yönetici olmanız gerekiyor." };
+  const reports = await importNews();
+  const added = reports.reduce((n, r) => n + r.added.length, 0);
+  if (added) updateTag(NEWS_TAG);
+  const failed = reports.filter((r) => r.errors.length).map((r) => r.source);
+  const parts = [added ? `${added} yeni haber yayımlandı.` : "Yeni haber yok."];
+  if (failed.length) parts.push(`Okunamayan: ${failed.join(", ")} (sonraki çekişte yeniden denenecek).`);
+  if (added) refresh();
+  return { ok: failed.length === 0, message: parts.join(" ") };
 }
 
 /** The editor's "Önizleme": the text as it will look on the site. */

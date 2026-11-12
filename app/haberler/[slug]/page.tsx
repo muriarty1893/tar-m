@@ -9,7 +9,8 @@ import { getPublished, listPublished } from "@/lib/news-data";
 import { formatTrDate } from "@/lib/format";
 import { KIND_TONE } from "@/components/NewsCard";
 import { siteConfig } from "@/config/site";
-import { ArrowLeftIcon, CalendarBlankIcon } from "@phosphor-icons/react/dist/ssr";
+import { buttonVariants } from "@/components/ui/button";
+import { ArrowLeftIcon, ArrowSquareOutIcon, CalendarBlankIcon } from "@phosphor-icons/react/dist/ssr";
 
 // Cache Components rejects an empty list, so a site with no articles yet still builds; the
 // placeholder slug simply resolves to notFound(). Articles published later render on first visit.
@@ -78,6 +79,7 @@ async function ArticleBody({ params }: { params: PageProps<"/haberler/[slug]">["
               <CalendarBlankIcon aria-hidden="true" weight="regular" className="size-3.5" />
               {formatTrDate(article.date)}
             </time>
+            {article.source && <span className="text-muted-foreground">· Kaynak: {article.source.name}</span>}
           </p>
           <h1 className="mt-2 text-2xl font-bold leading-tight sm:text-3xl">{article.title}</h1>
           <Suspense>
@@ -94,7 +96,20 @@ async function ArticleBody({ params }: { params: PageProps<"/haberler/[slug]">["
               <Image src={article.cover} alt="" fill priority sizes="(min-width: 768px) 768px, 100vw" className="object-cover" />
             </div>
           )}
-          <div className="prose-article space-y-4 p-4 leading-relaxed sm:p-6" dangerouslySetInnerHTML={{ __html: article.html }} />
+          {article.source && <p className="p-4 pb-0 text-lg leading-relaxed sm:p-6 sm:pb-0">{article.summary}</p>}
+          {article.html && <div className="prose-article space-y-4 p-4 leading-relaxed sm:p-6" dangerouslySetInnerHTML={{ __html: article.html }} />}
+          {article.source && (
+            <div className="m-4 flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-muted/40 p-3 sm:m-6">
+              <p className="text-sm text-muted-foreground">
+                Bu haber <span className="font-semibold text-foreground">{article.source.name}</span> sitesinden özetlendi. Ayrıntılar ve ekler kaynağın sayfasında.
+              </p>
+              <a href={article.source.url} target="_blank" rel="noopener noreferrer" className={buttonVariants({ size: "sm" })}>
+                Haberin tamamı
+                <ArrowSquareOutIcon aria-hidden="true" weight="bold" />
+                <span className="sr-only"> ({article.source.name}, yeni sekmede açılır)</span>
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </article>

@@ -14,6 +14,7 @@ const toSummary = (r: Row): ArticleSummary => ({
   date: day(r.published_on),
   summary: str(r.summary),
   cover: r.cover ? str(r.cover) : undefined,
+  source: r.source_url ? { name: str(r.source_name), url: str(r.source_url) } : undefined,
 });
 
 /** Published articles, newest first (same day: by address). */
@@ -23,7 +24,7 @@ export async function listPublished(): Promise<ArticleSummary[]> {
   cacheTag(NEWS_TAG);
   if (!process.env.DATABASE_URL) return [];
   const rows = await sql()`
-    select slug, kind, title, summary, cover, published_on from articles
+    select slug, kind, title, summary, cover, published_on, source_name, source_url from articles
     where status = 'published' order by published_on desc, slug asc`;
   return rows.map(toSummary);
 }
@@ -34,7 +35,7 @@ export async function getPublished(slug: string): Promise<Article | null> {
   cacheLife("hours");
   cacheTag(NEWS_TAG);
   if (!process.env.DATABASE_URL) return null;
-  const rows = await sql()`select slug, kind, title, summary, cover, published_on, body from articles where slug = ${slug} and status = 'published'`;
+  const rows = await sql()`select slug, kind, title, summary, cover, published_on, source_name, source_url, body from articles where slug = ${slug} and status = 'published'`;
   const r = rows[0];
   return r ? { ...toSummary(r), html: renderMarkdown(str(r.body)) } : null;
 }

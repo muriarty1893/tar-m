@@ -28,6 +28,8 @@ export type Article = {
   date: string;
   summary: string;
   cover?: string;
+  /** Imported automatically (lib/services/news-import.ts): who published it, and the original. */
+  source?: { name: string; url: string };
   html: string;
 };
 
