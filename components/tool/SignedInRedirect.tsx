@@ -4,11 +4,11 @@ import { useAuth, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { buttonVariants } from "@/components/ui/button";
+import { safeReturnPath } from "@/lib/sign-in-href";
 
 /** Where to go after sign-in: the `redirect_url` the site put there (a path on this site), else home. */
 function returnTarget() {
-  const asked = new URLSearchParams(window.location.search).get("redirect_url") ?? "";
-  return asked.startsWith("/") && !asked.startsWith("//") ? asked : "/";
+  return safeReturnPath(new URLSearchParams(window.location.search).get("redirect_url"));
 }
 
 /** How far the computer's clock is from the site's, in whole minutes (positive: ahead). */

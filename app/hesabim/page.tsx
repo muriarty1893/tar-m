@@ -6,6 +6,7 @@ import { ToolHeader } from "@/components/tool/ToolHeader";
 import { ProfileForm } from "@/components/account/ProfileForm";
 import { DeleteAccount, SecurityControls } from "@/components/account/AccountControls";
 import { ensureProfile, isAdmin, requireUserId } from "@/lib/auth";
+import { safeReturnPath } from "@/lib/sign-in-href";
 
 export const metadata: Metadata = { title: "Hesabım", robots: { index: false } };
 
@@ -31,7 +32,7 @@ export default function AccountPage({ searchParams }: PageProps<"/hesabim">) {
 
 async function Account({ searchParams }: { searchParams: PageProps<"/hesabim">["searchParams"] }) {
   const sp = await searchParams;
-  const next = typeof sp.devam === "string" && sp.devam.startsWith("/") && !sp.devam.startsWith("//") ? sp.devam : "";
+  const next = safeReturnPath(sp.devam, "");
   const userId = await requireUserId("/hesabim");
   const profile = await ensureProfile(userId);
 

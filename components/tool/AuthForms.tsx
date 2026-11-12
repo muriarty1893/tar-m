@@ -2,11 +2,11 @@
 
 import { SignIn, SignUp } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
+import { safeReturnPath } from "@/lib/sign-in-href";
 
 /** The page to return to (a path on this site, from `redirect_url`), or home. */
 function useReturnTo() {
-  const asked = useSearchParams().get("redirect_url") ?? "";
-  return asked.startsWith("/") && !asked.startsWith("//") ? asked : "/";
+  return safeReturnPath(useSearchParams().get("redirect_url"));
 }
 
 const withReturn = (path: string, back: string) => (back === "/" ? path : `${path}?redirect_url=${encodeURIComponent(back)}`);
