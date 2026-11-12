@@ -100,7 +100,7 @@ const ACRONYMS = new Set(
 const SMALL = new Set(["ve", "ile", "için", "de", "da", "ki", "veya", "ya", "mı", "mi"]);
 
 /** One word (or one part of "türkiye-ab"), in a title's case. */
-const caseWord = (bare: string, first: boolean) => {
+const caseWord = (bare: string, first: boolean): string => {
   if (ACRONYMS.has(bare)) return bare.toLocaleUpperCase("tr");
   if (!first && SMALL.has(bare)) return bare;
   return bare.includes("-")
