@@ -1,6 +1,6 @@
 import "server-only";
 import { clerkClient } from "@clerk/nextjs/server";
-import { del } from "@vercel/blob";
+import { deletePhotosNoLongerUsed } from "@/lib/services/photos";
 import { sql } from "@/lib/db";
 import { cleanHandle, isForumPhotoUrl, validateHandle } from "@/lib/forum";
 import { isOwnPhotoUrl, isProvince } from "@/lib/market";
@@ -42,23 +42,17 @@ export async function updateProfileFor(userId: string, name: unknown, province: 
 }
 
 /**
- * Deletes everything: listing photos, then the profile (which removes the listings, favourites, chats,
- * fields, expenses and tasks with it), then the Clerk account.
+ * Deletes everything: the profile (which removes the listings, posts, favourites, chats, fields,
+ * expenses and tasks with it), then their photos that nothing else shows, then the Clerk account.
  */
 export async function deleteAccountFor(userId: string) {
   const rows = await sql()`
     select photos from listings where seller_id = ${userId}
     union all select photos from forum_topics where author_id = ${userId}
     union all select photos from forum_replies where author_id = ${userId}`;
-  const photos = rows.flatMap((r) => (r.photos as string[] | null) ?? []).filter((p) => isOwnPhotoUrl(p) || isForumPhotoUrl(p));
-  if (photos.length) {
-    try {
-      await del(photos);
-    } catch (err) {
-      console.error("deleteAccount: photos", err);
-    }
-  }
+  const photos = rows.flatMap((r) => (r.photos as string[] | null) ?? []);
   await sql()`delete from profiles where user_id = ${userId}`;
+  await deletePhotosNoLongerUsed(photos, (p) => isOwnPhotoUrl(p) || isForumPhotoUrl(p), "deleteAccount");
   const clerk = await clerkClient();
   await clerk.users.deleteUser(userId);
 }

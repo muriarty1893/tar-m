@@ -13,6 +13,7 @@ import {
   type ListingInput,
 } from "@/lib/market";
 import type { Profile } from "@/lib/auth";
+import { PHOTO_OF_OTHERS, photosOfOthers } from "@/lib/services/photos";
 
 /**
  * Pazar's writes, shared by the website's server actions (app/pazar/actions.ts) and the mobile app's
@@ -48,6 +49,9 @@ export async function saveListingFor(profile: Profile, raw: Partial<Record<keyof
 
   if (id) {
     if (!isUuid(id)) return { ok: false, errors: {}, message: "İlan bulunamadı." };
+    // Checked against the seller, so an admin editing someone's ad keeps that person's photos.
+    const owner = admin ? await sql()`select seller_id from listings where id = ${id}` : [{ seller_id: profile.userId }];
+    if (owner[0] && (await photosOfOthers(v.photos, String(owner[0].seller_id)))) return { ok: false, errors: { photos: PHOTO_OF_OTHERS } };
     const rows = await sql()`
       update listings set title = ${v.title}, category = ${v.category}, condition = ${v.condition}, price = ${v.price},
         unit = ${v.unit}, quantity = ${v.quantity}, negotiable = ${v.negotiable}, province = ${v.province},
@@ -59,6 +63,7 @@ export async function saveListingFor(profile: Profile, raw: Partial<Record<keyof
     return { ok: true, id, created: false };
   }
 
+  if (await photosOfOthers(v.photos, profile.userId)) return { ok: false, errors: { photos: PHOTO_OF_OTHERS } };
   const recent = await sql()`select count(*) as n from listings where seller_id = ${profile.userId} and created_at > now() - interval '24 hours'`;
   if (Number(recent[0].n) >= DAILY_LISTING_LIMIT) {
     return { ok: false, errors: {}, message: `Bir günde en fazla ${DAILY_LISTING_LIMIT} ilan verebilirsiniz. Yarın yeniden deneyin.` };

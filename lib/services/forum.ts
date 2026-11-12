@@ -1,5 +1,4 @@
 import "server-only";
-import { del } from "@vercel/blob";
 import { iso, isUuid, sql, str } from "@/lib/db";
 import {
   DAILY_TOPIC_LIMIT,
@@ -16,6 +15,7 @@ import {
 } from "@/lib/forum";
 import { notify, usersByHandle } from "@/lib/services/notifications";
 import { forumCategories } from "@/lib/forum-categories";
+import { PHOTO_OF_OTHERS, deletePhotosNoLongerUsed, photosOfOthers } from "@/lib/services/photos";
 
 /**
  * The forum's writes, shared by the website's server actions (app/forum/actions.ts) and the mobile
@@ -25,16 +25,8 @@ import { forumCategories } from "@/lib/forum-categories";
 const s = (v: unknown) => (typeof v === "string" ? v : "");
 const photoList = (v: unknown) => (Array.isArray(v) ? v.filter((p): p is string => typeof p === "string") : []);
 
-/** Removes uploaded forum photos (best effort: a post is gone either way). */
-async function dropPhotos(urls: string[]) {
-  const own = urls.filter(isForumPhotoUrl);
-  if (!own.length) return;
-  try {
-    await del(own);
-  } catch (err) {
-    console.error("forum: photos", err);
-  }
-}
+/** Removes forum photos taken off a post, unless another post still shows them (lib/services/photos.ts). */
+const dropPhotos = (urls: string[]) => deletePhotosNoLongerUsed(urls, isForumPhotoUrl, "forum");
 
 export type CreateTopicOutcome = { ok: true; id: string } | { ok: false; errors: TopicErrors; message?: string };
 
@@ -55,6 +47,7 @@ export async function createTopicFor(userId: string, raw: Partial<Record<keyof T
   const t = cleanTopic(raw);
   const errors = await topicErrors(t);
   if (Object.keys(errors).length) return { ok: false, errors };
+  if (await photosOfOthers(t.photos, userId)) return { ok: false, errors: { photos: PHOTO_OF_OTHERS } };
   const recent = await sql()`select count(*) as n from forum_topics where author_id = ${userId} and created_at > now() - interval '24 hours'`;
   if (Number(recent[0].n) >= DAILY_TOPIC_LIMIT) return { ok: false, errors: {}, message: `Bir günde en fazla ${DAILY_TOPIC_LIMIT} konu açabilirsiniz. Yarın yeniden deneyin.` };
   const rows = await sql()`
@@ -76,9 +69,11 @@ export async function updateTopicFor(userId: string, admin: boolean, topicId: st
   const errors = await topicErrors(t);
   if (Object.keys(errors).length) return { ok: false, errors };
   const found = admin
-    ? await sql()`select photos from forum_topics where id = ${topicId}`
-    : await sql()`select photos from forum_topics where id = ${topicId} and author_id = ${userId}`;
+    ? await sql()`select author_id, photos from forum_topics where id = ${topicId}`
+    : await sql()`select author_id, photos from forum_topics where id = ${topicId} and author_id = ${userId}`;
   if (!found[0]) return { ok: false, errors: {}, message: "Bu konuyu düzenleyemezsiniz." };
+  // Checked against the author, so an admin editing someone's topic keeps that person's photos.
+  if (await photosOfOthers(t.photos, str(found[0].author_id))) return { ok: false, errors: { photos: PHOTO_OF_OTHERS } };
   await sql()`
     update forum_topics set category = ${t.category}, title = ${t.title}, body = ${t.body}, photos = ${t.photos},
       search_text = ${topicSearchText(t.title, t.body)}, edited_at = now()
@@ -125,6 +120,7 @@ export async function replyFor(userId: string, topicId: string, raw: ReplyInput)
   const invalid = validateReply(body, photos);
   if (invalid) return { ok: false, message: invalid };
   if (parentId && !isUuid(parentId)) return { ok: false, message: "Yanıt verdiğiniz yanıt bulunamadı." };
+  if (await photosOfOthers(photos, userId)) return { ok: false, message: PHOTO_OF_OTHERS };
   const recent = await sql()`select count(*) as n from forum_replies where author_id = ${userId} and created_at > now() - interval '10 minutes'`;
   if (Number(recent[0].n) >= REPLY_BURST_LIMIT) return { ok: false, message: "Çok hızlı yanıt yazdınız; birkaç dakika sonra yeniden deneyin." };
 
