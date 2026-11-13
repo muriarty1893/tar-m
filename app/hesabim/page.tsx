@@ -7,6 +7,7 @@ import { ProfileForm } from "@/components/account/ProfileForm";
 import { DeleteAccount, SecurityControls } from "@/components/account/AccountControls";
 import { ensureProfile, isAdmin, requireUserId } from "@/lib/auth";
 import { safeReturnPath } from "@/lib/sign-in-href";
+import { suspendedMessage } from "@/lib/services/members";
 
 export const metadata: Metadata = { title: "Hesabım", robots: { index: false } };
 
@@ -34,10 +35,19 @@ async function Account({ searchParams }: { searchParams: PageProps<"/hesabim">["
   const sp = await searchParams;
   const next = safeReturnPath(sp.devam, "");
   const userId = await requireUserId("/hesabim");
-  const profile = await ensureProfile(userId);
+  const [profile, suspended] = await Promise.all([ensureProfile(userId), suspendedMessage(userId)]);
 
   return (
     <div className="space-y-3 sm:space-y-4">
+      {suspended && (
+        <p role="status" className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2.5 text-[0.9375rem] font-medium text-destructive">
+          {suspended} Bir yanlışlık olduğunu düşünüyorsanız{" "}
+          <Link href="/is-birligi" className="underline underline-offset-4">
+            bize yazın
+          </Link>
+          .
+        </p>
+      )}
       {next && !profile.name && (
         <p role="status" className="rounded-md border border-gold/30 bg-gold-soft px-3 py-2.5 text-[0.9375rem] font-medium">
           Devam etmeden önce adınızı yazın: ilanlarınızda ve mesajlarda bu ad görünecek.
@@ -67,7 +77,7 @@ async function Account({ searchParams }: { searchParams: PageProps<"/hesabim">["
           {(await isAdmin(userId)) && (
             <li>
               <Link href="/yonetim" className="flex min-h-12 items-center gap-3 rounded-md border border-border bg-card px-3 text-[0.9375rem] font-semibold hover:bg-secondary">
-                Yönetim paneli: haberler ve şikâyetler
+                Yönetim paneli: üyeler, haberler, şikâyetler
               </Link>
             </li>
           )}

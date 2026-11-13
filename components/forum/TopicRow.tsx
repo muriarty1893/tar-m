@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ChatCircleTextIcon, EyeIcon, HeartIcon, ImageIcon } from "@phosphor-icons/react/dist/ssr";
+import { ChatCircleTextIcon, EyeIcon, HeartIcon, ImageIcon, LockSimpleIcon, PushPinIcon } from "@phosphor-icons/react/dist/ssr";
 import { Avatar } from "@/components/market/Avatar";
 import { CategoryChip } from "@/components/forum/parts";
 import { categoryName, type ForumCats } from "@/lib/forum";
@@ -13,6 +13,28 @@ const shortName = (name: string) => {
   const last = rest.at(-1);
   return last ? `${first} ${last.charAt(0).toLocaleUpperCase("tr-TR")}.` : first;
 };
+
+/** A pin before a pinned topic's title, a lock after a locked one's. */
+function Marks({ topic: t }: { topic: TopicCard }) {
+  return (
+    <>
+      {t.pinned && (
+        <span className="mr-1 inline-flex items-center align-[-2px] text-primary">
+          <PushPinIcon aria-hidden="true" weight="fill" className="size-3.5" />
+          <span className="sr-only">Sabit konu: </span>
+        </span>
+      )}
+    </>
+  );
+}
+
+const Lock = ({ topic: t }: { topic: TopicCard }) =>
+  t.locked ? (
+    <span className="ml-1 inline-flex items-center align-[-2px] text-muted-foreground">
+      <LockSimpleIcon aria-hidden="true" weight="fill" className="size-3.5" />
+      <span className="sr-only"> (yanıtlara kapalı)</span>
+    </span>
+  ) : null;
 
 /** Replies and views at the end of a topic's line. */
 function Counts({ topic: t, className = "" }: { topic: TopicCard; className?: string }) {
@@ -46,7 +68,11 @@ export function TopicRow({ topic: t, cats, now, showLastReply = false, dense = f
     return (
       <li>
         <Link href={`/forum/${t.id}`} className="block px-3 py-2 transition-colors hover:bg-muted/50 focus-visible:outline-offset-[-3px]">
-          <span className="block truncate font-medium leading-snug text-foreground">{t.title}</span>
+          <span className="block truncate font-medium leading-snug text-foreground">
+            <Marks topic={t} />
+            {t.title}
+            <Lock topic={t} />
+          </span>
           <span className="mt-0.5 flex items-center gap-2 text-[12px] leading-5 text-muted-foreground">
             <span className="min-w-0 truncate">
               {categoryName(cats, t.category)} · {when} · {who}
@@ -63,7 +89,11 @@ export function TopicRow({ topic: t, cats, now, showLastReply = false, dense = f
       <Link href={`/forum/${t.id}`} className="flex items-start gap-3 px-3.5 py-3 transition-colors hover:bg-secondary focus-visible:outline-offset-[-3px] sm:px-4">
         <Avatar id={t.authorId} name={t.authorName} photo={t.authorPhoto} size={38} />
         <span className="min-w-0 flex-1">
-          <span className="line-clamp-2 font-semibold leading-snug text-foreground">{t.title}</span>
+          <span className="line-clamp-2 font-semibold leading-snug text-foreground">
+            <Marks topic={t} />
+            {t.title}
+            <Lock topic={t} />
+          </span>
           <span className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-sm leading-5 text-muted-foreground">
             <CategoryChip cats={cats} category={t.category} size="sm" />
             <span className="max-w-[10rem] truncate">{t.authorName}</span>

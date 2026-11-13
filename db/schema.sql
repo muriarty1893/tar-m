@@ -287,3 +287,40 @@ create table if not exists news_imports (
   skipped    text,
   created_at timestamptz not null default now()
 );
+
+-- Yönetim, more control (2026-11-13).
+-- Üyeler: an admin can suspend someone: they can still sign in and read, but not post, reply, list,
+-- edit or message until unsuspended.
+alter table profiles add column if not exists suspended_at timestamptz;
+alter table profiles add column if not exists suspended_reason text check (suspended_reason is null or char_length(suspended_reason) <= 300);
+-- Forum: a pinned topic leads its lists; a locked one takes no new replies (admins still can).
+alter table forum_topics add column if not exists pinned_at timestamptz;
+alter table forum_topics add column if not exists locked_at timestamptz;
+create index if not exists forum_topics_pinned_idx on forum_topics (pinned_at) where pinned_at is not null;
+-- The home page's two ad spaces, edited in Yönetim → Reklam: 'sponsor' (the sponsor strip) and
+-- 'reklam' (the "Bu alanda reklam vermek için" box). `sample` marks placeholder content as "örnek".
+create table if not exists site_slots (
+  id         text primary key check (id in ('sponsor', 'reklam')),
+  enabled    boolean not null default true,
+  name       text not null default '' check (char_length(name) <= 60),
+  text       text not null default '' check (char_length(text) <= 120),
+  url        text not null default '' check (char_length(url) <= 300),
+  sample     boolean not null default false,
+  updated_at timestamptz not null default now(),
+  updated_by text
+);
+insert into site_slots (id, enabled, name, text, url, sample) values
+  ('sponsor', true, 'sukocu.com', 'Yakıtsız, elektriksiz su pompası', '', true),
+  ('reklam', true, 'İletişim', 'Bu alanda reklam vermek için', '/is-birligi', false)
+on conflict (id) do nothing;
+-- What admins did, newest first (Yönetim → Kayıtlar). Kept when the admin or the target is gone.
+create table if not exists admin_log (
+  id          uuid primary key default gen_random_uuid(),
+  admin_id    text not null,
+  action      text not null,
+  target_type text not null,
+  target_id   text,
+  summary     text not null default '' check (char_length(summary) <= 300),
+  created_at  timestamptz not null default now()
+);
+create index if not exists admin_log_created_idx on admin_log (created_at desc);

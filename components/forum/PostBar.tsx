@@ -62,6 +62,7 @@ export function PostBar({
   signInHref,
   canEdit = false,
   body = "",
+  canReply = true,
 }: {
   topicId: string;
   reply?: ReplyTarget | null;
@@ -77,6 +78,8 @@ export function PostBar({
   canEdit?: boolean;
   /** A reply's current text, for editing it in place. */
   body?: string;
+  /** False on a locked topic (admins can still answer). */
+  canReply?: boolean;
 }) {
   const [replying, setReplying] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -86,6 +89,7 @@ export function PostBar({
       <div className="flex flex-wrap items-center gap-x-4">
         <LikeButton topicId={topicId} replyId={reply?.id ?? null} liked={liked} count={likeCount} />
         {reply &&
+          canReply &&
           (signInHref ? (
             <a href={signInHref} className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-muted-foreground underline-offset-4 hover:text-primary hover:underline">
               <ArrowBendUpLeftIcon aria-hidden="true" weight="bold" className="size-4" />

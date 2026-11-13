@@ -16,6 +16,9 @@ import {
 import { notify, usersByHandle } from "@/lib/services/notifications";
 import { forumCategories } from "@/lib/forum-categories";
 import { PHOTO_OF_OTHERS, deletePhotosNoLongerUsed, photosOfOthers } from "@/lib/services/photos";
+import { suspendedMessage } from "@/lib/services/members";
+import { isAdmin } from "@/lib/auth";
+import { logAdmin } from "@/lib/services/admin-log";
 
 /**
  * The forum's writes, shared by the website's server actions (app/forum/actions.ts) and the mobile
@@ -48,6 +51,8 @@ export async function createTopicFor(userId: string, raw: Partial<Record<keyof T
   const errors = await topicErrors(t);
   if (Object.keys(errors).length) return { ok: false, errors };
   if (await photosOfOthers(t.photos, userId)) return { ok: false, errors: { photos: PHOTO_OF_OTHERS } };
+  const suspended = await suspendedMessage(userId);
+  if (suspended) return { ok: false, errors: {}, message: suspended };
   const recent = await sql()`select count(*) as n from forum_topics where author_id = ${userId} and created_at > now() - interval '24 hours'`;
   if (Number(recent[0].n) >= DAILY_TOPIC_LIMIT) return { ok: false, errors: {}, message: `Bir günde en fazla ${DAILY_TOPIC_LIMIT} konu açabilirsiniz. Yarın yeniden deneyin.` };
   const rows = await sql()`
@@ -65,6 +70,8 @@ export async function createTopicFor(userId: string, raw: Partial<Record<keyof T
  */
 export async function updateTopicFor(userId: string, admin: boolean, topicId: string, raw: Partial<Record<keyof TopicInput, unknown>>): Promise<CreateTopicOutcome> {
   if (!isUuid(topicId)) return { ok: false, errors: {}, message: "Konu bulunamadı." };
+  const suspended = admin ? null : await suspendedMessage(userId);
+  if (suspended) return { ok: false, errors: {}, message: suspended };
   const t = cleanTopic(raw);
   const errors = await topicErrors(t);
   if (Object.keys(errors).length) return { ok: false, errors };
@@ -80,20 +87,24 @@ export async function updateTopicFor(userId: string, admin: boolean, topicId: st
     where id = ${topicId}`;
   const before = (found[0].photos as string[] | null) ?? [];
   await dropPhotos(before.filter((p) => !t.photos.includes(p)));
+  if (admin && str(found[0].author_id) !== userId) await logAdmin(userId, "Konuyu düzenledi", "konu", topicId, t.title);
   return { ok: true, id: topicId };
 }
 
 /** The author (or an admin) changes a reply's text; its photos stay. Returns the topic's id. */
 export async function updateReplyFor(userId: string, admin: boolean, replyId: string, rawBody: unknown): Promise<{ ok: true; topicId: string } | { ok: false; message: string }> {
   if (!isUuid(replyId)) return { ok: false, message: "Yanıt bulunamadı." };
+  const suspended = admin ? null : await suspendedMessage(userId);
+  if (suspended) return { ok: false, message: suspended };
   const found = admin
-    ? await sql()`select topic_id, photos from forum_replies where id = ${replyId} and deleted_at is null`
-    : await sql()`select topic_id, photos from forum_replies where id = ${replyId} and author_id = ${userId} and deleted_at is null`;
+    ? await sql()`select topic_id, author_id, photos from forum_replies where id = ${replyId} and deleted_at is null`
+    : await sql()`select topic_id, author_id, photos from forum_replies where id = ${replyId} and author_id = ${userId} and deleted_at is null`;
   if (!found[0]) return { ok: false, message: "Bu yanıtı düzenleyemezsiniz." };
   const body = s(rawBody).replace(/\r\n/g, "\n").trim();
   const invalid = validateReply(body, (found[0].photos as string[] | null) ?? []);
   if (invalid) return { ok: false, message: invalid };
   await sql()`update forum_replies set body = ${body}, edited_at = now() where id = ${replyId}`;
+  if (admin && str(found[0].author_id) !== userId) await logAdmin(userId, "Yanıtı düzenledi", "yanıt", str(found[0].topic_id), body.slice(0, 120));
   return { ok: true, topicId: str(found[0].topic_id) };
 }
 
@@ -121,11 +132,14 @@ export async function replyFor(userId: string, topicId: string, raw: ReplyInput)
   if (invalid) return { ok: false, message: invalid };
   if (parentId && !isUuid(parentId)) return { ok: false, message: "Yanıt verdiğiniz yanıt bulunamadı." };
   if (await photosOfOthers(photos, userId)) return { ok: false, message: PHOTO_OF_OTHERS };
+  const suspended = await suspendedMessage(userId);
+  if (suspended) return { ok: false, message: suspended };
   const recent = await sql()`select count(*) as n from forum_replies where author_id = ${userId} and created_at > now() - interval '10 minutes'`;
   if (Number(recent[0].n) >= REPLY_BURST_LIMIT) return { ok: false, message: "Çok hızlı yanıt yazdınız; birkaç dakika sonra yeniden deneyin." };
 
-  const topic = await sql()`select author_id from forum_topics where id = ${topicId}`;
+  const topic = await sql()`select author_id, locked_at from forum_topics where id = ${topicId}`;
   if (!topic[0]) return { ok: false, message: "Konu bulunamadı; silinmiş olabilir." };
+  if (topic[0].locked_at && !(await isAdmin(userId))) return { ok: false, message: "Bu konu yanıtlara kapatıldı." };
   let answered = str(topic[0].author_id);
   if (parentId) {
     const parent = await sql()`select author_id from forum_replies where id = ${parentId} and topic_id = ${topicId} and deleted_at is null`;
@@ -148,9 +162,10 @@ export async function replyFor(userId: string, topicId: string, raw: ReplyInput)
 export async function deleteTopicFor(userId: string, admin: boolean, topicId: string): Promise<boolean> {
   if (!isUuid(topicId)) return false;
   const rows = admin
-    ? await sql()`delete from forum_topics where id = ${topicId} returning id, photos`
-    : await sql()`delete from forum_topics where id = ${topicId} and author_id = ${userId} returning id, photos`;
+    ? await sql()`delete from forum_topics where id = ${topicId} returning id, photos, author_id, title`
+    : await sql()`delete from forum_topics where id = ${topicId} and author_id = ${userId} returning id, photos, author_id, title`;
   if (!rows[0]) return false;
+  if (admin && str(rows[0].author_id) !== userId) await logAdmin(userId, "Konuyu sildi", "konu", topicId, str(rows[0].title));
   // The replies went with the topic (on delete cascade); their photos are gathered first below.
   return true;
 }
@@ -180,10 +195,11 @@ export async function deleteTopicWithPhotos(userId: string, admin: boolean, topi
 export async function deleteReplyFor(userId: string, admin: boolean, replyId: string): Promise<string | null> {
   if (!isUuid(replyId)) return null;
   const found = admin
-    ? await sql()`select id, topic_id, parent_id, photos from forum_replies where id = ${replyId} and deleted_at is null`
-    : await sql()`select id, topic_id, parent_id, photos from forum_replies where id = ${replyId} and author_id = ${userId} and deleted_at is null`;
+    ? await sql()`select id, topic_id, parent_id, photos, author_id, body from forum_replies where id = ${replyId} and deleted_at is null`
+    : await sql()`select id, topic_id, parent_id, photos, author_id, body from forum_replies where id = ${replyId} and author_id = ${userId} and deleted_at is null`;
   const reply = found[0];
   if (!reply) return null;
+  if (admin && str(reply.author_id) !== userId) await logAdmin(userId, "Yanıtı sildi", "yanıt", str(reply.topic_id), str(reply.body).slice(0, 120));
   const topicId = str(reply.topic_id);
   const answered = await sql()`select 1 from forum_replies where parent_id = ${replyId} limit 1`;
   if (answered.length) {
@@ -307,7 +323,26 @@ export async function moderateForumFor(adminId: string, raw: { topicId?: unknown
     return replyId ? (await deleteReplyFor(adminId, true, replyId)) !== null : deleteTopicWithPhotos(adminId, true, topicId);
   }
   if (raw.action !== "dismiss") return false;
+  await logAdmin(adminId, replyId ? "Yanıt şikâyetlerini kapattı" : "Konu şikâyetlerini kapattı", replyId ? "yanıt" : "konu", topicId);
   if (replyId) await sql()`update forum_reports set resolved_at = now() where reply_id = ${replyId} and resolved_at is null`;
   else await sql()`update forum_reports set resolved_at = now() where topic_id = ${topicId} and reply_id is null and resolved_at is null`;
   return true;
+}
+
+/** An admin pins a topic (it leads the lists) or unpins it. Returns its title, or null if it's gone. */
+export async function setPinnedFor(topicId: string, pinned: boolean): Promise<string | null> {
+  if (!isUuid(topicId)) return null;
+  const rows = pinned
+    ? await sql()`update forum_topics set pinned_at = coalesce(pinned_at, now()) where id = ${topicId} returning title`
+    : await sql()`update forum_topics set pinned_at = null where id = ${topicId} returning title`;
+  return rows[0] ? str(rows[0].title) : null;
+}
+
+/** An admin closes a topic to new replies, or opens it again. Returns its title, or null if it's gone. */
+export async function setLockedFor(topicId: string, locked: boolean): Promise<string | null> {
+  if (!isUuid(topicId)) return null;
+  const rows = locked
+    ? await sql()`update forum_topics set locked_at = coalesce(locked_at, now()) where id = ${topicId} returning title`
+    : await sql()`update forum_topics set locked_at = null where id = ${topicId} returning title`;
+  return rows[0] ? str(rows[0].title) : null;
 }

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { ArrowBendDownRightIcon, CaretRightIcon, ChatsTeardropIcon, CheckCircleIcon } from "@phosphor-icons/react/dist/ssr";
+import { ArrowBendDownRightIcon, CaretRightIcon, ChatsTeardropIcon, CheckCircleIcon, LockSimpleIcon, PushPinIcon } from "@phosphor-icons/react/dist/ssr";
+import { TopicAdminBar } from "@/components/forum/TopicAdminBar";
 import { Avatar } from "@/components/market/Avatar";
 import { CountView } from "@/components/forum/CountView";
 import { CategoryChip, repliesLabel } from "@/components/forum/parts";
@@ -74,7 +75,22 @@ async function Topic({ params, searchParams }: { params: PageProps<"/forum/[id]"
       )}
 
       <header className="space-y-4 border-y border-border bg-card p-4 sm:rounded-xl sm:border-x sm:p-5">
-        <CategoryChip cats={cats} category={topic.category} />
+        <div className="flex flex-wrap items-center gap-2">
+          <CategoryChip cats={cats} category={topic.category} />
+          {topic.pinned && (
+            <span className="inline-flex items-center gap-1 rounded bg-secondary px-1.5 text-xs font-semibold leading-6 text-primary">
+              <PushPinIcon aria-hidden="true" weight="fill" className="size-3.5" />
+              Sabit konu
+            </span>
+          )}
+          {topic.locked && (
+            <span className="inline-flex items-center gap-1 rounded bg-muted px-1.5 text-xs font-semibold leading-6 text-muted-foreground">
+              <LockSimpleIcon aria-hidden="true" weight="fill" className="size-3.5" />
+              Yanıtlara kapalı
+            </span>
+          )}
+        </div>
+        {admin && <TopicAdminBar topicId={topic.id} pinned={topic.pinned} locked={topic.locked} />}
         <h1 className="text-xl font-bold leading-tight tracking-tight sm:text-2xl">{topic.title}</h1>
         <div className="flex items-center gap-3">
           <Avatar id={topic.authorId} name={topic.authorName} photo={topic.authorPhoto} size={44} />
@@ -126,7 +142,14 @@ async function Topic({ params, searchParams }: { params: PageProps<"/forum/[id]"
             ))}
           </ol>
         )}
-        <ReplyForm topicId={topic.id} signInHref={signIn} />
+        {topic.locked && !admin ? (
+          <p className="flex items-center gap-2 rounded-md border border-border bg-muted/40 px-4 py-3 text-muted-foreground">
+            <LockSimpleIcon aria-hidden="true" weight="fill" className="size-5 shrink-0" />
+            Bu konu yöneticiler tarafından yanıtlara kapatıldı.
+          </p>
+        ) : (
+          <ReplyForm topicId={topic.id} signInHref={signIn} />
+        )}
       </section>
     </article>
   );
@@ -192,6 +215,7 @@ function Reply({
         likeCount={r.likeCount}
         canDelete={r.mine || admin}
         canEdit={r.mine || admin}
+        canReply={!topic.locked || admin}
         body={r.body}
         canReport={Boolean(userId) && !r.mine}
         reported={r.reported}

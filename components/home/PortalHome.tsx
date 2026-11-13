@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { PlusIcon, StorefrontIcon } from "@phosphor-icons/react/dist/ssr";
 import { AdvertiseBox, SponsorBanner } from "@/components/home/AdSlots";
+import { getSlots } from "@/lib/site-slots";
 import { BorsaWeather } from "@/components/home/BorsaWeather";
 import { NewsTicker } from "@/components/home/NewsTicker";
 import { LiveSearch } from "@/components/search/LiveSearch";
@@ -26,16 +27,21 @@ const PHONE_ADS = 3;
  * the two ad strips share a line, hava shows five days, Pazar five ads, and the forum's sections sit
  * beside the topics.
  */
+/** The sponsor and "reklam" strips as set in Yönetim → Reklam; a switched-off one leaves its place to the other. */
+async function AdStrips() {
+  const { sponsor, reklam } = await getSlots();
+  const shown = [sponsor.enabled && <SponsorBanner key="s" slot={sponsor} />, reklam.enabled && <AdvertiseBox key="r" slot={reklam} />].filter(Boolean);
+  if (!shown.length) return null;
+  return <div className={`space-y-2 xl:gap-3 xl:space-y-0 ${shown.length === 2 ? "xl:grid xl:grid-cols-2" : ""}`}>{shown}</div>;
+}
+
 export function PortalHome() {
   return (
     <div className="text-[13px] leading-[1.45]">
       <div className="mx-auto max-w-3xl space-y-2 p-2 pb-4 sm:p-3 xl:max-w-6xl xl:space-y-3 xl:px-4 xl:py-4">
         <h1 className="sr-only">{siteConfig.name}: çiftçi forumu, pazar ve hava durumu</h1>
         <LiveSearch id="ana-ara" />
-        <div className="space-y-2 xl:grid xl:grid-cols-2 xl:gap-3 xl:space-y-0">
-          <SponsorBanner />
-          <AdvertiseBox />
-        </div>
+        <AdStrips />
         <Suspense>
           <NewsTicker />
         </Suspense>

@@ -19,8 +19,8 @@ export const PUT = handler<{ id: string }>(async (req, { id }) => {
 });
 
 export const DELETE = handler<{ id: string }>(async (req, { id }) => {
-  await requireAppAdmin(req);
-  if (!(await deleteArticleFor(id))) throw new ApiError(404, "Haber bulunamadı.");
+  const adminId = await requireAppAdmin(req);
+  if (!(await deleteArticleFor(adminId, id))) throw new ApiError(404, "Haber bulunamadı.");
   expireTag(NEWS_TAG);
   return json({ ok: true });
 });

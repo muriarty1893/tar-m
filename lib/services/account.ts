@@ -53,6 +53,8 @@ export async function deleteAccountFor(userId: string) {
   const photos = rows.flatMap((r) => (r.photos as string[] | null) ?? []);
   await sql()`delete from profiles where user_id = ${userId}`;
   await deletePhotosNoLongerUsed(photos, (p) => isOwnPhotoUrl(p) || isForumPhotoUrl(p), "deleteAccount");
+  // Sample members ("demo_…") have no Clerk account.
+  if (!userId.startsWith("user_")) return;
   const clerk = await clerkClient();
   await clerk.users.deleteUser(userId);
 }

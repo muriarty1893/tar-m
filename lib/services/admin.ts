@@ -3,6 +3,7 @@ import { del } from "@vercel/blob";
 import { iso, isUuid, sql, str } from "@/lib/db";
 import { isArticleKind, validateArticle, type ArticleErrors, type ArticleInput } from "@/lib/news";
 import { REPORT_REASONS } from "@/lib/market";
+import { logAdmin } from "@/lib/services/admin-log";
 
 /**
  * The admin dashboard's reads and writes (news, reports), shared by /yonetim (app/yonetim/actions.ts)
@@ -13,10 +14,12 @@ export type ModerateAction = "remove" | "dismiss";
 export const isModerateAction = (s: unknown): s is ModerateAction => s === "remove" || s === "dismiss";
 
 /** A moderator removes the reported listing, or dismisses its reports. Either way they are closed. Returns whether the listing was removed. */
-export async function moderateFor(listingId: string, action: ModerateAction): Promise<boolean> {
+export async function moderateFor(adminId: string, listingId: string, action: ModerateAction): Promise<boolean> {
   if (!isUuid(listingId) || !isModerateAction(action)) return false;
   if (action === "remove") await sql()`update listings set status = 'removed', updated_at = now() where id = ${listingId}`;
   await sql()`update reports set resolved_at = now() where listing_id = ${listingId} and resolved_at is null`;
+  const title = (await sql()`select title from listings where id = ${listingId}`)[0]?.title;
+  await logAdmin(adminId, action === "remove" ? "Şikâyet edilen ilanı kaldırdı" : "İlan şikâyetlerini kapattı", "ilan", listingId, str(title));
   return action === "remove";
 }
 
@@ -61,6 +64,7 @@ export async function saveArticleFor(adminId: string, raw: Partial<Record<keyof 
     // A replaced or removed cover upload is deleted from Blob storage.
     const old = before[0].cover as string | null;
     if (old && old !== a.cover && isOwnCover(old)) await del(old).catch(() => {});
+    await logAdmin(adminId, "Haberi düzenledi", "haber", id, a.title);
     return { errors: {}, saved: true, id };
   }
 
@@ -68,12 +72,14 @@ export async function saveArticleFor(adminId: string, raw: Partial<Record<keyof 
     insert into articles (slug, title, summary, body, cover, published_on, status, kind, author_id)
     values (${a.slug}, ${a.title}, ${a.summary}, ${a.body}, ${a.cover || null}, ${a.date}, ${a.status}, ${a.kind}, ${adminId})
     returning id`;
+  await logAdmin(adminId, a.status === "published" ? "Haber yayımladı" : "Taslak haber ekledi", "haber", String(rows[0].id), a.title);
   return { errors: {}, saved: true, id: String(rows[0].id), created: true };
 }
 
-export async function deleteArticleFor(id: string): Promise<boolean> {
+export async function deleteArticleFor(adminId: string, id: string): Promise<boolean> {
   if (!isUuid(id)) return false;
-  const rows = await sql()`delete from articles where id = ${id} returning cover`;
+  const rows = await sql()`delete from articles where id = ${id} returning cover, title`;
+  if (rows[0]) await logAdmin(adminId, "Haberi sildi", "haber", id, str(rows[0].title));
   const cover = rows[0]?.cover as string | null | undefined;
   if (isOwnCover(cover)) await del(cover!).catch(() => {});
   return rows.length > 0;

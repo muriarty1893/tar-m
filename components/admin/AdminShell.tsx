@@ -1,15 +1,18 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ChartBarIcon, ChatsTeardropIcon, FlagIcon, NewspaperIcon } from "@phosphor-icons/react/dist/ssr";
+import { ChartBarIcon, ChatsTeardropIcon, ClockCounterClockwiseIcon, FlagIcon, MegaphoneIcon, NewspaperIcon, UsersIcon } from "@phosphor-icons/react/dist/ssr";
 import { ToolHeader } from "@/components/tool/ToolHeader";
 
-export type AdminSection = "genel" | "haberler" | "forum" | "sikayetler";
+export type AdminSection = "genel" | "uyeler" | "haberler" | "forum" | "sikayetler" | "reklam" | "kayitlar";
 
 const TABS: { id: AdminSection; href: string; label: string; short: string; Icon: typeof NewspaperIcon }[] = [
   { id: "genel", href: "/yonetim", label: "Genel bakış", short: "Genel", Icon: ChartBarIcon },
+  { id: "uyeler", href: "/yonetim/uyeler", label: "Üyeler", short: "Üyeler", Icon: UsersIcon },
   { id: "haberler", href: "/yonetim/haberler", label: "Haberler", short: "Haberler", Icon: NewspaperIcon },
   { id: "forum", href: "/yonetim/forum", label: "Forum kategorileri", short: "Kategoriler", Icon: ChatsTeardropIcon },
   { id: "sikayetler", href: "/yonetim/sikayetler", label: "Şikâyetler", short: "Şikâyetler", Icon: FlagIcon },
+  { id: "reklam", href: "/yonetim/reklam", label: "Reklam alanları", short: "Reklam", Icon: MegaphoneIcon },
+  { id: "kayitlar", href: "/yonetim/kayitlar", label: "Kayıtlar", short: "Kayıtlar", Icon: ClockCounterClockwiseIcon },
 ];
 
 /** The admin dashboard's frame: title, the section tabs and the page's own actions. */

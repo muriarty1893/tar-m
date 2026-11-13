@@ -14,6 +14,8 @@ import {
 } from "@/lib/market";
 import type { Profile } from "@/lib/auth";
 import { PHOTO_OF_OTHERS, photosOfOthers } from "@/lib/services/photos";
+import { suspendedMessage } from "@/lib/services/members";
+import { logAdmin } from "@/lib/services/admin-log";
 
 /**
  * Pazar's writes, shared by the website's server actions (app/pazar/actions.ts) and the mobile app's
@@ -42,6 +44,8 @@ export type SaveListingOutcome = { ok: true; id: string; created: boolean } | { 
 
 /** Posts a new listing, or saves the owner's (or, with `admin`, a moderator's) changes to `id`. */
 export async function saveListingFor(profile: Profile, raw: Partial<Record<keyof ListingInput, unknown>>, id?: string, admin = false): Promise<SaveListingOutcome> {
+  const suspended = admin ? null : await suspendedMessage(profile.userId);
+  if (suspended) return { ok: false, errors: {}, message: suspended };
   const input = cleanListing(raw);
   const errors = validateListing(input);
   if (Object.keys(errors).length) return { ok: false, errors };
@@ -60,6 +64,7 @@ export async function saveListingFor(profile: Profile, raw: Partial<Record<keyof
       where id = ${id} and ((seller_id = ${profile.userId} and status <> 'removed') or ${admin}::boolean)
       returning id`;
     if (!rows[0]) return { ok: false, errors: {}, message: "Bu ilanı düzenleyemezsiniz." };
+    if (admin && owner[0] && String(owner[0].seller_id) !== profile.userId) await logAdmin(profile.userId, "İlanı düzenledi", "ilan", id, v.title);
     return { ok: true, id, created: false };
   }
 
@@ -88,8 +93,10 @@ export const isListingStatusChange = (s: unknown): s is ListingStatusChange => s
 export async function setListingStatusFor(userId: string, admin: boolean, id: string, status: ListingStatusChange): Promise<boolean> {
   if (!isUuid(id) || !isListingStatusChange(status)) return false;
   const rows = admin
-    ? await sql()`update listings set status = ${status}, updated_at = now() where id = ${id} returning id`
-    : await sql()`update listings set status = ${status}, updated_at = now() where id = ${id} and seller_id = ${userId} and status <> 'removed' returning id`;
+    ? await sql()`update listings set status = ${status}, updated_at = now() where id = ${id} returning id, seller_id, title`
+    : await sql()`update listings set status = ${status}, updated_at = now() where id = ${id} and seller_id = ${userId} and status <> 'removed' returning id, seller_id, title`;
+  const label = { active: "yayına aldı", sold: "satıldı yaptı", removed: "kaldırdı" }[status];
+  if (admin && rows[0] && String(rows[0].seller_id) !== userId) await logAdmin(userId, `İlanı ${label}`, "ilan", id, String(rows[0].title));
   return rows.length > 0;
 }
 
@@ -128,6 +135,8 @@ export type StartConversationOutcome = { ok: true; conversationId: string } | { 
  */
 export async function startConversationFor(userId: string, listingId: string, text: unknown, offer: unknown): Promise<StartConversationOutcome> {
   if (!isUuid(listingId)) return { ok: false, message: "İlan bulunamadı." };
+  const suspended = await suspendedMessage(userId);
+  if (suspended) return { ok: false, message: suspended };
   const body = String(text ?? "").trim();
   const offerText = String(offer ?? "").trim();
   const isOffer = Boolean(offerText);

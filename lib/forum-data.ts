@@ -32,6 +32,10 @@ export type TopicCard = {
   photoCount: number;
   /** When the author or an admin last changed it. */
   editedAt: string | null;
+  /** An admin pinned it: it leads the forum's lists. */
+  pinned: boolean;
+  /** An admin closed it to new replies. */
+  locked: boolean;
 };
 
 const EXCERPT = 160;
@@ -60,6 +64,8 @@ const toCard = (r: Row, now: Date): TopicCard => {
     photo: photos[0] ?? null,
     photoCount: photos.length,
     editedAt: r.edited_at ? iso(r.edited_at) : null,
+    pinned: r.pinned_at != null,
+    locked: r.locked_at != null,
   };
 };
 
@@ -79,14 +85,16 @@ export async function listTopics(q: ForumQuery, authorId?: string): Promise<{ it
   }
   const words = fold(q.q).split(/\s+/).filter(Boolean).slice(0, 6);
   for (const w of words) where.push(`t.search_text like ${p(`%${w.replace(/[\\%_]/g, (c) => `\\${c}`)}%`)}`);
-  const order =
+  const sorted =
     q.sirala === "aktif"
       ? "coalesce(t.last_reply_at, t.created_at) desc"
       : q.sirala === "populer"
         ? "t.reply_count desc, coalesce(t.last_reply_at, t.created_at) desc"
         : "t.created_at desc";
+  // Pinned topics lead the forum and its sections; not a search's results or one person's list.
+  const order = !authorId && !words.length ? `(t.pinned_at is not null) desc, t.pinned_at desc nulls last, ${sorted}` : sorted;
   const rows = await sql().query(
-    `select t.id, t.title, t.category, t.body, t.photos, t.author_id, t.created_at, t.reply_count, t.like_count, t.view_count, t.last_reply_at, t.edited_at,
+    `select t.id, t.title, t.category, t.body, t.photos, t.author_id, t.created_at, t.reply_count, t.like_count, t.view_count, t.last_reply_at, t.edited_at, t.pinned_at, t.locked_at,
        p.name as author_name, p.handle as author_handle, count(*) over () as total,
        (select lp.name from forum_replies lr join profiles lp on lp.user_id = lr.author_id
         where lr.topic_id = t.id and lr.deleted_at is null order by lr.created_at desc limit 1) as last_reply_by

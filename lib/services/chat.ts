@@ -1,4 +1,5 @@
 import "server-only";
+import { suspendedMessage } from "@/lib/services/members";
 import { isUuid, sql } from "@/lib/db";
 import { getThread, underMessageLimit, type Thread } from "@/lib/chat-data";
 import { MESSAGE_MAX, PRICE_MAX, parsePrice, type OfferResponse } from "@/lib/market";
@@ -43,6 +44,8 @@ export async function offerConversationId(messageId: string): Promise<string | n
 }
 
 export async function sendMessageFor(userId: string, conversationId: string, text: unknown): Promise<ChatResult> {
+  const suspended = await suspendedMessage(userId);
+  if (suspended) return { error: suspended };
   const body = String(text ?? "").trim();
   if (!body) return { error: "Bir mesaj yazın." };
   if (body.length > MESSAGE_MAX) return { error: `Mesaj en fazla ${MESSAGE_MAX} karakter olabilir.` };
@@ -57,6 +60,8 @@ export async function sendMessageFor(userId: string, conversationId: string, tex
 
 /** The buyer's offer. Sellers answer offers (or counter them); they don't open with one. */
 export async function sendOfferFor(userId: string, conversationId: string, rawAmount: unknown): Promise<ChatResult> {
+  const suspended = await suspendedMessage(userId);
+  if (suspended) return { error: suspended };
   const amount = readAmount(rawAmount);
   if (!amount) return { error: "Geçerli bir teklif tutarı girin (ör. 640.000)." };
   const c = await openConversation(conversationId, userId);
@@ -74,6 +79,8 @@ export const isOfferResponse = (s: unknown): s is OfferResponse => s === "accept
 /** Accept, turn down or counter the other person's waiting offer. */
 export async function respondToOfferFor(userId: string, messageId: string, response: OfferResponse, rawCounter: unknown = ""): Promise<ChatResult> {
   if (!isUuid(messageId) || !isOfferResponse(response)) return { error: "Teklif bulunamadı." };
+  const suspended = await suspendedMessage(userId);
+  if (suspended) return { error: suspended };
   const rows = await sql()`select conversation_id, sender_id, offer_status from messages where id = ${messageId} and offer_amount is not null`;
   const offer = rows[0];
   if (!offer) return { error: "Teklif bulunamadı." };

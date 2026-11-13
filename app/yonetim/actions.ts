@@ -10,6 +10,11 @@ import { renderMarkdown, type ArticleErrors, type ArticleInput } from "@/lib/new
 import { deleteArticleFor, moderateFor, saveArticleFor } from "@/lib/services/admin";
 import { moderateForumFor } from "@/lib/services/forum";
 import { importNews } from "@/lib/services/news-import";
+import { logAdmin } from "@/lib/services/admin-log";
+import { deleteAccountFor } from "@/lib/services/account";
+import { isAdminAccount, setSuspendedFor, memberName } from "@/lib/services/members";
+import { setLockedFor, setPinnedFor } from "@/lib/services/forum";
+import { SLOTS_TAG, cleanSlot, isSlotId, saveSlotFor, validateSlot, type SlotErrors, type SlotInput } from "@/lib/site-slots";
 import {
   FORUM_CATS_TAG,
   createCategoryFor,
@@ -28,8 +33,9 @@ async function adminId() {
 
 /** A moderator removes the reported listing, or dismisses its reports. Either way they are closed. */
 export async function moderate(listingId: string, action: "remove" | "dismiss") {
-  if (!(await adminId())) return;
-  if (await moderateFor(listingId, action)) updateTag(LISTINGS_TAG);
+  const userId = await adminId();
+  if (!userId) return;
+  if (await moderateFor(userId, listingId, action)) updateTag(LISTINGS_TAG);
   refresh();
 }
 
@@ -55,17 +61,20 @@ export async function saveArticle(raw: ArticleInput, id?: string): Promise<SaveA
 }
 
 export async function deleteArticle(id: string) {
-  if (!(await adminId()) || !isUuid(id)) return;
-  await deleteArticleFor(id);
+  const userId = await adminId();
+  if (!userId || !isUuid(id)) return;
+  await deleteArticleFor(userId, id);
   updateTag(NEWS_TAG);
   redirect("/yonetim/haberler?silindi=1");
 }
 
 /** "Kaynaklardan şimdi çek": the daily import (TKDK, the Ministry), run now. Says what it added. */
 export async function importNewsNow(): Promise<{ ok: boolean; message: string }> {
-  if (!(await adminId())) return { ok: false, message: "Bu işlem için yönetici olmanız gerekiyor." };
+  const userId = await adminId();
+  if (!userId) return { ok: false, message: "Bu işlem için yönetici olmanız gerekiyor." };
   const reports = await importNews();
   const added = reports.reduce((n, r) => n + r.added.length, 0);
+  await logAdmin(userId, "Kaynaklardan haber çekti", "haber-kaynakları", null, `${added} yeni haber`);
   if (added) updateTag(NEWS_TAG);
   const failed = reports.filter((r) => r.errors.length).map((r) => r.source);
   const parts = [added ? `${added} yeni haber yayımlandı.` : "Yeni haber yok."];
@@ -88,18 +97,22 @@ const notAdmin: CategoryResult = { errors: { form: "Bu işlem için yönetici ol
 
 /** A new section (no `parentId`) or a sub-category under one. */
 export async function createForumCategory(raw: CategoryInput): Promise<CategoryResult> {
-  if (!(await adminId())) return notAdmin;
+  const userId = await adminId();
+  if (!userId) return notAdmin;
   const errors = await createCategoryFor(raw);
   if (errors) return { errors };
+  await logAdmin(userId, "Kategori ekledi", "kategori", null, String(raw.name ?? ""));
   updateTag(FORUM_CATS_TAG);
   refresh();
   return {};
 }
 
 export async function updateForumCategory(id: string, raw: CategoryInput): Promise<CategoryResult> {
-  if (!(await adminId())) return notAdmin;
+  const userId = await adminId();
+  if (!userId) return notAdmin;
   const errors = await updateCategoryFor(String(id), raw);
   if (errors) return { errors };
+  await logAdmin(userId, "Kategoriyi düzenledi", "kategori", String(id), String(raw.name ?? ""));
   updateTag(FORUM_CATS_TAG);
   refresh();
   return {};
@@ -114,10 +127,83 @@ export async function moveForumCategory(id: string, direction: "up" | "down") {
 
 /** Deletes a category; its topics move to `moveTo` first. */
 export async function deleteForumCategory(id: string, moveTo: string): Promise<{ error?: string }> {
-  if (!(await adminId())) return { error: "Bu işlem için yönetici olmanız gerekiyor." };
+  const userId = await adminId();
+  if (!userId) return { error: "Bu işlem için yönetici olmanız gerekiyor." };
   const error = await deleteCategoryFor(String(id), String(moveTo ?? ""));
   if (error) return { error };
+  await logAdmin(userId, "Kategoriyi sildi", "kategori", String(id), `Konuları şuraya taşındı: ${String(moveTo ?? "")}`);
   updateTag(FORUM_CATS_TAG);
   refresh();
   return {};
+}
+
+// ---------------------------------------------------------------- Üyeler (/yonetim/uyeler)
+
+export type MemberActionResult = { ok: boolean; message: string };
+
+/** Suspends a member (they can't post, reply, list, edit or message) or lifts it. */
+export async function setMemberSuspended(targetId: string, suspended: boolean, reason = ""): Promise<MemberActionResult> {
+  const userId = await adminId();
+  if (!userId) return { ok: false, message: "Bu işlem için yönetici olmanız gerekiyor." };
+  if (targetId === userId) return { ok: false, message: "Kendi hesabınızı askıya alamazsınız." };
+  const r = await setSuspendedFor(String(targetId), Boolean(suspended), String(reason ?? ""));
+  if (!r.ok) return r;
+  await logAdmin(userId, suspended ? "Üyeyi askıya aldı" : "Üyenin askısını kaldırdı", "üye", targetId, suspended && reason ? `${r.name}: ${reason}` : r.name);
+  refresh();
+  return { ok: true, message: suspended ? `${r.name} askıya alındı.` : `${r.name} yeniden paylaşım yapabilir.` };
+}
+
+/** Deletes a member's account with everything they wrote (as "Hesabımı sil" does). Not admins, not yourself. */
+export async function deleteMember(targetId: string, confirmName: string): Promise<MemberActionResult> {
+  const userId = await adminId();
+  if (!userId) return { ok: false, message: "Bu işlem için yönetici olmanız gerekiyor." };
+  const id = String(targetId);
+  if (id === userId) return { ok: false, message: "Kendi hesabınızı Hesabım sayfasından silebilirsiniz." };
+  const name = await memberName(id);
+  if (name === null) return { ok: false, message: "Üye bulunamadı." };
+  if (String(confirmName ?? "").trim().toLocaleLowerCase("tr") !== name.trim().toLocaleLowerCase("tr")) return { ok: false, message: "Onay için üyenin adını aynen yazın." };
+  if (await isAdminAccount(id)) return { ok: false, message: "Yönetici hesapları buradan silinemez." };
+  await deleteAccountFor(id);
+  await logAdmin(userId, "Üyeyi ve paylaşımlarını sildi", "üye", id, name);
+  updateTag(LISTINGS_TAG);
+  refresh();
+  return { ok: true, message: `${name} ve paylaşımları silindi.` };
+}
+
+// ---------------------------------------------------------------- Konular: sabitle, kilitle
+
+/** Pins a topic to the top of the forum's lists, or unpins it. */
+export async function setTopicPinned(topicId: string, pinned: boolean) {
+  const userId = await adminId();
+  if (!userId) return;
+  const title = await setPinnedFor(String(topicId), Boolean(pinned));
+  if (title !== null) await logAdmin(userId, pinned ? "Konuyu sabitledi" : "Konunun sabitlemesini kaldırdı", "konu", topicId, title);
+  refresh();
+}
+
+/** Closes a topic to new replies, or opens it again. */
+export async function setTopicLocked(topicId: string, locked: boolean) {
+  const userId = await adminId();
+  if (!userId) return;
+  const title = await setLockedFor(String(topicId), Boolean(locked));
+  if (title !== null) await logAdmin(userId, locked ? "Konuyu yanıtlara kapattı" : "Konuyu yanıtlara açtı", "konu", topicId, title);
+  refresh();
+}
+
+// ---------------------------------------------------------------- Reklam alanları (/yonetim/reklam)
+
+export type SlotResult = { errors: SlotErrors; message?: string; saved?: boolean };
+
+export async function saveSlot(id: string, raw: Partial<Record<keyof SlotInput, unknown>>): Promise<SlotResult> {
+  const userId = await adminId();
+  if (!userId) return { errors: {}, message: "Bu işlem için yönetici olmanız gerekiyor." };
+  if (!isSlotId(id)) return { errors: {}, message: "Böyle bir alan yok." };
+  const v = cleanSlot(raw);
+  const errors = validateSlot(id, v);
+  if (Object.keys(errors).length) return { errors };
+  await saveSlotFor(userId, id, v);
+  await logAdmin(userId, v.enabled ? "Reklam alanını güncelledi" : "Reklam alanını kapattı", "reklam", id, [v.name, v.text].filter(Boolean).join(" · "));
+  updateTag(SLOTS_TAG);
+  refresh();
+  return { errors: {}, saved: true };
 }
