@@ -4,36 +4,6 @@ The official website for Çiftçi Destek (formerly Bereket AI), a Turkish AI far
 
 Built with Next.js 16 (App Router, Cache Components) and Tailwind CSS 4. Deployed on Vercel.
 
-**Design:** "Organik Doğa" — palette and style from the UI UX Pro Max design database (Agriculture/Farm Tech, Organic Biophilic), Space Grotesk + DM Sans, light and dark mode. Components: [shadcn/ui](https://ui.shadcn.com) (in `components/ui/`), adapted [Magic UI](https://magicui.design) pieces (in `components/magicui/`), and [Phosphor](https://phosphoricons.com) icons. All free and MIT/OFL licensed. Design spec: `docs/superpowers/specs/2026-10-12-bereket-ai-redesign-design.md`.
-
-## Everyday edits
-
-| To change… | Edit |
-|---|---|
-| Name, tagline, contact e-mail, menu | `config/site.ts` |
-| Colors, radius, shadows | `app/globals.css` (`:root` tokens, light and dark) |
-| News | add a Markdown file to `content/haberler/` (see below) |
-| Demo examples | `data/demo-scenarios.ts` and images in `public/demo/` |
-| FAQ / About / Privacy | `app/sss/page.tsx`, `app/hakkimizda/page.tsx`, `app/gizlilik/page.tsx` |
-| Weather hint rules | `lib/weather.ts` → `farmingHint` |
-
-### Adding a news article
-
-Create `content/haberler/<slug>.md`. The filename is the URL: lowercase letters, digits and dashes only, e.g. `bugday-hasadi-basladi.md`.
-
-```markdown
----
-title: Buğday hasadı başladı
-date: 2026-10-20
-summary: Bir-iki cümlelik özet; listede ve paylaşım önizlemesinde görünür.
-cover: /images/haber/bugday.jpg   # optional; put the image under public/
----
-
-Yazının gövdesi **Markdown** ile.
-```
-
-Commit and push; Vercel redeploys. If a file is invalid (missing title, wrong date format, bad filename), the build fails with a Turkish message naming the file, so a broken article never goes live.
-
 ## Docs
 
 - [docs/deploy.md](docs/deploy.md): Vercel setup, domain, and the pre-launch checklist
