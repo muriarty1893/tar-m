@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
 import { clerkLocalization } from "@/lib/clerk-localization";
@@ -79,7 +80,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <BottomNav />
           <WelcomeGate />
           <SmoothScroll />
-          {ADSENSE_CLIENT && <AdConsent client={ADSENSE_CLIENT} />}
+          {/* Reads the URL (usePathname), so Cache Components needs it inside Suspense. */}
+          {ADSENSE_CLIENT && (
+            <Suspense fallback={null}>
+              <AdConsent client={ADSENSE_CLIENT} />
+            </Suspense>
+          )}
         </ClerkProvider>
         {/* Visit statistics (Vercel Web Analytics): no cookies, no personal data; see /gizlilik. */}
         <Analytics />
