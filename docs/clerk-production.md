@@ -31,14 +31,20 @@ and Clerk's own addresses (`clerk.ciftcidestek.com.tr`, `accounts.ciftcidestek.c
    production domain to `ciftcidestek.com.tr` there (Clerk can't change it for Vercel-managed apps).
    Clerk then makes a new publishable key for the new domain.
 
+**From this moment Vercel's Production environment holds the production keys** (the integration
+splits them off at once; it did on 2026-11-22 at 18:11 UTC), so the next production deploy, including
+any push to `main`, switches the live site. Don't deploy until steps 2–4 are done and step 6 can
+follow right away. The deployment that's live keeps its old keys until then.
+
 SSO connections (Google), integrations and paths are **not** copied; steps 3 and 4 redo them.
 
 ## 2. DNS records
 
 Clerk → (production) **Configure → Domains** lists five records, usually CNAMEs named `clerk`,
 `accounts`, `clkmail`, `clk._domainkey` and `clk2._domainkey`. The domain uses Vercel's nameservers
-(the registrar's panel has no DNS editor), so they go in Vercel → **Domains** →
-`ciftcidestek.com.tr` → **DNS Records**, exactly as Clerk shows them (name without the domain part).
+(the registrar's panel has no DNS editor), and the integration adds them there itself when the domain
+is set (Vercel → **Domains** → `ciftcidestek.com.tr` → **DNS Records**; add any that are missing,
+exactly as Clerk shows them, name without the domain part).
 
 - The `*` record Vercel added doesn't get in the way: a named record wins over the wildcard.
 - The domain's CAA records allow `letsencrypt.org` and `pki.goog`, the two authorities Clerk uses.
@@ -92,11 +98,11 @@ serves it too; no Android or iOS client is needed.
 
 ## 5. Keys and deploy
 
-With the Marketplace, the production instance's keys should sync into Vercel's **Production**
-environment (`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` = `pk_live_…`, `CLERK_SECRET_KEY` = `sk_live_…`), as
-their own pair apart from Development/Preview. Until 2026-11-22 there was one pair, `pk_test_…`, for
-all three. Check Vercel → project → Settings → Environment Variables. If Production still shares the
-development pair, copy the keys from Clerk → (production) **API keys** into Production only.
+Setting the domain (step 1) synced the production keys into Vercel's **Production** environment
+(`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` = `pk_live_Y2xlcmsuY2lmdGNpZGVzdGVrLmNvbS50ciQ`,
+`CLERK_SECRET_KEY` = `sk_live_…`), apart from Development/Preview, which keep `pk_test_…`. Nothing to
+type in by hand. Before deploying, check that `https://clerk.ciftcidestek.com.tr/v1/environment`
+answers (certificates deployed).
 
 The switch happens at the next production deploy after that, so do it when steps 1–4 are finished and
 the people in step 6 are ready to sign up right away: merge this branch to `main` (its deploy carries
