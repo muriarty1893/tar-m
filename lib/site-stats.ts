@@ -13,12 +13,21 @@ export function parsePeriod(v: string | undefined): StatPeriod {
 }
 
 /**
- * The window for the last `days` days, today included: from 00:00 UTC `days - 1` days ago until now.
- * Vercel counts days in UTC, so a visit between 00:00 and 03:00 Türkiye time falls on the day before.
+ * The window for the last `days` days, today included: from 00:00 UTC `days - 1` days ago to the end
+ * of today (next 00:00 UTC). It must end at midnight: Vercel's count query rounds `until` down to the
+ * day, so ending at "now" would leave today out of the totals. `today` is "YYYY-MM-DD", for dropping
+ * days after it from the daily breakdown. Vercel counts days in UTC, so a visit between 00:00 and
+ * 03:00 Türkiye time falls on the day before.
  */
-export function periodRange(days: StatPeriod, now: Date): { since: string; until: string } {
-  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - (days - 1)));
-  return { since: start.toISOString(), until: now.toISOString() };
+export function periodRange(days: StatPeriod, now: Date): { since: string; until: string; today: string } {
+  const y = now.getUTCFullYear();
+  const m = now.getUTCMonth();
+  const d = now.getUTCDate();
+  return {
+    since: new Date(Date.UTC(y, m, d - (days - 1))).toISOString(),
+    until: new Date(Date.UTC(y, m, d + 1)).toISOString(),
+    today: new Date(Date.UTC(y, m, d)).toISOString().slice(0, 10),
+  };
 }
 
 const STATIC_PAGES: Record<string, string> = {

@@ -64,7 +64,7 @@ async function pageTitles(paths: string[]): Promise<PageTitles> {
 export async function siteStats(days: StatPeriod, now: Date): Promise<SiteStatsResult> {
   const token = process.env.VERCEL_ANALYTICS_TOKEN;
   if (!token) return { ok: false, reason: "no-token" };
-  const range = periodRange(days, now);
+  const { today, ...range } = periodRange(days, now);
   try {
     type Grouped = Record<string, unknown>[];
     const [total, daily, paths, refs, countries, devices, systems] = await Promise.all([
@@ -90,7 +90,7 @@ export async function siteStats(days: StatPeriod, now: Date): Promise<SiteStatsR
       stats: {
         visitors: n(total.visitors),
         pageviews: n(total.pageviews),
-        days: daily.map((r) => ({ date: String(r.timestamp ?? "").slice(0, 10), visitors: n(r.visitors), pageviews: n(r.pageviews) })).filter((d) => d.date),
+        days: daily.map((r) => ({ date: String(r.timestamp ?? "").slice(0, 10), visitors: n(r.visitors), pageviews: n(r.pageviews) })).filter((d) => d.date && d.date <= today),
         pages: mergeByLabel(pathRows, (r) => pageLabel(r.key, titles)).slice(0, 15),
         referrers: ranked(refs, "referrerHostname", referrerLabel).slice(0, 10),
         countries: ranked(countries, "country", countryLabel).slice(0, 10),

@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { refresh } from "next/cache";
-import { getUserId, isAdmin, requireProfile, signInHref } from "@/lib/auth";
+import { ensureProfile, getUserId, isAdmin, requireProfile, signInHref } from "@/lib/auth";
 import { isUuid } from "@/lib/db";
 import type { TopicErrors, TopicInput } from "@/lib/forum";
 import { createTopicFor, deleteReplyFor, deleteTopicWithPhotos, replyFor, reportForumFor, toggleLikeFor, updateReplyFor, updateTopicFor } from "@/lib/services/forum";
@@ -68,6 +68,8 @@ export async function reportPost(topicId: string, replyId: string | null, reason
 export async function toggleLike(topicId: string, replyId: string | null): Promise<{ liked: boolean; count: number } | { signIn: string } | { error: string }> {
   const userId = await getUserId();
   if (!userId) return { signIn: signInHref(`/forum/${topicId}`) };
+  // A like is saved against the profile row: a member whose very first action is a ♥ has none yet.
+  await ensureProfile(userId);
   const r = await toggleLikeFor(userId, topicId, replyId);
   return r ?? { error: "Beğenilemedi; içerik silinmiş olabilir." };
 }

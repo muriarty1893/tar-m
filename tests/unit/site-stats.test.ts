@@ -16,9 +16,10 @@ describe("site stats labels", () => {
     expect(parsePeriod(undefined)).toBe(7);
   });
 
-  it("starts the window at 00:00 UTC, today included", () => {
+  it("covers whole UTC days, today included, ending at the next midnight", () => {
     const now = new Date("2026-11-22T21:30:00Z");
-    expect(periodRange(7, now)).toEqual({ since: "2026-11-16T00:00:00.000Z", until: "2026-11-22T21:30:00.000Z" });
+    expect(periodRange(7, now)).toEqual({ since: "2026-11-16T00:00:00.000Z", until: "2026-11-23T00:00:00.000Z", today: "2026-11-22" });
+    expect(periodRange(30, new Date("2026-12-31T23:59:00Z"))).toMatchObject({ since: "2026-12-02T00:00:00.000Z", until: "2027-01-01T00:00:00.000Z", today: "2026-12-31" });
   });
 
   it("names pages, with titles from the database", () => {
