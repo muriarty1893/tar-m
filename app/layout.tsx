@@ -10,6 +10,8 @@ import { BottomNav } from "@/components/nav/BottomNav";
 import { Footer } from "@/components/Footer";
 import { WelcomeGate } from "@/components/WelcomeGate";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { AdConsent } from "@/components/ads/AdConsent";
+import { ADSENSE_CLIENT } from "@/lib/ads";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 
@@ -36,6 +38,8 @@ export const metadata: Metadata = {
     description: siteConfig.description,
   },
   twitter: { card: "summary_large_image" },
+  // Lets AdSense confirm the site is ours without loading its script before consent.
+  ...(ADSENSE_CLIENT && { other: { "google-adsense-account": ADSENSE_CLIENT } }),
 };
 
 // `cover`: the page runs under the iPhone's rounded corners and home bar; the bottom tab bar keeps
@@ -75,6 +79,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <BottomNav />
           <WelcomeGate />
           <SmoothScroll />
+          {ADSENSE_CLIENT && <AdConsent client={ADSENSE_CLIENT} />}
         </ClerkProvider>
         {/* Visit statistics (Vercel Web Analytics): no cookies, no personal data; see /gizlilik. */}
         <Analytics />

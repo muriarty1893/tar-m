@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
+import { ADSENSE_CLIENT } from "@/lib/ads";
 
 export const metadata: Metadata = {
   title: "Gizlilik ve KVKK Aydınlatma Metni",
@@ -57,6 +58,18 @@ export default function PrivacyPage() {
             tarayıcı ve işletim sistemi türünü anonim olarak sayarız (Vercel Web Analytics). Çerez kullanılmaz, sizi tanıyan bir
             bilgi saklanmaz ve ziyaretler kişilere bağlanmaz.
           </li>
+          {ADSENSE_CLIENT && (
+            <li id="reklam">
+              Reklamlar (yalnızca izin verirseniz): sitede Google AdSense reklamları gösterilir. İzin verdiğinizde Google; çerezler ve
+              benzeri teknolojilerle cihaz bilgilerinizi, IP adresinizi ve sitedeki gezinmenizi kullanarak reklam gösterir, ölçer ve
+              ilgi alanlarınıza göre seçebilir. İzin vermezseniz Google’ın reklam kodu yüklenmez. Kararınızı her sayfanın altındaki
+              “Reklam tercihleri” bağlantısıyla değiştirebilirsiniz. Google’ın verileri nasıl kullandığı:{" "}
+              <a href="https://policies.google.com/technologies/partner-sites?hl=tr" rel="noopener noreferrer" target="_blank">
+                policies.google.com
+              </a>
+              .
+            </li>
+          )}
         </ul>
 
         <h2>3. İşleme amaçları</h2>
@@ -81,6 +94,7 @@ export default function PrivacyPage() {
           kayıtları Neon (veritabanı) ve ilan fotoğrafları Vercel Blob hizmetinde, Frankfurt (Almanya, AB) bölgesinde
           saklanır. [Yurt dışına aktarım için KVKK madde 9 kapsamındaki dayanak ve gerekli bildirimler hukuki inceleme ile
           netleştirilecektir.] Web sitesi Vercel Inc. altyapısında barındırılmaktadır.
+          {ADSENSE_CLIENT && " Reklam izni verdiyseniz reklamla ilgili veriler Google LLC (ABD) ve Google Ireland Ltd. tarafından işlenir."}
         </p>
 
         <h2>6. Saklama süresi</h2>

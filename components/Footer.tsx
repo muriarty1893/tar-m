@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
+import { AdPreferencesButton } from "@/components/ads/AdConsent";
+import { ADSENSE_CLIENT } from "@/lib/ads";
 
 // `wide`: shown from 1280 px only (phones reach these through the Hızlı menü). `short`: the phone's label.
 const links: { label: string; href: string; wide?: boolean; short?: string }[] = [
@@ -35,6 +37,11 @@ export function Footer() {
                 </Link>
               </li>
             ))}
+            {ADSENSE_CLIENT && (
+              <li>
+                <AdPreferencesButton />
+              </li>
+            )}
           </ul>
         </nav>
         <p className="flex flex-wrap items-center gap-x-2">
