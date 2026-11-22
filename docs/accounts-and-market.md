@@ -118,11 +118,10 @@ are cached (`lib/news-data.ts`, tag `news`) and refreshed whenever an article is
 
 ## Before a real launch
 
-- **Clerk production instance.** The connected Clerk instance uses *development* keys (`pk_test_…`):
-  it works on `tar-m-flame.vercel.app`, but shows "Development mode" under the sign-in form and has
-  development limits. Clerk's production instances need a domain you own (not `*.vercel.app`). Once
-  the domain is bought: Clerk dashboard → create the production instance → add the domain's DNS
-  records → put the production keys in Vercel → redeploy.
+- **Clerk production instance.** The site moves from Clerk's *development* keys (`pk_test_…`, the
+  "Development mode" badge, development limits) to a production instance on `ciftcidestek.com.tr`:
+  see [clerk-production.md](clerk-production.md). Preview deployments and local development keep the
+  development instance.
 - **Sign-up fields.** In the Clerk dashboard (User & authentication), turn on "First and last name"
   so new people give their name at sign-up; until then the site asks for it on /hesabim before the
   first listing or message.

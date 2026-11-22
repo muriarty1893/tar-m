@@ -22,10 +22,14 @@ const protectCheck = {
 };
 
 /**
- * Under the 6-digit code box. The codes come from Clerk's shared sender (the site has no domain of
- * its own yet), and Gmail sometimes files them under Spam.
+ * Under the 6-digit code box. Gmail sometimes files the codes under Spam (more so while the domain is
+ * new). Production (pk_live_…) mails from the site's domain; development, as on preview deployments,
+ * from Clerk's shared sender.
  */
-const codeHint = "Kod gelmediyse Spam klasörüne bakın. Gönderen: notifications@accounts.dev";
+const codeSender = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_live_")
+  ? "notifications@ciftcidestek.com.tr"
+  : "notifications@accounts.dev";
+const codeHint = `Kod gelmediyse Spam klasörüne bakın. Gönderen: ${codeSender}`;
 
 export const clerkLocalization = {
   ...withSiteName(trTR),

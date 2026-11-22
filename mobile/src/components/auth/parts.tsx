@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { clerkMessage } from '@/lib/clerk-errors';
+import { CODE_SENDER } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { COLORS } from '@/theme/tokens';
 
@@ -63,7 +64,7 @@ export const PasswordField = forwardRef<TextInput, TextInputProps & { label: str
 /** The 6-digit code from the e-mail, in one box: typing, pasting and the keyboard's suggestion all work. */
 export function CodeField({ value, onChange, error, email, onSubmit }: { value: string; onChange: (v: string) => void; error?: string; email: string; onSubmit: () => void }) {
   return (
-    <Field label="E-postadaki kod" required error={error} hint={`${email} adresine 6 haneli bir kod gönderdik. Gelen kutusunda yoksa “Spam” ya da “Gereksiz” klasörüne bakın (gönderen: notifications@accounts.dev).`}>
+    <Field label="E-postadaki kod" required error={error} hint={`${email} adresine 6 haneli bir kod gönderdik. Gelen kutusunda yoksa “Spam” ya da “Gereksiz” klasörüne bakın (gönderen: ${CODE_SENDER}).`}>
       <Input
         value={value}
         onChangeText={(t) => onChange(t.replace(/\D/g, '').slice(0, 6))}
