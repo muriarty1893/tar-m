@@ -52,6 +52,11 @@ export default function PrivacyPage() {
           </li>
           <li>Tarlalarım ve Tarım takvimi: tarla bilgileriniz, masraflarınız ve takvim işleriniz; yalnızca size görünür.</li>
           <li>Teknik veriler: güvenlik amacıyla, form gönderimlerinde IP adresi geçici olarak kullanılır ve saklanmaz.</li>
+          <li>
+            Ziyaret istatistikleri: hangi sayfaların açıldığını, ziyaretçinin hangi ülkeden ve hangi siteden geldiğini, cihaz,
+            tarayıcı ve işletim sistemi türünü anonim olarak sayarız (Vercel Web Analytics). Çerez kullanılmaz, sizi tanıyan bir
+            bilgi saklanmaz ve ziyaretler kişilere bağlanmaz.
+          </li>
         </ul>
 
         <h2>3. İşleme amaçları</h2>

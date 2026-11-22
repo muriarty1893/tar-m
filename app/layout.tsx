@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/next";
 import { clerkLocalization } from "@/lib/clerk-localization";
 import { Fira_Code, Fira_Sans } from "next/font/google";
 import { siteConfig } from "@/config/site";
@@ -75,6 +76,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <WelcomeGate />
           <SmoothScroll />
         </ClerkProvider>
+        {/* Visit statistics (Vercel Web Analytics): no cookies, no personal data; see /gizlilik. */}
+        <Analytics />
       </body>
     </html>
   );
