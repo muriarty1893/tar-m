@@ -22,13 +22,14 @@ Know before starting:
 The instance's domain is the root domain, **`ciftcidestek.com.tr`** (not `www.…`): the site at `www`
 and Clerk's own addresses (`clerk.ciftcidestek.com.tr`, `accounts.ciftcidestek.com.tr`) all sit under it.
 
-1. Vercel → the team → **Integrations** (or the project's **Storage** tab) → the Clerk resource →
-   **Open in Clerk**. For Marketplace apps, Clerk says the production domain is set from the
-   integration's settings in Vercel; if the resource's settings there have a **Production domain**
-   field, enter `ciftcidestek.com.tr` there.
-2. In the Clerk dashboard, top left: **Development** → **Create production instance** →
-   **Clone development instance** (keeps sign-up fields, e-mail code sign-in and the look) → domain
-   `ciftcidestek.com.tr`.
+1. Vercel → the team → **Integrations** → Clerk → **Open in Clerk** (signs in through Vercel; there
+   is no separate Clerk login). The app is "ciftci-destek-auth".
+2. Switch to the **Production** instance (top left). On a Vercel-managed app it already exists, with a
+   placeholder domain (`….lcl.dev`). If it doesn't, **Development → Create production instance →
+   Clone development instance**.
+3. **Configure → Domains → Danger zone → Manage** opens the integration's settings in Vercel: set the
+   production domain to `ciftcidestek.com.tr` there (Clerk can't change it for Vercel-managed apps).
+   Clerk then makes a new publishable key for the new domain.
 
 SSO connections (Google), integrations and paths are **not** copied; steps 3 and 4 redo them.
 
@@ -91,11 +92,16 @@ serves it too; no Android or iOS client is needed.
 
 ## 5. Keys and deploy
 
-With the Marketplace, creating the production instance should sync `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
-(`pk_live_…`) and `CLERK_SECRET_KEY` (`sk_live_…`) into Vercel's **Production** environment. Check
-Vercel → project → Settings → Environment Variables: Production should show its own pair, apart from
-Development/Preview. If it doesn't, copy them from Clerk → (production) **API keys** into Production
-only. Then redeploy production (**Deployments → … → Redeploy**, or the next push to `main`).
+With the Marketplace, the production instance's keys should sync into Vercel's **Production**
+environment (`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` = `pk_live_…`, `CLERK_SECRET_KEY` = `sk_live_…`), as
+their own pair apart from Development/Preview. Until 2026-11-22 there was one pair, `pk_test_…`, for
+all three. Check Vercel → project → Settings → Environment Variables. If Production still shares the
+development pair, copy the keys from Clerk → (production) **API keys** into Production only.
+
+The switch happens at the next production deploy after that, so do it when steps 1–4 are finished and
+the people in step 6 are ready to sign up right away: merge this branch to `main` (its deploy carries
+the keys), or **Deployments → … → Redeploy**. Between the deploy and step 7 their old posts still show
+under their old names; only editing them waits for step 7.
 
 Check: `https://www.ciftcidestek.com.tr/giris` shows no "Development mode" badge, and signing up sends
 a code from `notifications@ciftcidestek.com.tr`.
