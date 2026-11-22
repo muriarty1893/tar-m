@@ -33,6 +33,20 @@ Paste this whole file into a new Claude Code session opened in `C:\Users\murat\D
 6. Delete the "test" news post and the old "erken erişim" article in Yönetim → Haberler. If the article goes, update the redirect in `next.config.ts` and `tests/e2e/seo.spec.ts`.
 7. Later: the mobile app needs Clerk → Native applications turned on (Android `tr.com.ciftcidestek.app`, redirect `ciftcidestek://`). Then the vercel.app copy can be kept out of Google (noindex). Optionally, AdSense → Gizlilik ve mesajlaşma → Avrupa düzenlemeleri for EU visitors.
 
+## Starting on another computer (or the Claude Code CLI)
+Everything above lives in Git, so it works anywhere. Secrets and logins don't travel; set them up once per computer:
+```powershell
+git clone https://github.com/muriarty1893/tar-m.git
+cd tar-m
+npm ci
+npm i -g vercel
+vercel login
+vercel link --yes --project tar-m --scope murat-eker-s-projects
+vercel env pull .env.local --environment=development
+vercel env pull --environment=production .env.production.local
+```
+Use Node 24 (what Vercel runs). Then start Claude Code in that folder (`claude`) and say: "Read docs/handover.md and continue." The notes Claude keeps on this computer don't carry over, but this file has everything needed. Pushing to `main` deploys to production, so you only need the local setup for running scripts (like the remap) or testing locally.
+
 ## Good to know
 - If the site won't open at home but works on a VPN, that's the provider's DNS cache. It clears within about a day; using DNS 1.1.1.1 fixes it immediately.
 - Local keys: `vercel env pull .env.local` and `vercel env pull --environment=production .env.production.local` (the Vercel CLI is installed and logged in).
