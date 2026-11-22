@@ -58,6 +58,7 @@ What keeps the home page fast: no animation library on load, the Hızlı menü's
   - a set of our own cover images per label (Destek / Haber / Duyuru) or per topic (hayvancılık, bitkisel üretim, IPARD…), chosen by keywords in the title; free-licence photos (Wikimedia Commons, credited on `/kaynaklar`) or made for the site;
   - or permission from TKDK / the Ministry to show their photos, then take the article's main image.
   Hand-written articles can already have a cover (Yönetim → Haberler → editor).
+- [ ] **Next.js security upgrade** (noted 2026-11-22). `next build` reports that Next.js 16.4.4 "is affected by a known security vulnerability". Run `npx next upgrade --agent=security` (ideally in its own branch or worktree), then typecheck, test and build before merging.
 - [ ] **Shared rate limits.** `lib/rateLimit.ts` counts in memory per server instance, so on Vercel the limits on contact forms, photo uploads and view counts reset whenever an instance restarts and aren't shared between instances. Move them to a shared store (e.g. Upstash Redis from the Vercel Marketplace; free at this size).
 - [ ] **Accounts and Pazar**: see [accounts-and-market.md](accounts-and-market.md): sign-up name fields, `ADMIN_USER_IDS`.
 
