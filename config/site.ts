@@ -5,7 +5,7 @@ export const siteConfig = {
   tagline: "Çiftçinin Akıllı Rehberi",
   description:
     "Çiftçi Destek, çiftçiler için Türkçe dijital tarım rehberi: çiftçi forumu, çiftçi pazarı ve mesajlaşma, hava durumu, tarım takvimi, tarla ve masraf takibi.",
-  contactEmail: "iletisim@bereketai.com",
+  contactEmail: "iletisim@ciftcidestek.com.tr",
   ctaLabel: "Ücretsiz hesap açın",
   /** The header's main menu: the tools that work on the website today. */
   nav: [

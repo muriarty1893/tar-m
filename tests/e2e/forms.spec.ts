@@ -43,7 +43,7 @@ test("an upstream failure shows the error and keeps the typed values", async ({ 
   await fillQuestion(page);
   await soru(page).getByRole("button", { name: "Soruyu gönder" }).click();
   await expect(page.getByRole("alert").filter({ hasText: "Bir sorun" })).toContainText("Bir sorun oluştu, lütfen tekrar deneyin");
-  await expect(page.getByRole("alert").filter({ hasText: "Bir sorun" })).toContainText("iletisim@bereketai.com");
+  await expect(page.getByRole("alert").filter({ hasText: "Bir sorun" })).toContainText("iletisim@ciftcidestek.com.tr");
   await expect(soru(page).getByLabel("Adınız")).toHaveValue("Şükrü Çağlar");
   await expect(soru(page).getByLabel("E-posta", { exact: true })).toHaveValue("sukru@example.com");
   await expect(soru(page).getByRole("checkbox")).toBeChecked();

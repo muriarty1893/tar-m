@@ -25,7 +25,7 @@ test("the footer is one thin band: the info pages, the contact address and the c
   // Phones: two short lines (Hakkımızda and İş birliği are in the Hızlı menü there).
   const names = ["SSS", "Pazar kuralları", "Gizlilik ve KVKK", "Görsel kaynakları", ...(isMobile ? [] : ["Hakkımızda", "İş birliği"])];
   for (const name of names) await expect(footer.getByRole("link", { name, exact: true })).toBeVisible();
-  await expect(footer.getByRole("link", { name: "iletisim@bereketai.com" })).toHaveAttribute("href", "mailto:iletisim@bereketai.com");
+  await expect(footer.getByRole("link", { name: "iletisim@ciftcidestek.com.tr" })).toHaveAttribute("href", "mailto:iletisim@ciftcidestek.com.tr");
   await expect(footer.getByText(/© 2026 Çiftçi Destek/)).toBeVisible();
   // No maker credit, no big wordmark.
   await expect(footer).not.toContainText(/vibecoded/i);
