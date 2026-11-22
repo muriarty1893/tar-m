@@ -1,6 +1,6 @@
 # Çiftçi Destek: mobile app
 
-The Çiftçi Destek app for Android and iOS, built with Expo SDK 57 (React Native), in the look of the website's demo phone. It works on **the website's own data**: the same accounts (Clerk), Pazar listings, chats and offers, calendar, fields and news as https://tar-m-flame.vercel.app, through the website's API for the app (`app/api/app/…`, see `docs/accounts-and-market.md` on the website). A listing posted in the app is on the website at once, and the other way round.
+The Çiftçi Destek app for Android and iOS, built with Expo SDK 57 (React Native), in the look of the website's demo phone. It works on **the website's own data**: the same accounts (Clerk), Pazar listings, chats and offers, calendar, fields and news as https://www.ciftcidestek.com.tr, through the website's API for the app (`app/api/app/…`, see `docs/accounts-and-market.md` on the website). A listing posted in the app is on the website at once, and the other way round.
 
 The AI scan is still a **demo**: the camera, the diagnosis and the assistant chat run on the website demo's scripted scenarios, and every such screen says "Örnek". Weather is live (Open-Meteo). Prices are sample data, as on the website.
 
@@ -16,7 +16,7 @@ The AI scan is still a **demo**: the camera, the diagnosis and the assistant cha
    - On Linux with a firewall, open the port first: `sudo ufw allow 8081/tcp`.
    - If they can't share a Wi-Fi, use `npx expo start --tunnel`.
 
-The app talks to the live website by default. To try it against a website running on your computer (`npm run dev` there), start it with `EXPO_PUBLIC_API_URL=http://<your computer's IP>:3000 npx expo start -c`.
+The app talks to the live website, and signs in with its production Clerk instance, by default. A website running on your computer (`npm run dev` there) signs in with Clerk's development instance, so point the app at both: `EXPO_PUBLIC_API_URL=http://<your computer's IP>:3000 EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_a25vd2luZy10YXJwb24tOTU2Mi5jbGVyay5hY2NvdW50cy5kZXYk npx expo start -c`.
 
 `npx expo start --web` opens the same app in the browser (handy for checking screens; pop-up questions such as "Alan güncellensin mi?" only appear on phones, and Clerk's sign-up bot check may block automated browsers).
 
