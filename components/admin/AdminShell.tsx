@@ -1,12 +1,13 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ChartBarIcon, ChartLineUpIcon, ChatsTeardropIcon, ClockCounterClockwiseIcon, FlagIcon, MegaphoneIcon, NewspaperIcon, UsersIcon } from "@phosphor-icons/react/dist/ssr";
+import { ChartBarIcon, ChartLineUpIcon, ChatsTeardropIcon, ClipboardTextIcon, ClockCounterClockwiseIcon, FlagIcon, MegaphoneIcon, NewspaperIcon, UsersIcon } from "@phosphor-icons/react/dist/ssr";
 import { ToolHeader } from "@/components/tool/ToolHeader";
 
-export type AdminSection = "genel" | "istatistikler" | "uyeler" | "haberler" | "forum" | "sikayetler" | "reklam" | "kayitlar";
+export type AdminSection = "genel" | "rapor" | "istatistikler" | "uyeler" | "haberler" | "forum" | "sikayetler" | "reklam" | "kayitlar";
 
 const TABS: { id: AdminSection; href: string; label: string; short: string; Icon: typeof NewspaperIcon }[] = [
   { id: "genel", href: "/yonetim", label: "Genel bakış", short: "Genel", Icon: ChartBarIcon },
+  { id: "rapor", href: "/yonetim/rapor", label: "Haftalık rapor", short: "Rapor", Icon: ClipboardTextIcon },
   { id: "istatistikler", href: "/yonetim/istatistikler", label: "İstatistikler", short: "İstatistik", Icon: ChartLineUpIcon },
   { id: "uyeler", href: "/yonetim/uyeler", label: "Üyeler", short: "Üyeler", Icon: UsersIcon },
   { id: "haberler", href: "/yonetim/haberler", label: "Haberler", short: "Haberler", Icon: NewspaperIcon },

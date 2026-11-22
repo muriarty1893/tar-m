@@ -45,6 +45,22 @@ async function query<T>(path: "count" | "aggregate", params: Record<string, stri
 
 const n = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : 0);
 
+/**
+ * Visitors and page views between two UTC midnights (Vercel rounds `until` down to the day). Null
+ * without a token or when Vercel can't be reached.
+ */
+export async function countVisits(since: string, until: string): Promise<{ visitors: number; pageviews: number } | null> {
+  const token = process.env.VERCEL_ANALYTICS_TOKEN;
+  if (!token) return null;
+  try {
+    const c = await query<Counts>("count", { since, until }, token);
+    return { visitors: n(c.visitors), pageviews: n(c.pageviews) };
+  } catch (e) {
+    console.error("site stats: count", e);
+    return null;
+  }
+}
+
 /** Titles for the forum topics, listings, articles and forum sections among the visited pages. */
 async function pageTitles(paths: string[]): Promise<PageTitles> {
   const refs = paths.map(pageRef);
