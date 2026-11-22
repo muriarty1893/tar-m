@@ -41,6 +41,10 @@ Clerk → (production) **Configure → Domains** lists five records, usually CNA
 
 - The `*` record Vercel added doesn't get in the way: a named record wins over the wildcard.
 - The domain's CAA records allow `letsencrypt.org` and `pki.goog`, the two authorities Clerk uses.
+- The zone also holds Zoho Mail's records (apex MX, apex SPF `v=spf1 include:zohomail.eu ~all`,
+  `zmail._domainkey`, `_dmarc`). Clerk's records are all on their own subdomains and don't touch
+  them; never add a second apex SPF record (one domain, one SPF). Clerk signs its mail with its own
+  DKIM keys on this domain, which is what DMARC checks.
 - Back in Clerk: **Verify configuration**, then **Deploy certificates** on the instance's home page
   once all five show as verified (minutes with Vercel DNS; Clerk allows up to 48 hours).
 
@@ -82,6 +86,8 @@ serves it too; no Android or iOS client is needed.
   isn't allowed, add the address it names (e-mail code sign-in needs none of this).
 - E-mail codes now come from `notifications@ciftcidestek.com.tr`; the hints under the code box on the
   site (`lib/clerk-localization.ts`) and in the app (`mobile/src/lib/config.ts`) follow the key.
+  Clerk advises a real mailbox behind that address (mail providers check): add `notifications` as an
+  alias of an existing mailbox in Zoho Mail.
 
 ## 5. Keys and deploy
 
