@@ -76,14 +76,28 @@ describe("listing form", () => {
 
 describe("Pazar filters in the URL", () => {
   test("unknown values fall back to the defaults", () => {
-    expect(parseMarketQuery({ kategori: "uzay", sirala: "x", il: "Atlantis", sayfa: "-3", gorunum: "?" })).toEqual({
+    expect(
+      parseMarketQuery({ kategori: "uzay", sirala: "x", il: "Atlantis", sayfa: "-3", gorunum: "?", fmin: "çok", fmax: "-5", tarih: "2", foto: "evet", duzen: "?" }),
+    ).toEqual({
       q: "",
       kategori: "tumu",
       il: "",
+      fmin: null,
+      fmax: null,
+      tarih: 0,
+      foto: false,
       sirala: "yeni",
       gorunum: "tumu",
+      duzen: "liste",
       sayfa: 1,
     });
+  });
+
+  test("price, date, photo and layout filters", () => {
+    const q = parseMarketQuery({ fmin: "10.000", fmax: "250000", tarih: "7", foto: "1", duzen: "galeri" });
+    expect(q).toMatchObject({ fmin: 10000, fmax: 250000, tarih: 7, foto: true, duzen: "galeri" });
+    expect(marketHref(q)).toBe("/pazar?fmin=10000&fmax=250000&tarih=7&foto=1&duzen=galeri");
+    expect(parseMarketQuery({ fmax: "999999999999" }).fmax).toBe(100_000_000);
   });
 
   test("round trip, with defaults left out and the page reset on change", () => {

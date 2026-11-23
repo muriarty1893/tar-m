@@ -146,9 +146,41 @@ export const SORTS: { id: MarketSort; label: string }[] = [
   { id: "pahali", label: "En yüksek fiyat" },
 ];
 
-export type MarketQuery = { q: string; kategori: CategoryId; il: string; sirala: MarketSort; gorunum: MarketView; sayfa: number };
+/** How the results are laid out on wide screens: sahibinden's table (default) or photo cards. */
+export type MarketLayout = "liste" | "galeri";
+/** "Son N gün" in the date filter; 0 is any time. */
+export type MarketDays = 0 | 1 | 3 | 7 | 30;
+
+export const DATE_FILTERS: { days: Exclude<MarketDays, 0>; label: string }[] = [
+  { days: 1, label: "Son 24 saat" },
+  { days: 3, label: "Son 3 gün" },
+  { days: 7, label: "Son 7 gün" },
+  { days: 30, label: "Son 30 gün" },
+];
+
+export type MarketQuery = {
+  q: string;
+  kategori: CategoryId;
+  il: string;
+  /** Price range in lira; null is open. */
+  fmin: number | null;
+  fmax: number | null;
+  tarih: MarketDays;
+  /** Only listings with the seller's own photos. */
+  foto: boolean;
+  sirala: MarketSort;
+  gorunum: MarketView;
+  duzen: MarketLayout;
+  sayfa: number;
+};
 
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
+
+/** "145.000" or "145000" as a whole-lira bound; empty, zero or nonsense is no bound. */
+function priceBound(s: string): number | null {
+  const n = Math.round(parsePrice(s.slice(0, 20)));
+  return n > 0 ? Math.min(n, PRICE_MAX) : null;
+}
 
 /** Reads /pazar's search params; anything unknown falls back to the default. */
 export function parseMarketQuery(sp: Record<string, string | string[] | undefined>): MarketQuery {
@@ -157,29 +189,47 @@ export function parseMarketQuery(sp: Record<string, string | string[] | undefine
   const gorunum = first(sp.gorunum);
   const il = first(sp.il);
   const sayfa = Number.parseInt(first(sp.sayfa), 10);
+  const tarih = Number(first(sp.tarih));
   return {
     q: first(sp.q).trim().slice(0, 80),
     kategori: CATEGORIES.some((c) => c.id === kategori) ? (kategori as CategoryId) : "tumu",
     il: isProvince(il) ? il : "",
+    fmin: priceBound(first(sp.fmin)),
+    fmax: priceBound(first(sp.fmax)),
+    tarih: DATE_FILTERS.some((d) => d.days === tarih) ? (tarih as MarketDays) : 0,
+    foto: first(sp.foto) === "1",
     sirala: SORTS.some((s) => s.id === sirala) ? (sirala as MarketSort) : "yeni",
     gorunum: gorunum === "favoriler" || gorunum === "ilanlarim" ? gorunum : "tumu",
+    duzen: first(sp.duzen) === "galeri" ? "galeri" : "liste",
     sayfa: Number.isFinite(sayfa) && sayfa > 1 ? Math.min(sayfa, 100) : 1,
   };
 }
 
-/** /pazar with these filters; defaults are left out of the URL. */
-export function marketHref(q: MarketQuery, change: Partial<MarketQuery> = {}) {
-  const next = { ...q, sayfa: 1, ...change };
+/** The query's search params, defaults left out (the order matches the filter form). */
+export function marketParams(q: MarketQuery) {
   const p = new URLSearchParams();
-  if (next.q) p.set("q", next.q);
-  if (next.kategori !== "tumu") p.set("kategori", next.kategori);
-  if (next.il) p.set("il", next.il);
-  if (next.sirala !== "yeni") p.set("sirala", next.sirala);
-  if (next.gorunum !== "tumu") p.set("gorunum", next.gorunum);
-  if (next.sayfa > 1) p.set("sayfa", String(next.sayfa));
-  const s = p.toString();
+  if (q.q) p.set("q", q.q);
+  if (q.kategori !== "tumu") p.set("kategori", q.kategori);
+  if (q.il) p.set("il", q.il);
+  if (q.fmin) p.set("fmin", String(q.fmin));
+  if (q.fmax) p.set("fmax", String(q.fmax));
+  if (q.tarih) p.set("tarih", String(q.tarih));
+  if (q.foto) p.set("foto", "1");
+  if (q.sirala !== "yeni") p.set("sirala", q.sirala);
+  if (q.gorunum !== "tumu") p.set("gorunum", q.gorunum);
+  if (q.duzen !== "liste") p.set("duzen", q.duzen);
+  if (q.sayfa > 1) p.set("sayfa", String(q.sayfa));
+  return p;
+}
+
+/** /pazar with these filters; defaults are left out of the URL. Any change goes back to page 1. */
+export function marketHref(q: MarketQuery, change: Partial<MarketQuery> = {}) {
+  const s = marketParams({ ...q, sayfa: 1, ...change }).toString();
   return s ? `/pazar?${s}` : "/pazar";
 }
+
+/** Whether any of the sidebar's filters (not the words or category) is set. */
+export const hasSideFilters = (q: MarketQuery) => Boolean(q.il || q.fmin || q.fmax || q.tarih || q.foto);
 
 // ---------------------------------------------------------------- Offers in chats
 

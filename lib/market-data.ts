@@ -14,6 +14,8 @@ export type ListingCard = {
   id: string;
   title: string;
   category: ListingCategory;
+  /** "sifir" / "ikinci-el"; null for produce. */
+  condition: string | null;
   price: number;
   unit: string | null;
   province: string;
@@ -33,6 +35,7 @@ function toCard(r: Row): ListingCard {
     id: str(r.id),
     title: str(r.title),
     category,
+    condition: r.condition ? str(r.condition) : null,
     price: num(r.price) ?? 0,
     unit: r.unit ? str(r.unit) : null,
     province: str(r.province),
@@ -46,7 +49,7 @@ function toCard(r: Row): ListingCard {
   };
 }
 
-const CARD_COLUMNS = "l.id, l.title, l.category, l.price, l.unit, l.province, l.district, l.photos, l.status, l.created_at, l.seller_id";
+const CARD_COLUMNS = "l.id, l.title, l.category, l.condition, l.price, l.unit, l.province, l.district, l.photos, l.status, l.created_at, l.seller_id";
 
 /** One page of /pazar for these filters. Favoriler and İlanlarım need `userId`. */
 export async function listListings(q: MarketQuery, userId: string | null): Promise<{ items: ListingCard[]; total: number }> {
@@ -69,6 +72,10 @@ export async function listListings(q: MarketQuery, userId: string | null): Promi
   }
   if (q.kategori !== "tumu") where.push(`l.category = ${p(q.kategori)}`);
   if (q.il) where.push(`l.province = ${p(q.il)}`);
+  if (q.fmin) where.push(`l.price >= ${p(q.fmin)}`);
+  if (q.fmax) where.push(`l.price <= ${p(q.fmax)}`);
+  if (q.tarih) where.push(`l.created_at >= now() - make_interval(days => ${p(q.tarih)}::int)`);
+  if (q.foto) where.push(`cardinality(coalesce(l.photos, '{}')) > 0`);
   const words = fold(q.q).split(/\s+/).filter(Boolean).slice(0, 6);
   for (const w of words) where.push(`l.search_text like ${p(`%${w.replace(/[\\%_]/g, (c) => `\\${c}`)}%`)}`);
 

@@ -7,7 +7,7 @@ import { agoLabel } from "@/lib/tr-time";
 
 /**
  * A listing as a row, the way sahibinden.com lists them on a phone: the photo on the left; the title,
- * the price in the brand green, then place and date on the right. Hairlines between rows.
+ * the place, then the date and (bottom right) the price in the site's blue. Hairlines between rows.
  */
 export function ListingRow({ listing: l, now, mine = false }: { listing: ListingCard; now?: Date; mine?: boolean }) {
   const place = l.district ? `${l.district}, ${l.province}` : l.province;
@@ -22,15 +22,17 @@ export function ListingRow({ listing: l, now, mine = false }: { listing: Listing
           )}
         </span>
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className="line-clamp-2 font-semibold leading-snug">{l.title}</span>
-          <span className="mt-1 text-base font-bold text-primary tabular-nums">
-            {formatPrice(l.price)}
-            {l.unit && <span className="text-sm font-semibold text-muted-foreground"> / {l.unit}</span>}
-          </span>
-          <span className="mt-auto flex min-w-0 items-center gap-1 pt-1 text-sm text-muted-foreground">
+          <span className="line-clamp-2 text-[15px] font-semibold leading-snug">{l.title}</span>
+          <span className="mt-0.5 flex min-w-0 items-center gap-1 text-[13px] text-muted-foreground">
             <MapPinIcon aria-hidden="true" weight="fill" className="size-3.5 shrink-0" />
             <span className="truncate">{place}</span>
-            {now && <span className="ml-auto shrink-0 pl-2">{agoLabel(new Date(l.createdAt), now)}</span>}
+          </span>
+          <span className="mt-auto flex items-end justify-between gap-2 pt-1">
+            <span className="text-[12.5px] text-muted-foreground">{now ? agoLabel(new Date(l.createdAt), now) : ""}</span>
+            <span className="shrink-0 text-right font-borsa-mono text-[15px] font-semibold text-primary">
+              {formatPrice(l.price)}
+              {l.unit && <span className="font-sans text-[12.5px] font-medium text-muted-foreground"> / {l.unit}</span>}
+            </span>
           </span>
           <span className="sr-only">
             Kategori: {categoryLabel(l.category)}
