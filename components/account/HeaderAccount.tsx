@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { UserButton, useAuth } from "@clerk/nextjs";
-import { BellIcon, ChatsCircleIcon, HeartIcon, PlantIcon, SignInIcon, StorefrontIcon, UserCircleIcon } from "@phosphor-icons/react/dist/ssr";
+import { BellIcon, ChatsCircleIcon, HeartIcon, PlantIcon, ShieldCheckIcon, SignInIcon, StorefrontIcon, UserCircleIcon } from "@phosphor-icons/react/dist/ssr";
 import { buttonVariants } from "@/components/ui/button";
 
 /** How often the header asks for the unread count while the tab is visible. */
@@ -44,6 +44,42 @@ export function useUnreadCounts() {
     };
   }, [isSignedIn, pathname]);
   return isSignedIn ? counts : { messages: 0, notifications: 0 };
+}
+
+/** Asks the server once whether the signed-in person is an admin (false until it answers). */
+export function useIsAdmin(ask: boolean) {
+  const [admin, setAdmin] = useState(false);
+  useEffect(() => {
+    if (!ask) return;
+    let live = true;
+    fetch("/api/yonetici", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { admin: false }))
+      .then((d: { admin?: boolean }) => live && setAdmin(d.admin === true))
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [ask]);
+  return ask && admin;
+}
+
+/** Desktop header: "Yönetim" for admins only (phones have it in the Hızlı menü). */
+export function AdminLink() {
+  const { isSignedIn } = useAuth();
+  const admin = useIsAdmin(Boolean(isSignedIn));
+  const pathname = usePathname();
+  if (!admin) return null;
+  const here = pathname === "/yonetim" || pathname.startsWith("/yonetim/");
+  return (
+    <Link
+      href="/yonetim"
+      aria-current={here ? "page" : undefined}
+      className="mr-1 hidden min-h-9 items-center gap-1.5 rounded-md border border-gold/40 px-2.5 text-[13.5px] font-semibold text-gold transition-colors hover:bg-gold-soft aria-[current=page]:bg-gold-soft xl:inline-flex"
+    >
+      <ShieldCheckIcon aria-hidden="true" weight="fill" className="size-4" />
+      Yönetim
+    </Link>
+  );
 }
 
 /** The number of chats with unread messages. */

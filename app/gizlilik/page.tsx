@@ -16,7 +16,7 @@ export const metadata: Metadata = {
  * ones (listed in docs/placeholders.md). The company, address and terms are not real.
  */
 const PLACEHOLDER = {
-  controller: "Çiftçi Destek Bilişim ve Tarım Hizmetleri Ltd. Şti., Yazır Mah. Bosna Hersek Cad. No: 12, 42250 Selçuklu / Konya",
+  controller: `${siteConfig.name} Bilişim ve Tarım Hizmetleri Ltd. Şti., Yazır Mah. Bosna Hersek Cad. No: 12, 42250 Selçuklu / Konya`,
   transfer:
     "Yurt dışına aktarım, KVKK madde 9 uyarınca hizmet sağlayıcılarla imzalanan standart sözleşmelere ve gerektiğinde açık rızanıza dayanılarak yapılır; standart sözleşmeler imzalandıktan sonra beş iş günü içinde Kişisel Verileri Koruma Kurumuna bildirilir.",
   retention:

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
 import { siteConfig } from "@/config/site";
-import { AccountButton, MessagesLink } from "./account/HeaderAccount";
+import { AccountButton, AdminLink, MessagesLink } from "./account/HeaderAccount";
 
 /** The wide-screen menu: plain links, the current page in blue with a line under it. */
 function DesktopNav({ pathname }: { pathname: string }) {
@@ -57,6 +57,7 @@ export function Header() {
 
         <div className="ml-auto flex shrink-0 items-center gap-0.5">
           <Suspense>
+            <AdminLink />
             <MessagesLink />
           </Suspense>
           <Suspense fallback={<span aria-hidden="true" className="block size-9" />}>

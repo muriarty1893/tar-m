@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type RefObject } from "react";
+import type { RefObject } from "react";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import { CaretRightIcon, EnvelopeSimpleIcon, ShieldCheckIcon, SignOutIcon, UserCircleIcon } from "@phosphor-icons/react/dist/ssr";
 import { siteConfig } from "@/config/site";
 import { buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { useUnreadCounts } from "@/components/account/HeaderAccount";
+import { useIsAdmin, useUnreadCounts } from "@/components/account/HeaderAccount";
 import { QUICK_ITEMS, QUICK_LINKS, TILE } from "./quick-menu-items";
 
 /**
@@ -140,21 +140,4 @@ function SignOut({ onDone, signOut, compact = false }: { onDone: () => void; sig
       Çıkış yap
     </button>
   );
-}
-
-/** Asks once per sheet opening whether the signed-in person is an admin. */
-function useIsAdmin(ask: boolean) {
-  const [admin, setAdmin] = useState(false);
-  useEffect(() => {
-    if (!ask) return;
-    let live = true;
-    fetch("/api/yonetici", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : { admin: false }))
-      .then((d: { admin?: boolean }) => live && setAdmin(d.admin === true))
-      .catch(() => {});
-    return () => {
-      live = false;
-    };
-  }, [ask]);
-  return admin;
 }
