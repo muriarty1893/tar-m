@@ -51,8 +51,8 @@ function toCard(r: Row): ListingCard {
 
 const CARD_COLUMNS = "l.id, l.title, l.category, l.condition, l.price, l.unit, l.province, l.district, l.photos, l.status, l.created_at, l.seller_id";
 
-/** One page of /pazar for these filters. Favoriler and İlanlarım need `userId`. */
-export async function listListings(q: MarketQuery, userId: string | null): Promise<{ items: ListingCard[]; total: number }> {
+/** One page of /pazar for these filters (`limit`: the showcase takes more). Favoriler and İlanlarım need `userId`. */
+export async function listListings(q: MarketQuery, userId: string | null, limit = PAGE_SIZE): Promise<{ items: ListingCard[]; total: number }> {
   const params: unknown[] = [];
   const p = (v: unknown) => {
     params.push(v);
@@ -75,6 +75,7 @@ export async function listListings(q: MarketQuery, userId: string | null): Promi
   if (q.fmin) where.push(`l.price >= ${p(q.fmin)}`);
   if (q.fmax) where.push(`l.price <= ${p(q.fmax)}`);
   if (q.tarih) where.push(`l.created_at >= now() - make_interval(days => ${p(q.tarih)}::int)`);
+  if (q.durum) where.push(`l.condition = ${p(q.durum)}`);
   if (q.foto) where.push(`cardinality(coalesce(l.photos, '{}')) > 0`);
   if (isListingNo(q.q)) {
     // An "İlan no" (the first 8 characters of the id, as the listing page shows it).
@@ -91,7 +92,7 @@ export async function listListings(q: MarketQuery, userId: string | null): Promi
     from listings l
     where ${where.join(" and ")}
     order by ${order}
-    limit ${PAGE_SIZE} offset ${(q.sayfa - 1) * PAGE_SIZE}`;
+    limit ${Math.min(Math.max(1, Math.floor(limit)), 60)} offset ${(q.sayfa - 1) * PAGE_SIZE}`;
   const rows = await sql().query(text, params);
   return { items: rows.map(toCard), total: rows.length ? Number(rows[0].total) : 0 };
 }

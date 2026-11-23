@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPinIcon } from "@phosphor-icons/react/dist/ssr";
 import type { ListingCard } from "@/lib/market-data";
-import { categoryLabel, formatPrice } from "@/lib/market";
+import { categoryLabel, formatTL } from "@/lib/market";
 import { agoLabel } from "@/lib/tr-time";
 
 /**
@@ -30,7 +30,7 @@ export function ListingRow({ listing: l, now, mine = false }: { listing: Listing
           <span className="mt-auto flex items-end justify-between gap-2 pt-1">
             <span className="text-[12.5px] text-muted-foreground">{now ? agoLabel(new Date(l.createdAt), now) : ""}</span>
             <span className="shrink-0 text-right font-borsa-mono text-[15px] font-semibold text-primary">
-              {formatPrice(l.price)}
+              {formatTL(l.price)}
               {l.unit && <span className="font-sans text-[12.5px] font-medium text-muted-foreground"> / {l.unit}</span>}
             </span>
           </span>

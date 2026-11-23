@@ -99,7 +99,7 @@ export function validateListing(d: ListingInput): ListingErrors {
 }
 
 /** The form's order, for the error summary. */
-export const LISTING_FIELD_ORDER: ListingField[] = ["photos", "title", "category", "condition", "price", "unit", "quantity", "province", "district", "description"];
+export const LISTING_FIELD_ORDER: ListingField[] = ["category", "title", "description", "price", "unit", "quantity", "condition", "province", "district", "photos"];
 
 /** A valid input as the values saved in `listings`. */
 export function normalizeListing(d: ListingInput) {
@@ -149,14 +149,20 @@ export const SORTS: { id: MarketSort; label: string }[] = [
 /** How the results are laid out on wide screens: sahibinden's table (default) or photo cards. */
 export type MarketLayout = "liste" | "galeri";
 /** "Son N gün" in the date filter; 0 is any time. */
-export type MarketDays = 0 | 1 | 3 | 7 | 30;
+export type MarketDays = 0 | 1 | 3 | 7 | 15 | 30;
 
 export const DATE_FILTERS: { days: Exclude<MarketDays, 0>; label: string }[] = [
   { days: 1, label: "Son 24 saat" },
-  { days: 3, label: "Son 3 gün" },
-  { days: 7, label: "Son 7 gün" },
-  { days: 30, label: "Son 30 gün" },
+  { days: 3, label: "Son 3 gün içinde" },
+  { days: 7, label: "Son 7 gün içinde" },
+  { days: 15, label: "Son 15 gün içinde" },
+  { days: 30, label: "Son 30 gün içinde" },
 ];
+
+/** "1.100.000 TL", "12,50 TL": prices in Pazar as sahibinden writes them. */
+export const formatTL = (n: number) => formatPrice(n).replace("₺", "TL");
+/** "11.200 TL / ton" */
+export const priceTL = (price: number, unit?: string | null) => (unit ? `${formatTL(price)} / ${unit}` : formatTL(price));
 
 export type MarketQuery = {
   q: string;
@@ -166,6 +172,8 @@ export type MarketQuery = {
   fmin: number | null;
   fmax: number | null;
   tarih: MarketDays;
+  /** "Durumu": sıfır or ikinci el; "" is both. */
+  durum: "" | Condition;
   /** Only listings with the seller's own photos. */
   foto: boolean;
   sirala: MarketSort;
@@ -197,6 +205,7 @@ export function parseMarketQuery(sp: Record<string, string | string[] | undefine
     fmin: priceBound(first(sp.fmin)),
     fmax: priceBound(first(sp.fmax)),
     tarih: DATE_FILTERS.some((d) => d.days === tarih) ? (tarih as MarketDays) : 0,
+    durum: CONDITIONS.some((c) => c.id === first(sp.durum)) ? (first(sp.durum) as Condition) : "",
     foto: first(sp.foto) === "1",
     sirala: SORTS.some((s) => s.id === sirala) ? (sirala as MarketSort) : "yeni",
     gorunum: gorunum === "favoriler" || gorunum === "ilanlarim" ? gorunum : "tumu",
@@ -214,6 +223,7 @@ export function marketParams(q: MarketQuery) {
   if (q.fmin) p.set("fmin", String(q.fmin));
   if (q.fmax) p.set("fmax", String(q.fmax));
   if (q.tarih) p.set("tarih", String(q.tarih));
+  if (q.durum) p.set("durum", q.durum);
   if (q.foto) p.set("foto", "1");
   if (q.sirala !== "yeni") p.set("sirala", q.sirala);
   if (q.gorunum !== "tumu") p.set("gorunum", q.gorunum);
@@ -222,10 +232,13 @@ export function marketParams(q: MarketQuery) {
   return p;
 }
 
-/** /pazar with these filters; defaults are left out of the URL. Any change goes back to page 1. */
+/**
+ * The results page for these filters; defaults are left out of the URL, and any change goes back to
+ * page 1. Bare /pazar is the showcase (sahibinden's home), so "everything" is /pazar?sirala=yeni.
+ */
 export function marketHref(q: MarketQuery, change: Partial<MarketQuery> = {}) {
   const s = marketParams({ ...q, sayfa: 1, ...change }).toString();
-  return s ? `/pazar?${s}` : "/pazar";
+  return `/pazar?${s || "sirala=yeni"}`;
 }
 
 /** "D908CB5E": a listing's number, as its page shows it (the id's first 8 characters). */
@@ -233,7 +246,7 @@ export const isListingNo = (s: string) => /^[0-9a-f]{8}$/i.test(s.trim());
 export const listingNo = (id: string) => id.slice(0, 8).toUpperCase();
 
 /** Whether any of the sidebar's filters (not the words or category) is set. */
-export const hasSideFilters = (q: MarketQuery) => Boolean(q.il || q.fmin || q.fmax || q.tarih || q.foto);
+export const hasSideFilters = (q: MarketQuery) => Boolean(q.il || q.fmin || q.fmax || q.tarih || q.durum || q.foto);
 
 // ---------------------------------------------------------------- Offers in chats
 

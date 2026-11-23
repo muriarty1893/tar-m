@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPinIcon } from "@phosphor-icons/react/dist/ssr";
 import type { ListingCard as Card } from "@/lib/market-data";
-import { categoryLabel, formatPrice, placeLabel } from "@/lib/market";
+import { categoryLabel, formatTL, placeLabel } from "@/lib/market";
 import { agoLabel } from "@/lib/tr-time";
 import { FavoriteButton } from "./FavoriteButton";
 
@@ -23,7 +23,7 @@ export function ListingCard({ listing: l, now, mine = false, showFavorite = true
         </div>
         <div className="p-3">
           <p className="truncate text-lg font-bold">
-            {formatPrice(l.price)}
+            {formatTL(l.price)}
             {l.unit && <span className="text-sm font-medium text-muted-foreground"> / {l.unit}</span>}
           </p>
           <h3 className="line-clamp-2 min-h-[2lh] font-medium leading-snug">{l.title}</h3>

@@ -13,40 +13,37 @@ test("the header menu lists the tools that work on the site", async ({ page, isM
   await expect(page.locator("header").getByRole("link", { name: "Giriş yap" })).toBeVisible();
 });
 
-test("Pazar: search, categories and the post-a-listing button are in view", async ({ page, isMobile }) => {
+test("Pazar opens on the showcase, as sahibinden's home: search, categories with counts, the newest listings", async ({ page }) => {
   await page.goto("/pazar");
-  await expect(page.getByRole("heading", { level: 1, name: isMobile ? "Pazar" : "Çiftçi Pazarı" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Pazar" })).toBeVisible();
   await expect(page.getByRole("search", { name: "İlan ara" })).toBeVisible();
   const cats = page.getByRole("navigation", { name: "Kategoriler" });
-  for (const name of ["Ürün", "Tohum & Gübre", "Alet", "Ekipman", "Araç"]) await expect(cats.getByRole("link", { name })).toBeVisible();
-  if (!isMobile) await expect(cats.getByRole("link", { name: "Tümü" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "İlan ver" }).first()).toHaveAttribute("href", "/pazar/ilan-ver");
-  // One safety note per layout (above the listings on wide screens, below them on phones).
-  await expect(page.getByText(/Güvenli alışveriş/).filter({ visible: true })).toBeVisible();
+  for (const name of ["Ürün", "Tohum & Gübre", "Alet", "Ekipman", "Araç"]) await expect(cats.getByRole("link", { name: new RegExp(`^${name} \\(\\d+\\)$`) })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pazar Vitrini" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /İlan ver/i }).first()).toHaveAttribute("href", "/pazar/ilan-ver");
 });
 
-test("Pazar on phones, as on sahibinden: a category list with counts, then the listings as rows", async ({ page, isMobile }) => {
-  test.skip(!isMobile, "phones only");
-  await page.goto("/pazar");
-  const cats = page.getByRole("navigation", { name: "Kategoriler" });
-  await expect(cats.getByText("Kategoriler")).toBeVisible();
-  await expect(cats.getByRole("link", { name: /^Araç \(\d+\)$/ })).toBeVisible();
-  // "Son ilanlar" (with "· Sayfa 1 / 3" when there are more pages) over the rows, or "İlan bulunamadı."
-  await expect(page.getByText(/^(Son ilanlar|İlan bulunamadı\.)/).filter({ visible: true })).toBeVisible();
-  // The grid of cards is the wide-screen view; phones list rows with the photo on the left.
-  await expect(page.locator("main ul.grid").filter({ visible: true })).toHaveCount(0);
+test("Pazar results: the sahibinden box over a table on wide screens, a Filtrele | Sırala bar and rows on phones", async ({ page, isMobile }) => {
+  await page.goto("/pazar?sirala=yeni");
+  await expect(page.getByText(/sonuç bulundu\./)).toBeVisible();
+  if (isMobile) {
+    await expect(page.getByRole("button", { name: /Filtrele/ })).toBeVisible();
+    await expect(page.getByRole("table")).toBeHidden();
+  } else {
+    await expect(page.getByRole("columnheader", { name: "İlan Başlığı" })).toBeVisible();
+    await expect(page.getByRole("form", { name: "Filtreler" }).filter({ visible: true })).toBeVisible();
+  }
 });
 
 test("Pazar: a category is kept in the address and marked as current", async ({ page, isMobile }) => {
   await page.goto("/pazar");
   await page.getByRole("navigation", { name: "Kategoriler" }).getByRole("link", { name: /^Araç/ }).click();
   await expect(page).toHaveURL(/\/pazar\?kategori=arac$/);
+  await expect(page.getByText(/“Araç” kategorisinde/)).toBeVisible();
   if (isMobile) {
-    // The phone shows where you are, with a way back to every category.
-    await expect(page.getByText("Pazar ›")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Kategoriyi kaldır" })).toHaveAttribute("href", "/pazar");
+    await expect(page.getByRole("link", { name: "Kategoriyi kaldır" })).toHaveAttribute("href", "/pazar?sirala=yeni");
   } else {
-    await expect(page.getByRole("navigation", { name: "Kategoriler" }).getByRole("link", { name: "Araç" })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("navigation", { name: "Kategoriler" }).getByRole("link", { name: /^Araç/ })).toHaveAttribute("aria-current", "page");
   }
 });
 

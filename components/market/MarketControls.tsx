@@ -3,9 +3,9 @@
 import Form from "next/form";
 import Link from "next/link";
 import { useRef, type FormEvent, type ReactNode } from "react";
-import { CaretDownIcon, MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr";
 import { provinces } from "@/data/provinces";
-import { DATE_FILTERS, SORTS, marketHref, marketParams, type MarketQuery } from "@/lib/market";
+import { CONDITIONS, DATE_FILTERS, SORTS, marketHref, marketParams, type MarketQuery } from "@/lib/market";
 import { SelectChevron, selectClass } from "@/components/forms/fields";
 
 /**
@@ -20,6 +20,8 @@ type Key = keyof MarketQuery;
 /** The query's other filters, as hidden fields. */
 function Keep({ query, except }: { query: MarketQuery; except: Key[] }) {
   const params = marketParams({ ...query, sayfa: 1 });
+  // Always send the order, so a form with nothing filled in still opens the results, not the showcase.
+  if (!params.has("sirala")) params.set("sirala", query.sirala);
   return [...params]
     .filter(([k]) => !except.includes(k as Key))
     .map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />);
@@ -66,44 +68,61 @@ export function MarketSearch({ query }: { query: MarketQuery }) {
   );
 }
 
-/** One collapsible filter section, open at first, as sahibinden's left column. */
-function Section({ title, children, open = true }: { title: string; children: ReactNode; open?: boolean }) {
+/** A grey filter box with a bold heading, as in sahibinden's left column. */
+function Box({ title, hideTitle = false, aside, children }: { title: string; hideTitle?: boolean; aside?: ReactNode; children: ReactNode }) {
   return (
-    <details open={open} className="group border-b border-border">
-      <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between px-3 text-[13px] font-bold transition-colors hover:bg-muted/50 xl:min-h-9 [&::-webkit-details-marker]:hidden">
+    <fieldset className="rounded-sm bg-muted/80 px-3 pb-3 pt-2.5">
+      <legend className={hideTitle ? "sr-only" : "float-left mb-2 flex w-full items-baseline justify-between text-[14px] font-bold"}>
         {title}
-        <CaretDownIcon aria-hidden="true" weight="bold" className="size-3.5 text-muted-foreground transition-transform group-open:rotate-180" />
-      </summary>
-      <div className="px-3 pb-3">{children}</div>
-    </details>
+        {aside}
+      </legend>
+      <div className="clear-both">{children}</div>
+    </fieldset>
   );
 }
 
 const smallInput =
-  "min-h-10 w-full min-w-0 rounded-md border border-input bg-card px-2.5 text-[15px] tabular-nums outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 xl:min-h-9 xl:text-[13.5px]";
-const choice = "flex min-h-10 cursor-pointer items-center gap-2 text-[14px] xl:min-h-7 xl:text-[13px]";
+  "min-h-10 w-full min-w-0 rounded-sm border border-input bg-card px-2 text-[15px] outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 xl:min-h-8 xl:text-[13px]";
+const choice = "flex min-h-10 cursor-pointer items-center gap-2 text-[14px] text-primary xl:min-h-6 xl:text-[13px]";
+const heading = "px-0.5 pt-1 text-[15px] font-bold";
 
-/** The left column's filters: Adres, Fiyat, İlan tarihi, Fotoğraf. `id` keeps two copies apart. */
+/**
+ * The left column's filters, in sahibinden's order: Durumu; "Arama Seçenekleri" (Adres, Fiyat,
+ * Kelime ile filtrele); "Diğer Seçenekler" (İlan Tarihi, Fotoğraflı ilanlar); the Ara button stays
+ * in view at the bottom. `id` keeps two copies (column and phone sheet) apart.
+ */
 export function MarketFilterForm({ query, id }: { query: MarketQuery; id: string }) {
-  const clear = marketHref(query, { il: "", fmin: null, fmax: null, tarih: 0, foto: false });
+  const clear = marketHref(query, { q: "", il: "", fmin: null, fmax: null, tarih: 0, durum: "", foto: false });
   return (
     <Form
       action="/pazar"
       aria-label="Filtreler"
+      className="space-y-2.5"
       onSubmit={(e) => {
         dropEmpty(e);
         closeSheet(e.currentTarget);
       }}
     >
-      <Keep query={query} except={["il", "fmin", "fmax", "tarih", "foto"]} />
+      <Keep query={query} except={["q", "il", "fmin", "fmax", "tarih", "durum", "foto"]} />
 
-      <Section title="Adres">
+      <p className={heading}>Durumu</p>
+      <Box title="Durumu" hideTitle>
+        {[...CONDITIONS, { id: "" as const, label: "Tümü" }].map((c) => (
+          <label key={c.id || "tumu"} className={choice}>
+            <input type="radio" name="durum" value={c.id} defaultChecked={query.durum === c.id} className="size-4 accent-[var(--primary)]" />
+            {c.label}
+          </label>
+        ))}
+      </Box>
+
+      <p className={heading}>Arama Seçenekleri</p>
+      <Box title="Adres" aside={<span className="text-[12px] font-normal text-primary">Türkiye</span>}>
         <label htmlFor={`${id}-il`} className="sr-only">
           İl
         </label>
         <div className="relative">
-          <select id={`${id}-il`} name="il" defaultValue={query.il} className={`${selectClass} min-h-10 text-[15px] xl:min-h-9 xl:text-[13.5px]`}>
-            <option value="">Tüm iller</option>
+          <select id={`${id}-il`} name="il" defaultValue={query.il} className={`${selectClass} min-h-10 rounded-sm text-[15px] xl:min-h-8 xl:py-1 xl:text-[13px]`}>
+            <option value="">İl</option>
             {provinces.map((p) => (
               <option key={p.name} value={p.name}>
                 {p.name}
@@ -112,48 +131,53 @@ export function MarketFilterForm({ query, id }: { query: MarketQuery; id: string
           </select>
           <SelectChevron />
         </div>
-      </Section>
+      </Box>
 
-      <Section title="Fiyat">
+      <Box title="Fiyat">
         <div className="flex items-center gap-1.5">
           <label htmlFor={`${id}-fmin`} className="sr-only">
             En düşük fiyat (TL)
           </label>
           <input id={`${id}-fmin`} name="fmin" inputMode="numeric" autoComplete="off" defaultValue={query.fmin ?? ""} placeholder="min TL" className={smallInput} />
           <span aria-hidden="true" className="text-muted-foreground">
-            –
+            -
           </span>
           <label htmlFor={`${id}-fmax`} className="sr-only">
             En yüksek fiyat (TL)
           </label>
           <input id={`${id}-fmax`} name="fmax" inputMode="numeric" autoComplete="off" defaultValue={query.fmax ?? ""} placeholder="max TL" className={smallInput} />
         </div>
-      </Section>
+      </Box>
 
-      <Section title="İlan tarihi">
-        <fieldset>
-          <legend className="sr-only">İlan tarihi</legend>
-          {[{ days: 0, label: "Tümü" }, ...DATE_FILTERS].map((d) => (
-            <label key={d.days} className={choice}>
-              <input type="radio" name="tarih" value={d.days || ""} defaultChecked={query.tarih === d.days} className="size-4 accent-[var(--primary)]" />
-              {d.label}
-            </label>
-          ))}
-        </fieldset>
-      </Section>
+      <Box title="Kelime ile filtrele">
+        <label htmlFor={`${id}-q`} className="sr-only">
+          Kelime
+        </label>
+        <input id={`${id}-q`} name="q" type="search" defaultValue={query.q} autoComplete="off" className={smallInput} />
+      </Box>
 
-      <Section title="Fotoğraf">
+      <p className={heading}>Diğer Seçenekler</p>
+      <Box title="İlan Tarihi">
+        {[...DATE_FILTERS, { days: 0, label: "Tümü" }].map((d) => (
+          <label key={d.days} className={choice}>
+            <input type="radio" name="tarih" value={d.days || ""} defaultChecked={query.tarih === d.days} className="size-4 accent-[var(--primary)]" />
+            {d.label}
+          </label>
+        ))}
+      </Box>
+
+      <Box title="Fotoğraflı ilanlar">
         <label className={choice}>
           <input type="checkbox" name="foto" value="1" defaultChecked={query.foto} className="size-4 accent-[var(--primary)]" />
           Fotoğraflı ilanlar
         </label>
-      </Section>
+      </Box>
 
-      <div className="flex items-center gap-3 p-3">
-        <button type="submit" className="inline-flex min-h-10 flex-1 cursor-pointer items-center justify-center rounded-md bg-primary px-4 font-semibold text-primary-foreground transition-colors hover:bg-primary/90 xl:min-h-9 xl:text-[14px]">
+      <div className="sticky bottom-0 z-10 -mx-1 flex items-center gap-3 border-t border-border bg-card/95 px-1 py-2.5 backdrop-blur-sm xl:bg-background/95">
+        <button type="submit" className="inline-flex min-h-11 flex-1 cursor-pointer items-center justify-center rounded-sm bg-primary px-4 text-[15px] font-bold text-primary-foreground shadow-soft transition-colors hover:bg-primary/90 xl:min-h-9">
           Ara
         </button>
-        <Link href={clear} onClick={(e) => closeSheet(e.currentTarget)} className="inline-flex min-h-10 items-center text-[14px] font-semibold text-primary hover:underline xl:min-h-9 xl:text-[13px]">
+        <Link href={clear} onClick={(e) => closeSheet(e.currentTarget)} className="inline-flex min-h-11 items-center text-[13px] font-semibold text-primary hover:underline xl:min-h-9">
           Temizle
         </Link>
       </div>

@@ -27,9 +27,9 @@ export function ReportListing({ listingId, reported }: { listingId: string; repo
   }
   if (!open) {
     return (
-      <button type="button" onClick={() => setOpen(true)} className="inline-flex min-h-11 cursor-pointer items-center gap-2 font-semibold text-muted-foreground underline-offset-4 hover:text-destructive hover:underline">
-        <FlagIcon aria-hidden="true" weight="bold" className="size-5" />
-        İlanı şikâyet et
+      <button type="button" onClick={() => setOpen(true)} className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 text-[13px] text-primary underline-offset-4 hover:underline">
+        <FlagIcon aria-hidden="true" weight="fill" className="size-4 text-muted-foreground" />
+        İlan ile İlgili Şikayetim Var
       </button>
     );
   }

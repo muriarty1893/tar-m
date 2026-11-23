@@ -85,6 +85,7 @@ describe("Pazar filters in the URL", () => {
       fmin: null,
       fmax: null,
       tarih: 0,
+      durum: "",
       foto: false,
       sirala: "yeni",
       gorunum: "tumu",
@@ -94,9 +95,10 @@ describe("Pazar filters in the URL", () => {
   });
 
   test("price, date, photo and layout filters", () => {
-    const q = parseMarketQuery({ fmin: "10.000", fmax: "250000", tarih: "7", foto: "1", duzen: "galeri" });
-    expect(q).toMatchObject({ fmin: 10000, fmax: 250000, tarih: 7, foto: true, duzen: "galeri" });
-    expect(marketHref(q)).toBe("/pazar?fmin=10000&fmax=250000&tarih=7&foto=1&duzen=galeri");
+    const q = parseMarketQuery({ fmin: "10.000", fmax: "250000", tarih: "15", durum: "sifir", foto: "1", duzen: "galeri" });
+    expect(q).toMatchObject({ fmin: 10000, fmax: 250000, tarih: 15, durum: "sifir", foto: true, duzen: "galeri" });
+    expect(marketHref(q)).toBe("/pazar?fmin=10000&fmax=250000&tarih=15&durum=sifir&foto=1&duzen=galeri");
+    expect(parseMarketQuery({ durum: "eski" }).durum).toBe("");
     expect(parseMarketQuery({ fmax: "999999999999" }).fmax).toBe(100_000_000);
   });
 
@@ -105,7 +107,7 @@ describe("Pazar filters in the URL", () => {
     expect(q.sayfa).toBe(3);
     expect(marketHref(q)).toBe("/pazar?q=trakt%C3%B6r&kategori=arac&il=Konya");
     expect(marketHref(q, { sayfa: 2 })).toContain("sayfa=2");
-    expect(marketHref(parseMarketQuery({}))).toBe("/pazar");
+    expect(marketHref(parseMarketQuery({}))).toBe("/pazar?sirala=yeni");
   });
 });
 

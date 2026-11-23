@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { ToolHeader } from "@/components/tool/ToolHeader";
 import { ListingForm } from "@/components/market/ListingForm";
 import { isAdmin, requireProfile } from "@/lib/auth";
 import { num, str } from "@/lib/db";
@@ -13,12 +12,10 @@ export const metadata: Metadata = { title: "İlanı düzenle", robots: { index: 
 export default function EditListingPage({ params }: PageProps<"/pazar/ilan/[id]/duzenle">) {
   return (
     <>
-      <ToolHeader eyebrow="Pazar" title="İlanı düzenle" />
-      <div className="mx-auto max-w-3xl px-3 py-3 sm:px-4 sm:py-6">
-        <Suspense fallback={<div aria-hidden="true" className="h-96 rounded-lg bg-muted motion-safe:animate-pulse" />}>
-          <EditListing params={params} />
-        </Suspense>
-      </div>
+      <h1 className="sr-only">İlanı düzenle</h1>
+      <Suspense fallback={<div aria-hidden="true" className="mx-auto mt-6 h-96 max-w-5xl rounded-sm bg-muted motion-safe:animate-pulse" />}>
+        <EditListing params={params} />
+      </Suspense>
     </>
   );
 }
@@ -36,7 +33,7 @@ async function EditListing({ params }: { params: PageProps<"/pazar/ilan/[id]/duz
   return (
     <>
       {someoneElses && (
-        <p className="mb-5 rounded-xl bg-gold-soft px-4 py-3 font-semibold text-gold ring-1 ring-gold/30">
+        <p className="mx-auto mt-4 max-w-5xl rounded-sm bg-gold-soft px-4 py-3 font-semibold text-gold ring-1 ring-gold/30 max-sm:mx-3">
           Yönetici olarak başkasının ilanını düzenliyorsunuz (satıcı: {str(r.seller_name) || "Kullanıcı"}).
         </p>
       )}
