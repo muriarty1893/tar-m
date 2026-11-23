@@ -76,10 +76,10 @@ test("FAQ has at least 6 questions that expand", async ({ page }) => {
   await expect(page.getByText("Türkçe bir dijital tarım rehberi", { exact: false })).toBeVisible();
 });
 
-test("privacy page is a KVKK draft with the legal-review note", async ({ page }) => {
+test("privacy page is the KVKK notice, with no unfilled [brackets] left", async ({ page }) => {
   await page.goto("/gizlilik");
-  await expect(page.getByText("Taslak — hukuki inceleme gereklidir.")).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("KVKK");
+  await expect(page.locator("article")).not.toContainText("[");
 });
 
 test("partner page covers problem, solution and market and has the form", async ({ page }) => {

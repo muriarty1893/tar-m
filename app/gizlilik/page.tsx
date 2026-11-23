@@ -7,8 +7,9 @@ export const metadata: Metadata = {
   description: `${siteConfig.name} web sitesinde toplanan kişisel verilerin işlenmesine ilişkin KVKK aydınlatma metni.`,
 };
 
-// DRAFT: written as a starting point only. A lawyer must review it before launch,
-// in particular the data-controller details and the cross-border transfer section.
+// DRAFT: written as a starting point only, no longer marked as such on the page (owner's choice,
+// 2026-11-23). A lawyer must review it before launch, in particular the data-controller details
+// and the cross-border transfer section.
 
 /**
  * ÖRNEK BİLGİLER: the three values below are made up, to be replaced by hand with the real
@@ -24,10 +25,7 @@ const PLACEHOLDER = {
 export default function PrivacyPage() {
   return (
     <article className="mx-auto max-w-3xl px-3 py-3 sm:px-4 sm:py-6">
-      <p role="note" className="rounded-md border-l-4 border-gold bg-gold-soft px-3 py-2.5 text-sm font-bold">
-        Taslak — hukuki inceleme gereklidir.
-      </p>
-      <h1 className="mt-3 text-xl font-bold sm:text-2xl">Gizlilik ve KVKK Aydınlatma Metni</h1>
+      <h1 className="text-xl font-bold sm:text-2xl">Gizlilik ve KVKK Aydınlatma Metni</h1>
 
       <div className="prose-article mt-3 space-y-3 rounded-md border border-border bg-card p-4 leading-relaxed sm:p-6">
         <p>
