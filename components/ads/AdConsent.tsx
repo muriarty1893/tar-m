@@ -45,11 +45,20 @@ function save(answer: "evet" | "hayir") {
   window.dispatchEvent(new Event(CHANGED));
 }
 
-/** True once this visitor has accepted ads, on a page that may show them. False on the server. */
-export function useAdsAllowed(): boolean {
-  const answer = useSyncExternalStore(subscribe, read, () => "hayir" as Answer);
+const noop = () => () => {};
+/** True on a page that may show ads, once the page runs in the browser (false on the server). */
+export function useAdsShown(): boolean {
+  const browser = useSyncExternalStore(noop, () => true, () => false);
   const path = usePathname();
-  return answer === "evet" && !adFreePath(path);
+  return browser && !adFreePath(path);
+}
+
+/**
+ * Ads show either way; the answer only decides whether Google may pick them by the visitor's
+ * interests. Without a yes (refused, or not answered yet) every ad request is non-personalised.
+ */
+function personalise(answer: Answer) {
+  (window.adsbygoogle = window.adsbygoogle || []).requestNonPersonalizedAds = answer === "evet" ? 0 : 1;
 }
 
 let loaded = false;
@@ -66,8 +75,9 @@ function loadAdSense(client: string) {
 
 /**
  * Asks once whether Google may show ads (with cookies), after the welcome question is answered, and
- * loads AdSense only on a yes. "Reddet" is as easy as "Kabul et"; the footer's "Reklam tercihleri"
- * asks again. The ads then fill the site's own boxes (AdStrip), sized by us.
+ * loads AdSense on every page that may show ads: personalised ads on a yes, non-personalised ones
+ * otherwise (the owner's choice, 2026-11-23). "Reddet" is as easy as "Kabul et"; the footer's
+ * "Reklam tercihleri" asks again. The ads then fill the site's own boxes (AdStrip), sized by us.
  */
 export function AdConsent({ client }: { client: string }) {
   const answer = useSyncExternalStore(subscribe, read, () => "hayir" as Answer);
@@ -82,7 +92,8 @@ export function AdConsent({ client }: { client: string }) {
   }, []);
 
   useEffect(() => {
-    if (answer === "evet" && !adFreePath(path)) loadAdSense(client);
+    personalise(answer);
+    if (!adFreePath(path)) loadAdSense(client);
   }, [answer, path, client]);
 
   const show = asking || (answer === null && greeted && !adFreePath(path));
@@ -91,8 +102,6 @@ export function AdConsent({ client }: { client: string }) {
   const choose = (a: "evet" | "hayir") => {
     save(a);
     setAsking(false);
-    // Turning ads off after they loaded needs a fresh page to drop Google's script.
-    if (a === "hayir" && loaded) window.location.reload();
   };
 
   return (
@@ -105,8 +114,8 @@ export function AdConsent({ client }: { client: string }) {
         Reklamlar ve çerezler
       </h2>
       <p className="mt-1 text-[13.5px] leading-snug text-muted-foreground">
-        Site ücretsiz kalsın diye Google reklamları gösteriyoruz. Google bunun için çerez kullanır ve reklamları ilgi alanlarınıza göre seçebilir. Kabul etmezseniz reklam gösterilmez,
-        site aynen çalışır. Kararınızı sayfanın altındaki “Reklam tercihleri” ile değiştirebilirsiniz.{" "}
+        Site ücretsiz kalsın diye Google reklamları gösteriyoruz. Google bunun için çerez kullanır ve reklamları ilgi alanlarınıza göre seçebilir. Reddederseniz reklamlar yine
+        gösterilir ama ilgi alanlarınıza göre seçilmez. Kararınızı sayfanın altındaki “Reklam tercihleri” ile değiştirebilirsiniz.{" "}
         <Link href="/gizlilik#reklam" className="font-medium text-primary underline-offset-4 hover:underline">
           Ayrıntılar
         </Link>

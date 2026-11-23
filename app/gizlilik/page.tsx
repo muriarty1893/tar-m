@@ -60,9 +60,10 @@ export default function PrivacyPage() {
           </li>
           {ADSENSE_CLIENT && (
             <li id="reklam">
-              Reklamlar (yalnızca izin verirseniz): sitede Google AdSense reklamları gösterilir. İzin verdiğinizde Google; çerezler ve
-              benzeri teknolojilerle cihaz bilgilerinizi, IP adresinizi ve sitedeki gezinmenizi kullanarak reklam gösterir, ölçer ve
-              ilgi alanlarınıza göre seçebilir. İzin vermezseniz Google’ın reklam kodu yüklenmez. Kararınızı her sayfanın altındaki
+              Reklamlar: sitede Google AdSense reklamları gösterilir. Google; çerezler ve benzeri teknolojilerle cihaz bilgilerinizi,
+              IP adresinizi ve sitedeki gezinmenizi kullanarak reklam gösterir ve ölçer. İzin verirseniz reklamları ilgi alanlarınıza
+              göre de seçebilir. İzin vermezseniz reklamlar yine gösterilir, ancak kişiselleştirilmez; Google bu durumda da sıklık
+              sınırı, ölçüm ve kötüye kullanımı önleme için çerez kullanabilir. Kararınızı her sayfanın altındaki
               “Reklam tercihleri” bağlantısıyla değiştirebilirsiniz. Google’ın verileri nasıl kullandığı:{" "}
               <a href="https://policies.google.com/technologies/partner-sites?hl=tr" rel="noopener noreferrer" target="_blank">
                 policies.google.com
@@ -94,7 +95,7 @@ export default function PrivacyPage() {
           kayıtları Neon (veritabanı) ve ilan fotoğrafları Vercel Blob hizmetinde, Frankfurt (Almanya, AB) bölgesinde
           saklanır. [Yurt dışına aktarım için KVKK madde 9 kapsamındaki dayanak ve gerekli bildirimler hukuki inceleme ile
           netleştirilecektir.] Web sitesi Vercel Inc. altyapısında barındırılmaktadır.
-          {ADSENSE_CLIENT && " Reklam izni verdiyseniz reklamla ilgili veriler Google LLC (ABD) ve Google Ireland Ltd. tarafından işlenir."}
+          {ADSENSE_CLIENT && " Reklamla ilgili veriler Google LLC (ABD) ve Google Ireland Ltd. tarafından işlenir."}
         </p>
 
         <h2>6. Saklama süresi</h2>

@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useAdsAllowed } from "@/components/ads/AdConsent";
+import { useAdsShown } from "@/components/ads/AdConsent";
 import { ADSENSE_CLIENT, ADSENSE_SLOT } from "@/lib/ads";
 
 declare global {
   interface Window {
-    adsbygoogle?: unknown[];
+    adsbygoogle?: unknown[] & { requestNonPersonalizedAds?: 0 | 1 };
   }
 }
 
@@ -26,12 +26,12 @@ const SIZE = `.ad-serit{width:320px;height:100px}@media(min-width:768px){.ad-ser
 
 /**
  * One Google ad in a box the site sizes, so Google may only fill it with ads that fit. Nothing is
- * drawn until the visitor has accepted ads and the ad unit is set, and the strip hides itself when
+ * drawn on ad-free pages or until the ad unit is set, and the strip hides itself when
  * Google has no ad (data-ad-status="unfilled", AdSense Help 10762946). The label must be "Reklamlar"
  * or "Sponsorlu bağlantılar": AdSense allows no other heading above an ad.
  */
 export function AdStrip({ as = "div", colSpan = 1, className = "" }: Props) {
-  const allowed = useAdsAllowed();
+  const allowed = useAdsShown();
   const ins = useRef<HTMLModElement>(null);
 
   useEffect(() => {

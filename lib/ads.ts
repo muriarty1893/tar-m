@@ -1,7 +1,7 @@
 /**
  * Google AdSense, switched on by one setting: `NEXT_PUBLIC_ADSENSE_CLIENT` = the publisher id
  * ("ca-pub-1234567890123456", from AdSense → Account → Account information). Without it the site
- * shows no ads, no consent banner and no ads.txt. Ads load only after the visitor accepts (KVKK).
+ * shows no ads, no consent banner and no ads.txt. Ads load for everyone; only a visitor who accepts gets personalised ones.
  */
 
 const raw = (process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? "").trim();
