@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense, type ReactNode } from "react";
+import { Fragment, Suspense, type ReactNode } from "react";
 import {
   CaretRightIcon,
   ChatsCircleIcon,
@@ -19,10 +19,15 @@ import {
   WrenchIcon,
   XIcon,
 } from "@phosphor-icons/react/dist/ssr";
+import { AdStrip } from "@/components/ads/AdStrip";
 import { ListingCard } from "@/components/market/ListingCard";
 import { ListingRow } from "@/components/market/ListingRow";
 import { ListingTable } from "@/components/market/ListingTable";
-import { MarketFilterForm, MarketSearch, SortSelect } from "@/components/market/MarketControls";
+import {
+  MarketFilterForm,
+  MarketSearch,
+  SortSelect,
+} from "@/components/market/MarketControls";
 import { MarketPagination } from "@/components/market/MarketPagination";
 import { SafetyNote } from "@/components/market/SafetyNote";
 import { buttonVariants } from "@/components/ui/button";
@@ -40,12 +45,19 @@ import {
   type MarketQuery,
   type MarketView,
 } from "@/lib/market";
-import { PAGE_SIZE, listListings, marketSummary, type ListingCard as Card, type MarketSummary } from "@/lib/market-data";
+import {
+  PAGE_SIZE,
+  listListings,
+  marketSummary,
+  type ListingCard as Card,
+  type MarketSummary,
+} from "@/lib/market-data";
 import { requestNow } from "@/lib/now";
 
 export const metadata: Metadata = {
   title: "Pazar",
-  description: "Çiftçiden çiftçiye pazar: ürün, tohum ve gübre, el aletleri, ekipman ve araç ilanları. Satıcıyla site içinden mesajlaşın, teklif verin.",
+  description:
+    "Çiftçiden çiftçiye pazar: ürün, tohum ve gübre, el aletleri, ekipman ve araç ilanları. Satıcıyla site içinden mesajlaşın, teklif verin.",
 };
 
 /**
@@ -73,20 +85,34 @@ const CATEGORY_ICON: Record<Exclude<CategoryId, "tumu">, typeof PlantIcon> = {
   arac: TractorIcon,
 };
 
-const LISTING_CATEGORIES = CATEGORIES.filter((c) => c.id !== "tumu") as { id: Exclude<CategoryId, "tumu">; label: string }[];
+const LISTING_CATEGORIES = CATEGORIES.filter((c) => c.id !== "tumu") as {
+  id: Exclude<CategoryId, "tumu">;
+  label: string;
+}[];
 const count = (n: number) => n.toLocaleString("tr-TR");
 const FILTER_SHEET = "filtre-sayfasi";
 /** How many listings the showcase shows (5 rows of 7 on wide screens). */
 const SHOWCASE = 35;
 
-async function Market({ searchParams }: { searchParams: PageProps<"/pazar">["searchParams"] }) {
+async function Market({
+  searchParams,
+}: {
+  searchParams: PageProps<"/pazar">["searchParams"];
+}) {
   const sp = await searchParams;
   const query = parseMarketQuery(sp);
   // Nothing in the address at all: sahibinden's home page (the showcase), not the results.
   const showcase = Object.keys(sp).length === 0;
   const userId = await getUserId();
-  const [{ items, total }, summary, now] = await Promise.all([listListings(query, userId, showcase ? SHOWCASE : PAGE_SIZE), marketSummary(), requestNow()]);
-  const viewHref = (v: MarketView) => (userId || v === "tumu" ? marketHref(query, { gorunum: v }) : signInHref(marketHref(query, { gorunum: v })));
+  const [{ items, total }, summary, now] = await Promise.all([
+    listListings(query, userId, showcase ? SHOWCASE : PAGE_SIZE),
+    marketSummary(),
+    requestNow(),
+  ]);
+  const viewHref = (v: MarketView) =>
+    userId || v === "tumu"
+      ? marketHref(query, { gorunum: v })
+      : signInHref(marketHref(query, { gorunum: v }));
 
   return (
     <>
@@ -100,11 +126,17 @@ async function Market({ searchParams }: { searchParams: PageProps<"/pazar">["sea
             <MarketSearch query={query} />
           </div>
           <div className="flex shrink-0 gap-2 xl:ml-auto">
-            <Link href="/mesajlar" className={buttonVariants({ variant: "outline", size: "sm" })}>
+            <Link
+              href="/mesajlar"
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
               <ChatsCircleIcon aria-hidden="true" weight="duotone" />
               Mesajlar
             </Link>
-            <Link href="/pazar/ilan-ver" className={buttonVariants({ variant: "create", size: "sm" })}>
+            <Link
+              href="/pazar/ilan-ver"
+              className={buttonVariants({ variant: "create", size: "sm" })}
+            >
               <PlusIcon aria-hidden="true" weight="bold" />
               <span>
                 <span className="max-xl:hidden">Ücretsiz </span>İlan Ver
@@ -123,13 +155,30 @@ async function Market({ searchParams }: { searchParams: PageProps<"/pazar">["sea
                   </Link>
                 </li>
                 <Crumb>
-                  <Link href="/pazar" className="hover:underline" aria-current={showcase ? "page" : undefined}>
+                  <Link
+                    href="/pazar"
+                    className="hover:underline"
+                    aria-current={showcase ? "page" : undefined}
+                  >
                     Pazar
                   </Link>
                 </Crumb>
                 {query.kategori !== "tumu" && (
                   <Crumb>
-                    <Link href={marketHref(query, { kategori: query.kategori, q: "", il: "", fmin: null, fmax: null, tarih: 0, durum: "", foto: false })} className="hover:underline" aria-current="page">
+                    <Link
+                      href={marketHref(query, {
+                        kategori: query.kategori,
+                        q: "",
+                        il: "",
+                        fmin: null,
+                        fmax: null,
+                        tarih: 0,
+                        durum: "",
+                        foto: false,
+                      })}
+                      className="hover:underline"
+                      aria-current="page"
+                    >
                       {categoryLabel(query.kategori)}
                     </Link>
                   </Crumb>
@@ -158,8 +207,15 @@ async function Market({ searchParams }: { searchParams: PageProps<"/pazar">["sea
       </div>
 
       {sp.kaldirildi === "1" && (
-        <p role="status" className="mx-auto mt-3 flex max-w-6xl items-center gap-2 px-3 font-semibold xl:px-4">
-          <CheckCircleIcon aria-hidden="true" weight="fill" className="size-6 text-primary" />
+        <p
+          role="status"
+          className="mx-auto mt-3 flex max-w-6xl items-center gap-2 px-3 font-semibold xl:px-4"
+        >
+          <CheckCircleIcon
+            aria-hidden="true"
+            weight="fill"
+            className="size-6 text-primary"
+          />
           İlanınız kaldırıldı.
         </p>
       )}
@@ -167,7 +223,15 @@ async function Market({ searchParams }: { searchParams: PageProps<"/pazar">["sea
       {showcase ? (
         <Showcase items={items} summary={summary} />
       ) : (
-        <Results query={query} items={items} total={total} summary={summary} userId={userId} now={now} viewHref={viewHref} />
+        <Results
+          query={query}
+          items={items}
+          total={total}
+          summary={summary}
+          userId={userId}
+          now={now}
+          viewHref={viewHref}
+        />
       )}
     </>
   );
@@ -176,45 +240,82 @@ async function Market({ searchParams }: { searchParams: PageProps<"/pazar">["sea
 // ---------------------------------------------------------------- Home: the showcase
 
 /** sahibinden's home: quick date links and the category tree on the left, the showcase on the right. */
-function Showcase({ items, summary }: { items: Card[]; summary: MarketSummary }) {
+function Showcase({
+  items,
+  summary,
+}: {
+  items: Card[];
+  summary: MarketSummary;
+}) {
   const all = parseMarketQuery({});
   return (
     <div className="mx-auto max-w-6xl pb-4 xl:grid xl:grid-cols-[15rem_minmax(0,1fr)] xl:items-start xl:gap-6 xl:px-4 xl:py-4">
-      <aside aria-label="Kategoriler ve tarihler" className="max-xl:border-b max-xl:border-border max-xl:bg-card">
+      <aside
+        aria-label="Kategoriler ve tarihler"
+        className="max-xl:border-b max-xl:border-border max-xl:bg-card"
+      >
         <div className="flex items-center gap-2.5 border-b border-border px-3 py-2.5 text-[13.5px] xl:px-0 xl:pt-0">
-          <span aria-hidden="true" className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted-foreground/70 text-white">
+          <span
+            aria-hidden="true"
+            className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted-foreground/70 text-white"
+          >
             <ClockIcon weight="bold" className="size-4" />
           </span>
           <span className="flex flex-wrap items-center gap-1 text-primary">
-            <Link href={marketHref(all, { tarih: 1 })} className="hover:underline">
+            <Link
+              href={marketHref(all, { tarih: 1 })}
+              className="hover:underline"
+            >
               Son 24 Saat
             </Link>
             /
-            <Link href={marketHref(all, { tarih: 7 })} className="hover:underline">
+            <Link
+              href={marketHref(all, { tarih: 7 })}
+              className="hover:underline"
+            >
               1 Hafta
             </Link>
             /
-            <Link href={marketHref(all, { tarih: 30 })} className="hover:underline">
+            <Link
+              href={marketHref(all, { tarih: 30 })}
+              className="hover:underline"
+            >
               1 Ay
             </Link>
           </span>
         </div>
         <nav aria-label="Kategoriler" className="px-3 py-2.5 xl:px-0">
-          <h2 id="vitrin-kategori" className="flex items-center gap-2.5 text-[14px]">
-            <span aria-hidden="true" className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+          <h2
+            id="vitrin-kategori"
+            className="flex items-center gap-2.5 text-[14px]"
+          >
+            <span
+              aria-hidden="true"
+              className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
+            >
               <StorefrontIcon weight="fill" className="size-3.5" />
             </span>
-            <Link href={marketHref(all)} className="font-bold text-primary hover:underline">
+            <Link
+              href={marketHref(all)}
+              className="font-bold text-primary hover:underline"
+            >
               Pazar
             </Link>
-            <span className="text-[12px] text-muted-foreground">({count(summary.active)})</span>
+            <span className="text-[12px] text-muted-foreground">
+              ({count(summary.active)})
+            </span>
           </h2>
           <ul className="mt-1 space-y-0.5 pl-[2.125rem] max-xl:space-y-0">
             {LISTING_CATEGORIES.map((c) => (
               <li key={c.id}>
-                <Link href={marketHref(all, { kategori: c.id })} className="inline-flex min-h-8 items-center gap-1 text-[13.5px] text-primary hover:underline max-xl:min-h-10">
+                <Link
+                  href={marketHref(all, { kategori: c.id })}
+                  className="inline-flex min-h-8 items-center gap-1 text-[13.5px] text-primary hover:underline max-xl:min-h-10"
+                >
                   {c.label}
-                  <span className="text-[12px] text-muted-foreground">({count(summary.byCategory[c.id] ?? 0)})</span>
+                  <span className="text-[12px] text-muted-foreground">
+                    ({count(summary.byCategory[c.id] ?? 0)})
+                  </span>
                 </Link>
               </li>
             ))}
@@ -223,19 +324,28 @@ function Showcase({ items, summary }: { items: Card[]; summary: MarketSummary })
         <SafetyNote className="mx-3 mb-3 text-[12.5px] xl:mx-0 xl:mt-3" />
       </aside>
 
-      <section aria-labelledby="vitrin-baslik" className="px-3 pt-3 xl:px-0 xl:pt-0">
+      <section
+        aria-labelledby="vitrin-baslik"
+        className="px-3 pt-3 xl:px-0 xl:pt-0"
+      >
         <div className="flex items-baseline justify-between gap-3 border-b border-border pb-1.5">
           <h2 id="vitrin-baslik" className="text-[14px] font-semibold">
             Pazar Vitrini
           </h2>
-          <Link href={marketHref(all)} className="text-[13px] text-primary hover:underline">
+          <Link
+            href={marketHref(all)}
+            className="text-[13px] text-primary hover:underline"
+          >
             Tüm ilanları göster
           </Link>
         </div>
         {items.length === 0 ? (
           <p className="py-8 text-center text-muted-foreground">
             Pazar yeni açıldı, henüz ilan yok.{" "}
-            <Link href="/pazar/ilan-ver" className="font-semibold text-primary underline">
+            <Link
+              href="/pazar/ilan-ver"
+              className="font-semibold text-primary underline"
+            >
               İlk ilanı siz verin
             </Link>
             .
@@ -244,11 +354,23 @@ function Showcase({ items, summary }: { items: Card[]; summary: MarketSummary })
           <ul className="mt-3 grid grid-cols-3 gap-x-2.5 gap-y-3 sm:grid-cols-5 xl:grid-cols-7 xl:gap-x-4">
             {items.map((l) => (
               <li key={l.id}>
-                <Link href={`/pazar/ilan/${l.id}`} className="group block" title={l.title}>
+                <Link
+                  href={`/pazar/ilan/${l.id}`}
+                  className="group block"
+                  title={l.title}
+                >
                   <span className="relative block aspect-[4/3] overflow-hidden border border-border bg-card">
-                    <Image src={l.photo} alt="" fill sizes="(min-width: 1280px) 112px, (min-width: 640px) 20vw, 33vw" className="object-cover" />
+                    <Image
+                      src={l.photo}
+                      alt=""
+                      fill
+                      sizes="(min-width: 1280px) 112px, (min-width: 640px) 20vw, 33vw"
+                      className="object-cover"
+                    />
                   </span>
-                  <span className="mt-1 block truncate text-[12px] group-hover:text-primary group-hover:underline">{l.title}</span>
+                  <span className="mt-1 block truncate text-[12px] group-hover:text-primary group-hover:underline">
+                    {l.title}
+                  </span>
                 </Link>
               </li>
             ))}
@@ -279,13 +401,29 @@ function Results({
   viewHref: (v: MarketView) => string;
 }) {
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const sideFilters = [query.il, query.fmin || query.fmax, query.tarih, query.durum, query.foto].filter(Boolean).length;
-  const tab = query.gorunum === "favoriler" ? "Favori İlanlarım" : query.gorunum === "ilanlarim" ? "İlanlarım" : "Tümü";
+  // One ad strip, after the 5th listing (or after the last, on a short page).
+  const adAfter = Math.min(5, items.length) - 1;
+  const sideFilters = [
+    query.il,
+    query.fmin || query.fmax,
+    query.tarih,
+    query.durum,
+    query.foto,
+  ].filter(Boolean).length;
+  const tab =
+    query.gorunum === "favoriler"
+      ? "Favori İlanlarım"
+      : query.gorunum === "ilanlarim"
+        ? "İlanlarım"
+        : "Tümü";
 
   return (
     <div className="mx-auto max-w-6xl pb-3 xl:grid xl:grid-cols-[13.5rem_minmax(0,1fr)] xl:items-start xl:gap-4 xl:px-4 xl:py-3">
       {/* ------------------------------------------------ Wide screens: the left column */}
-      <aside aria-label="Kategoriler ve filtreler" className="space-y-3 max-xl:hidden">
+      <aside
+        aria-label="Kategoriler ve filtreler"
+        className="space-y-3 max-xl:hidden"
+      >
         <CategoryTree query={query} summary={summary} />
         <MarketFilterForm query={query} id="yan" />
       </aside>
@@ -295,9 +433,19 @@ function Results({
         {/* Phones, in a category: where you are, and the way back to all. */}
         {query.kategori !== "tumu" && (
           <div className="flex items-center gap-2 px-3 xl:hidden">
-            <SquaresFourIcon aria-hidden="true" weight="duotone" className="size-5 text-primary" />
-            <span className="font-semibold">{categoryLabel(query.kategori)}</span>
-            <Link href={marketHref(query, { kategori: "tumu" })} aria-label="Kategoriyi kaldır" className="ml-auto inline-flex size-10 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground">
+            <SquaresFourIcon
+              aria-hidden="true"
+              weight="duotone"
+              className="size-5 text-primary"
+            />
+            <span className="font-semibold">
+              {categoryLabel(query.kategori)}
+            </span>
+            <Link
+              href={marketHref(query, { kategori: "tumu" })}
+              aria-label="Kategoriyi kaldır"
+              className="ml-auto inline-flex size-10 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground"
+            >
               <XIcon aria-hidden="true" weight="bold" className="size-5" />
             </Link>
           </div>
@@ -305,14 +453,31 @@ function Results({
 
         {/* Phones: sahibinden's "Filtrele | Sırala" bar; Filtrele opens a full-screen sheet. */}
         <div className="grid grid-cols-2 gap-2 px-3 xl:hidden">
-          <button type="button" popoverTarget={FILTER_SHEET} className="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-md border border-input bg-card font-semibold">
-            <FunnelIcon aria-hidden="true" weight="duotone" className="size-5 text-primary" />
+          <button
+            type="button"
+            popoverTarget={FILTER_SHEET}
+            className="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-md border border-input bg-card font-semibold"
+          >
+            <FunnelIcon
+              aria-hidden="true"
+              weight="duotone"
+              className="size-5 text-primary"
+            />
             Filtrele
-            {sideFilters > 0 && <span className="rounded bg-primary px-1.5 text-[12px] font-bold leading-5 text-primary-foreground">{sideFilters}</span>}
+            {sideFilters > 0 && (
+              <span className="rounded bg-primary px-1.5 text-[12px] font-bold leading-5 text-primary-foreground">
+                {sideFilters}
+              </span>
+            )}
           </button>
           <SortSelect query={query} id="sirala-tel" />
         </div>
-        <div id={FILTER_SHEET} popover="auto" aria-label="Filtrele" className="fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none overflow-y-auto bg-background p-0 xl:hidden">
+        <div
+          id={FILTER_SHEET}
+          popover="auto"
+          aria-label="Filtrele"
+          className="fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none overflow-y-auto bg-background p-0 xl:hidden"
+        >
           <div className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-surface py-1 pl-4 pr-1">
             <h2 className="text-lg font-bold">Filtrele</h2>
             <button
@@ -341,7 +506,9 @@ function Results({
         <section aria-label="İlanlar">
           {/* The tab on the left; the layout switch and the order on the right. */}
           <div className="flex items-end justify-between gap-3 border-b border-border px-3 xl:px-0">
-            <span className="-mb-px inline-flex min-h-9 items-center rounded-t-sm border border-border border-b-card border-t-2 border-t-primary bg-card px-3 text-[13px] font-bold">{tab}</span>
+            <span className="-mb-px inline-flex min-h-9 items-center rounded-t-sm border border-border border-b-card border-t-2 border-t-primary bg-card px-3 text-[13px] font-bold">
+              {tab}
+            </span>
             {total > 0 && (
               <div className="flex items-center gap-2 pb-1.5 max-xl:hidden">
                 <LayoutToggle query={query} />
@@ -358,21 +525,41 @@ function Results({
             ) : (
               <>
                 <ul className="divide-y divide-border xl:hidden">
-                  {items.map((l) => (
-                    <ListingRow key={l.id} listing={l} now={now} mine={l.sellerId === userId} />
+                  {items.map((l, i) => (
+                    <Fragment key={l.id}>
+                      <ListingRow
+                        listing={l}
+                        now={now}
+                        mine={l.sellerId === userId}
+                      />
+                      {i === adAfter && <AdStrip as="li" />}
+                    </Fragment>
                   ))}
                 </ul>
                 <div className="max-xl:hidden">
                   {query.duzen === "galeri" ? (
                     <ul className="grid grid-cols-4 gap-3 p-3">
-                      {items.map((l) => (
-                        <li key={l.id}>
-                          <ListingCard listing={l} now={now} mine={l.sellerId === userId} />
-                        </li>
+                      {items.map((l, i) => (
+                        <Fragment key={l.id}>
+                          <li>
+                            <ListingCard
+                              listing={l}
+                              now={now}
+                              mine={l.sellerId === userId}
+                            />
+                          </li>
+                          {i === adAfter && (
+                            <AdStrip as="li" className="col-span-full" />
+                          )}
+                        </Fragment>
                       ))}
                     </ul>
                   ) : (
-                    <ListingTable items={items} userId={userId} />
+                    <ListingTable
+                      items={items}
+                      userId={userId}
+                      adAfter={adAfter}
+                    />
                   )}
                 </div>
               </>
@@ -387,10 +574,16 @@ function Results({
         <SafetyNote className="mx-3 text-sm xl:mx-0 xl:text-[13px]" />
         {/* Links for the views live in the strip on wide screens; phones get them here. */}
         <p className="flex justify-center gap-4 px-3 text-[14px] sm:hidden">
-          <Link href={viewHref("favoriler")} className="font-semibold text-primary">
+          <Link
+            href={viewHref("favoriler")}
+            className="font-semibold text-primary"
+          >
             Favori İlanlarım
           </Link>
-          <Link href={viewHref("ilanlarim")} className="font-semibold text-primary">
+          <Link
+            href={viewHref("ilanlarim")}
+            className="font-semibold text-primary"
+          >
             İlanlarım
           </Link>
         </p>
@@ -401,8 +594,11 @@ function Results({
 
 /** sahibinden's sentence: "traktör" araması için "Ürün" kategorisinde 28 sonuç bulundu. */
 function Found({ query, total }: { query: MarketQuery; total: number }) {
-  const n = <b className="font-bold text-[var(--create-hover)]">{count(total)}</b>;
-  if (query.gorunum === "favoriler") return <>Favori ilanlarınızda {n} ilan var.</>;
+  const n = (
+    <b className="font-bold text-[var(--create-hover)]">{count(total)}</b>
+  );
+  if (query.gorunum === "favoriler")
+    return <>Favori ilanlarınızda {n} ilan var.</>;
   if (query.gorunum === "ilanlarim") return <>{n} ilanınız var.</>;
   const q = query.q && (
     <>
@@ -411,7 +607,8 @@ function Found({ query, total }: { query: MarketQuery; total: number }) {
   );
   const cat = query.kategori !== "tumu" && (
     <>
-      “<b className="font-bold">{categoryLabel(query.kategori)}</b>” kategorisinde{" "}
+      “<b className="font-bold">{categoryLabel(query.kategori)}</b>”
+      kategorisinde{" "}
     </>
   );
   return (
@@ -426,18 +623,40 @@ function Found({ query, total }: { query: MarketQuery; total: number }) {
 
 /** The second line of that box: each chosen filter as a chip with ×, then "Tümünü Temizle". */
 function Chosen({ query }: { query: MarketQuery }) {
-  const chips: { name: string; label: string; off: Partial<MarketQuery> }[] = [];
-  if (query.q) chips.push({ name: "Arama Kelimesi", label: query.q, off: { q: "" } });
-  if (query.durum) chips.push({ name: "Durumu", label: conditionLabel(query.durum) ?? "", off: { durum: "" } });
+  const chips: { name: string; label: string; off: Partial<MarketQuery> }[] =
+    [];
+  if (query.q)
+    chips.push({ name: "Arama Kelimesi", label: query.q, off: { q: "" } });
+  if (query.durum)
+    chips.push({
+      name: "Durumu",
+      label: conditionLabel(query.durum) ?? "",
+      off: { durum: "" },
+    });
   if (query.il) chips.push({ name: "Adres", label: query.il, off: { il: "" } });
   if (query.fmin || query.fmax)
     chips.push({
       name: "Fiyat",
-      label: query.fmin && query.fmax ? `${formatTL(query.fmin)} - ${formatTL(query.fmax)}` : query.fmin ? `min ${formatTL(query.fmin)}` : `max ${formatTL(query.fmax ?? 0)}`,
+      label:
+        query.fmin && query.fmax
+          ? `${formatTL(query.fmin)} - ${formatTL(query.fmax)}`
+          : query.fmin
+            ? `min ${formatTL(query.fmin)}`
+            : `max ${formatTL(query.fmax ?? 0)}`,
       off: { fmin: null, fmax: null },
     });
-  if (query.tarih) chips.push({ name: "İlan Tarihi", label: DATE_FILTERS.find((d) => d.days === query.tarih)?.label ?? "", off: { tarih: 0 } });
-  if (query.foto) chips.push({ name: "Fotoğraf", label: "Fotoğraflı ilanlar", off: { foto: false } });
+  if (query.tarih)
+    chips.push({
+      name: "İlan Tarihi",
+      label: DATE_FILTERS.find((d) => d.days === query.tarih)?.label ?? "",
+      off: { tarih: 0 },
+    });
+  if (query.foto)
+    chips.push({
+      name: "Fotoğraf",
+      label: "Fotoğraflı ilanlar",
+      off: { foto: false },
+    });
   if (chips.length === 0) return null;
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-border py-2 text-[13px]">
@@ -450,13 +669,27 @@ function Chosen({ query }: { query: MarketQuery }) {
             className="inline-flex min-h-7 items-center gap-1 rounded-sm bg-muted px-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
           >
             {c.label}
-            <span aria-hidden="true" className="flex size-3.5 items-center justify-center rounded-[2px] bg-[var(--create-hover)] text-white">
+            <span
+              aria-hidden="true"
+              className="flex size-3.5 items-center justify-center rounded-[2px] bg-[var(--create-hover)] text-white"
+            >
               <XIcon weight="bold" className="size-2.5" />
             </span>
           </Link>
         </span>
       ))}
-      <Link href={marketHref(query, { q: "", il: "", fmin: null, fmax: null, tarih: 0, durum: "", foto: false })} className="text-[12.5px] text-primary hover:underline">
+      <Link
+        href={marketHref(query, {
+          q: "",
+          il: "",
+          fmin: null,
+          fmax: null,
+          tarih: 0,
+          durum: "",
+          foto: false,
+        })}
+        className="text-[12.5px] text-primary hover:underline"
+      >
         Tümünü Temizle
       </Link>
     </div>
@@ -466,28 +699,60 @@ function Chosen({ query }: { query: MarketQuery }) {
 function Crumb({ children }: { children: ReactNode }) {
   return (
     <li className="flex items-center gap-1">
-      <CaretRightIcon aria-hidden="true" weight="bold" className="size-2.5 text-muted-foreground" />
+      <CaretRightIcon
+        aria-hidden="true"
+        weight="bold"
+        className="size-2.5 text-muted-foreground"
+      />
       {children}
     </li>
   );
 }
 
 /** The results page's category tree: Pazar, and the categories under it with their counts. */
-function CategoryTree({ query, summary }: { query: MarketQuery; summary: MarketSummary }) {
-  const link = "inline-flex min-h-6 items-center gap-1 text-[13px] text-primary hover:underline aria-[current=page]:font-bold aria-[current=page]:text-foreground aria-[current=page]:no-underline";
+function CategoryTree({
+  query,
+  summary,
+}: {
+  query: MarketQuery;
+  summary: MarketSummary;
+}) {
+  const link =
+    "inline-flex min-h-6 items-center gap-1 text-[13px] text-primary hover:underline aria-[current=page]:font-bold aria-[current=page]:text-foreground aria-[current=page]:no-underline";
   return (
-    <nav aria-label="Kategoriler" className="rounded-sm border border-border bg-card px-3 py-2.5">
-      <Link href={marketHref(query, { kategori: "tumu" })} aria-current={query.kategori === "tumu" ? "page" : undefined} className={link}>
-        Pazar <span className="text-[11.5px] font-normal text-muted-foreground">({count(summary.active)})</span>
+    <nav
+      aria-label="Kategoriler"
+      className="rounded-sm border border-border bg-card px-3 py-2.5"
+    >
+      <Link
+        href={marketHref(query, { kategori: "tumu" })}
+        aria-current={query.kategori === "tumu" ? "page" : undefined}
+        className={link}
+      >
+        Pazar{" "}
+        <span className="text-[11.5px] font-normal text-muted-foreground">
+          ({count(summary.active)})
+        </span>
       </Link>
       <ul className="pl-3">
         {LISTING_CATEGORIES.map((c) => {
           const Icon = CATEGORY_ICON[c.id];
           return (
             <li key={c.id}>
-              <Link href={marketHref(query, { kategori: c.id })} aria-current={query.kategori === c.id ? "page" : undefined} className={link}>
-                <Icon aria-hidden="true" weight="duotone" className="size-3.5 shrink-0" />
-                {c.label} <span className="text-[11.5px] font-normal text-muted-foreground">({count(summary.byCategory[c.id] ?? 0)})</span>
+              <Link
+                href={marketHref(query, { kategori: c.id })}
+                aria-current={query.kategori === c.id ? "page" : undefined}
+                className={link}
+              >
+                <Icon
+                  aria-hidden="true"
+                  weight="duotone"
+                  className="size-3.5 shrink-0"
+                />
+                {c.label}{" "}
+                <span className="text-[11.5px] font-normal text-muted-foreground">
+                  ({count(summary.byCategory[c.id] ?? 0)})
+                </span>
               </Link>
             </li>
           );
@@ -524,8 +789,15 @@ function LayoutToggle({ query }: { query: MarketQuery }) {
   );
 }
 
-function EmptyState({ query, signedIn }: { query: MarketQuery; signedIn: boolean }) {
-  const filtered = query.q || query.kategori !== "tumu" || hasSideFilters(query);
+function EmptyState({
+  query,
+  signedIn,
+}: {
+  query: MarketQuery;
+  signedIn: boolean;
+}) {
+  const filtered =
+    query.q || query.kategori !== "tumu" || hasSideFilters(query);
   const text =
     query.gorunum === "favoriler"
       ? "Henüz favori ilanınız yok. Beğendiğiniz ilanlarda “Favorilerime Ekle”ye dokunun, burada toplansın."
@@ -536,11 +808,20 @@ function EmptyState({ query, signedIn }: { query: MarketQuery; signedIn: boolean
           : "Pazar yeni açıldı, henüz ilan yok. İlk ilanı siz verin!";
   return (
     <div className="rounded-sm border border-dashed border-input px-4 py-6 text-center">
-      <StorefrontIcon aria-hidden="true" weight="duotone" className="mx-auto size-9 text-primary" />
-      <p className="mx-auto mt-2 max-w-md text-[0.9375rem] text-muted-foreground">{text}</p>
+      <StorefrontIcon
+        aria-hidden="true"
+        weight="duotone"
+        className="mx-auto size-9 text-primary"
+      />
+      <p className="mx-auto mt-2 max-w-md text-[0.9375rem] text-muted-foreground">
+        {text}
+      </p>
       <div className="mt-4 flex flex-wrap justify-center gap-2">
         {filtered && query.gorunum === "tumu" && (
-          <Link href="/pazar?sirala=yeni" className={buttonVariants({ variant: "outline" })}>
+          <Link
+            href="/pazar?sirala=yeni"
+            className={buttonVariants({ variant: "outline" })}
+          >
             Filtreleri temizle
           </Link>
         )}
@@ -549,7 +830,14 @@ function EmptyState({ query, signedIn }: { query: MarketQuery; signedIn: boolean
             Pazara göz at
           </Link>
         ) : (
-          <Link href={signedIn ? "/pazar/ilan-ver" : "/giris?redirect_url=%2Fpazar%2Filan-ver"} className={buttonVariants({ variant: "create" })}>
+          <Link
+            href={
+              signedIn
+                ? "/pazar/ilan-ver"
+                : "/giris?redirect_url=%2Fpazar%2Filan-ver"
+            }
+            className={buttonVariants({ variant: "create" })}
+          >
             İlan Ver
           </Link>
         )}
@@ -576,7 +864,10 @@ function MarketSkeleton() {
         </div>
         <div className="grid grid-cols-3 gap-3 px-3 pt-3 sm:grid-cols-5 xl:grid-cols-7 xl:px-0 xl:pt-0">
           {Array.from({ length: 21 }, (_, i) => (
-            <div key={i} className="aspect-[4/3] bg-muted motion-safe:animate-pulse" />
+            <div
+              key={i}
+              className="aspect-[4/3] bg-muted motion-safe:animate-pulse"
+            />
           ))}
         </div>
       </div>

@@ -45,6 +45,13 @@ function save(answer: "evet" | "hayir") {
   window.dispatchEvent(new Event(CHANGED));
 }
 
+/** True once this visitor has accepted ads, on a page that may show them. False on the server. */
+export function useAdsAllowed(): boolean {
+  const answer = useSyncExternalStore(subscribe, read, () => "hayir" as Answer);
+  const path = usePathname();
+  return answer === "evet" && !adFreePath(path);
+}
+
 let loaded = false;
 function loadAdSense(client: string) {
   if (loaded || document.querySelector("script[data-adsense]")) return;
@@ -60,7 +67,7 @@ function loadAdSense(client: string) {
 /**
  * Asks once whether Google may show ads (with cookies), after the welcome question is answered, and
  * loads AdSense only on a yes. "Reddet" is as easy as "Kabul et"; the footer's "Reklam tercihleri"
- * asks again. AdSense's Auto ads then decide where the ads go.
+ * asks again. The ads then fill the site's own boxes (AdStrip), sized by us.
  */
 export function AdConsent({ client }: { client: string }) {
   const answer = useSyncExternalStore(subscribe, read, () => "hayir" as Answer);

@@ -9,6 +9,13 @@ const raw = (process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? "").trim();
 /** The publisher id as AdSense's tag wants it ("ca-pub-…"), or null when ads are off or it's malformed. */
 export const ADSENSE_CLIENT: string | null = /^ca-pub-\d{10,20}$/.test(raw) ? raw : null;
 
+/**
+ * The display ad unit that fills the site's ad strips (`NEXT_PUBLIC_ADSENSE_SLOT`, the number AdSense
+ * shows as data-ad-slot). Without it the strips stay hidden.
+ */
+const rawSlot = (process.env.NEXT_PUBLIC_ADSENSE_SLOT ?? "").trim();
+export const ADSENSE_SLOT: string | null = /^\d{6,14}$/.test(rawSlot) ? rawSlot : null;
+
 /** The line Google looks for at /ads.txt ("google.com, pub-…, DIRECT, f08c47fec0942fa0"). */
 export function adsTxt(client: string): string {
   return `google.com, ${client.replace(/^ca-/, "")}, DIRECT, f08c47fec0942fa0\n`;

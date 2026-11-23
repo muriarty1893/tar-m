@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { PlusIcon, StorefrontIcon } from "@phosphor-icons/react/dist/ssr";
 import { AdvertiseBox, SponsorBanner } from "@/components/home/AdSlots";
+import { AdStrip } from "@/components/ads/AdStrip";
 import { getSlots } from "@/lib/site-slots";
 import { BorsaWeather } from "@/components/home/BorsaWeather";
 import { NewsTicker } from "@/components/home/NewsTicker";
@@ -51,6 +52,7 @@ export function PortalHome() {
             <MarketBox />
           </Suspense>
         </div>
+        <AdStrip className="rounded-md border border-border bg-card" />
         <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start xl:gap-3">
           <Suspense fallback={<ForumSkeleton />}>
             <ForumBlock />

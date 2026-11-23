@@ -10,6 +10,7 @@ import { formatTrDate } from "@/lib/format";
 import { KIND_TONE } from "@/components/NewsCard";
 import { siteConfig } from "@/config/site";
 import { buttonVariants } from "@/components/ui/button";
+import { AdStrip } from "@/components/ads/AdStrip";
 import { ArrowLeftIcon, ArrowSquareOutIcon, CalendarBlankIcon } from "@phosphor-icons/react/dist/ssr";
 
 // Cache Components rejects an empty list, so a site with no articles yet still builds; the
@@ -111,6 +112,7 @@ async function ArticleBody({ params }: { params: PageProps<"/haberler/[slug]">["
             </div>
           )}
         </div>
+        <AdStrip className="mt-3 border-y border-border bg-card sm:rounded-md sm:border-x" />
       </div>
     </article>
   );

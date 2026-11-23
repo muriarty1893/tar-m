@@ -1,3 +1,4 @@
+import { AdStrip } from "@/components/ads/AdStrip";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -116,6 +117,8 @@ async function Topic({ params, searchParams }: { params: PageProps<"/forum/[id]"
           signInHref={signIn}
         />
       </header>
+
+      <AdStrip className="border-y border-border bg-card sm:rounded-md sm:border-x" />
 
       <section aria-labelledby="yanitlar" className="space-y-4 px-3 sm:px-0">
         <h2 id="yanitlar" className="flex items-center gap-2 text-xl font-bold sm:text-2xl">
