@@ -2,16 +2,17 @@
 
 import Form from "next/form";
 import Link from "next/link";
-import { useRef, type FormEvent } from "react";
-import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr";
+import { useRef, type FormEvent, type ReactNode } from "react";
+import { CaretDownIcon, MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr";
 import { provinces } from "@/data/provinces";
 import { DATE_FILTERS, SORTS, marketHref, marketParams, type MarketQuery } from "@/lib/market";
 import { SelectChevron, selectClass } from "@/components/forms/fields";
 
 /**
- * Pazar's controls, sahibinden-style: the search bar over the results, the filter box in the left
- * column (a "Filtrele" drawer on phones) and the order picker. All are plain GET forms to /pazar, so
- * they work without JavaScript; each keeps the filters it doesn't show as hidden fields.
+ * Pazar's controls, laid out as on sahibinden.com: the search bar in the top band, the filter
+ * sections in the left column (a full-screen "Filtrele" sheet on phones) and the order picker. All
+ * are plain GET forms to /pazar, so they work without JavaScript; each keeps the filters it doesn't
+ * show as hidden fields.
  */
 
 type Key = keyof MarketQuery;
@@ -32,26 +33,31 @@ function dropEmpty(e: FormEvent<HTMLFormElement>) {
   setTimeout(() => fields.forEach((el) => (el.disabled = false)));
 }
 
-/** The search bar over the results: words only; the category and filters carry over. */
+/** Inside the phone's filter sheet (a popover), close it as the results load. */
+function closeSheet(el: Element) {
+  (el.closest("[popover]") as HTMLElement | null)?.hidePopover?.();
+}
+
+/** The search bar: words or an ilan no; the category and filters carry over. */
 export function MarketSearch({ query }: { query: MarketQuery }) {
   return (
     <Form action="/pazar" role="search" aria-label="İlan ara" onSubmit={dropEmpty} className="flex">
       <Keep query={query} except={["q"]} />
       <label htmlFor="pazar-q" className="sr-only">
-        Ne arıyorsunuz?
+        Kelime veya ilan no ile ara
       </label>
       <input
         id="pazar-q"
         name="q"
         type="search"
         defaultValue={query.q}
-        placeholder="Kelime ile ara: traktör, buğday tohumu, pulverizatör…"
+        placeholder="Kelime veya ilan no ile ara"
         enterKeyHint="search"
-        className="min-h-11 min-w-0 flex-1 rounded-l-md border border-r-0 border-input bg-card px-3 text-base outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 xl:text-[15px]"
+        className="min-h-10 min-w-0 flex-1 rounded-l-md border border-r-0 border-input bg-card px-3 text-base outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 xl:text-[14px]"
       />
       <button
         type="submit"
-        className="inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-r-md bg-primary px-4 font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+        className="inline-flex min-h-10 shrink-0 cursor-pointer items-center gap-1.5 rounded-r-md bg-primary px-3.5 text-[14px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
       >
         <MagnifyingGlassIcon aria-hidden="true" weight="bold" className="size-5" />
         <span className="max-sm:sr-only">Ara</span>
@@ -60,26 +66,44 @@ export function MarketSearch({ query }: { query: MarketQuery }) {
   );
 }
 
-const fieldset = "border-b border-border px-3 py-2.5 [&>*:not(legend)]:clear-both";
-const legend = "float-left mb-1.5 w-full text-[13px] font-bold";
-const smallInput =
-  "min-h-10 w-full min-w-0 rounded-md border border-input bg-card px-2.5 text-[15px] tabular-nums outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20";
+/** One collapsible filter section, open at first, as sahibinden's left column. */
+function Section({ title, children, open = true }: { title: string; children: ReactNode; open?: boolean }) {
+  return (
+    <details open={open} className="group border-b border-border">
+      <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between px-3 text-[13px] font-bold transition-colors hover:bg-muted/50 xl:min-h-9 [&::-webkit-details-marker]:hidden">
+        {title}
+        <CaretDownIcon aria-hidden="true" weight="bold" className="size-3.5 text-muted-foreground transition-transform group-open:rotate-180" />
+      </summary>
+      <div className="px-3 pb-3">{children}</div>
+    </details>
+  );
+}
 
-/** The left column's filters: place, price range, date and "photos only". `id` keeps two copies apart. */
+const smallInput =
+  "min-h-10 w-full min-w-0 rounded-md border border-input bg-card px-2.5 text-[15px] tabular-nums outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 xl:min-h-9 xl:text-[13.5px]";
+const choice = "flex min-h-10 cursor-pointer items-center gap-2 text-[14px] xl:min-h-7 xl:text-[13px]";
+
+/** The left column's filters: Adres, Fiyat, İlan tarihi, Fotoğraf. `id` keeps two copies apart. */
 export function MarketFilterForm({ query, id }: { query: MarketQuery; id: string }) {
   const clear = marketHref(query, { il: "", fmin: null, fmax: null, tarih: 0, foto: false });
   return (
-    <Form action="/pazar" aria-label="Filtreler" onSubmit={dropEmpty}>
+    <Form
+      action="/pazar"
+      aria-label="Filtreler"
+      onSubmit={(e) => {
+        dropEmpty(e);
+        closeSheet(e.currentTarget);
+      }}
+    >
       <Keep query={query} except={["il", "fmin", "fmax", "tarih", "foto"]} />
 
-      <fieldset className={fieldset}>
-        <legend className={legend}>Adres</legend>
+      <Section title="Adres">
         <label htmlFor={`${id}-il`} className="sr-only">
           İl
         </label>
         <div className="relative">
-          <select id={`${id}-il`} name="il" defaultValue={query.il} className={`${selectClass} min-h-10 text-[15px]`}>
-            <option value="">Tüm Türkiye</option>
+          <select id={`${id}-il`} name="il" defaultValue={query.il} className={`${selectClass} min-h-10 text-[15px] xl:min-h-9 xl:text-[13.5px]`}>
+            <option value="">Tüm iller</option>
             {provinces.map((p) => (
               <option key={p.name} value={p.name}>
                 {p.name}
@@ -88,51 +112,48 @@ export function MarketFilterForm({ query, id }: { query: MarketQuery; id: string
           </select>
           <SelectChevron />
         </div>
-      </fieldset>
+      </Section>
 
-      <fieldset className={fieldset}>
-        <legend className={legend}>Fiyat (₺)</legend>
+      <Section title="Fiyat">
         <div className="flex items-center gap-1.5">
           <label htmlFor={`${id}-fmin`} className="sr-only">
-            En düşük fiyat
+            En düşük fiyat (TL)
           </label>
-          <input id={`${id}-fmin`} name="fmin" inputMode="numeric" autoComplete="off" defaultValue={query.fmin ?? ""} placeholder="min" className={smallInput} />
+          <input id={`${id}-fmin`} name="fmin" inputMode="numeric" autoComplete="off" defaultValue={query.fmin ?? ""} placeholder="min TL" className={smallInput} />
           <span aria-hidden="true" className="text-muted-foreground">
             –
           </span>
           <label htmlFor={`${id}-fmax`} className="sr-only">
-            En yüksek fiyat
+            En yüksek fiyat (TL)
           </label>
-          <input id={`${id}-fmax`} name="fmax" inputMode="numeric" autoComplete="off" defaultValue={query.fmax ?? ""} placeholder="max" className={smallInput} />
+          <input id={`${id}-fmax`} name="fmax" inputMode="numeric" autoComplete="off" defaultValue={query.fmax ?? ""} placeholder="max TL" className={smallInput} />
         </div>
-      </fieldset>
+      </Section>
 
-      <fieldset className={fieldset}>
-        <legend className={legend}>İlan tarihi</legend>
-        <ul className="space-y-0.5">
+      <Section title="İlan tarihi">
+        <fieldset>
+          <legend className="sr-only">İlan tarihi</legend>
           {[{ days: 0, label: "Tümü" }, ...DATE_FILTERS].map((d) => (
-            <li key={d.days}>
-              <label className="flex min-h-10 cursor-pointer items-center gap-2 text-[14px] xl:min-h-8">
-                <input type="radio" name="tarih" value={d.days || ""} defaultChecked={query.tarih === d.days} className="size-4 accent-[var(--primary)]" />
-                {d.label}
-              </label>
-            </li>
+            <label key={d.days} className={choice}>
+              <input type="radio" name="tarih" value={d.days || ""} defaultChecked={query.tarih === d.days} className="size-4 accent-[var(--primary)]" />
+              {d.label}
+            </label>
           ))}
-        </ul>
-      </fieldset>
+        </fieldset>
+      </Section>
 
-      <div className={fieldset}>
-        <label className="flex min-h-10 cursor-pointer items-center gap-2 text-[14px] xl:min-h-8">
+      <Section title="Fotoğraf">
+        <label className={choice}>
           <input type="checkbox" name="foto" value="1" defaultChecked={query.foto} className="size-4 accent-[var(--primary)]" />
-          Sadece fotoğraflı ilanlar
+          Fotoğraflı ilanlar
         </label>
-      </div>
+      </Section>
 
-      <div className="flex items-center gap-3 px-3 py-3">
-        <button type="submit" className="inline-flex min-h-10 flex-1 cursor-pointer items-center justify-center rounded-md bg-primary px-4 font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
+      <div className="flex items-center gap-3 p-3">
+        <button type="submit" className="inline-flex min-h-10 flex-1 cursor-pointer items-center justify-center rounded-md bg-primary px-4 font-semibold text-primary-foreground transition-colors hover:bg-primary/90 xl:min-h-9 xl:text-[14px]">
           Ara
         </button>
-        <Link href={clear} className="inline-flex min-h-10 items-center text-[14px] font-semibold text-primary hover:underline">
+        <Link href={clear} onClick={(e) => closeSheet(e.currentTarget)} className="inline-flex min-h-10 items-center text-[14px] font-semibold text-primary hover:underline xl:min-h-9 xl:text-[13px]">
           Temizle
         </Link>
       </div>
@@ -141,16 +162,22 @@ export function MarketFilterForm({ query, id }: { query: MarketQuery; id: string
 }
 
 /** "Sıralama" over the results; changes apply at once (a button does it without JavaScript). */
-export function SortSelect({ query, id }: { query: MarketQuery; id: string }) {
+export function SortSelect({ query, id, className = "" }: { query: MarketQuery; id: string; className?: string }) {
   const form = useRef<HTMLFormElement>(null);
   return (
-    <Form ref={form} action="/pazar" aria-label="Sıralama" className="flex items-center gap-2">
+    <Form ref={form} action="/pazar" aria-label="Sıralama" className={`flex items-center gap-2 ${className}`}>
       <Keep query={query} except={["sirala"]} />
-      <label htmlFor={id} className="text-[13px] text-muted-foreground max-sm:sr-only">
+      <label htmlFor={id} className="shrink-0 text-[13px] text-muted-foreground max-xl:sr-only">
         Sıralama
       </label>
-      <div className="relative">
-        <select id={id} name="sirala" defaultValue={query.sirala} onChange={() => form.current?.requestSubmit()} className={`${selectClass} min-h-10 py-1 text-[14px]`}>
+      <div className="relative min-w-0 flex-1">
+        <select
+          id={id}
+          name="sirala"
+          defaultValue={query.sirala}
+          onChange={() => form.current?.requestSubmit()}
+          className={`${selectClass} min-h-11 pl-2.5 pr-8 text-[14px] font-semibold xl:min-h-9 xl:py-1 xl:pl-3 xl:pr-9 xl:text-[13px] xl:font-normal`}
+        >
           {SORTS.map((s) => (
             <option key={s.id} value={s.id}>
               {s.label}

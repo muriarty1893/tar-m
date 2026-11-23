@@ -10,7 +10,7 @@ import { toggleFavorite } from "@/app/pazar/actions";
  * The heart on a listing. Signed out, it goes to sign-in and back. Signed in but not seen by the
  * server (an out-of-date session token), it renews the token and tries once more first.
  */
-export function FavoriteButton({ listingId, favorite, variant = "overlay" }: { listingId: string; favorite: boolean; variant?: "overlay" | "inline" }) {
+export function FavoriteButton({ listingId, favorite, variant = "overlay" }: { listingId: string; favorite: boolean; variant?: "overlay" | "inline" | "text" }) {
   const router = useRouter();
   const { isSignedIn, getToken } = useAuth();
   const [pending, start] = useTransition();
@@ -29,6 +29,21 @@ export function FavoriteButton({ listingId, favorite, variant = "overlay" }: { l
     });
 
   const label = shown ? "Favorilerden çıkar" : "Favorilere ekle";
+  if (variant === "text") {
+    // The listing's title bar, as sahibinden's "Favorilerime ekle".
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-pressed={shown}
+        disabled={pending}
+        className="inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-md px-2 text-[13px] font-semibold text-primary transition-colors hover:bg-secondary disabled:opacity-70"
+      >
+        <HeartIcon aria-hidden="true" weight={shown ? "fill" : "bold"} className={`size-4 ${shown ? "text-destructive" : ""}`} />
+        {shown ? "Favorilerimde" : "Favorilerime ekle"}
+      </button>
+    );
+  }
   if (variant === "inline") {
     return (
       <button

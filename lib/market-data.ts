@@ -2,7 +2,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { iso, isUuid, num, sql, str, type Row } from "./db";
 import { photoOf } from "./avatars";
-import { STOCK_PHOTOS, fold, type ListingCategory, type ListingStatus, type MarketQuery } from "./market";
+import { STOCK_PHOTOS, fold, isListingNo, type ListingCategory, type ListingStatus, type MarketQuery } from "./market";
 
 /** Reads for Pazar. Writes are server actions (app/pazar/actions.ts). */
 
@@ -76,8 +76,13 @@ export async function listListings(q: MarketQuery, userId: string | null): Promi
   if (q.fmax) where.push(`l.price <= ${p(q.fmax)}`);
   if (q.tarih) where.push(`l.created_at >= now() - make_interval(days => ${p(q.tarih)}::int)`);
   if (q.foto) where.push(`cardinality(coalesce(l.photos, '{}')) > 0`);
-  const words = fold(q.q).split(/\s+/).filter(Boolean).slice(0, 6);
-  for (const w of words) where.push(`l.search_text like ${p(`%${w.replace(/[\\%_]/g, (c) => `\\${c}`)}%`)}`);
+  if (isListingNo(q.q)) {
+    // An "İlan no" (the first 8 characters of the id, as the listing page shows it).
+    where.push(`l.id::text like ${p(`${q.q.toLowerCase()}%`)}`);
+  } else {
+    const words = fold(q.q).split(/\s+/).filter(Boolean).slice(0, 6);
+    for (const w of words) where.push(`l.search_text like ${p(`%${w.replace(/[\\%_]/g, (c) => `\\${c}`)}%`)}`);
+  }
 
   const order = q.sirala === "ucuz" ? "l.price asc, l.created_at desc" : q.sirala === "pahali" ? "l.price desc, l.created_at desc" : "l.created_at desc";
   const favorite = userId ? `exists (select 1 from favorites f where f.listing_id = l.id and f.user_id = ${me})` : "false";

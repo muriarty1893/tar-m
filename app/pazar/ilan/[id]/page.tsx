@@ -109,6 +109,8 @@ async function Listing({ params, searchParams }: Pick<PageProps<"/pazar/ilan/[id
           </h1>
           {l.status === "sold" && <span className="rounded bg-foreground px-2 py-0.5 text-[13px] font-semibold text-background">Satıldı</span>}
           {l.status === "removed" && <span className="rounded bg-destructive/10 px-2 py-0.5 text-[13px] font-semibold text-destructive">Kaldırıldı</span>}
+          {/* sahibinden's title bar: "Favorilerime ekle" on the right. */}
+          {contactable && <FavoriteButton listingId={l.id} favorite={l.favorite} variant="text" />}
         </header>
 
         <div className="grid gap-4 pb-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:p-3 xl:grid-cols-[minmax(0,1fr)_16.5rem_18.5rem]">
@@ -133,8 +135,8 @@ async function Listing({ params, searchParams }: Pick<PageProps<"/pazar/ilan/[id
             <dl className="mt-3 border-t border-border text-[14px]">
               {facts.map(([label, value]) => (
                 <div key={label} className="flex items-baseline justify-between gap-3 border-b border-border py-2">
-                  <dt className="text-muted-foreground">{label}</dt>
-                  <dd className={`text-right font-semibold ${label === "İlan no" ? "font-borsa-mono text-create" : ""}`}>{value}</dd>
+                  <dt className="font-semibold">{label}</dt>
+                  <dd className={`text-right ${label === "İlan no" ? "font-borsa-mono font-semibold text-create" : ""}`}>{value}</dd>
                 </div>
               ))}
             </dl>
@@ -176,11 +178,6 @@ async function Listing({ params, searchParams }: Pick<PageProps<"/pazar/ilan/[id
                     />
                   )}
                 </div>
-                {contactable && (
-                  <div className="mt-3 [&>button]:w-full [&>button]:justify-center">
-                    <FavoriteButton listingId={l.id} favorite={l.favorite} variant="inline" />
-                  </div>
-                )}
               </div>
             </section>
             {admin && !mine && (
@@ -188,31 +185,34 @@ async function Listing({ params, searchParams }: Pick<PageProps<"/pazar/ilan/[id
                 <OwnerActions listingId={l.id} status={l.status} admin />
               </div>
             )}
+            <SafetyNote className="text-[12.5px]" />
           </aside>
         </div>
       </article>
 
-      <div className="mt-3 grid gap-3 xl:grid-cols-[minmax(0,1fr)_18.5rem] xl:items-start">
-        {/* sahibinden's tabs under the listing; here one: the description. */}
-        <section aria-labelledby="aciklama" className="border-y border-border bg-card xl:rounded-md xl:border-x">
-          <div className="border-b border-border px-2">
-            <h2 id="aciklama" className="-mb-px inline-flex min-h-10 items-center border-b-2 border-primary px-3 text-[14px] font-bold text-primary">
-              İlan detayları
-            </h2>
-          </div>
-          <div className="px-3 py-3 xl:px-4 xl:py-4">
-            {l.description ? (
-              <p className="max-w-[70ch] whitespace-pre-line text-base leading-relaxed">{l.description}</p>
-            ) : (
-              <p className="text-muted-foreground">Satıcı açıklama eklemedi. Merak ettiklerinizi mesajla sorabilirsiniz.</p>
-            )}
-          </div>
-        </section>
-        <div className="space-y-3 px-3 xl:px-0">
-          <SafetyNote className="text-[13px]" />
-          {!mine && userId && <ReportListing listingId={l.id} reported={l.reported} />}
+      {/* sahibinden's tabs under the listing; here one: the description. */}
+      <section aria-labelledby="aciklama" className="mt-3 border-y border-border bg-card xl:rounded-md xl:border-x">
+        <div className="border-b border-border bg-muted/40 px-2 pt-1.5">
+          <h2
+            id="aciklama"
+            className="-mb-px inline-flex min-h-9 items-center rounded-t-md border border-border border-b-card bg-card px-4 text-[13.5px] font-bold"
+          >
+            İlan detayları
+          </h2>
         </div>
-      </div>
+        <div className="px-3 py-3 xl:px-4 xl:py-4">
+          {l.description ? (
+            <p className="max-w-[75ch] whitespace-pre-line text-base leading-relaxed">{l.description}</p>
+          ) : (
+            <p className="text-muted-foreground">Satıcı açıklama eklemedi. Merak ettiklerinizi mesajla sorabilirsiniz.</p>
+          )}
+        </div>
+      </section>
+      {!mine && userId && (
+        <div className="mt-3 px-3 xl:px-0">
+          <ReportListing listingId={l.id} reported={l.reported} />
+        </div>
+      )}
 
       {/* Phones: sahibinden's bar at the bottom, above the tab bar, so the seller is one tap away. */}
       {contactable && (

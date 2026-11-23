@@ -141,9 +141,9 @@ export type MarketSort = "yeni" | "ucuz" | "pahali";
 export type MarketView = "tumu" | "favoriler" | "ilanlarim";
 
 export const SORTS: { id: MarketSort; label: string }[] = [
-  { id: "yeni", label: "En yeni" },
-  { id: "ucuz", label: "En düşük fiyat" },
-  { id: "pahali", label: "En yüksek fiyat" },
+  { id: "yeni", label: "Tarih: Önce en yeni" },
+  { id: "ucuz", label: "Fiyat: Önce en düşük" },
+  { id: "pahali", label: "Fiyat: Önce en yüksek" },
 ];
 
 /** How the results are laid out on wide screens: sahibinden's table (default) or photo cards. */
@@ -227,6 +227,10 @@ export function marketHref(q: MarketQuery, change: Partial<MarketQuery> = {}) {
   const s = marketParams({ ...q, sayfa: 1, ...change }).toString();
   return s ? `/pazar?${s}` : "/pazar";
 }
+
+/** "D908CB5E": a listing's number, as its page shows it (the id's first 8 characters). */
+export const isListingNo = (s: string) => /^[0-9a-f]{8}$/i.test(s.trim());
+export const listingNo = (id: string) => id.slice(0, 8).toUpperCase();
 
 /** Whether any of the sidebar's filters (not the words or category) is set. */
 export const hasSideFilters = (q: MarketQuery) => Boolean(q.il || q.fmin || q.fmax || q.tarih || q.foto);
