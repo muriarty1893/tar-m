@@ -69,11 +69,6 @@ export const questionSchema = z.object({
 export type PartnerInput = z.input<typeof partnerSchema>;
 export type QuestionInput = z.input<typeof questionSchema>;
 
-/** Google Sheets runs cells starting with = + - @ as formulas; a leading ' stores them as text. */
-export function neutraliseFormula(value: string): string {
-  return /^[=+\-@]/.test(value) ? `'${value}` : value;
-}
-
 /** First message per field, for showing next to inputs. */
 export function fieldErrors(error: z.ZodError): Record<string, string> {
   const out: Record<string, string> = {};

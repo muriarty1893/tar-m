@@ -11,6 +11,7 @@ import { deleteArticleFor, moderateFor, saveArticleFor } from "@/lib/services/ad
 import { moderateForumFor } from "@/lib/services/forum";
 import { importNews } from "@/lib/services/news-import";
 import { logAdmin } from "@/lib/services/admin-log";
+import { deleteSubmission, setSubmissionRead } from "@/lib/services/submissions";
 import { deleteAccountFor } from "@/lib/services/account";
 import { isAdminAccount, setSuspendedFor, memberName } from "@/lib/services/members";
 import { setLockedFor, setPinnedFor } from "@/lib/services/forum";
@@ -29,6 +30,22 @@ import {
 async function adminId() {
   const userId = await getUserId();
   return userId && (await isAdmin(userId)) ? userId : null;
+}
+
+/** Başvurular: mark a form message read or unread. */
+export async function markSubmission(id: string, read: boolean) {
+  if (!(await adminId()) || !isUuid(id)) return;
+  await setSubmissionRead(id, read);
+  refresh();
+}
+
+/** Başvurular: delete a form message for good. */
+export async function removeSubmission(id: string) {
+  const userId = await adminId();
+  if (!userId || !isUuid(id)) return;
+  const who = await deleteSubmission(id);
+  if (who !== null) await logAdmin(userId, "Başvuruyu sildi", "başvuru", id, who);
+  refresh();
 }
 
 /** A moderator removes the reported listing, or dismisses its reports. Either way they are closed. */

@@ -18,8 +18,6 @@
 
    | Name | Value | Notes |
    |---|---|---|
-   | `APPS_SCRIPT_URL` | your Apps Script `/exec` URL | see [apps-script.md](apps-script.md) |
-   | `APPS_SCRIPT_SECRET` | the `SECRET` script property | must match exactly |
    | `NEXT_PUBLIC_SITE_URL` | e.g. `https://bereket-ai.vercel.app` | optional: if omitted, Vercel's production domain is used automatically |
 
 4. Deploy. You get a URL like `https://bereket-ai.vercel.app` (the exact name depends on availability; you can rename it under **Settings → Domains**).

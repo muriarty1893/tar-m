@@ -9,6 +9,18 @@ export const metadata: Metadata = {
 
 // DRAFT: written as a starting point only. A lawyer must review it before launch,
 // in particular the data-controller details and the cross-border transfer section.
+
+/**
+ * ÖRNEK BİLGİLER: the three values below are made up, to be replaced by hand with the real
+ * ones (listed in docs/placeholders.md). The company, address and terms are not real.
+ */
+const PLACEHOLDER = {
+  controller: "Çiftçi Destek Bilişim ve Tarım Hizmetleri Ltd. Şti., Yazır Mah. Bosna Hersek Cad. No: 12, 42250 Selçuklu / Konya",
+  transfer:
+    "Yurt dışına aktarım, KVKK madde 9 uyarınca hizmet sağlayıcılarla imzalanan standart sözleşmelere ve gerektiğinde açık rızanıza dayanılarak yapılır; standart sözleşmeler imzalandıktan sonra beş iş günü içinde Kişisel Verileri Koruma Kurumuna bildirilir.",
+  retention:
+    "Hesap bilgileri hesabınız açık kaldığı sürece; formlardan gönderdiğiniz mesajlar en fazla 2 yıl; güvenlik ve sunucu kayıtları en fazla 6 ay saklanır.",
+};
 export default function PrivacyPage() {
   return (
     <article className="mx-auto max-w-3xl px-3 py-3 sm:px-4 sm:py-6">
@@ -25,7 +37,7 @@ export default function PrivacyPage() {
 
         <h2>1. Veri sorumlusu</h2>
         <p>
-          Veri sorumlusu: [Şirket / kişi adı ve adresi eklenecek]. İletişim:{" "}
+          Veri sorumlusu: {PLACEHOLDER.controller}. İletişim:{" "}
           <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>
         </p>
 
@@ -90,18 +102,16 @@ export default function PrivacyPage() {
 
         <h2>5. Aktarım</h2>
         <p>
-          Form verileri, kayıt amacıyla Google LLC tarafından sağlanan Google E-Tablolar hizmetinde saklanır. Bu hizmetin
-          sunucuları yurt dışında bulunabilir. Hesap bilgileri Clerk Inc. (ABD) tarafından; ilan, mesaj, tarla ve takvim
-          kayıtları Neon (veritabanı) ve ilan fotoğrafları Vercel Blob hizmetinde, Frankfurt (Almanya, AB) bölgesinde
-          saklanır. [Yurt dışına aktarım için KVKK madde 9 kapsamındaki dayanak ve gerekli bildirimler hukuki inceleme ile
-          netleştirilecektir.] Web sitesi Vercel Inc. altyapısında barındırılmaktadır.
+          Hesap bilgileri Clerk Inc. (ABD) tarafından; formlardan gönderdikleriniz (iş birliği mesajları, sorular), ilan,
+          mesaj, tarla ve takvim kayıtları Neon (veritabanı) ve ilan fotoğrafları Vercel Blob hizmetinde, Frankfurt (Almanya, AB) bölgesinde
+          saklanır. {PLACEHOLDER.transfer} Web sitesi Vercel Inc. altyapısında barındırılmaktadır.
           {ADSENSE_CLIENT && " Reklamla ilgili veriler Google LLC (ABD) ve Google Ireland Ltd. tarafından işlenir."}
         </p>
 
         <h2>6. Saklama süresi</h2>
         <p>
           Verileriniz, işleme amacı sona erene kadar veya rızanızı geri çekene kadar saklanır; ardından silinir ya da
-          anonim hâle getirilir. [Kesin süre belirlenecektir.] Hesabınızı{" "}
+          anonim hâle getirilir. {PLACEHOLDER.retention} Hesabınızı{" "}
           <a href="/hesabim">Hesabım</a> sayfasından istediğiniz an silebilirsiniz: ilanlarınız, fotoğraflarınız,
           mesajlarınız, tarla ve takvim kayıtlarınız da kalıcı olarak silinir.
         </p>

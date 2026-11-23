@@ -6,7 +6,7 @@ import { iso, sql, str } from "@/lib/db";
  * after the action succeeds; a failed write is logged and never undoes or blocks the action itself.
  */
 
-export type AdminTarget = "konu" | "yanıt" | "ilan" | "haber" | "kategori" | "üye" | "reklam" | "haber-kaynakları";
+export type AdminTarget = "konu" | "yanıt" | "ilan" | "haber" | "kategori" | "üye" | "reklam" | "haber-kaynakları" | "başvuru";
 
 export async function logAdmin(adminId: string, action: string, targetType: AdminTarget, targetId: string | null, summary = "") {
   try {

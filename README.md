@@ -7,7 +7,7 @@ Built with Next.js 16 (App Router, Cache Components) and Tailwind CSS 4. Deploye
 ## Docs
 
 - [docs/deploy.md](docs/deploy.md): Vercel setup, domain, and the pre-launch checklist
-- [docs/apps-script.md](docs/apps-script.md): connecting the forms to Google Sheets
+- Form messages (İş birliği, "Sorunuz mu var?", "Bizi nereden duydunuz?") are saved in the database and read in Yönetim → Başvurular
 - [docs/placeholders.md](docs/placeholders.md): everything to replace before launch
 - [docs/3d-model.md](docs/3d-model.md): the 3D phone showcase and its model credit
 - [docs/superpowers/specs/](docs/superpowers/specs/): the design spec

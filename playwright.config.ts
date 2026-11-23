@@ -25,7 +25,6 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,
     env: {
-      APPS_SCRIPT_URL: "http://localhost:9/not-used-in-e2e",
       NEXT_PUBLIC_SITE_URL: `http://localhost:${PORT}`,
     },
   },

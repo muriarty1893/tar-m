@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { FlagIcon, NewspaperIcon, PlusIcon, StorefrontIcon, UsersIcon } from "@phosphor-icons/react/dist/ssr";
+import { EnvelopeSimpleIcon, FlagIcon, NewspaperIcon, PlusIcon, StorefrontIcon, UsersIcon } from "@phosphor-icons/react/dist/ssr";
 import { AdminShell, AdminSkeleton } from "@/components/admin/AdminShell";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { buttonVariants } from "@/components/ui/button";
@@ -37,6 +37,7 @@ async function Overview() {
   const counts = await adminCounts();
   const articles = (await listAllArticles()).slice(0, 5);
   const stats = [
+    { label: "Okunmamış başvuru", value: counts.unread, href: "/yonetim/basvurular", Icon: EnvelopeSimpleIcon },
     { label: "Yayındaki haber", value: counts.published, href: "/yonetim/haberler", Icon: NewspaperIcon },
     { label: "Taslak", value: counts.drafts, href: "/yonetim/haberler", Icon: NewspaperIcon },
     { label: "Şikâyet edilen ilan", value: counts.reports, href: "/yonetim/sikayetler", Icon: FlagIcon },
@@ -47,7 +48,7 @@ async function Overview() {
 
   return (
     <div className="space-y-3 sm:space-y-6">
-      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
         {stats.map(({ label, value, href, Icon }) => {
           const inner = (
             <>

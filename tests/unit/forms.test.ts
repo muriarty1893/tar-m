@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { partnerSchema, questionSchema, neutraliseFormula } from "@/lib/forms";
+import { partnerSchema, questionSchema } from "@/lib/forms";
 
 const partner = (over: Record<string, unknown> = {}) => ({
   name: "Mehmet Demir",
@@ -48,20 +48,6 @@ describe("partnerSchema", () => {
     expect(partnerSchema.safeParse(partner({ phone: "call me" })).success).toBe(false);
   });
 });
-
-describe("neutraliseFormula", () => {
-  it("prefixes values that a spreadsheet would run as a formula", () => {
-    expect(neutraliseFormula("=HYPERLINK(\"x\")")).toBe("'=HYPERLINK(\"x\")");
-    expect(neutraliseFormula("+90 532")).toBe("'+90 532");
-    expect(neutraliseFormula("-1")).toBe("'-1");
-    expect(neutraliseFormula("@foo")).toBe("'@foo");
-  });
-
-  it("leaves normal text alone", () => {
-    expect(neutraliseFormula("Konya")).toBe("Konya");
-  });
-});
-
 const question = (over: Record<string, unknown> = {}) => ({
   name: "Hasan Kaya",
   email: "hasan@example.com",

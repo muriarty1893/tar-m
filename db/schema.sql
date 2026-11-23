@@ -324,3 +324,13 @@ create table if not exists admin_log (
   created_at  timestamptz not null default now()
 );
 create index if not exists admin_log_created_idx on admin_log (created_at desc);
+-- Messages from the site's forms ('partner': İş birliği, 'question': "Sorunuz mu var?") and answers
+-- to the first-visit "Bizi nereden duydunuz?" question ('source'). Read in Yönetim → Başvurular.
+create table if not exists submissions (
+  id         uuid primary key default gen_random_uuid(),
+  kind       text not null check (kind in ('partner', 'question', 'source')),
+  data       jsonb not null,
+  created_at timestamptz not null default now(),
+  read_at    timestamptz
+);
+create index if not exists submissions_kind_created_idx on submissions (kind, created_at desc);

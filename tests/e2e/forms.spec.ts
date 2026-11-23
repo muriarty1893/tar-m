@@ -62,8 +62,9 @@ test("rate-limited submission explains to wait instead of a generic error", asyn
   await expect(soru(page).getByLabel("E-posta", { exact: true })).toHaveValue("sukru@example.com");
 });
 
-test("real API route with an unreachable Apps Script shows the error (no mocks)", async ({ page }) => {
-  // playwright.config points APPS_SCRIPT_URL at a closed port.
+test("when the message can't be saved, the error shows and the form keeps what was typed", async ({ page }) => {
+  // Mocked: the real route writes to the live database.
+  await page.route("**/api/question", (route) => route.fulfill({ status: 502, json: { ok: false, error: "upstream" } }));
   await page.goto("/sss#soru");
   await fillQuestion(page);
   await soru(page).getByRole("button", { name: "Soruyu gönder" }).click();

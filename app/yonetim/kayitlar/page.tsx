@@ -19,6 +19,7 @@ const TYPE_LABEL: Record<AdminLogEntry["targetType"], string> = {
   üye: "Üye",
   reklam: "Reklam",
   "haber-kaynakları": "Haber kaynakları",
+  başvuru: "Başvuru",
 };
 
 /** Where an entry's subject can still be opened; nothing for things that were deleted. */
